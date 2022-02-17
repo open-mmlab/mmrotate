@@ -5,7 +5,7 @@
 - PyTorch 1.6+
 - CUDA 9.2+
 - GCC 5+
-- [mmcv](https://mmcv.readthedocs.io/en/latest/#installation) 1.4.4+
+- [mmcv](https://mmcv.readthedocs.io/en/latest/#installation) 1.4.5+
 - [mmdet](https://mmdetection.readthedocs.io/en/latest/#installation) 2.19.0+
 
 
@@ -13,7 +13,7 @@ MMRotate 和 MMCV, MMDet 版本兼容性如下所示，需要安装正确的版�
 
 | MMRotate 版本   |    MMCV 版本   |      MMDetection 版本     |
 |:-------------------:|:-----------------:|:---------------------------------:|
-| master              | mmcv-full>=1.4.4 |      mmdet >= 2.19.0               |
+| master              | mmcv-full>=1.4.5 |      mmdet >= 2.19.0               |
 
 **注意：**如果已经安装了 mmcv，首先需要使用 `pip uninstall mmcv` 卸载已安装的 mmcv，如果同时安装了 mmcv 和 mmcv-full，将会报 `ModuleNotFoundError` 错误。
 

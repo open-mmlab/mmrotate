@@ -5,7 +5,7 @@
 - PyTorch 1.6+
 - CUDA 9.2+
 - GCC 5+
-- [mmcv](https://mmcv.readthedocs.io/en/latest/get_started/installation.html) 1.4.4+
+- [mmcv](https://mmcv.readthedocs.io/en/latest/get_started/installation.html) 1.4.5+
 - [mmdet](https://mmdetection.readthedocs.io/en/latest/get_started.html#installation) 2.19.0+
 
 
@@ -13,7 +13,7 @@ Compatible MMCV, MMClassification and MMDetection versions are shown as below. P
 
 | MMRotate version   |    MMCV version   |      MMDetection version     |
 |:-------------------:|:-----------------:|:---------------------------------:|
-| master              | mmcv-full>=1.4.4 |      mmdet >= 2.19.0              |
+| master              | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
 
 **Note:** You need to run `pip uninstall mmcv` first if you have mmcv installed.
 If mmcv and mmcv-full are both installed, there will be `ModuleNotFoundError`.
