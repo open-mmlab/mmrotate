@@ -1,0 +1,10 @@
+e2cnn
+matplotlib
+mmcv
+mmdet
+numpy
+pycocotools; platform_system == "Linux"
+pycocotools-windows; platform_system == "Windows"
+six
+terminaltables
+torch

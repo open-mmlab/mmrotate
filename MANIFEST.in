@@ -1,0 +1,4 @@
+include requirements/*.txt
+include mmrotate/.mim/model-index.yml
+recursive-include mmrotate/.mim/configs *.py *.yml
+recursive-include mmrotate/.mim/tools *.py *.sh

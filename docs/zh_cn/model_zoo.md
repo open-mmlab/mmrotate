@@ -1,0 +1,16 @@
+## Benchmark and Model Zoo
+
+- [Rotated RetinaNet-OBB/HBB](../../configs/rotated_retinanet/README.md) (ICCV'2017)
+- [Rotated FasterRCNN-OBB](../../configs/rotated_faster_rcnn/README.md) (TPAMI'2017)
+- [Rotated RepPoints-OBB](../../configs/rotated_reppoints/README.md) (ICCV'2019)
+- [RoI Transformer](../../configs/roi_trans/README.md) (CVPR'2019)
+- [Gliding Vertex](../../configs/gliding_vertex/README.md) (TPAMI'2020)
+- [R<sup>3</sup>Det](../../configs/r3det/README.md) (AAAI'2021)
+- [S<sup>2</sup>A-Net](../../configs/s2anet/README.md) (TGRS'2021)
+- [ReDet](../../configs/redet/README.md) (CVPR'2021)
+- [Beyond Bounding-Box](../../configs/cfa/README.md) (CVPR'2021)
+- [Oriented R-CNN](../../configs/oriented_rcnn/README.md) (ICCV'2021)
+- [GWD](../../configs/gwd/README.md) (ICML'2021)
+- [KLD](../../configs/kld/README.md) (NeurIPS'2021)
+- [KFIoU](../../configs/kfiou/README.md) (arxiv)
+- [G-Rep](../../configs/g_reppoints/README.md) (stay tuned)
