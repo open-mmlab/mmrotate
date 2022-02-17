@@ -12,5 +12,6 @@
 - [Oriented R-CNN](../../configs/oriented_rcnn/README.md) (ICCV'2021)
 - [GWD](../../configs/gwd/README.md) (ICML'2021)
 - [KLD](../../configs/kld/README.md) (NeurIPS'2021)
+- [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
 - [KFIoU](../../configs/kfiou/README.md) (arxiv)
 - [G-Rep](../../configs/g_reppoints/README.md) (stay tuned)

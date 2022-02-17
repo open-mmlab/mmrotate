@@ -6,7 +6,7 @@
 
 English | [简体中文](README_zh-CN.md)
 
-# MMRotate: OpenMMlab Rotating Object Detection Toolkit
+# MMRotate: OpenMMLab Rotated Object Detection Toolkit
 
 [![Documentation](https://readthedocs.org/projects/mmrotate/badge/?version=latest)](https://mmrotate.readthedocs.io/en/latest/?badge=latest)
 [![actions](https://github.com/open-mmlab/mmrotate/workflows/build/badge.svg)](https://github.com/open-mmlab/mmrotate/actions)
@@ -63,7 +63,7 @@ Supported algorithms:
 - [x] [Oriented R-CNN](configs/oriented_rcnn/README.md) (ICCV'2021)
 - [x] [GWD](configs/gwd/README.md) (ICML'2021)
 - [x] [KLD](configs/kld/README.md) (NeurIPS'2021)
-- [x] [SASM](configs/sasm_reppoints/README.md) (AAAI2022)
+- [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
 - [x] [KFIoU](configs/kfiou/README.md) (arXiv)
 - [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
 </details>
@@ -96,8 +96,8 @@ If you find this project useful in your research, please consider cite:
 
 ```bibtex
 @article{mmrotate2022,
-    title={MMRotate: A rotation detection benchmark using PyTorch},
-    author={Zhou, Yue and Yang, Xue and Zhang, Gefan},
+    title={MMRotate: A Rotation Detection Benchmark using PyTorch},
+    author={Zhou, Yue and Yang, Xue and Zhang, Gefan and et al.},
     journal= {arXiv preprint arXiv:xxxx.xxxx},
     year={2022}
 }

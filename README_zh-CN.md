@@ -2,7 +2,7 @@
   <img src="resources/mmrotate-logo.png" width="500px"/>
 </div>
 
-## Introduction
+## 介绍
 
 [English](README.md) | 简体中文
 
@@ -61,7 +61,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 - [x] [Oriented R-CNN](configs/oriented_rcnn/README.md) (ICCV'2021)
 - [x] [GWD](configs/gwd/README.md) (ICML'2021)
 - [x] [KLD](configs/kld/README.md) (NeurIPS'2021)
-- [x] [SASM](configs/sasm_reppoints/README.md) (AAAI2022)
+- [x] [SASM](configs/sasm_reppoints/README.md) (AAAI‘2022)
 - [x] [KFIoU](configs/kfiou/README.md) (arXiv)
 - [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
 </details>
@@ -103,8 +103,8 @@ MMRotate 是一款由不同学校和公司共同贡献的开源项目。我们�
 
 ```bibtex
 @article{mmrotate2022,
-    title={MMRotate: A rotation detection benchmark using PyTorch},
-    author={Zhou, Yue and Yang, Xue and Zhang, Gefan},
+    title={MMRotate: A Rotation Detection Benchmark using PyTorch},
+    author={Zhou, Yue and Yang, Xue and Zhang, Gefan and et al.},
     journal= {arXiv preprint arXiv:xxxx.xxxx},
     year={2022}
 }
