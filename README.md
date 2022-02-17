@@ -75,20 +75,20 @@ Please refer to [model_zoo](docs/en/model_zoo.md) for more details.
 
 ## Installation & Dataset Preparation
 
-Please refer to [install.md](docs/install.md) for installation of mmrotate and [data preparation](tools/data/README.md) for dataset preparation.
+Please refer to [install.md](docs/en/install.md) for installation of mmrotate and [data preparation](tools/data/README.md) for dataset preparation.
 
 ## Getting Started
 
-If you are new of rotation detection, you can start with [learn the basics](docs/intro.md).
-If you are familiar with it, check out [getting_started.md](docs/get_started.md) for the basic usage of mmrotate.
+If you are new of rotation detection, you can start with [learn the basics](docs/en/intro.md).
+If you are familiar with it, check out [getting_started.md](docs/en/get_started.md) for the basic usage of mmrotate.
 
 
 Refer to the below tutorials to dive deeper:
 
-- [Overview](docs/overview.md)
-- [Config](docs/customize_config.md)
-- [Customize Dataset](docs/customize_dataset.md)
-- [Customize Model](docs/customize_models.md)
+- [Learn the Basics](docs/en/intro.md)
+- [Config](docs/en/tutorials/customize_config.md)
+- [Customize Dataset](docs/en/tutorials/customize_dataset.md)
+- [Customize Model](docs/en/tutorials/customize_models.md)
 
 ## Citation
 

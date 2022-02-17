@@ -44,8 +44,6 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## 基准测试和模型库
 
-测试结果和模型可以在[模型库](docs/zh_cn/model_zoo.md)中找到。
-
 已支持的算法：
 
 <details open>
@@ -68,24 +66,24 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 - [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
 </details>
 
-请点击[模型库](docs/model_zoo.md)查看更多关于上述算法的详细信息。
+请点击[模型库](docs/zh_cn/model_zoo.md)查看更多关于上述算法的详细信息。
 
 ## 更新记录
 
 ## 安装与准备数据集
 
-请参考[安装文档](docs/install.md)进行安装和参考[数据准备](tools/data/README.md)准备数据集。
+请参考[安装文档](docs/zh_cn/install.md)进行安装和参考[数据准备](tools/data/README.md)准备数据集。
 
 ## 快速入门
-如果初次了解旋转框检测，你可以从[基础介绍](docs/intro.md)开始了解旋转框检测的基本概念和 MMRotate 的框架。
-如果对旋转框检测很熟悉，请参考[使用教程](docs/get_started.md)获取 MMRotate 的基本用法。
+如果初次了解旋转框检测，你可以从[基础介绍](docs/zh_cn/intro.md)开始了解旋转框检测的基本概念和 MMRotate 的框架。
+如果对旋转框检测很熟悉，请参考[使用教程](docs/zh_cn/get_started.md)获取 MMRotate 的基本用法。
 
 MMRotate 也提供了其他更详细的教程，包括：
 
-- [概览](docs/detection/overview.md)
-- [配置文件](docs/detection/customize_config.md)
-- [添加数据集](docs/detection/customize_dataset.md)
-- [添加新模型](docs/detection/customize_models.md)。
+- [学习基础知识](docs/zh_cn/intro.md)
+- [配置文件](docs/zh_cn/tutorials/customize_config.md)
+- [添加数据集](docs/zh_cn/tutorials/customize_dataset.md)
+- [添加新模型](docs/zh_cn/tutorials/customize_models.md)。
 
 
 ## 贡献指南
@@ -105,7 +103,7 @@ MMRotate 是一款由不同学校和公司共同贡献的开源项目。我们�
 
 ```bibtex
 @article{mmrotate2022,
-    title={MMRotate:  A Comprehensive Toolbox for Rotation Detection},
+    title={MMRotate: A rotation detection benchmark using pytorch},
     author={Zhou, Yue and Yang, Xue and Zhang, Gefan},
     journal= {arXiv preprint arXiv:xxxx.xxxx},
     year={2022}
