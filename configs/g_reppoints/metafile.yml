@@ -1,0 +1,27 @@
+Collections:
+- Name: g_reppoints
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: None
+    Title: 'G-Rep: Gaussian Representation for Arbitrary-Oriented Object Detection'
+  README: configs/g_reppoints/README.md
+
+Models:
+  - Name: g_reppoints_r50_fpn_1x_dota_le135
+    In Collection: g_reppoints
+    Config: configs/g_reppoints/g_reppoints_r50_fpn_1x_dota_le135.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.49
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/g_reppoints/g_reppoints_r50_fpn_1x_dota_le135/g_reppoints_r50_fpn_1x_dota_le135-b840eed7.pth

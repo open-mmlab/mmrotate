@@ -1,0 +1,63 @@
+Collections:
+- Name: kfiou
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/2101.11952.pdf
+    Title: 'The KFIoU Loss for Rotated Object Detection'
+  README: configs/kfiou/README.md
+
+Models:
+  - Name: rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le90
+    In Collection: kfiou
+    Config: configs/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.60
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le90/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le90-03e02f75.pth
+
+  - Name: rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc
+    In Collection: kfiou
+    Config: configs/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.76
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc-c00be030.pth
+
+  - Name: rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135
+    In Collection: kfiou
+    Config: configs/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.77
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135-0eaa4156.pth
+
+  - Name: r3det_kfiou_ln_r50_fpn_1x_dota_oc
+    In Collection: kfiou
+    Config: configs/kfiou/r3det_kfiou_ln_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 72.68
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kfiou/r3det_kfiou_ln_r50_fpn_1x_dota_oc/r3det_kfiou_ln_r50_fpn_1x_dota_oc-8e7f049d.pth

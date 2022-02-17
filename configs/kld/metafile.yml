@@ -1,0 +1,51 @@
+Collections:
+- Name: kld
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/2106.01883.pdf
+    Title: 'Learning High-Precision Bounding Box for Rotated Object Detection via Kullback-Leibler Divergence'
+  README: configs/kld/README.md
+
+Models:
+  - Name: rotated_retinanet_hbb_kld_r50_fpn_1x_dota_oc
+    In Collection: kld
+    Config: configs/kld/rotated_retinanet_hbb_kld_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.94
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_hbb_kld_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_kld_r50_fpn_1x_dota_oc-49c1f937.pth
+
+  - Name: r3det_kld_r50_fpn_1x_dota_oc
+    In Collection: kld
+    Config: configs/kld/r3det_kld_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.83
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/r3det_kld_r50_fpn_1x_dota_oc/r3det_kld_r50_fpn_1x_dota_oc-31866226.pth
+
+  - Name: r3det_tiny_kld_r50_fpn_1x_dota_oc
+    In Collection: kld
+    Config: configs/kld/r3det_tiny_kld_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 72.76
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/r3det_tiny_kld_r50_fpn_1x_dota_oc/r3det_tiny_kld_r50_fpn_1x_dota_oc-589e142a.pth

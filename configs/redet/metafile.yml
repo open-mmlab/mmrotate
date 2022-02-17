@@ -1,0 +1,39 @@
+Collections:
+- Name: redet
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ReResNet
+  Paper:
+    URL: https://openaccess.thecvf.com/content/CVPR2021/papers/Han_ReDet_A_Rotation-Equivariant_Detector_for_Aerial_Object_Detection_CVPR_2021_paper.pdf
+    Title: 'ReDet: A Rotation-equivariant Detector for Aerial Object Detection'
+  README: configs/redet/README.md
+
+Models:
+  - Name: redet_re50_refpn_1x_dota_le90
+    In Collection: redet
+    Config: configs/redet/redet_re50_refpn_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 76.68
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_le90/redet_re50_fpn_1x_dota_le90-724ab2da.pth
+
+  - Name: redet_re50_refpn_1x_dota_ms_rr_le90
+    In Collection: redet
+    Config: configs/redet/redet_re50_refpn_1x_dota_ms_rr_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 79.87
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90-fc9217b5.pth

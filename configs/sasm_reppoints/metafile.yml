@@ -1,0 +1,27 @@
+Collections:
+- Name: sasm
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: None
+    Title: 'SASM RepPoints'
+  README: configs/sasm_reppoints/README.md
+
+Models:
+  - Name: sasm_reppoints_r50_fpn_1x_dota_oc
+    In Collection: sasm
+    Config: configs/sasm_reppoints/sasm_reppoints_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 66.45
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/sasm/sasm_reppoints_r50_fpn_1x_dota_oc/sasm_reppoints_r50_fpn_1x_dota_oc-6d9edded.pth

@@ -1,0 +1,39 @@
+Collections:
+- Name: r3det
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/1908.05612.pdf
+    Title: 'R3Det: Refined Single-Stage Detector with Feature Refinement for Rotating Object'
+  README: configs/r3det/README.md
+
+Models:
+  - Name: r3det_r50_fpn_1x_dota_oc
+    In Collection: r3det
+    Config: configs/r3det/r3det_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.80
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/r3det/r3det_r50_fpn_1x_dota_oc/r3det_r50_fpn_1x_dota_oc-b1fb045c.pth
+
+  - Name: r3det_tiny_r50_fpn_1x_dota_oc
+    In Collection: r3det
+    Config: configs/r3det/r3det_tiny_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 70.18
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/r3det/r3det_tiny_r50_fpn_1x_dota_oc/r3det_tiny_r50_fpn_1x_dota_oc-c98a616c.pth

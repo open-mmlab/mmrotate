@@ -1,0 +1,27 @@
+Collections:
+- Name: rotated_reppoints
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/1904.11490.pdf
+    Title: 'RepPoints: Point Set Representation for Object Detection'
+  README: configs/cfa/README.md
+
+Models:
+  - Name: rotated_reppoints_r50_fpn_1x_dota_oc
+    In Collection: rotated_reppoints
+    Config: configs/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 59.44
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc/rotated_reppoints_r50_fpn_1x_dota_oc-d38ce217.pth

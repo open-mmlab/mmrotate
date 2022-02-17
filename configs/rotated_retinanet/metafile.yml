@@ -1,0 +1,51 @@
+Collections:
+- Name: rotated_retinanet
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/1708.02002.pdf
+    Title: 'Focal loss for dense object detection'
+  README: configs/rotated_retinanet/README.md
+
+Models:
+  - Name: rotated_retinanet_obb_r50_fpn_1x_dota_le90
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 68.42
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90/rotated_retinanet_obb_r50_fpn_1x_dota_le90-c0097bc4.pth
+
+  - Name: rotated_retinanet_obb_r50_fpn_1x_dota_le135
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.79
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135-e4131166.pth
+
+  - Name: rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 76.50
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90-1da1ec9c.pth

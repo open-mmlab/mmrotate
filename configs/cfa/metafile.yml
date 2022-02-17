@@ -1,0 +1,39 @@
+Collections:
+- Name: cfa
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://openaccess.thecvf.com/content/CVPR2021/papers/Guo_Beyond_Bounding-Box_Convex-Hull_Feature_Adaptation_for_Oriented_and_Densely_Packed_CVPR_2021_paper.pdf
+    Title: 'Beyond Bounding-Box: Convex-hull Feature Adaptation for Oriented and Densely Packed Object Detection'
+  README: configs/cfa/README.md
+
+Models:
+  - Name: cfa_r50_fpn_1x_dota_le135
+    In Collection: cfa
+    Config: configs/cfa/cfa_r50_fpn_1x_dota_le135.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.63
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/cfa/cfa_r50_fpn_1x_dota_le135/cfa_r50_fpn_1x_dota_le135-aed1cbc6.pth
+
+  - Name: cfa_r50_fpn_40e_dota_oc
+    In Collection: cfa
+    Config: configs/cfa/cfa_r50_fpn_40e_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 73.45
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/cfa/cfa_r50_fpn_40e_dota_oc/cfa_r50_fpn_40e_dota_oc-2f387232.pth
