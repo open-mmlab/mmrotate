@@ -103,7 +103,7 @@ MMRotate 是一款由不同学校和公司共同贡献的开源项目。我们�
 
 ```bibtex
 @article{mmrotate2022,
-    title={MMRotate: A rotation detection benchmark using pytorch},
+    title={MMRotate: A rotation detection benchmark using PyTorch},
     author={Zhou, Yue and Yang, Xue and Zhang, Gefan},
     journal= {arXiv preprint arXiv:xxxx.xxxx},
     year={2022}

@@ -16,7 +16,7 @@ English | [简体中文](README_zh-CN.md)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
 
-mmrotate is an open source rotating object detection toolbox based on PyTorch. It is a part of the [OpenMMLab](https://open-mmlab.github.io/) project.
+MMRotate is an open source rotating object detection toolbox based on PyTorch. It is a part of the [OpenMMLab](https://open-mmlab.github.io/) project.
 
 The master branch works with **PyTorch 1.6+**.
 The compatibility to earlier versions of PyTorch is not fully tested.
@@ -75,7 +75,7 @@ Please refer to [model_zoo](docs/en/model_zoo.md) for more details.
 
 ## Installation & Dataset Preparation
 
-Please refer to [install.md](docs/en/install.md) for installation of mmrotate and [data preparation](tools/data/README.md) for dataset preparation.
+Please refer to [install.md](docs/en/install.md) for installation of MMRotate and [data preparation](tools/data/README.md) for dataset preparation.
 
 ## Getting Started
 
@@ -96,7 +96,7 @@ If you find this project useful in your research, please consider cite:
 
 ```bibtex
 @article{mmrotate2022,
-    title={MMRotate: A rotation detection benchmark using pytorch},
+    title={MMRotate: A rotation detection benchmark using PyTorch},
     author={Zhou, Yue and Yang, Xue and Zhang, Gefan},
     journal= {arXiv preprint arXiv:xxxx.xxxx},
     year={2022}
@@ -106,11 +106,11 @@ If you find this project useful in your research, please consider cite:
 
 ## Contributing
 
-We appreciate all contributions to improve mmrotate. Please refer to [CONTRIBUTING.md](https://github.com/open-mmlab/mmrotate/blob/main/.github/CONTRIBUTING.md) in MMRotate for the contributing guideline.
+We appreciate all contributions to improve MMRotate. Please refer to [CONTRIBUTING.md](https://github.com/open-mmlab/mmrotate/blob/main/.github/CONTRIBUTING.md) in MMRotate for the contributing guideline.
 
 ## Acknowledgement
 
-mmrotate is an open source project that is contributed by researchers and engineers from various colleges and companies. We appreciate all the contributors who implement their methods or add new features, as well as users who give valuable feedbacks. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible toolkit to reimplement existing methods and develop their own new methods.
+MMRotate is an open source project that is contributed by researchers and engineers from various colleges and companies. We appreciate all the contributors who implement their methods or add new features, as well as users who give valuable feedbacks. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible toolkit to reimplement existing methods and develop their own new methods.
 
 ## Projects in OpenMMLab
 
