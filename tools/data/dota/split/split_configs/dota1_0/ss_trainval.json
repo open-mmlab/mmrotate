@@ -1,0 +1,34 @@
+{
+  "nproc": 10,
+  "load_type": "dota",
+  "img_dirs": [
+    "/cluster/home/it_stu198/main/datasets/DOTA/train/images/",
+    "/cluster/home/it_stu198/main/datasets/DOTA/val/images/"
+  ],
+  "ann_dirs": [
+    "/cluster/home/it_stu198/main/datasets/DOTA/train/labelTxt/",
+    "/cluster/home/it_stu198/main/datasets/DOTA/val/labelTxt/"
+  ],
+  "classes": null,
+  "prior_annfile": null,
+  "merge_type": "addition",
+  "sizes": [
+    1024
+  ],
+  "gaps": [
+    200
+  ],
+  "rates": [
+    1.0
+  ],
+  "img_rate_thr": 0.6,
+  "iof_thr": 0.7,
+  "no_padding": false,
+  "padding_value": [
+    104,
+    116,
+    124
+  ],
+  "save_dir": "/cluster/home/it_stu198/main/datasets/split_1024_dota1_0_test/trainval/",
+  "save_ext": ".png"
+}
