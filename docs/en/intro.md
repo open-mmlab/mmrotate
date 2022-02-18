@@ -1,13 +1,13 @@
 # Learn the Basics
 
-This chapter introduces you to the basic conception of rotated object detection, and the framework of
-MMRotate, and provides links to detailed tutorials about MMRotate.
+This chapter introduces the basic conception of rotated object detection and the framework of MMRotate, and provides
+links to detailed tutorials about MMRotate.
 
 ## What is rotated object detection
 
 ### Problem definition
-Benefiting from the vigorous development of universal detection, most current
-rotated object detection models are based on classic universal detectors.
+Benefiting from the vigorous development of general object detection, most current
+rotated object detection models are based on classic general object detector.
 With the development of detection tasks, horizontal boxes have been unable to
 meet the needs of researchers in some subdivisions. We call it rotating object
 detection by redefining the object representation and increasing the number of

@@ -65,7 +65,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## 教程
 
-请参考 [getting_started.md](docs/zh_cn/get_started.md) 了解 MMRotate 的基本使用。
+请参考 [get_started.md](docs/zh_cn/get_started.md) 了解 MMRotate 的基本使用。
 MMRotate 也提供了其他更详细的教程:
 
 * [学习基础知识](docs/zh_cn/intro.md)

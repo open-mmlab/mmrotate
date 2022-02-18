@@ -70,7 +70,7 @@ Please refer to [install.md](docs/en/install.md) for installation guide.
 
 ## Get Started
 
-Please see [getting_started.md](docs/en/get_started.md) for the basic usage of MMRotate.
+Please see [get_started.md](docs/en/get_started.md) for the basic usage of MMRotate.
 There are also tutorials:
 
 * [learn the basics](docs/en/intro.md)
