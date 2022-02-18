@@ -36,7 +36,7 @@
 
 English | [简体中文](README_zh-CN.md)
 
-MMRotate is an open-source toolbox for pose estimation based on PyTorch.
+MMRotate is an open-source toolbox for rotating object detection based on PyTorch.
 It is a part of the [OpenMMLab project](https://github.com/open-mmlab).
 
 The master branch works with **PyTorch 1.6+**.
