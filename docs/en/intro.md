@@ -1,27 +1,27 @@
 # Learn the Basics
 
-This chapter introduces you to the basic conception of rotation detection, and the framework of
-MMRotate, and provides links to detailed tutorials about MMRotate.
+This chapter introduces the basic conception of rotated object detection and the framework of MMRotate, and provides
+links to detailed tutorials about MMRotate.
 
-## What is rotation detection
+## What is rotated object detection
 
 ### Problem definition
-Benefiting from the vigorous development of universal detection, most current
-rotation detection models are based on classic universal detectors.
+Benefiting from the vigorous development of general object detection, most current
+rotated object detection models are based on classic general object detector.
 With the development of detection tasks, horizontal boxes have been unable to
 meet the needs of researchers in some subdivisions. We call it rotating object
 detection by redefining the object representation and increasing the number of
 regression degrees of freedom to achieve rotated rectangle, quadrilateral, and
-even arbitrary shape detection. Performing high-precision rotation detection
+even arbitrary shape detection. Performing high-precision rotated object detection
 more efficiently has become a current research hotspot. The following areas are
-where rotation detection has been applied or has great potential: face
+where rotated object detection has been applied or has great potential: face
 recognition, scene text, remote sensing, self-driving, medical,
 robotic grasping, etc.
 
 
 ### What is rotated box
 
-The most notable difference between rotation detection and generic detection is
+The most notable difference between rotated object detection and generic detection is
 the replacement of horizontal box annotations with rotated box annotations.
 They are defined as follows:
 - Horizontal box: A rectangle with the width along the x-axis and height along
@@ -136,7 +136,7 @@ In MMRotate, the rotation direction of the rotated boxes is `CW`.
 
 ### Definition of rotated box
 Due to the difference in the definition range of `theta`, the following three
-definitions of the rotated box gradually emerge in rotation detection:
+definitions of the rotated box gradually emerge in rotated object detection:
 - {math}`D_{oc^{\prime}}`: OpenCV Definition, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`,
 The angle between the height of the rectangle and the positive semi-axis of x is
 a positive acute angle. This definition comes from the `cv2.minAreaRect` function
@@ -197,7 +197,7 @@ of polygons IoU).
 
 ## What is MMRotate
 
-MMRotate is a toolbox that provides a framework for unified implementation and evaluation of rotation detection,
+MMRotate is a toolbox that provides a framework for unified implementation and evaluation of rotated object detection,
 and below is its whole framework:
 
 <div align=center>
@@ -207,7 +207,7 @@ and below is its whole framework:
 MMRotate consists of 4 main parts, `datasets`, `models`, `core` and `apis`.
 
 - `datasets` is for data loading and data augmentation. In this part,
-we support various datasets for rotation detection algorithms,
+we support various datasets for rotated object detection algorithms,
 useful data augmentation transforms in `pipelines` for pre-processing image.
 
 - `models` contains models and loss functions.
