@@ -1,94 +1,125 @@
 <div align="center">
-  <img src="resources/mmrotate-logo.png" width="500px"/>
-</div>
-
-## Introduction
-
-English | [简体中文](README_zh-CN.md)
-
-# MMRotate: OpenMMLab Rotated Object Detection Toolkit
+  <img src="resources/mmrotate-logo.png" width="450"/>
+  <div>&nbsp;</div>
+  <div align="center">
+    <b><font size="5">OpenMMLab website</font></b>
+    <sup>
+      <a href="https://openmmlab.com">
+        <i><font size="4">HOT</font></i>
+      </a>
+    </sup>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <b><font size="5">OpenMMLab platform</font></b>
+    <sup>
+      <a href="https://platform.openmmlab.com">
+        <i><font size="4">TRY IT OUT</font></i>
+      </a>
+    </sup>
+  </div>
+  <div>&nbsp;</div>
 
 [![Documentation](https://readthedocs.org/projects/mmrotate/badge/?version=latest)](https://mmrotate.readthedocs.io/en/latest/?badge=latest)
 [![actions](https://github.com/open-mmlab/mmrotate/workflows/build/badge.svg)](https://github.com/open-mmlab/mmrotate/actions)
-[![codecov](https://codecov.io/gh/open-mmlab/mmrotate/branch/main/graph/badge.svg)](https://codecov.io/gh/open-mmlab/mmrotate)
-[![PyPI](https://badge.fury.io/py/mmrotate.svg)](https://pypi.org/project/mmrotate/)
+[![codecov](https://codecov.io/gh/open-mmlab/mmrotate/branch/master/graph/badge.svg)](https://codecov.io/gh/open-mmlab/mmrotate)
+[![PyPI](https://img.shields.io/pypi/v/mmrotate)](https://pypi.org/project/mmrotate/)
 [![LICENSE](https://img.shields.io/github/license/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/blob/master/LICENSE)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
 
-MMRotate is an open source rotating object detection toolbox based on PyTorch. It is a part of the [OpenMMLab](https://open-mmlab.github.io/) project.
+[📘Documentation](https://mmrotate.readthedocs.io/en/latest/) |
+[🛠️Installation](https://mmrotate.readthedocs.io/en/latest/install.html) |
+[👀Model Zoo](docs/en/model_zoo.md) |
+[🤔Reporting Issues](https://github.com/open-mmlab/mmrotate/issues/new/choose)
+</div>
+
+## Introduction
+
+English | [简体中文](README_CN.md)
+
+MMRotate is an open-source toolbox for pose estimation based on PyTorch.
+It is a part of the [OpenMMLab project](https://github.com/open-mmlab).
 
 The master branch works with **PyTorch 1.6+**.
-The compatibility to earlier versions of PyTorch is not fully tested.
-
-Documentation: https://mmrotate.readthedocs.io/en/latest/.
 
 https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-9ebb-5ba106d3e9d5.MP4
 
-### Major features
-- **Support multiple angle representations**
+
+<details open>
+<summary><b>Major Features</b></summary>
+  
+* **Support multiple angle representations**
 
   MMRotate provides three mainstream angle representations to meet different paper settings.
 
-- **Modular Design**
-
+* **Modular Design**
+   
   We decompose the rotation detection framework into different components,
   which makes it much easy and flexible to build a new model by combining different modules.
 
-- **Strong baseline and State of the art**
-
+* **Strong baseline and State of the art**
+   
   The toolbox provides strong baselines and state-of-the-art methods in rotation detection.
 
-## License
+</details>
 
-This project is released under the [Apache 2.0 license](LICENSE).
+
+
+## Installation
+
+Please refer to [install.md](docs/en/install.md) for installation guide.
+
+## Get Started
+
+Please see [getting_started.md](docs/en/getting_started.md) for the basic usage of MMRotate.
+There are also tutorials:
+
+* [learn the basics](docs/en/intro.md)
+* [learn the config](docs/en/tutorials/customize_config.md)
+* [customize dataset](docs/en/tutorials/customize_dataset.md)
+* [customize model](docs/en/tutorials/customize_models.md)
 
 
 ## Model Zoo
 
-Supported algorithms:
+Results and models are available in the *README.md* of each method's config directory.
+A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 
 <details open>
-<summary>Detection</summary>
+<summary><b>Supported algorithms:</b></summary>
 
-- [x] [Rotated RetinaNet-OBB/HBB](configs/rotated_retinanet/README.md) (ICCV'2017)
-- [x] [Rotated FasterRCNN-OBB](configs/rotated_faster_rcnn/README.md) (TPAMI'2017)
-- [x] [Rotated RepPoints-OBB](configs/rotated_reppoints/README.md) (ICCV'2019)
-- [x] [RoI Transformer](configs/roi_trans/README.md) (CVPR'2019)
-- [x] [Gliding Vertex](configs/gliding_vertex/README.md) (TPAMI'2020)
-- [x] [R<sup>3</sup>Det](configs/r3det/README.md) (AAAI'2021)
-- [x] [S<sup>2</sup>A-Net](configs/s2anet/README.md) (TGRS'2021)
-- [x] [ReDet](configs/redet/README.md) (CVPR'2021)
-- [x] [Beyond Bounding-Box](configs/cfa/README.md) (CVPR'2021)
-- [x] [Oriented R-CNN](configs/oriented_rcnn/README.md) (ICCV'2021)
-- [x] [GWD](configs/gwd/README.md) (ICML'2021)
-- [x] [KLD](configs/kld/README.md) (NeurIPS'2021)
-- [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
-- [x] [KFIoU](configs/kfiou/README.md) (arXiv)
-- [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
+* [x] [Rotated RetinaNet-OBB/HBB](configs/rotated_retinanet/README.md) (ICCV'2017)
+* [x] [Rotated FasterRCNN-OBB](configs/rotated_faster_rcnn/README.md) (TPAMI'2017)
+* [x] [Rotated RepPoints-OBB](configs/rotated_reppoints/README.md) (ICCV'2019)
+* [x] [RoI Transformer](configs/roi_trans/README.md) (CVPR'2019)
+* [x] [Gliding Vertex](configs/gliding_vertex/README.md) (TPAMI'2020)
+* [x] [R<sup>3</sup>Det](configs/r3det/README.md) (AAAI'2021)
+* [x] [S<sup>2</sup>A-Net](configs/s2anet/README.md) (TGRS'2021)
+* [x] [ReDet](configs/redet/README.md) (CVPR'2021)
+* [x] [Beyond Bounding-Box](configs/cfa/README.md) (CVPR'2021)
+* [x] [Oriented R-CNN](configs/oriented_rcnn/README.md) (ICCV'2021)
+* [x] [GWD](configs/gwd/README.md) (ICML'2021)
+* [x] [KLD](configs/kld/README.md) (NeurIPS'2021)
+* [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
+* [x] [KFIoU](configs/kfiou/README.md) (arXiv)
+* [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
+
 </details>
 
-Please refer to [model_zoo](docs/en/model_zoo.md) for more details.
+## Data Preparation
 
-## Changelog
+Please refer to [data_preparation.md](tools/data/README.md) for a general knowledge of data preparation.
 
+## FAQ
 
-## Installation & Dataset Preparation
+Please refer to [FAQ](docs/en/faq.md) for frequently asked questions.
 
-Please refer to [install.md](docs/en/install.md) for installation of MMRotate and [data preparation](tools/data/README.md) for dataset preparation.
+## Contributing
 
-## Getting Started
+We appreciate all contributions to improve MMRotate. Please refer to [CONTRIBUTING.md](.github/CONTRIBUTING.md) for the contributing guideline.
 
-If you are new of rotation detection, you can start with [learn the basics](docs/en/intro.md).
-If you are familiar with it, check out [getting_started.md](docs/en/get_started.md) for the basic usage of mmrotate.
+## Acknowledgement
 
-
-Refer to the below tutorials to dive deeper:
-
-- [Learn the Basics](docs/en/intro.md)
-- [Config](docs/en/tutorials/customize_config.md)
-- [Customize Dataset](docs/en/tutorials/customize_dataset.md)
-- [Customize Model](docs/en/tutorials/customize_models.md)
+MMRotate is an open source project that is contributed by researchers and engineers from various colleges and companies. We appreciate all the contributors who implement their methods or add new features, as well as users who give valuable feedbacks. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible toolkit to reimplement existing methods and develop their own new methods.
 
 ## Citation
 
@@ -103,33 +134,28 @@ If you find this project useful in your research, please consider cite:
 }
 ```
 
+## License
 
-## Contributing
-
-We appreciate all contributions to improve MMRotate. Please refer to [CONTRIBUTING.md](https://github.com/open-mmlab/mmrotate/blob/main/.github/CONTRIBUTING.md) in MMRotate for the contributing guideline.
-
-## Acknowledgement
-
-MMRotate is an open source project that is contributed by researchers and engineers from various colleges and companies. We appreciate all the contributors who implement their methods or add new features, as well as users who give valuable feedbacks. We wish that the toolbox and benchmark could serve the growing research community by providing a flexible toolkit to reimplement existing methods and develop their own new methods.
+This project is released under the [Apache 2.0 license](LICENSE).
 
 ## Projects in OpenMMLab
 
-- [MMCV](https://github.com/open-mmlab/mmcv): OpenMMLab foundational library for computer vision.
-- [MIM](https://github.com/open-mmlab/mim): MIM Installs OpenMMLab Packages.
-- [MMClassification](https://github.com/open-mmlab/mmclassification): OpenMMLab image classification toolbox and benchmark.
-- [MMDetection](https://github.com/open-mmlab/mmdetection): OpenMMLab detection toolbox and benchmark.
-- [MMDetection3D](https://github.com/open-mmlab/mmdetection3d): OpenMMLab's next-generation platform for general 3D object detection.
-- [MMSegmentation](https://github.com/open-mmlab/mmsegmentation): OpenMMLab semantic segmentation toolbox and benchmark.
-- [MMAction2](https://github.com/open-mmlab/mmaction2): OpenMMLab's next-generation action understanding toolbox and benchmark.
-- [MMTracking](https://github.com/open-mmlab/mmtracking): OpenMMLab video perception toolbox and benchmark.
-- [MMPose](https://github.com/open-mmlab/mmpose): OpenMMLab pose estimation toolbox and benchmark.
-- [MMEditing](https://github.com/open-mmlab/mmediting): OpenMMLab image and video editing toolbox.
-- [MMOCR](https://github.com/open-mmlab/mmocr): A Comprehensive Toolbox for Text Detection, Recognition and Understanding.
-- [MMGeneration](https://github.com/open-mmlab/mmgeneration): OpenMMLab image and video generative models toolbox.
-- [MMFlow](https://github.com/open-mmlab/mmflow): OpenMMLab optical flow toolbox and benchmark.
-- [MMFewShot](https://github.com/open-mmlab/mmfewshot): OpenMMLab FewShot Learning Toolbox and Benchmark.
-- [MMHuman3D](https://github.com/open-mmlab/mmhuman3d): OpenMMLab Human Pose and Shape Estimation Toolbox and Benchmark.
-- [MMSelfSup](https://github.com/open-mmlab/mmselfsup): OpenMMLab self-supervised learning Toolbox and Benchmark.
-- [MMRazor](https://github.com/open-mmlab/mmrazor): OpenMMLab Model Compression Toolbox and Benchmark.
-- [MMDeploy](https://github.com/open-mmlab/mmdeploy): OpenMMLab Model Deployment Framework.
-- [MMRotate](https://github.com/open-mmlab/mmrotate): OpenMMLab rotation detection toolbox and benchmark.
+* [MMCV](https://github.com/open-mmlab/mmcv): OpenMMLab foundational library for computer vision.
+* [MIM](https://github.com/open-mmlab/mim): MIM Installs OpenMMLab Packages.
+* [MMClassification](https://github.com/open-mmlab/mmclassification): OpenMMLab image classification toolbox and benchmark.
+* [MMDetection](https://github.com/open-mmlab/mmdetection): OpenMMLab detection toolbox and benchmark.
+* [MMDetection3D](https://github.com/open-mmlab/mmdetection3d): OpenMMLab next-generation platform for general 3D object detection.
+* [MMSegmentation](https://github.com/open-mmlab/mmsegmentation): OpenMMLab semantic segmentation toolbox and benchmark.
+* [MMAction2](https://github.com/open-mmlab/mmaction2): OpenMMLab next-generation action understanding toolbox and benchmark.
+* [MMTracking](https://github.com/open-mmlab/mmtracking): OpenMMLab video perception toolbox and benchmark.
+* [MMPose](https://github.com/open-mmlab/mmpose): OpenMMLab pose estimation toolbox and benchmark.
+* [MMEditing](https://github.com/open-mmlab/mmediting): OpenMMLab image and video editing toolbox.
+* [MMOCR](https://github.com/open-mmlab/mmocr): A comprehensive toolbox for text detection, recognition and understanding.
+* [MMGeneration](https://github.com/open-mmlab/mmgeneration): OpenMMLab next-generation toolbox for generative models.
+* [MMFlow](https://github.com/open-mmlab/mmflow): OpenMMLab optical flow toolbox and benchmark.
+* [MMFewShot](https://github.com/open-mmlab/mmfewshot): OpenMMLab fewshot learning toolbox and benchmark.
+* [MMHuman3D](https://github.com/open-mmlab/mmhuman3d): OpenMMLab 3D human parametric model toolbox and benchmark.
+* [MMSelfSup](https://github.com/open-mmlab/mmselfsup): OpenMMLab self-supervised learning toolbox and benchmark.
+* [MMRazor](https://github.com/open-mmlab/mmrazor): OpenMMLab model compression toolbox and benchmark.
+* [MMDeploy](https://github.com/open-mmlab/mmdeploy): OpenMMLab model deployment framework.
+* [MMRotate](https://github.com/open-mmlab/mmrotate): OpenMMLab rotating detection toolbox and benchmark.
