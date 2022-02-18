@@ -70,7 +70,7 @@ Please refer to [install.md](docs/en/install.md) for installation guide.
 
 ## Get Started
 
-Please see [getting_started.md](docs/en/getting_started.md) for the basic usage of MMRotate.
+Please see [getting_started.md](docs/en/get_started.md) for the basic usage of MMRotate.
 There are also tutorials:
 
 * [learn the basics](docs/en/intro.md)
@@ -130,11 +130,11 @@ MMRotate is an open source project that is contributed by researchers and engine
 If you find this project useful in your research, please consider cite:
 
 ```bibtex
-@article{mmrotate2022,
-    title={MMRotate: A Rotated Object Detection Benchmark using PyTorch},
-    author={Zhou, Yue and Yang, Xue and Zhang, Gefan and et al.},
-    journal= {arXiv preprint arXiv:xxxx.xxxx},
-    year={2022}
+@misc{mmrotate2022,
+  title={MMRotate: A Rotated Object Detection Benchmark using PyTorch},
+  author =       {Zhou, Yue and Yang, Xue and Zhang, Gefan and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and Zhang, Wenwei, and Chen, Kai},
+  howpublished = {\url{https://github.com/open-mmlab/mmrotate}},
+  year =         {2022}
 }
 ```
 
