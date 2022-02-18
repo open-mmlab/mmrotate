@@ -36,7 +36,7 @@
 
 English | [简体中文](README_zh-CN.md)
 
-MMRotate is an open-source toolbox for rotating object detection based on PyTorch.
+MMRotate is an open-source toolbox for rotated object detection based on PyTorch.
 It is a part of the [OpenMMLab project](https://github.com/open-mmlab).
 
 The master branch works with **PyTorch 1.6+**.
@@ -53,12 +53,12 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 * **Modular Design**
 
-  We decompose the rotation detection framework into different components,
+  We decompose the rotated object detection framework into different components,
   which makes it much easy and flexible to build a new model by combining different modules.
 
 * **Strong baseline and State of the art**
 
-  The toolbox provides strong baselines and state-of-the-art methods in rotation detection.
+  The toolbox provides strong baselines and state-of-the-art methods in rotated object detection.
 
 </details>
 
@@ -105,9 +105,13 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 
 </details>
 
+### Model Request
+
+We will keep up with the latest progress of the community, and support more popular algorithms and frameworks. If you have any feature requests, please feel free to leave a comment in [MMRotate Roadmap](https://github.com/open-mmlab/mmrotate/issues/1).
+
 ## Data Preparation
 
-Please refer to [data_preparation.md](tools/data/README.md) for a general knowledge of data preparation.
+Please refer to [data_preparation.md](tools/data/README.md) to prepare the data.
 
 ## FAQ
 
@@ -127,7 +131,7 @@ If you find this project useful in your research, please consider cite:
 
 ```bibtex
 @article{mmrotate2022,
-    title={MMRotate: A Rotation Detection Benchmark using PyTorch},
+    title={MMRotate: A Rotated Object Detection Benchmark using PyTorch},
     author={Zhou, Yue and Yang, Xue and Zhang, Gefan and et al.},
     journal= {arXiv preprint arXiv:xxxx.xxxx},
     year={2022}
@@ -158,4 +162,4 @@ This project is released under the [Apache 2.0 license](LICENSE).
 * [MMSelfSup](https://github.com/open-mmlab/mmselfsup): OpenMMLab self-supervised learning toolbox and benchmark.
 * [MMRazor](https://github.com/open-mmlab/mmrazor): OpenMMLab model compression toolbox and benchmark.
 * [MMDeploy](https://github.com/open-mmlab/mmdeploy): OpenMMLab model deployment framework.
-* [MMRotate](https://github.com/open-mmlab/mmrotate): OpenMMLab rotating detection toolbox and benchmark.
+* [MMRotate](https://github.com/open-mmlab/mmrotate): OpenMMLab rotated object detection toolbox and benchmark.

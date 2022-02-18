@@ -99,7 +99,9 @@ MMRotate 也提供了其他更详细的教程:
 
 </details>
 
+### 模型需求
 
+我们将跟进学界的最新进展，并支持更多算法和框架。如果您对 MMRotate 有任何功能需求，请随时在 [MMRotate Roadmap](https://github.com/open-mmlab/mmrotate/issues/1) 中留言。
 
 ## 数据准备
 
@@ -124,7 +126,7 @@ MMRotate 是一款由不同学校和公司共同贡献的开源项目。我们�
 
 ```bibtex
 @article{mmrotate2022,
-    title={MMRotate: A Rotation Detection Benchmark using PyTorch},
+    title={MMRotate: A Rotated Object Detection Benchmark using PyTorch},
     author={Zhou, Yue and Yang, Xue and Zhang, Gefan and et al.},
     journal= {arXiv preprint arXiv:xxxx.xxxx},
     year={2022}
@@ -154,7 +156,7 @@ MMRotate 是一款由不同学校和公司共同贡献的开源项目。我们�
 * [MMHuman3D](https://github.com/open-mmlab/mmhuman3d): OpenMMLab 人体参数化模型工具箱与测试基准
 * [MMSelfSup](https://github.com/open-mmlab/mmselfsup): OpenMMLab 自监督学习工具箱与测试基准
 * [MMRazor](https://github.com/open-mmlab/mmrazor): OpenMMLab 模型压缩工具箱与测试基准
-* [MMDeploy](https://github.com/open-mmlab/mmdeploy):OpenMMLab 模型部署框架
+* [MMDeploy](https://github.com/open-mmlab/mmdeploy): OpenMMLab 模型部署框架
 * [MMRotate](https://github.com/open-mmlab/mmrotate): OpenMMLab 旋转框检测工具箱与测试基准
 
 ## 欢迎加入 OpenMMLab 社区
