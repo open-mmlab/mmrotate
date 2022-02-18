@@ -46,18 +46,18 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 <details open>
 <summary><b>Major Features</b></summary>
-  
+
 * **Support multiple angle representations**
 
   MMRotate provides three mainstream angle representations to meet different paper settings.
 
 * **Modular Design**
-   
+
   We decompose the rotation detection framework into different components,
   which makes it much easy and flexible to build a new model by combining different modules.
 
 * **Strong baseline and State of the art**
-   
+
   The toolbox provides strong baselines and state-of-the-art methods in rotation detection.
 
 </details>

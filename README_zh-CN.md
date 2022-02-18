@@ -25,7 +25,7 @@
 [![LICENSE](https://img.shields.io/github/license/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/blob/master/LICENSE)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
-  
+
 [📘文档](https://mmrotate.readthedocs.io/en/latest/) |
 [🛠️安装](https://mmrotate.readthedocs.io/en/latest/install.html) |
 [👀模型库](docs/en/model_zoo.md) |
