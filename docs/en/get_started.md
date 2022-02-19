@@ -20,7 +20,7 @@ python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments] --la
 
 Examples:
 
-Inference RotatedRetinaNet on DOTA-1.0 dataset, which can generate compressed files for online [submission](https://captain-whu.github.io/DOTA/). (Please change the [data_root](.../configs/_base_/datasets/dotav1.py) firstly.)
+Inference RotatedRetinaNet on DOTA-1.0 dataset, which can generate compressed files for online [submission](https://captain-whu.github.io/DOTA/evaluation.html). (Please change the [data_root](../../configs/_base_/datasets/dotav1.py) firstly.)
 ```shell
 python ./tools/test.py  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
