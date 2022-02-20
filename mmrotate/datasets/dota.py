@@ -236,10 +236,16 @@ class DOTADataset(CustomDataset):
             collector[oriname].append(new_result)
 
         merge_func = partial(_merge_func, CLASSES=self.CLASSES, iou_thr=0.1)
+        nproc = min(4, os.cpu_count())
+        if nproc <= 1:
+            print('Single processing')
+            merged_results = mmcv.track_iter_progress(
+                (map(merge_func, collector.items()), len(collector)))
+        else:
+            print('Multiple processing')
+            merged_results = mmcv.track_parallel_progress(
+                merge_func, list(collector.items()), nproc)
 
-        merged_results = mmcv.track_parallel_progress(merge_func,
-                                                      list(collector.items()),
-                                                      min(4, os.cpu_count()))
         return zip(*merged_results)
 
     def _results2submission(self, results, out_folder=None):
