@@ -67,9 +67,10 @@ def imshow_det_rbboxes(img,
     inds = scores > score_thr
     bboxes = bboxes[inds, :]
 
-    bbox_color = color_val(bbox_color)
-    text_color = color_val(text_color)
-
+    bbox_color = (226, 43,
+                  138) if bbox_color is None else color_val(bbox_color)
+    text_color = (255, 255,
+                  255) if text_color is None else color_val(text_color)
     for bbox, label in zip(bboxes, labels):
         xc, yc, w, h, ag, score = bbox.tolist()
         wx, wy = w / 2 * math.cos(ag), w / 2 * math.sin(ag)
