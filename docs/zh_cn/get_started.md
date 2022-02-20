@@ -27,12 +27,25 @@ python ./tools/test.py  \
   checkpoints/SOME_CHECKPOINT.pth --format-only \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
+or
+```shell
+./tools/dist_test.sh  \
+  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  checkpoints/SOME_CHECKPOINT.pth 1 --format-only \
+  --eval-options submission_dir=work_dirs/Task1_results
+```
 
 You can change the test set path in the [data_root](.../configs/_base_/datasets/dotav1.py) to the val set or trainval set for the offline evaluation.
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth --eval mAP
+```
+or
+```shell
+./tools/dist_test.sh  \
+  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  checkpoints/SOME_CHECKPOINT.pth 1 --eval mAP
 ```
 
 You can also visualize the results.
