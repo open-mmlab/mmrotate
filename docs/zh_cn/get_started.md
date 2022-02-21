@@ -1,20 +1,20 @@
 ## Test a model
 
-- 单个GPU
-- 单个节点多个GPU
-- 多个节点多个GPU
+- 单个 GPU
+- 单个节点多个 GPU
+- 多个节点多个 GPU
 
 您可以使用以下命令来推理数据集。
 
 ```shell
-# 单个GPU
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [可选参数]
+# 单个 GPU
+python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [[optional arguments]
 
-# 多个GPU
-./tools/dist_test.sh ${CONFIG_FILE} ${CHECKPOINT_FILE} ${GPU_NUM} [可选参数]
+# 多个 GPU
+./tools/dist_test.sh ${CONFIG_FILE} ${CHECKPOINT_FILE} ${GPU_NUM} [[optional arguments]
 
-# slurm环境中多个节点
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [可选参数] --launcher slurm
+# slurm 环境中多个节点
+python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [[optional arguments] --launcher slurm
 ```
 
 
@@ -63,15 +63,15 @@ python ./tools/test.py \
 ### 单GPU训练
 
 ```shell
-python tools/train.py ${CONFIG_FILE} [可选参数]
+python tools/train.py ${CONFIG_FILE} [[optional arguments]
 ```
 
-如果您想在命令行中指定工作路径，您可以增加参数`--work_dir ${您的工作目录}`。
+如果您想在命令行中指定工作路径，您可以增加参数`--work_dir ${YOUR_WORK_DIR}`。
 
 ### 多GPU训练
 
 ```shell
-./tools/dist_train.sh ${CONFIG_FILE} ${GPU_NUM} [可选参数]
+./tools/dist_train.sh ${CONFIG_FILE} ${GPU_NUM} [[optional arguments]
 ```
 
 可选参数包括:
