@@ -35,7 +35,7 @@ python ./tools/test.py  \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
 
-您可以修改 [data_root](.../configs/_base_/datasets/dotav1.py) 中测试集的路径为验证集或训练集路径用于离线的验证。
+您可以修改 [data_root](../../configs/_base_/datasets/dotav1.py) 中测试集的路径为验证集或训练集路径用于离线的验证。
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
