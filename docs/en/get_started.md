@@ -122,7 +122,7 @@ In `config2.py`,
 dist_params = dict(backend='nccl', port=29501)
 ```
 
-Then you can launch two jobs with `config1.py` ang `config2.py`.
+Then you can launch two jobs with `config1.py` and `config2.py`.
 
 ```shell
 CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py ${WORK_DIR}
