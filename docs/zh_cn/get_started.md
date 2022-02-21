@@ -66,7 +66,7 @@ python ./tools/test.py \
 python tools/train.py ${CONFIG_FILE} [optional arguments]
 ```
 
-如果您想在命令行中指定工作路径，您可以增加参数`--work_dir ${YOUR_WORK_DIR}`。
+如果您想在命令行中指定工作路径，您可以增加参数 `--work_dir ${YOUR_WORK_DIR}`。
 
 ### 多 GPU 训练
 
@@ -94,7 +94,7 @@ python tools/train.py ${CONFIG_FILE} [optional arguments]
 [GPUS=${GPUS}] ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${WORK_DIR}
 ```
 
-如果您有多台机器联网，您可以参考 PyTorch [launch utility](https://pytorch.org/docs/stable/distributed_deprecated.html#launch-utility).
+如果您有多台机器联网，您可以参考 PyTorch [launch utility](https://pytorch.org/docs/stable/distributed_deprecated.html#launch-utility)。
 如果您没有如无线带宽技术的高速网络，通常训练速度会很慢。
 
 ### 在一台机器上启动多个作业
