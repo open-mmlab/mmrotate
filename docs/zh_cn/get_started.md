@@ -27,7 +27,7 @@ python ./tools/test.py  \
   checkpoints/SOME_CHECKPOINT.pth --format-only \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
-or
+或者
 ```shell
 ./tools/dist_test.sh  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -41,14 +41,14 @@ python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth --eval mAP
 ```
-or
+或者
 ```shell
 ./tools/dist_test.sh  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth 1 --eval mAP
 ```
 
-You can also visualize the results.
+您也可以可以可视化结果。
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -115,7 +115,7 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29501 ./tools/dist_train.sh ${CONFIG_FILE} 4
 dist_params = dict(backend='nccl', port=29500)
 ```
 
-In `config2.py`,
+在 `config2.py`中,
 
 ```python
 dist_params = dict(backend='nccl', port=29501)
