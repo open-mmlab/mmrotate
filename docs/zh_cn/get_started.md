@@ -48,7 +48,7 @@ python ./tools/test.py \
   checkpoints/SOME_CHECKPOINT.pth 1 --eval mAP
 ```
 
-您也可以可以可视化结果。
+您也可以可视化结果。
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -81,6 +81,7 @@ python tools/train.py ${CONFIG_FILE} [可选参数]
 - `--resume-from ${CHECKPOINT_FILE}`: 从以前的检查点恢复训练。
 
 `resume-from` 和 `load-from`的不同点：
+
 `resume-from`读取模型的权重和优化器的状态，并且epoch也会继承于指定的检查点。通常用于恢复意外中断的训练过程。
 `load-from`只读取模型的权重并且训练的epoch会从0开始。通常用于微调。
 
