@@ -63,7 +63,7 @@ python ./tools/test.py \
 ### 单GPU训练
 
 ```shell
-python tools/train.py ${CONFIG_FILE} [[optional arguments]
+python tools/train.py ${CONFIG_FILE} [optional arguments]
 ```
 
 如果您想在命令行中指定工作路径，您可以增加参数`--work_dir ${YOUR_WORK_DIR}`。
