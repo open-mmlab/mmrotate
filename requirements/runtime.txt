@@ -1,6 +1,6 @@
 e2cnn
 matplotlib
-mmcv
+mmcv-full
 mmdet
 numpy
 pycocotools; platform_system == "Linux"
