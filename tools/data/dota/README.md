@@ -54,4 +54,4 @@ Please change the `img_dirs` and `ann_dirs` in json. (Forked from [BboxToolkit](
 
 ## change root path in base config
 
-Please change `data_root` in `configs/_base_/datasets/dota1_0.py` to split DOTA dataset.
+Please change `data_root` in `configs/_base_/datasets/dotav1.py` to split DOTA dataset.
