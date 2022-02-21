@@ -1,10 +1,10 @@
 ## Test a model
 
-- single GPU
-- single node multiple GPU
-- multiple node
+- 单个GPU
+- 单个节点多个GPU
+- 多个节点多个GPU
 
-You can use the following commands to infer a dataset.
+您可以使用以下命令来推理数据集.
 
 ```shell
 # single-gpu
@@ -18,9 +18,9 @@ python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments] --la
 ```
 
 
-Examples:
+例子:
 
-Inference RotatedRetinaNet on DOTA-1.0 dataset, which can generate compressed files for online [submission](https://captain-whu.github.io/DOTA/evaluation.html). (Please change the [data_root](../../configs/_base_/datasets/dotav1.py) firstly.)
+在DOTA-1.0数据集推理RotatedRetinaNet，可以生成压缩文件用于在线提交。 [submission](https://captain-whu.github.io/DOTA/evaluation.html). (首先请修改 [data_root](../../configs/_base_/datasets/dotav1.py).)
 ```shell
 python ./tools/test.py  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -35,7 +35,7 @@ or
   --eval-options submission_dir=work_dirs/Task1_results
 ```
 
-You can change the test set path in the [data_root](.../configs/_base_/datasets/dotav1.py) to the val set or trainval set for the offline evaluation.
+您可以修改[data_root](.../configs/_base_/datasets/dotav1.py)中测试集的路径为验证集或训练集路径用于离线的验证。
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -58,59 +58,58 @@ python ./tools/test.py \
 
 
 
-## Train a model
+## 训练一个模型
 
-### Train with a single GPU
+### 单GPU训练
 
 ```shell
 python tools/train.py ${CONFIG_FILE} [optional arguments]
 ```
 
-If you want to specify the working directory in the command, you can add an argument `--work_dir ${YOUR_WORK_DIR}`.
+如果您想在命令行中指定工作路径，您可以增加参数`--work_dir ${YOUR_WORK_DIR}`。
 
-### Train with multiple GPUs
+### 多GPU训练
 
 ```shell
 ./tools/dist_train.sh ${CONFIG_FILE} ${GPU_NUM} [optional arguments]
 ```
 
-Optional arguments are:
+可选参数包括:
 
-- `--no-validate` (**not suggested**): By default, the codebase will perform evaluation during the training. To disable this behavior, use `--no-validate`.
-- `--work-dir ${WORK_DIR}`: Override the working directory specified in the config file.
-- `--resume-from ${CHECKPOINT_FILE}`: Resume from a previous checkpoint file.
+- `--no-validate` (**不建议**): 默认情况下代码将在训练期间进行评估。通过设置`--no-validate`关闭训练期间进行评估。
+- `--work-dir ${WORK_DIR}`: 覆盖配置文件中指定的工作目录。
+- `--resume-from ${CHECKPOINT_FILE}`: 从以前的检查点恢复训练。
 
-Difference between `resume-from` and `load-from`:
-`resume-from` loads both the model weights and optimizer status, and the epoch is also inherited from the specified checkpoint. It is usually used for resuming the training process that is interrupted accidentally.
-`load-from` only loads the model weights and the training epoch starts from 0. It is usually used for finetuning.
+`resume-from` 和 `load-from`的不同点：
+`resume-from`读取模型的权重和优化器的状态，并且epoch也会继承于指定的检查点。通常用于恢复意外中断的训练过程。
+`load-from`只读取模型的权重并且训练的epoch会从0开始。通常用于微调。
 
-### Train with multiple machines
+### 多机多GPU训练
 
-If you run MMRotate on a cluster managed with [slurm](https://slurm.schedmd.com/), you can use the script `slurm_train.sh`. (This script also supports single machine training.)
+如果您在[slurm](https://slurm.schedmd.com/)管理的集群上运行 MMRotate，您可以使用脚本`slurm_train.sh`（此脚本还支持单机训练）。
+
 
 ```shell
 [GPUS=${GPUS}] ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${WORK_DIR}
 ```
 
-If you have just multiple machines connected with ethernet, you can refer to
-PyTorch [launch utility](https://pytorch.org/docs/stable/distributed_deprecated.html#launch-utility).
-Usually it is slow if you do not have high speed networking like InfiniBand.
+如果您有多台机器联网，您可以参考PyTorch [launch utility](https://pytorch.org/docs/stable/distributed_deprecated.html#launch-utility).
+如果您没有如无线带宽技术的高速网络，通常训练速度会很慢。
 
-### Launch multiple jobs on a single machine
+### 在一台机器上启动多个作业
 
-If you launch multiple jobs on a single machine, e.g., 2 jobs of 4-GPU training on a machine with 8 GPUs,
-you need to specify different ports (29500 by default) for each job to avoid communication conflict.
+如果您在一台机器上启动多个作业，如在一台机器上使用8张GPU训练2个作业，每个作业使用4张GPU，您需要为每个作业指定不同的端口号（默认为29500）进而避免通讯冲突。
 
-If you use `dist_train.sh` to launch training jobs, you can set the port in commands.
+如果您使用`dist_train.sh`启动训练，您可以在命令行中指定端口号。
 
 ```shell
 CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29500 ./tools/dist_train.sh ${CONFIG_FILE} 4
 CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29501 ./tools/dist_train.sh ${CONFIG_FILE} 4
 ```
 
-If you use launch training jobs with Slurm, you need to modify the config files (usually the 6th line from the bottom in config files) to set different communication ports.
+如果您通过Slurm启动训练，您需要修改配置文件（通常是配置文件底部的第 6 行）进而设置不同的通讯端口。
 
-In `config1.py`,
+在`config1.py`中,
 
 ```python
 dist_params = dict(backend='nccl', port=29500)
@@ -122,7 +121,7 @@ In `config2.py`,
 dist_params = dict(backend='nccl', port=29501)
 ```
 
-Then you can launch two jobs with `config1.py` ang `config2.py`.
+之后您可以使用`config1.py` 和 `config2.py`开启两个作业。
 
 ```shell
 CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py ${WORK_DIR}
