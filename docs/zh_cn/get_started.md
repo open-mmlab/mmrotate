@@ -8,13 +8,13 @@
 
 ```shell
 # 单个 GPU
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [[optional arguments]
+python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments]
 
 # 多个 GPU
-./tools/dist_test.sh ${CONFIG_FILE} ${CHECKPOINT_FILE} ${GPU_NUM} [[optional arguments]
+./tools/dist_test.sh ${CONFIG_FILE} ${CHECKPOINT_FILE} ${GPU_NUM} [optional arguments]
 
 # slurm 环境中多个节点
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [[optional arguments] --launcher slurm
+python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments] --launcher slurm
 ```
 
 
@@ -71,7 +71,7 @@ python tools/train.py ${CONFIG_FILE} [optional arguments]
 ### 多GPU训练
 
 ```shell
-./tools/dist_train.sh ${CONFIG_FILE} ${GPU_NUM} [[optional arguments]
+./tools/dist_train.sh ${CONFIG_FILE} ${GPU_NUM} [optional arguments]
 ```
 
 可选参数包括:
