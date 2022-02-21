@@ -11,7 +11,7 @@
 optimizer = dict(type='Adam', lr=0.0003, weight_decay=0.0001)
 ```
 
-为了修改模型训练的学习率，使用者仅需修改配置文件里 optimizer 的 `lr` 即可。
+为了修改模型训练的学习率，使用者仅需修改配置文件里 `optimizer` 的 `lr` 即可。
 使用者可以参考 PyTorch 的 [API doc](https://pytorch.org/docs/stable/optim.html?highlight=optim#module-torch.optim) 直接设置参数。
 
 ### 自定义用户自己实现的优化器
@@ -39,9 +39,9 @@ class MyOptimizer(Optimizer):
 
 为了能够使得上述添加的模块被 `mmrotate` 发现，需要先将该模块添加到主命名空间（main namespace）。
 
-- 修改 `mmrotate/core/optimizer/__init__.py` 文件来导入该模块
+- 修改 `mmrotate/core/optimizer/__init__.py` 文件来导入该模块。
 
-    新的被定义的模块应该被导入到 `mmrotate/core/optimizer/__init__.py` 这样注册表才会发现新的模块并添加它：
+    新的被定义的模块应该被导入到 `mmrotate/core/optimizer/__init__.py` 中，这样注册表才会发现新的模块并添加它：
 
 ```python
 from .my_optimizer import MyOptimizer
@@ -57,7 +57,7 @@ custom_imports = dict(imports=['mmrotate.core.optimizer.my_optimizer'], allow_fa
 需要注意只有包含 `MyOptimizer` 类的包 (package) 应当被导入。
 而 `mmrotate.core.optimizer.my_optimizer.MyOptimizer` **不能** 被直接导入。
 
-事实上，用户可以用完全不同的使用这种导入方式的文件夹结构，只要这一模块的根目录已经被添加到 `PYTHONPATH` 里面。
+事实上，在这种导入方式下用户可以用完全不同的文件夹结构，只要这一模块的根目录已经被添加到 `PYTHONPATH` 里面。
 
 #### 3. 在配置文件中指定优化器
 
@@ -113,11 +113,11 @@ class MyOptimizerConstructor(object):
         _delete_=True, grad_clip=dict(max_norm=35, norm_type=2))
     ```
 
-    如果您的配置继承了已经设置了 `optimizer_config` 的基础配置（base config），你可能需要设置 `_delete_=True` 来覆盖不必要的配置参数。更多细节请参考 [配置文档](https://mmdetection.readthedocs.io/en/latest/tutorials/config.html) 。
+    如果您的配置继承了已经设置了 `optimizer_config` 的基础配置（base config），你可能需要设置 `_delete_=True` 来覆盖不必要的配置参数。请参考 [配置文档](https://mmdetection.readthedocs.io/en/latest/tutorials/config.html) 了解更多细节。
 
 - __使用动量调度加速模型收敛__:
     我们支持动量规划器（Momentum scheduler），以实现根据学习率调节模型优化过程中的动量设置，这可以使模型以更快速度收敛。
-    动量规划器经常与学习率规划器（LR scheduler）一起使用，例如下面的配置经常被用于3D 检测模型训练中以加速收敛。更多细节请参考 [CyclicLrUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L327) 和 [CyclicMomentumUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/momentum_updater.py#L130) 。
+    动量规划器经常与学习率规划器（LR scheduler）一起使用，例如下面的配置经常被用于 3D 检测模型训练中以加速收敛。更多细节请参考 [CyclicLrUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L327) 和 [CyclicMomentumUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/momentum_updater.py#L130) 。
 
     ```python
     lr_config = dict(
@@ -136,7 +136,7 @@ class MyOptimizerConstructor(object):
 
 ## 自定义训练计划
 
-默认地，我们使用 1x 计划（1x schedule）的步进学习率（step learning rate），这在MMCV中被称为 [`StepLRHook`](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L153) 。
+默认地，我们使用 1x 计划（1x schedule）的步进学习率（step learning rate），这在 MMCV 中被称为 [`StepLRHook`](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L153) 。
 我们支持很多其他的学习率规划器，参考 [这里](https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/lr_updater.py) ，例如 `CosineAnnealing` 和 `Poly` 。下面是一些例子：
 
 - `Poly` :
@@ -265,7 +265,7 @@ custom_hooks = [
 
 #### 4. 示例: `NumClassCheckHook`
 
-我们实现了一个自定义的钩子 [NumClassCheckHook](https://github.com/open-mmlab/mmdetection/blob/master/mmdet/datasets/utils.py) ，用来检验head中的 `num_classes` 是否与 `dataset` 中的 `CLASSSES` 长度匹配。
+我们实现了一个自定义的钩子 [NumClassCheckHook](https://github.com/open-mmlab/mmdetection/blob/master/mmdet/datasets/utils.py) ，用来检验 head 中的 `num_classes` 是否与 `dataset` 中的 `CLASSSES` 长度匹配。
 
 我们在 [default_runtime.py](https://github.com/open-mmlab/mmdetection/blob/master/configs/_base_/default_runtime.py) 中对其进行设置。
 
@@ -290,7 +290,7 @@ custom_hooks = [dict(type='NumClassCheckHook')]
 
 #### Checkpoint config
 
-MMCV runner将使用 `checkpoint_config` 来初始化 [`CheckpointHook`](https://github.com/open-mmlab/mmcv/blob/9ecd6b0d5ff9d2172c49a182eaa669e9f27bb8e7/mmcv/runner/hooks/checkpoint.py#L9) 。
+MMCV runner 将使用 `checkpoint_config` 来初始化 [`CheckpointHook`](https://github.com/open-mmlab/mmcv/blob/9ecd6b0d5ff9d2172c49a182eaa669e9f27bb8e7/mmcv/runner/hooks/checkpoint.py#L9) 。
 
 ```python
 checkpoint_config = dict(interval=1)
