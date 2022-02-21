@@ -3,7 +3,7 @@
 We incorporate modular and inheritance design into our config system, which is convenient to conduct various experiments.
 If you wish to inspect the config file, you may run `python tools/misc/print_config.py /PATH/TO/CONFIG` to see the complete config.
 The mmrotate is built upon the [mmdet](https://github.com/open-mmlab/mmdetection),
-thus it is highly recommended learning the basic of [mmdet](https://mmdetection.readthedocs.io/en/latest/).
+thus it is highly recommended to learn the basics of [mmdet](https://mmdetection.readthedocs.io/en/latest/).
 
 
 ## Modify a config through script arguments
@@ -13,7 +13,7 @@ When submitting jobs using "tools/train.py" or "tools/test.py", you may specify 
 - Update config keys of dict chains.
 
   The config options can be specified following the order of the dict keys in the original config.
-  For example, `--cfg-options model.backbone.norm_eval=False` changes the all BN modules in model backbones to `train` mode.
+  For example, `--cfg-options model.backbone.norm_eval=False` changes all BN modules in model backbones to `train` mode.
 
 - Update keys inside a list of configs.
 
@@ -41,18 +41,19 @@ We follow the below style to name config files. Contributors are advised to foll
 - `[model setting]`: specific setting for some model, like `hbb` for `rotated_retinanet`, etc.
 - `{backbone}`: backbone type like `r50` (ResNet-50), `swin_tiny` (SWIN-tiny).
 - `{neck}`: neck type like `fpn`,  `refpn`.
-- `[norm_setting]`: `bn` (Batch Normalization) is used unless specified, other norm layer type could be `gn` (Group Normalization), `syncbn` (Synchronized Batch Normalization).
+- `[norm_setting]`: `bn` (Batch Normalization) is used unless specified, other norm layer types could be `gn` (Group Normalization), `syncbn` (Synchronized Batch Normalization).
     `gn-head`/`gn-neck` indicates GN is applied in head/neck only, while `gn-all` means GN is applied in the entire model, e.g. backbone, neck, head.
-- `[misc]`: miscellaneous setting/plugins of model, e.g. `dconv`, `gcb`, `attention`, `albu`, `mstrain`.
+- `[misc]`: miscellaneous setting/plugins of the model, e.g. `dconv`, `gcb`, `attention`, `albu`, `mstrain`.
 - `[gpu x batch_per_gpu]`: GPUs and samples per GPU, `1xb2` is used by default.
 - `{dataset}`: dataset like `dota`.
-- `{angle version}`: like `oc`, `le135` or `le90`.
+- `{angle version}`: like `oc`, `le135`, or `le90`.
 
 ## An example of RotatedRetinaNet
 
 To help the users have a basic idea of a complete config and the modules in a modern detection system,
 we make brief comments on the config of RotatedRetinaNet using ResNet50 and FPN as the following. For more
-detailed usage and the corresponding alternative for each modules, please refer to the API documentation.
+detailed usage and the corresponding alternative for each module, please refer to the API documentation.
+
 ```python
 angle_version = 'oc'  # The angle version
 model = dict(
@@ -286,8 +287,8 @@ work_dir = './work_dirs/rotated_retinanet_hbb_r50_fpn_1x_dota_oc'  # Directory t
 ### Use intermediate variables in configs
 
 Some intermediate variables are used in the configs files, like `train_pipeline`/`test_pipeline` in datasets.
-It's worth noting that when modifying intermediate variables in the children configs, user need to pass the intermediate variables into corresponding fields again.
-For example, we would like to use offline multi scale strategy to train a RoI-Trans. `train_pipeline` are intermediate variable we would like modify.
+It's worth noting that when modifying intermediate variables in the children configs, the user needs to pass the intermediate variables into corresponding fields again.
+For example, we would like to use an offline multi-scale strategy to train an RoI-Trans. `train_pipeline` are intermediate variables we would like to modify.
 
 ```python
 _base_ = ['./roi_trans_r50_fpn_1x_dota_le90.py']
