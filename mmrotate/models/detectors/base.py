@@ -26,7 +26,8 @@ class RotatedBaseDetector(BaseDetector):
                     win_name='',
                     show=False,
                     wait_time=0,
-                    out_file=None):
+                    out_file=None,
+                    **kwargs):
         """Draw `result` over `img`.
 
         Args:
