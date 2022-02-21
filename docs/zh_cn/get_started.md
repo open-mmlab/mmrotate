@@ -35,7 +35,7 @@ python ./tools/test.py  \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
 
-您可以修改 [data_root] (.../configs/_base_/datasets/dotav1.py) 中测试集的路径为验证集或训练集路径用于离线的验证。
+您可以修改 [data_root](.../configs/_base_/datasets/dotav1.py) 中测试集的路径为验证集或训练集路径用于离线的验证。
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -87,7 +87,7 @@ python tools/train.py ${CONFIG_FILE} [optional arguments]
 
 ### 多机多 GPU 训练
 
-如果您在 [slurm] (https://slurm.schedmd.com/) 管理的集群上运行 MMRotate，您可以使用脚本 `slurm_train.sh` (此脚本还支持单机训练)。
+如果您在 [slurm](https://slurm.schedmd.com/) 管理的集群上运行 MMRotate，您可以使用脚本 `slurm_train.sh` (此脚本还支持单机训练)。
 
 
 ```shell
@@ -95,7 +95,7 @@ python tools/train.py ${CONFIG_FILE} [optional arguments]
 ```
 
 如果您有多台机器联网，您可以参考 PyTorch [launch utility](https://pytorch.org/docs/stable/distributed_deprecated.html#launch-utility)。
-如果您没有如无线带宽技术的高速网络，通常训练速度会很慢。
+如果您没有像 InfiniBand 这样的高速网络，训练速度通常会很慢。
 
 ### 在一台机器上启动多个作业
 
