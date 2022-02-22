@@ -216,8 +216,7 @@ class DOTADataset(CustomDataset):
 
         Params:
             results (list): Testing results of the dataset.
-            nproc (int): Processes used for computing TP and FP.
-                Default: 4.
+            nproc (int): number of process. Default: 4.
         """
         collector = defaultdict(list)
         for idx in range(len(self)):
