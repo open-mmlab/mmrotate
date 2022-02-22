@@ -1,22 +1,22 @@
-# Tutorial 3: Customize Models
+# 教程 3: 自定义模型 
 
-We basically categorize model components into 5 types.
+我们大致将模型组件分为了5种类型。
 
-- backbone: usually an FCN network to extract feature maps, e.g., ResNet, Swin.
-- neck: the component between backbones and heads, e.g., FPN, ReFPN.
-- head: the component for specific tasks, e.g., bbox prediction.
-- roi extractor: the part for extracting RoI features from feature maps, e.g., RoI Align Rotated.
-- loss: the component in head for calculating losses, e.g., FocalLoss, GWDLoss, and KFIoULoss.
+- 主干网络(Backbone): 通常是一个全卷积网络(FCN)，用来提取特征图，比如残差网络(ResNet)。也可以是基于视觉Transformer的网络，比如Swin Transformer等。
+- Neck: 主干网络和任务头(Head)之间的连接组件，比如FPN, ReFPN。
+- 任头务(Head): 用于某种具体任务（比如边界框预测）的组件。
+- 区域特征提取器(Roi Extractor): 用于从特征图上提取区域特征的组件，比如RoI Align Rotated。
+- 损失（loss）: 任务头上用于计算损失函数的组件，比如FocalLoss, GWDLoss, and KFIoULoss。
 
-## Develop new components
+## 开发新的组件
 
-### Add a new backbone
+### 添加新的主干网络
 
-Here we show how to develop new components with an example of MobileNet.
+这里，我们以 MobileNet 为例来展示如何开发新组件。
 
-#### 1. Define a new backbone (e.g. MobileNet)
+#### 1. 定义一个新的主干网络（以 MobileNet 为例）
 
-Create a new file `mmrotate/models/backbones/mobilenet.py`.
+新建文件 `mmrotate/models/backbones/mobilenet.py`.
 
 ```python
 import torch.nn as nn
@@ -34,15 +34,15 @@ class MobileNet(nn.Module):
         pass
 ```
 
-#### 2. Import the module
+#### 2. 导入模块
 
-You can either add the following line to `mmrotate/models/backbones/__init__.py`
+你可以将下面的代码添加到 `mmrotate/models/backbones/__init__.py` 中：
 
 ```python
 from .mobilenet import MobileNet
 ```
 
-or alternatively add
+或者添加如下代码
 
 ```python
 custom_imports = dict(
@@ -50,9 +50,9 @@ custom_imports = dict(
     allow_failed_imports=False)
 ```
 
-to the config file to avoid modifying the original code.
+到配置文件中以避免修改原始代码。
 
-#### 3. Use the backbone in your config file
+#### 3. 在你的配置文件中使用该主干网络
 
 ```python
 model = dict(
@@ -64,11 +64,11 @@ model = dict(
     ...
 ```
 
-### Add new necks
+### 添加新的 Neck
 
-#### 1. Define a neck (e.g. PAFPN)
+#### 1. 定义一个 Neck（以 PAFPN 为例）
 
-Create a new file `mmrotate/models/necks/pafpn.py`.
+新建文件： `mmrotate/models/necks/pafpn.py`.
 
 ```python
 from mmrotate.models.builder import ROTATED_NECKS
@@ -90,15 +90,15 @@ class PAFPN(nn.Module):
         pass
 ```
 
-#### 2. Import the module
+#### 2. 导入该模块
 
-You can either add the following line to `mmrotate/models/necks/__init__.py`,
+你可以添加下述代码到 `mmrotate/models/necks/__init__.py` 中
 
 ```python
 from .pafpn import PAFPN
 ```
 
-or alternatively add
+或者添加
 
 ```python
 custom_imports = dict(
@@ -106,9 +106,9 @@ custom_imports = dict(
     allow_failed_imports=False)
 ```
 
-to the config file and avoid modifying the original code.
+到配置文件中以避免修改原始代码。
 
-#### 3. Modify the config file
+#### 3. 修改配置文件
 
 ```python
 neck=dict(
@@ -118,13 +118,12 @@ neck=dict(
     num_outs=5)
 ```
 
-### Add new heads
+### 添加新的 Head
 
-Here we show how to develop a new head with the example of [Double Head R-CNN](https://arxiv.org/abs/1904.06493) as the following.
+这里，我们以 [Double Head R-CNN](https://arxiv.org/abs/1904.06493) 为例来展示如何添加一个新的 Head。
 
-First, add a new bbox head in `mmrotate/models/roi_heads/bbox_heads/double_bbox_head.py`.
-Double Head R-CNN implements a new bbox head for object detection.
-To implement a bbox head, basically we need to implement three functions of the new module as the following.
+首先，添加一个新的 bbox head 到 `mmrotate/models/roi_heads/bbox_heads/double_bbox_head.py`.
+Double Head R-CNN 在目标检测上实现了一个新的 bbox head。为了实现 bbox head，我们需要使用如下的新模块中三个函数。
 
 ```python
 from mmrotate.models.builder import ROTATED_HEADS
@@ -159,7 +158,7 @@ class DoubleConvFCBBoxHead(BBoxHead):
 
 ```
 
-Second, implement a new RoI Head if it is necessary. We plan to inherit the new `DoubleHeadRoIHead` from `StandardRoIHead`. We can find that a `StandardRoIHead` already implements the following functions.
+然后，如有必要，我们需要实现一个新的 RoI Head。我们打算从 `StandardRoIHead` 继承出新的 `DoubleHeadRoIHead`。我们发现 `StandardRoIHead` 已经实现了下述函数。
 
 ```python
 import torch
@@ -206,8 +205,8 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
 ```
 
-Double Head's modification is mainly in the bbox_forward logic, and it inherits other logics from the `StandardRoIHead`.
-In the `mmrotate/models/roi_heads/double_roi_head.py`, we implement the new RoI Head as the following:
+Double Head 的修改主要在 _bbox_forward 的逻辑中，且它从 `StandardRoIHead` 中继承了其他逻辑。
+在 `mmrotate/models/roi_heads/double_roi_head.py` 中, 我们实现如下的新的RoI Head:
 
 ```python
 from mmrotate.models.builder import ROTATED_HEADS
@@ -244,24 +243,26 @@ class DoubleHeadRoIHead(StandardRoIHead):
         return bbox_results
 ```
 
-Last, the users need to add the module in
-`mmrotate/models/bbox_heads/__init__.py` and `mmrotate/models/roi_heads/__init__.py` thus the corresponding registry could find and load them.
+最后，用户需要把这个新模块添加到
+`mmrotate/models/bbox_heads/__init__.py` 以及 `mmrotate/models/roi_heads/__init__.py` 中。 这样，注册机制就能找到并加载它们。
 
-Alternatively, the users can add
+另外，用户也可以添加
 
 ```python
 custom_imports=dict(
     imports=['mmrotate.models.roi_heads.double_roi_head', 'mmrotate.models.bbox_heads.double_bbox_head'])
 ```
 
-to the config file and achieve the same goal.
+到配置文件中来实现同样的功能.
 
 
 ### Add new loss
 
-Assume you want to add a new loss as `MyLoss`, for bounding box regression.
-To add a new loss function, the users need implement it in `mmrotate/models/losses/my_loss.py`.
-The decorator `weighted_loss` enable the loss to be weighted for each element.
+### 添加新的损失
+
+假设你想添加一个新的损失 `MyLoss` 用于边界框回归。
+为了添加一个新的损失函数，用户需要在 `mmrotate/models/losses/my_loss.py` 中实现。
+装饰器 `weighted_loss` 可以使损失每个部分加权。
 
 ```python
 import torch
@@ -298,24 +299,23 @@ class MyLoss(nn.Module):
         return loss_bbox
 ```
 
-Then the users need to add it in the `mmrotate/models/losses/__init__.py`.
+然后，用户需要把下面的代码加到 `mmrotate/models/losses/__init__.py` 中。
 
 ```python
 from .my_loss import MyLoss, my_loss
 
 ```
 
-Alternatively, you can add
+或者，你可以添加：
 
 ```python
 custom_imports=dict(
     imports=['mmrotate.models.losses.my_loss'])
 ```
 
-to the config file and achieve the same goal.
+到配置文件来实现相同的目的。
 
-To use it, modify the `loss_xxx` field.
-Since MyLoss is for regression, you need to modify the `loss_bbox` field in the head.
+因为 MyLoss 是用于回归的，你需要在 Head 中修改 `loss_bbox` 字段：
 
 ```python
 loss_bbox=dict(type='MyLoss', loss_weight=1.0))
