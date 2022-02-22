@@ -256,8 +256,6 @@ custom_imports=dict(
 到配置文件中来实现同样的功能.
 
 
-### Add new loss
-
 ### 添加新的损失
 
 假设你想添加一个新的损失 `MyLoss` 用于边界框回归。
