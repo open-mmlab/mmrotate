@@ -61,7 +61,7 @@ custom_imports = dict(imports=['mmrotate.core.optimizer.my_optimizer'], allow_fa
 
 #### 3. 在配置文件中指定优化器
 
-之后您可以在配置文件的 `optimizer` 部分里面使用 `MyOptimizer` 。
+之后您可以在配置文件的 `optimizer` 部分里面使用 `MyOptimizer`。
 在配置文件里，优化器按照如下形式被定义在 `optimizer` 部分里：
 
 ```python
@@ -117,7 +117,7 @@ class MyOptimizerConstructor(object):
 
 - __使用动量调度加速模型收敛__:
     我们支持动量规划器（Momentum scheduler），以实现根据学习率调节模型优化过程中的动量设置，这可以使模型以更快速度收敛。
-    动量规划器经常与学习率规划器（LR scheduler）一起使用，例如下面的配置经常被用于 3D 检测模型训练中以加速收敛。更多细节请参考 [CyclicLrUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L327) 和 [CyclicMomentumUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/momentum_updater.py#L130) 。
+    动量规划器经常与学习率规划器（LR scheduler）一起使用，例如下面的配置经常被用于 3D 检测模型训练中以加速收敛。更多细节请参考 [CyclicLrUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L327) 和 [CyclicMomentumUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/momentum_updater.py#L130)。
 
     ```python
     lr_config = dict(
@@ -136,8 +136,8 @@ class MyOptimizerConstructor(object):
 
 ## 自定义训练计划
 
-默认地，我们使用 1x 计划（1x schedule）的步进学习率（step learning rate），这在 MMCV 中被称为 [`StepLRHook`](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L153) 。
-我们支持很多其他的学习率规划器，参考 [这里](https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/lr_updater.py) ，例如 `CosineAnnealing` 和 `Poly` 。下面是一些例子：
+默认地，我们使用 1x 计划（1x schedule）的步进学习率（step learning rate），这在 MMCV 中被称为 [`StepLRHook`](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L153)。
+我们支持很多其他的学习率规划器，参考 [这里](https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/lr_updater.py) ，例如 `CosineAnnealing` 和 `Poly`。下面是一些例子：
 
 - `Poly` :
 
@@ -165,7 +165,7 @@ class MyOptimizerConstructor(object):
 workflow = [('train', 1)]
 ```
 
-这是指训练 1 个 epoch 。
+这是指训练 1 个 epoch。
 有时候用户可能想检查一些模型在验证集上的指标，如损失函数值（Loss）和准确性（Accuracy）。
 在这种情况下，我们可以将工作流设置为：
 
@@ -249,7 +249,7 @@ custom_hooks = [
 ]
 ```
 
-您也可以通过配置键值 `priority` 为`'NORMAL'` 或 `'HIGHEST'` 来设置钩子的优先级：
+您也可以通过配置键值 `priority` 为 `'NORMAL'` 或 `'HIGHEST'` 来设置钩子的优先级：
 
 ```python
 custom_hooks = [
@@ -257,7 +257,7 @@ custom_hooks = [
 ]
 ```
 
-默认地，钩子的优先级在注册时被设置为 `NORMAL` 。
+默认地，钩子的优先级在注册时被设置为 `NORMAL`。
 
 ### 使用 MMCV 中实现的钩子 (hooks)
 
@@ -284,24 +284,24 @@ custom_hooks = [dict(type='NumClassCheckHook')]
 - optimizer_config
 - momentum_config
 
-这些钩子中，只有记录器钩子（logger hook）是 `VERY_LOW` 优先级，其他钩子的优先级为 `NORMAL` 。
-前面提到的教程已经介绍了如何修改 `optimizer_config` , `momentum_config` 以及 `lr_config` 。
-这里我们介绍一下如何处理 `log_config` , `checkpoint_config` 以及 `evaluation` 。
+这些钩子中，只有记录器钩子（logger hook）是 `VERY_LOW` 优先级，其他钩子的优先级为 `NORMAL`。
+前面提到的教程已经介绍了如何修改 `optimizer_config` , `momentum_config` 以及 `lr_config`。
+这里我们介绍一下如何处理 `log_config` , `checkpoint_config` 以及 `evaluation`。
 
 #### Checkpoint config
 
-MMCV runner 将使用 `checkpoint_config` 来初始化 [`CheckpointHook`](https://github.com/open-mmlab/mmcv/blob/9ecd6b0d5ff9d2172c49a182eaa669e9f27bb8e7/mmcv/runner/hooks/checkpoint.py#L9) 。
+MMCV runner 将使用 `checkpoint_config` 来初始化 [`CheckpointHook`](https://github.com/open-mmlab/mmcv/blob/9ecd6b0d5ff9d2172c49a182eaa669e9f27bb8e7/mmcv/runner/hooks/checkpoint.py#L9)。
 
 ```python
 checkpoint_config = dict(interval=1)
 ```
 
-用户可以设置 `max_keep_ckpts` 来仅保存一小部分检查点（checkpoint）或者通过设置 `save_optimizer` 来决定是否保存优化器的状态字典 (state dict of optimizer)。更多使用参数的细节请参考 [这里](https://mmcv.readthedocs.io/en/latest/api.html#mmcv.runner.CheckpointHook) 。
+用户可以设置 `max_keep_ckpts` 来仅保存一小部分检查点（checkpoint）或者通过设置 `save_optimizer` 来决定是否保存优化器的状态字典 (state dict of optimizer)。更多使用参数的细节请参考 [这里](https://mmcv.readthedocs.io/en/latest/api.html#mmcv.runner.CheckpointHook)。
 
 #### Log config
 
- `log_config` 包裹了许多日志钩 (logger hooks) 而且能去设置间隔 (intervals)。现在 MMCV 支持 `WandbLoggerHook` ， `MlflowLoggerHook` 和 `TensorboardLoggerHook` 。
-详细的使用请参照 [文档](https://mmcv.readthedocs.io/en/latest/api.html#mmcv.runner.LoggerHook) 。
+ `log_config` 包裹了许多日志钩 (logger hooks) 而且能去设置间隔 (intervals)。现在 MMCV 支持 `WandbLoggerHook` ， `MlflowLoggerHook` 和 `TensorboardLoggerHook`。
+详细的使用请参照 [文档](https://mmcv.readthedocs.io/en/latest/api.html#mmcv.runner.LoggerHook)。
 
 ```python
 log_config = dict(
@@ -314,8 +314,8 @@ log_config = dict(
 
 #### Evaluation config
 
- `evaluation` 的配置文件将被用来初始化 [`EvalHook`](https://github.com/open-mmlab/mmdetection/blob/7a404a2c000620d52156774a5025070d9e00d918/mmdet/core/evaluation/eval_hooks.py#L8) 。
-除了 `interval` 键，其他的像 `metric` 这样的参数将被传递给 `dataset.evaluate()` 。
+ `evaluation` 的配置文件将被用来初始化 [`EvalHook`](https://github.com/open-mmlab/mmdetection/blob/7a404a2c000620d52156774a5025070d9e00d918/mmdet/core/evaluation/eval_hooks.py#L8)。
+除了 `interval` 键，其他的像 `metric` 这样的参数将被传递给 `dataset.evaluate()`。
 
 ```python
 evaluation = dict(interval=1, metric='bbox')
