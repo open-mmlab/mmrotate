@@ -165,7 +165,8 @@ class DOTADataset(CustomDataset):
                  logger=None,
                  proposal_nums=(100, 300, 1000),
                  iou_thr=0.5,
-                 scale_ranges=None):
+                 scale_ranges=None,
+                 nproc=4):
         """Evaluate the dataset.
 
         Args:
@@ -181,7 +182,10 @@ class DOTADataset(CustomDataset):
                 Default: 0.5.
             scale_ranges (list[tuple] | None): Scale ranges for evaluating mAP.
                 Default: None.
+            nproc (int): Processes used for computing TP and FP.
+                Default: 4.
         """
+        nproc = min(nproc, os.cpu_count())
         if not isinstance(metric, str):
             assert len(metric) == 1
             metric = metric[0]
@@ -199,18 +203,20 @@ class DOTADataset(CustomDataset):
                 iou_thr=iou_thr,
                 dataset=self.CLASSES,
                 version=self.version,
-                logger=logger)
+                logger=logger,
+                nproc=nproc)
             eval_results['mAP'] = mean_ap
         else:
             raise NotImplementedError
 
         return eval_results
 
-    def merge_det(self, results):
+    def merge_det(self, results, nproc=4):
         """Merging patch bboxes into full image.
 
         Params:
             results (list): Testing results of the dataset.
+            nproc (int): number of process. Default: 4.
         """
         collector = defaultdict(list)
         for idx in range(len(self)):
@@ -236,25 +242,25 @@ class DOTADataset(CustomDataset):
             collector[oriname].append(new_result)
 
         merge_func = partial(_merge_func, CLASSES=self.CLASSES, iou_thr=0.1)
+        if nproc <= 1:
+            print('Single processing')
+            merged_results = mmcv.track_iter_progress(
+                (map(merge_func, collector.items()), len(collector)))
+        else:
+            print('Multiple processing')
+            merged_results = mmcv.track_parallel_progress(
+                merge_func, list(collector.items()), nproc)
 
-        merged_results = mmcv.track_parallel_progress(merge_func,
-                                                      list(collector.items()),
-                                                      min(4, os.cpu_count()))
         return zip(*merged_results)
 
-    def _results2submission(self, results, out_folder=None):
+    def _results2submission(self, id_list, dets_list, out_folder=None):
         """Generate the submission of full images.
 
         Params:
-            results (list): Testing results of the dataset.
+            id_list (list): Id of images.
+            dets_list (list): Detection results of per class.
             out_folder (str, optional): Folder of submission.
         """
-        print('\nMerging patch bboxes into full image!!!')
-        start_time = time.time()
-        id_list, dets_list = self.merge_det(results)
-        stop_time = time.time()
-        print(f'Used time: {(stop_time - start_time):.1f} s')
-
         if osp.exists(out_folder):
             raise ValueError(f'The out_folder should be a non-exist path, '
                              f'but {out_folder} is existing')
@@ -287,7 +293,7 @@ class DOTADataset(CustomDataset):
 
         return files
 
-    def format_results(self, results, submission_dir=None, **kwargs):
+    def format_results(self, results, submission_dir=None, nproc=4, **kwargs):
         """Format the results to submission text (standard format for DOTA
         evaluation).
 
@@ -296,12 +302,14 @@ class DOTADataset(CustomDataset):
             submission_dir (str, optional): The folder that contains submission
             files.
                 If not specified, a temp folder will be created. Default: None.
+            nproc (int, optional): number of process.
 
         Returns:
             tuple: (result_files, tmp_dir), result_files is a dict containing
                 the json filepaths, tmp_dir is the temporal directory created
                 for saving json files when submission_dir is not specified.
         """
+        nproc = min(nproc, os.cpu_count())
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             f'The length of results is not equal to '
@@ -311,7 +319,15 @@ class DOTADataset(CustomDataset):
         else:
             tmp_dir = None
 
-        result_files = self._results2submission(results, submission_dir)
+        print('\nMerging patch bboxes into full image!!!')
+        start_time = time.time()
+        id_list, dets_list = self.merge_det(results, nproc)
+        stop_time = time.time()
+        print(f'Used time: {(stop_time - start_time):.1f} s')
+
+        result_files = self._results2submission(id_list, dets_list,
+                                                submission_dir)
+
         return result_files, tmp_dir
 
 
@@ -320,7 +336,6 @@ def eval_map(det_results,
              scale_ranges=None,
              iou_thr=0.5,
              dataset=None,
-             version='oc',
              logger=None,
              nproc=4):
     """Evaluate mAP of a dataset.
@@ -345,7 +360,6 @@ def eval_map(det_results,
         dataset (list[str] | str | None): Dataset name or dataset classes,
             there are minor differences in metrics for different datasets, e.g.
             "voc07", "imagenet_det", etc. Default: None.
-        version (str, optional): Angle representations. Defaults to 'oc'.
         logger (logging.Logger | str | None): The way to print the mAP
             summary. See `mmcv.utils.print_log()` for details. Default: None.
         tpfp_fn (callable | None): The function used to determine true/
