@@ -35,7 +35,7 @@ or
   --eval-options submission_dir=work_dirs/Task1_results
 ```
 
-You can change the test set path in the [data_root](.../configs/_base_/datasets/dotav1.py) to the val set or trainval set for the offline evaluation.
+You can change the test set path in the [data_root](../../configs/_base_/datasets/dotav1.py) to the val set or trainval set for the offline evaluation.
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -122,7 +122,7 @@ In `config2.py`,
 dist_params = dict(backend='nccl', port=29501)
 ```
 
-Then you can launch two jobs with `config1.py` ang `config2.py`.
+Then you can launch two jobs with `config1.py` and `config2.py`.
 
 ```shell
 CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py ${WORK_DIR}
