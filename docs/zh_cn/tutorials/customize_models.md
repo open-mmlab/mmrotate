@@ -1,12 +1,12 @@
 # 教程 3: 自定义模型 
 
-我们大致将模型组件分为了5种类型。
+我们大致将模型组件分为了 5 种类型。
 
-- 主干网络(Backbone): 通常是一个全卷积网络(FCN)，用来提取特征图，比如残差网络(ResNet)。也可以是基于视觉Transformer的网络，比如Swin Transformer等。
-- Neck: 主干网络和任务头(Head)之间的连接组件，比如FPN, ReFPN。
-- 任头务(Head): 用于某种具体任务（比如边界框预测）的组件。
-- 区域特征提取器(Roi Extractor): 用于从特征图上提取区域特征的组件，比如RoI Align Rotated。
-- 损失（loss）: 任务头上用于计算损失函数的组件，比如FocalLoss, GWDLoss, and KFIoULoss。
+- 主干网络 (Backbone): 通常是一个全卷积网络 (FCN)，用来提取特征图，比如残差网络 (ResNet)。也可以是基于视觉 Transformer 的网络，比如 Swin Transformer 等。
+- Neck: 主干网络和任务头 (Head) 之间的连接组件，比如 FPN, ReFPN。
+- 任头务 (Head): 用于某种具体任务（比如边界框预测）的组件。
+- 区域特征提取器 (Roi Extractor): 用于从特征图上提取区域特征的组件，比如 RoI Align Rotated。
+- 损失（loss）: 任务头上用于计算损失函数的组件，比如 FocalLoss, GWDLoss, and KFIoULoss。
 
 ## 开发新的组件
 
@@ -206,7 +206,7 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 ```
 
 Double Head 的修改主要在 _bbox_forward 的逻辑中，且它从 `StandardRoIHead` 中继承了其他逻辑。
-在 `mmrotate/models/roi_heads/double_roi_head.py` 中, 我们实现如下的新的RoI Head:
+在 `mmrotate/models/roi_heads/double_roi_head.py` 中, 我们实现如下的新的 RoI Head:
 
 ```python
 from mmrotate.models.builder import ROTATED_HEADS
@@ -243,8 +243,7 @@ class DoubleHeadRoIHead(StandardRoIHead):
         return bbox_results
 ```
 
-最后，用户需要把这个新模块添加到
-`mmrotate/models/bbox_heads/__init__.py` 以及 `mmrotate/models/roi_heads/__init__.py` 中。 这样，注册机制就能找到并加载它们。
+最后，用户需要把这个新模块添加到 `mmrotate/models/bbox_heads/__init__.py` 以及 `mmrotate/models/roi_heads/__init__.py` 中。 这样，注册机制就能找到并加载它们。
 
 另外，用户也可以添加
 
