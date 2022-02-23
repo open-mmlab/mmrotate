@@ -6,7 +6,7 @@
 - Neck: 主干网络和任务头 (Head) 之间的连接组件，比如 FPN, ReFPN。
 - 任头务 (Head): 用于某种具体任务（比如边界框预测）的组件。
 - 区域特征提取器 (Roi Extractor): 用于从特征图上提取区域特征的组件，比如 RoI Align Rotated。
-- 损失（loss）: 任务头上用于计算损失函数的组件，比如 FocalLoss, GWDLoss, and KFIoULoss。
+- 损失 (loss): 任务头上用于计算损失函数的组件，比如 FocalLoss, GWDLoss, and KFIoULoss。
 
 ## 开发新的组件
 
