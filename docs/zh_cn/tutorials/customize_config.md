@@ -1,4 +1,4 @@
-# 教程1：学习配置文件
+# 教程 1：学习配置文件
 
 我们在配置文件中支持了继承和模块化，这便于进行各种实验。
 如果需要检查配置文件，可以通过运行 `python tools/misc/print_config.py /PATH/TO/CONFIG` 来查看完整的配置。
@@ -10,7 +10,7 @@ mmrotate 是建立在 [mmdet](https://github.com/open-mmlab/mmdetection) 之上�
 
 当运行 `tools/train.py` 或者 `tools/test.py` 时，可以通过 `--cfg-options` 来修改配置。
 
-- 更新字典链的配置键
+- 更新字典链的配置
 
   可以按照原始配置文件中的 dict 键顺序地指定配置预选项。
   例如，使用 `--cfg-options model.backbone.norm_eval=False` 将模型主干网络中的所有 BN 模块都改为 `train` 模式。
@@ -81,10 +81,10 @@ model = dict(
         assign_by_circumhbbox='oc',  # obb2hbb 的旋转定义方式
         anchor_generator=dict(  # 锚点(Anchor)生成器的配置
             type='RotatedAnchorGenerator',  # 锚点生成器类别
-            octave_base_scale=4,  # The base scale of octave.
-            scales_per_octave=3,  #  Number of scales for each octave.
+            octave_base_scale=4,  # RetinaNet 用于生成锚点的超参数，特征图 anchor 的基本尺度。值越大，所有 anchor 的尺度都会变大。
+            scales_per_octave=3,  #  RetinaNet 用于生成锚点的超参数，每个特征图有3个尺度
             ratios=[1.0, 0.5, 2.0],  # 高度和宽度之间的比率
-            strides=[8, 16, 32, 64, 128]),  # 锚生成器的步幅。这与 FPN 特征步幅一致。
+            strides=[8, 16, 32, 64, 128]),  # 锚生成器的步幅。这与 FPN 特征步幅一致。如果未设置 base_sizes，则当前步幅值将被视为 base_sizes。
         bbox_coder=dict(  # 在训练和测试期间对框进行编码和解码
             type='DeltaXYWHAOBBoxCoder',  # 框编码器的类别
             angle_range='oc',  # 框编码器的旋转定义方式
