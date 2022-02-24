@@ -4,7 +4,7 @@
 
 - 主干网络 (Backbone): 通常是一个全卷积网络 (FCN)，用来提取特征图，比如残差网络 (ResNet)。也可以是基于视觉 Transformer 的网络，比如 Swin Transformer 等。
 - Neck: 主干网络和任务头 (Head) 之间的连接组件，比如 FPN, ReFPN。
-- 任头务 (Head): 用于某种具体任务（比如边界框预测）的组件。
+- 任务头 (Head): 用于某种具体任务（比如边界框预测）的组件。
 - 区域特征提取器 (Roi Extractor): 用于从特征图上提取区域特征的组件，比如 RoI Align Rotated。
 - 损失 (loss): 任务头上用于计算损失函数的组件，比如 FocalLoss, GWDLoss, and KFIoULoss。
 
@@ -16,7 +16,7 @@
 
 #### 1. 定义一个新的主干网络（以 MobileNet 为例）
 
-新建文件 `mmrotate/models/backbones/mobilenet.py`.
+新建文件 `mmrotate/models/backbones/mobilenet.py`。
 
 ```python
 import torch.nn as nn
@@ -68,7 +68,7 @@ model = dict(
 
 #### 1. 定义一个 Neck（以 PAFPN 为例）
 
-新建文件： `mmrotate/models/necks/pafpn.py`.
+新建文件 `mmrotate/models/necks/pafpn.py`。
 
 ```python
 from mmrotate.models.builder import ROTATED_NECKS
@@ -122,7 +122,7 @@ neck=dict(
 
 这里，我们以 [Double Head R-CNN](https://arxiv.org/abs/1904.06493) 为例来展示如何添加一个新的 Head。
 
-首先，添加一个新的 bbox head 到 `mmrotate/models/roi_heads/bbox_heads/double_bbox_head.py`.
+首先，添加一个新的 bbox head 到 `mmrotate/models/roi_heads/bbox_heads/double_bbox_head.py`。
 Double Head R-CNN 在目标检测上实现了一个新的 bbox head。为了实现 bbox head，我们需要使用如下的新模块中三个函数。
 
 ```python
@@ -252,7 +252,7 @@ custom_imports=dict(
     imports=['mmrotate.models.roi_heads.double_roi_head', 'mmrotate.models.bbox_heads.double_bbox_head'])
 ```
 
-到配置文件中来实现同样的功能.
+到配置文件中来实现同样的目的。
 
 
 ### 添加新的损失
