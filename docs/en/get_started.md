@@ -1,8 +1,8 @@
 ## Test a model
 
 - single GPU
-- single node multiple GPUs
-- multiple nodes
+- single node multiple GPU
+- multiple node
 
 You can use the following commands to infer a dataset.
 
@@ -76,7 +76,7 @@ If you want to specify the working directory in the command, you can add an argu
 
 Optional arguments are:
 
-- `--no-validate` (**not suggested**): By default, the codebase will perform an evaluation during the training. To disable this behavior, use `--no-validate`.
+- `--no-validate` (**not suggested**): By default, the codebase will perform evaluation during the training. To disable this behavior, use `--no-validate`.
 - `--work-dir ${WORK_DIR}`: Override the working directory specified in the config file.
 - `--resume-from ${CHECKPOINT_FILE}`: Resume from a previous checkpoint file.
 
@@ -92,8 +92,9 @@ If you run MMRotate on a cluster managed with [slurm](https://slurm.schedmd.com/
 [GPUS=${GPUS}] ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${WORK_DIR}
 ```
 
-If you have just multiple machines connected with Ethernet, you can refer to PyTorch [launch utility](https://pytorch.org/docs/stable/distributed.html#launch-utility).
-Usually, it is slow if you do not have high-speed networking like InfiniBand.
+If you have just multiple machines connected with ethernet, you can refer to
+PyTorch [launch utility](https://pytorch.org/docs/stable/distributed_deprecated.html#launch-utility).
+Usually it is slow if you do not have high speed networking like InfiniBand.
 
 ### Launch multiple jobs on a single machine
 
@@ -121,7 +122,7 @@ In `config2.py`,
 dist_params = dict(backend='nccl', port=29501)
 ```
 
-Then you can launch two jobs with `config1.py` and `config2.py`.
+Then you can launch two jobs with `config1.py` ang `config2.py`.
 
 ```shell
 CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py ${WORK_DIR}
