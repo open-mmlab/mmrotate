@@ -5,7 +5,6 @@ If you wish to inspect the config file, you may run `python tools/misc/print_con
 The mmrotate is built upon the [mmdet](https://github.com/open-mmlab/mmdetection),
 thus it is highly recommended to learn the basics of [mmdet](https://mmdetection.readthedocs.io/en/latest/).
 
-
 ## Modify a config through script arguments
 
 When submitting jobs using "tools/train.py" or "tools/test.py", you may specify `--cfg-options` to in-place modify the config.
@@ -31,7 +30,7 @@ When submitting jobs using "tools/train.py" or "tools/test.py", you may specify 
 
 We follow the below style to name config files. Contributors are advised to follow the same style.
 
-```
+```text
 {model}_[model setting]_{backbone}_{neck}_[norm setting]_[misc]_[gpu x batch_per_gpu]_{dataset}_{data setting}_{angle version}
 ```
 

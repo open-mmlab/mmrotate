@@ -5,7 +5,6 @@
 mmrotate 是建立在 [mmdet](https://github.com/open-mmlab/mmdetection) 之上的，
 因此强烈建议学习 [mmdet](https://mmdetection.readthedocs.io/en/latest/) 的基本知识。
 
-
 ## 通过脚本参数修改配置
 
 当运行 `tools/train.py` 或者 `tools/test.py` 时，可以通过 `--cfg-options` 来修改配置。
@@ -18,7 +17,7 @@ mmrotate 是建立在 [mmdet](https://github.com/open-mmlab/mmdetection) 之上�
 - 更新配置列表中的键
 
   在配置文件里，一些字典型的配置被包含在列表中。例如，数据训练流程 `data.train.pipeline` 通常是一个列表，比如  `[dict(type='LoadImageFromFile'), ...]`。 如果需要将 `'LoadImageFromFile'` 改成 `'LoadImageFromWebcam'` ，需要写成下述形式： `--cfg-options data.train.pipeline.0.type=LoadImageFromWebcam`。
-  
+
 - 更新列表或元组的值
 
   如果要更新的值是列表或元组。例如，配置文件通常设置 `workflow=[('train', 1)]`，如果需要改变这个键，可以通过 `--cfg-options workflow="[(train,1),(val,1)]"` 来重新设置。需要注意，引号 " 是支持列表或元组数据类型所必需的，并且在指定值的引号内**不允许**有空格。
@@ -27,7 +26,7 @@ mmrotate 是建立在 [mmdet](https://github.com/open-mmlab/mmdetection) 之上�
 
 我们遵循以下样式来命名配置文件。建议贡献者遵循相同的风格。
 
-```
+```text
 {model}_[model setting]_{backbone}_{neck}_[norm setting]_[misc]_[gpu x batch_per_gpu]_{dataset}_{data setting}_{angle version}
 ```
 
