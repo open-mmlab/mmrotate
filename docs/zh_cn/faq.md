@@ -21,19 +21,19 @@
 - "RTX 30 series card fails when building MMCV or MMDet"
 
   1.  常见报错信息为 `nvcc fatal : Unsupported gpu architecture 'compute_86'` 意思是你的编译器应该为 sm_86 进行优化，例如， 英伟达30系列的显卡，但这样的优化 CUDA toolkit 11.0 并不支持。
-     此解决方案通过添加 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 来修改编译标志，这告诉编译器 `nvcc`  为 **sm_80** 进行优化，例如Nvidia A100，尽管 A100 不同于30系列的显卡，但他们使用相似的图灵架构。这种解决方案可能会丧失一些性能但的确有效。
+     此解决方案通过添加 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 来修改编译标志，这告诉编译器 `nvcc`  为 **sm_80** 进行优化，例如 Nvidia A100，尽管 A100 不同于30系列的显卡，但他们使用相似的图灵架构。这种解决方案可能会丧失一些性能但的确有效。
 
   2. PyTorch 开发者已经在 [pytorch/pytorch#47585](https://github.com/pytorch/pytorch/pull/47585) 更新了 PyTorch 默认的编译 flag，所以使用 Pytorch-nightly 可能也能解决这个问题， 但是我们对此并没有验证这种方式是否有效。
 
 - "invalid device function" or "no kernel image is available for execution".
 
-  1. 检查您的cuda运行时版本(一般在 `/usr/local/` )、指令 `nvcc --version` 显示的版本以及 `conda list cudatoolkit` 指令显式的版本是否匹配。
-  2. 通过运行 `python mmdet/utils/collect_env.py` 来检查是否为当前的GPU架构编译了正确的 Pytorch、torchvision 和 MMCV ,你可能需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV 。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV 。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
-  3. 检查运行环境是否与 mmcv/mmdet 编译时相同，例如，您可能使用  CUDA 10.0 编译    mmcv，但在  CUDA 9.0 环境中运行它。
+  1. 检查您的 cuda 运行时版本(一般在 `/usr/local/` )、指令 `nvcc --version` 显示的版本以及 `conda list cudatoolkit` 指令显式的版本是否匹配。
+  2. 通过运行 `python mmdet/utils/collect_env.py` 来检查是否为当前的GPU架构编译了正确的 Pytorch、torchvision 和 MMCV ，你可能需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV 。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
+  3. 检查运行环境是否与 mmcv/mmdet 编译时相同，例如，您可能使用 CUDA 10.0 编译 MMCV，但在 CUDA 9.0 环境中运行它。
 
 - "undefined symbol" or "cannot open xxx.so".
 
-  1. 如果这些 symbols 属于 CUDA/C++ (例如， libcudart.so 或者 GLIBCXX)，检查 CUDA/GCC 运行时环境是否与编译 MMCV 的一致。例如使用 `python mmdet/utils/collect_env.py` 检查 `"MMCV Complier"`/`"MMCV CUDA Complier"` 是否和 `"GCC"`/`"CUDA_HOME"` 一致。
+  1. 如果这些 symbols 属于 CUDA/C++(例如， libcudart.so 或者 GLIBCXX)，检查 CUDA/GCC 运行时环境是否与编译 MMCV 的一致。例如使用 `python mmdet/utils/collect_env.py` 检查 `"MMCV Complier"`/`"MMCV CUDA Complier"` 是否和 `"GCC"`/`"CUDA_HOME"` 一致。
   2. 如果这些 symbols 属于 PyTorch，(例如， symbols containing caffe, aten, and TH), 检查当前 Pytorch 版本是否与编译 MMCV 的版本一致。
   3. 运行 `python mmdet/utils/collect_env.py` 检查 PyTorch， torchvision， MMCV 等的编译环境与运行环境一致。
 
@@ -46,7 +46,7 @@
 
   1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如， 对于 Pytorch GCC < 4.9 )，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
 
-  2. 检查是是否 Pytorch 被正确的安装并可以使用CUDA 算子，例如在终端中键入如下的指令 。
+  2. 检查是是否 PyTorch 被正确的安装并可以使用 CUDA 算子，例如在终端中键入如下的指令。
 
      ```shell
      python -c 'import torch; print(torch.cuda.is_available())'
@@ -72,8 +72,8 @@
   3. 延长 warm up 的时间：一些模型在训练初始时对学习率很敏感，您可以把 `warmup_iters` 从 500 更改为 1000 或 2000。
   4. 添加 gradient clipping: 一些模型需要梯度裁剪来稳定训练过程。 默认的 `grad_clip` 是 `None`,  你可以在 config 设置 `optimizer_config=dict(_delete_=True, grad_clip=dict(max_norm=35, norm_type=2))`  如果你的 config 没有继承任何包含 `optimizer_config=dict(grad_clip=None)`,  你可以直接设置`optimizer_config=dict(grad_clip=dict(max_norm=35, norm_type=2))`.
 - ’GPU out of memory"
-  1. 存在大量 ground truth boxes 或者大量 anchor 的场景，可能在 assigner 会 OOM。 您可以在 assigner 的配置中设置 `gpu_assign_thr=N`，这样当超过 N 个 GT boxes 时，assigner 会通过 CPU 计算 IOU。
-  2. 在 backbone 中设置 `with_cp=True`。 这使用 PyTorch 中的 `sublinear strategy` 来降低 backbone 占用的 GPU 显存。
+  1. 存在大量 ground truth boxes 或者大量 anchor 的场景，可能在 assigner 会 OOM。您可以在 assigner 的配置中设置 `gpu_assign_thr=N`，这样当超过 N 个 GT boxes 时，assigner 会通过 CPU 计算 IOU。
+  2. 在 backbone 中设置 `with_cp=True`。这使用 PyTorch 中的 `sublinear strategy` 来降低 backbone 占用的 GPU 显存。
   3. 使用 `config/fp16` 中的示例尝试混合精度训练。`loss_scale` 可能需要针对不同模型进行调整。
 - "RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one"
   1. 错误表明，您的模块有没用于产生损失的参数，这种现象可能是由于在DDP模式下运行代码中的不同分支造成的。
