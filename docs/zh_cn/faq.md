@@ -20,7 +20,7 @@
 
 - "RTX 30 series card fails when building MMCV or MMDet"
 
-  1. 临时解决方案为使用命令 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 进行编译。 常见报错信息为 `nvcc fatal : Unsupported gpu architecture 'compute_86'` 意思是你的编译器不支持 sm_86 架构(包括英伟达 30 系列的显卡)的优化，至 CUDA toolkit 11.0 依旧未支持. 这个命令是通过增加宏 `MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80` 让 nvcc 编译器为英伟达 30 系列显卡(例如Nvidia A100)进行 `sm_80` 的优化，虽然这有可能会无法发挥出显卡所有性能,但确实有效。
+  1. 临时解决方案为使用命令 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 进行编译。 常见报错信息为 `nvcc fatal : Unsupported gpu architecture 'compute_86'` 意思是你的编译器不支持 sm_86 架构(包括英伟达 30 系列的显卡)的优化，至 CUDA toolkit 11.0 依旧未支持. 这个命令是通过增加宏 `MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80` 让 nvcc 编译器为英伟达 30 系列显卡(例如， Nvidia A100)进行 `sm_80` 的优化，虽然这有可能会无法发挥出显卡所有性能,但确实有效。
 
   2. 有开发者已经在 [pytorch/pytorch#47585](https://github.com/pytorch/pytorch/pull/47585) 更新了 PyTorch 默认的编译 flag， 但是我们对此并没有进行测试。
 
@@ -43,7 +43,7 @@
 
 - "Segmentation fault". 
 
-  1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如 对于Pytorch GCC < 4.9 )，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
+  1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如， 对于Pytorch GCC < 4.9 )，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
 
   2. 检查是是否Pytorch被正确的安装并可以使用CUDA 算子，例如在终端中键入如下的指令 。
 
