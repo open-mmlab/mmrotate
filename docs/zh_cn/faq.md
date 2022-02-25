@@ -26,19 +26,19 @@
 
 - "invalid device function" or "no kernel image is available for execution".
 
-  1. 检查您的cuda运行时版本(一般在`/usr/local/`)、指令`nvcc --version`显示的版本以及`conda list cudatoolkit`指令显式的版本是否匹配。
-  2. 通过运行`python mmdet/utils/collect_env.py`来检查是否为当前的GPU架构编译了正确的Pytorch、torchvision和MMCV,你可能需要设置`TORCH_CUDA_ARCH_LIST`来重新安装MMCV。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
-  3. 检查运行环境是否与mmcv/mmdet编译时相同，例如您可能使用CUDA 10.0编译mmcv，但在CUDA 9.0环境中运行它。
+  1. 检查您的cuda运行时版本(一般在 `/usr/local/` )、指令 `nvcc --version` 显示的版本以及 `conda list cudatoolkit` 指令显式的版本是否匹配。
+  2. 通过运行 `python mmdet/utils/collect_env.py` 来检查是否为当前的GPU架构编译了正确的 Pytorch 、 torchvision 和 MMCV ,你可能需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV 。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV 。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
+  3. 检查运行环境是否与 mmcv/mmdet 编译时相同，例如您可能使用 CUDA 10.0 编译    mmcv，但在 CUDA 9.0 环境中运行它。
 
 - "undefined symbol" or "cannot open xxx.so".
 
-  1. 如果这些 symbol 属于 CUDA/C++ (如 libcudart.so 或者 GLIBCXX)，检查CUDA/GCC运行时环境是否与编译MMCV的一致。例如使用 `python mmdet/utils/collect_env.py`检查`"MMCV Complier"`/`"MMCV CUDA Complier"`是否和`"GCC"`/`"CUDA_HOME"`一致。
-  2. 如果这些 symbols 属于 PyTorch，(例如, symbols containing caffe, aten, and TH), 检查当前 Pytorch 版本是否与编译 MMCV 的版本一致。
+  1. 如果这些 symbol 属于 CUDA/C++ (如 libcudart.so 或者 GLIBCXX)，检查CUDA/GCC运行时环境是否与编译MMCV的一致。例如使用 `python mmdet/utils/collect_env.py` 检查 `"MMCV Complier"`/`"MMCV CUDA Complier"`是否和 `"GCC"`/`"CUDA_HOME"` 一致。
+  2. 如果这些 symbols 属于 PyTorch，(例如，symbols containing caffe, aten, and TH), 检查当前 Pytorch 版本是否与编译 MMCV 的版本一致。
   3. 运行 `python mmdet/utils/collect_env.py` 检查 PyTorch， torchvision， MMCV 等的编译环境与运行环境一致。
 
 - "setuptools.sandbox.UnpickleableException: DistutilsSetupError("each element of 'ext_modules' option must be an Extension instance or 2-tuple")"
 
-  1. 如果你在使用 miniconda 而不是 anaconda，检查是否正确的安装了 Cython 如 [#3379](https://github.com/open-mmlab/mmdetection/issues/3379)。您需要先手动安装Cpython然后运命令`pip install -r requirements.txt`。
+  1. 如果你在使用 miniconda 而不是 anaconda，检查是否正确的安装了 Cython 如 [#3379](https://github.com/open-mmlab/mmdetection/issues/3379)。您需要先手动安装 Cpython 然后运命令 `pip install -r requirements.txt`。
   2. 检查环境中的 `setuptools`, `Cython`, and `PyTorch` 相互之间版本是否匹配。
 
 - "Segmentation fault".
@@ -51,7 +51,7 @@
      python -c 'import torch; print(torch.cuda.is_available())'
      ```
 
-     并判断是否是否返回True。
+     并判断是否是否返回 True。
 
   3. 如果 `torch` 的安装是正确的，检查是否正确编译了 MMCV。
 
@@ -66,7 +66,7 @@
 ## Training 相关
 
 - "Loss goes Nan"
-  1. 检查数据的标注是否正常， 长或宽为 0 的框可能会导致回归 loss 变为 nan，一些小尺寸（宽度或高度小于 1）的框在数据增强（例如，instaboost）后也会导致此问题。 因此，可以检查标注并过滤掉那些特别小甚至面积为 0 的框，并关闭一些可能会导致 0 面积框出现数据增强。
+  1. 检查数据的标注是否正常， 长或宽为 0 的框可能会导致回归 loss 变为 nan，一些小尺寸（宽度或高度小于 1）的框在数据增强（例如，instaboost）后也会导致此问题。因此，可以检查标注并过滤掉那些特别小甚至面积为 0 的框，并关闭一些可能会导致 0 面积框出现数据增强。
   2. 降低学习率：由于某些原因，例如 batch size 大小的变化， 导致当前学习率可能太大。 您可以降低为可以稳定训练模型的值。
   3. 延长 warm up 的时间：一些模型在训练初始时对学习率很敏感，您可以把 `warmup_iters` 从 500 更改为 1000 或 2000。
   4. 添加 gradient clipping: 一些模型需要梯度裁剪来稳定训练过程。 默认的 `grad_clip` 是 `None`,  你可以在 config 设置 `optimizer_config=dict(_delete_=True, grad_clip=dict(max_norm=35, norm_type=2))`  如果你的 config 没有继承任何包含 `optimizer_config=dict(grad_clip=None)`,  你可以直接设置`optimizer_config=dict(grad_clip=dict(max_norm=35, norm_type=2))`.
