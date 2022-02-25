@@ -26,18 +26,9 @@
 
 - "invalid device function" or "no kernel image is available for execution".
 
-  1. 检查您正常安装了 CUDA runtime (一般在`/usr/local/`)，或者使用 `nvcc --version` 检查本地版本，有时安装 PyTorch 会顺带安装一个 CUDA runtime，并且实际优先使用 conda 环境中的版本，你可以使用 `conda list cudatoolkit` 查看其版本。
-
-  2. 编译 extension 的 CUDA Toolkit 版本与运行时的 CUDA Toolkit 版本是否相符，
-
-     * 如果您从源码自己编译的，使用 `python mmdet/utils/collect_env.py` 检查编译编译 extension 的 CUDA Toolkit 版本，然后使用 `conda list cudatoolkit` 检查当前 conda 环境是否有 CUDA Toolkit，若有检查版本是否匹配， 如不匹配，更换 conda 环境的 CUDA Toolkit，或者使用匹配的 CUDA Toolkit 中的 nvcc 编译即可，如环境中无 CUDA Toolkit，可以使用 `nvcc -V`。
-
-       等命令查看当前使用的 CUDA runtime。
-
-     * 如果您是通过 pip 下载的预编译好的版本，请确保与当前 CUDA runtime 一致。
-
-  3. 运行 `python mmdet/utils/collect_env.py` 检查是否为正确的 GPU 架构编译的 PyTorch， torchvision， 与 MMCV。 你或许需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV，可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list),
-     例如， 运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
+  1. 检查您的cuda运行时版本(一般在`/usr/local/`)、指令`nvcc --version`显示的版本以及`conda list cudatoolkit`指令显式的版本是否匹配。
+2. 通过运行`python mmdet/utils/collect_env.py`来检查是否为当前的GPU架构编译了正确的Pytorch、torchvision和MMCV,你可能需要设置`TORCH_CUDA_ARCH_LIST`来重新安装MMCV。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
+  3. 检查运行环境是否与mmcv/mmdet编译时相同，例如您可能使用CUDA 10.0编译mmcv，但在CUDA 9.0环境中运行它。
 
 - "undefined symbol" or "cannot open xxx.so".
 
@@ -83,8 +74,7 @@
   3. 使用 `config/fp16` 中的示例尝试混合精度训练。`loss_scale` 可能需要针对不同模型进行调整。
 - "RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one"
   1. 这个错误出现在存在参数没有在 forward 中使用，容易在 DDP 中运行不同分支时发生。
-  2. 你可以在 config 设置 `find_unused_parameters = True` 进行训练 (会降低训练速度)。
-  3. 你也可以通过在 config 中的 `optimizer_config` 里设置 `detect_anomalous_params=True` 查找哪些参数没有用到，但是需要 MMCV 的版本 >= 1.4.1。
+  2. 你可以手动在 config 设置 `find_unused_parameters = True` 进行训练 (会降低训练速度)。
 
 
 
