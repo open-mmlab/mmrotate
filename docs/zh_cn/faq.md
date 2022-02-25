@@ -20,7 +20,7 @@
 
 - "RTX 30 series card fails when building MMCV or MMDet"
 
-  1. 临时解决方案为使用命令 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 进行编译。 常见报错信息为 `nvcc fatal : Unsupported gpu architecture 'compute_86'` 意思是你的编译器不支持 sm_86 架构(包括英伟达 30 系列的显卡)的优化，至 CUDA toolkit 11.0 依旧未支持. 这个命令是通过增加宏 `MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80` 让 nvcc 编译器为英伟达 30 系列显卡进行 `sm_80` 的优化，虽然这有可能会无法发挥出显卡所有性能。
+  1. 临时解决方案为使用命令 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 进行编译。 常见报错信息为 `nvcc fatal : Unsupported gpu architecture 'compute_86'` 意思是你的编译器不支持 sm_86 架构(包括英伟达 30 系列的显卡)的优化，至 CUDA toolkit 11.0 依旧未支持. 这个命令是通过增加宏 `MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80` 让 nvcc 编译器为英伟达 30 系列显卡(例如Nvidia A100)进行 `sm_80` 的优化，虽然这有可能会无法发挥出显卡所有性能,但确实有效。
 
   2. 有开发者已经在 [pytorch/pytorch#47585](https://github.com/pytorch/pytorch/pull/47585) 更新了 PyTorch 默认的编译 flag， 但是我们对此并没有进行测试。
 
@@ -32,26 +32,26 @@
 
 - "undefined symbol" or "cannot open xxx.so".
 
-  1. 如果这些 symbol 属于 CUDA/C++ (如 libcudart.so 或者 GLIBCXX)，使用 `python mmdet/utils/collect_env.py`检查 CUDA/GCC runtime 与编译 MMCV 的 CUDA 版本是否相同。
+  1. 如果这些 symbol 属于 CUDA/C++ (如 libcudart.so 或者 GLIBCXX)，检查CUDA/GCC运行时环境是否与编译MMCV的一致。例如使用 `python mmdet/utils/collect_env.py`检查`"MMCV Complier"`/`"MMCV CUDA Complier"`是否和`"GCC"`/`"CUDA_HOME"`一致。
   2. 如果这些 symbols 属于 PyTorch，(例如, symbols containing caffe, aten, and TH), 检查当前 Pytorch 版本是否与编译 MMCV 的版本一致。
   3. 运行 `python mmdet/utils/collect_env.py` 检查 PyTorch， torchvision， MMCV 等的编译环境与运行环境一致。
 
 - "setuptools.sandbox.UnpickleableException: DistutilsSetupError("each element of 'ext_modules' option must be an Extension instance or 2-tuple")"
 
-  1. 如果你在使用 miniconda 而不是 anaconda，检查是否正确的安装了 Cython 如 [#3379](https://github.com/open-mmlab/mmdetection/issues/3379).
+  1. 如果你在使用 miniconda 而不是 anaconda，检查是否正确的安装了 Cython 如 [#3379](https://github.com/open-mmlab/mmdetection/issues/3379)。您需要先手动安装Cpython然后运命令`pip install -r requirements.txt`。
   2. 检查环境中的 `setuptools`, `Cython`, and `PyTorch` 相互之间版本是否匹配。
 
 - "Segmentation fault".
 
-  1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如 GCC < 4.9 )，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
+  1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如 对于Pytorch GCC < 4.9 )，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
 
-  2. 检查是否正确安装了 CUDA 版本的 PyTorch 。
+  2. 检查是是否Pytorch被正确的安装并可以使用CUDA 算子，例如在终端中键入如下的指令 。
 
      ```shell
      python -c 'import torch; print(torch.cuda.is_available())'
      ```
 
-     是否返回True。
+     并判断是否是否返回True。
 
   3. 如果 `torch` 的安装是正确的，检查是否正确编译了 MMCV。
 
@@ -59,6 +59,8 @@
      python -c 'import mmcv; import mmcv.ops'
      ```
 
+     如果MMCV被正确的安装了，那么上面的两条指令不会有、问题。
+  
   4. 如果 MMCV 与 PyTorch 都被正确安装了，则使用 `ipdb`, `pdb` 设置断点，直接查找哪一部分的代码导致了 `segmentation fault`。
 
 ## Training 相关
