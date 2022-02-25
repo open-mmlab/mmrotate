@@ -1,6 +1,6 @@
 # 常见问题解答
 
-我们在这里列出了使用时的一些常见问题及其相应的解决方案。 如果您发现有一些问题被遗漏，请随时提 PR 丰富这个列表。 如果您无法在此获得帮助，请使用 [issue模板](https://github.com/open-mmlab/mmdetection/blob/master/.github/ISSUE_TEMPLATE/error-report.md/ )创建问题，但是请在模板中填写所有必填信息，这有助于我们更快定位问题。
+我们在这里列出了使用时的一些常见问题及其相应的解决方案。 如果您发现有一些问题被遗漏，请随时提 PR 丰富这个列表。 如果您无法在此获得帮助，请使用 [issue模板](https://github.com/open-mmlab/mmdetection/blob/master/.github/ISSUE_TEMPLATE/error-report.md/ ) 创建问题，但是请在模板中填写所有必填信息，这有助于我们更快定位问题。
 
 ## MMCV 安装相关
 
@@ -20,32 +20,33 @@
 
 - "RTX 30 series card fails when building MMCV or MMDet"
 
-  1. 临时解决方案为使用命令 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 进行编译。 常见报错信息为 `nvcc fatal : Unsupported gpu architecture 'compute_86'` 意思是你的编译器不支持 sm_86 架构(包括英伟达 30 系列的显卡)的优化，至 CUDA toolkit 11.0 依旧未支持. 这个命令是通过增加宏 `MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80` 让 nvcc 编译器为英伟达 30 系列显卡(例如， Nvidia A100)进行 `sm_80` 的优化，虽然这有可能会无法发挥出显卡所有性能,但确实有效。
+  1.  常见报错信息为 `nvcc fatal : Unsupported gpu architecture 'compute_86'` 意思是你的编译器应该为 sm_86 进行优化，例如， 英伟达30系列的显卡，但这样的优化 CUDA toolkit 11.0 并不支持。
+     此解决方案通过添加 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 来修改编译标志，这告诉编译器 `nvcc`  为 **sm_80** 进行优化，例如Nvidia A100，尽管 A100 不同于30系列的显卡，但他们使用相似的图灵架构。这种解决方案可能会丧失一些性能但的确有效。
 
-  2. 有开发者已经在 [pytorch/pytorch#47585](https://github.com/pytorch/pytorch/pull/47585) 更新了 PyTorch 默认的编译 flag， 但是我们对此并没有进行测试。
+  2. PyTorch 开发者已经在 [pytorch/pytorch#47585](https://github.com/pytorch/pytorch/pull/47585) 更新了 PyTorch 默认的编译 flag，所以使用 Pytorch-nightly 可能也能解决这个问题， 但是我们对此并没有验证这种方式是否有效。
 
 - "invalid device function" or "no kernel image is available for execution".
 
   1. 检查您的cuda运行时版本(一般在 `/usr/local/` )、指令 `nvcc --version` 显示的版本以及 `conda list cudatoolkit` 指令显式的版本是否匹配。
-  2. 通过运行 `python mmdet/utils/collect_env.py` 来检查是否为当前的GPU架构编译了正确的 Pytorch 、 torchvision 和 MMCV ,你可能需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV 。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV 。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
-  3. 检查运行环境是否与 mmcv/mmdet 编译时相同，例如，您可能使用 CUDA 10.0 编译    mmcv，但在 CUDA 9.0 环境中运行它。
+  2. 通过运行 `python mmdet/utils/collect_env.py` 来检查是否为当前的GPU架构编译了正确的 Pytorch、torchvision 和 MMCV ,你可能需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV 。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV 。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
+  3. 检查运行环境是否与 mmcv/mmdet 编译时相同，例如，您可能使用  CUDA 10.0 编译    mmcv，但在  CUDA 9.0 环境中运行它。
 
 - "undefined symbol" or "cannot open xxx.so".
 
-  1. 如果这些 symbol 属于 CUDA/C++ (例如， libcudart.so 或者 GLIBCXX)，检查CUDA/GCC运行时环境是否与编译MMCV的一致。例如使用 `python mmdet/utils/collect_env.py` 检查 `"MMCV Complier"`/`"MMCV CUDA Complier"`是否和 `"GCC"`/`"CUDA_HOME"` 一致。
+  1. 如果这些 symbols 属于 CUDA/C++ (例如， libcudart.so 或者 GLIBCXX)，检查 CUDA/GCC 运行时环境是否与编译 MMCV 的一致。例如使用 `python mmdet/utils/collect_env.py` 检查 `"MMCV Complier"`/`"MMCV CUDA Complier"` 是否和 `"GCC"`/`"CUDA_HOME"` 一致。
   2. 如果这些 symbols 属于 PyTorch，(例如， symbols containing caffe, aten, and TH), 检查当前 Pytorch 版本是否与编译 MMCV 的版本一致。
   3. 运行 `python mmdet/utils/collect_env.py` 检查 PyTorch， torchvision， MMCV 等的编译环境与运行环境一致。
 
 - "setuptools.sandbox.UnpickleableException: DistutilsSetupError("each element of 'ext_modules' option must be an Extension instance or 2-tuple")"
 
   1. 如果你在使用 miniconda 而不是 anaconda，检查是否正确的安装了 Cython 如 [#3379](https://github.com/open-mmlab/mmdetection/issues/3379)。您需要先手动安装 Cpython 然后运命令 `pip install -r requirements.txt`。
-  2. 检查环境中的 `setuptools`, `Cython`, and `PyTorch` 相互之间版本是否匹配。
+  2. 检查环境中的 `setuptools`, `Cython`, 和  `PyTorch` 相互之间版本是否匹配。
 
 - "Segmentation fault". 
 
-  1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如， 对于Pytorch GCC < 4.9 )，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
+  1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如， 对于 Pytorch GCC < 4.9 )，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
 
-  2. 检查是是否Pytorch被正确的安装并可以使用CUDA 算子，例如在终端中键入如下的指令 。
+  2. 检查是是否 Pytorch 被正确的安装并可以使用CUDA 算子，例如在终端中键入如下的指令 。
 
      ```shell
      python -c 'import torch; print(torch.cuda.is_available())'
@@ -59,7 +60,7 @@
      python -c 'import mmcv; import mmcv.ops'
      ```
 
-     如果MMCV被正确的安装了，那么上面的两条指令不会有、问题。
+     如果 MMCV 被正确的安装了，那么上面的两条指令不会有问题。
   
   4. 如果 MMCV 与 PyTorch 都被正确安装了，则使用 `ipdb`, `pdb` 设置断点，直接查找哪一部分的代码导致了 `segmentation fault`。
 
@@ -75,13 +76,13 @@
   2. 在 backbone 中设置 `with_cp=True`。 这使用 PyTorch 中的 `sublinear strategy` 来降低 backbone 占用的 GPU 显存。
   3. 使用 `config/fp16` 中的示例尝试混合精度训练。`loss_scale` 可能需要针对不同模型进行调整。
 - "RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one"
-  1. 这个错误出现在存在参数没有在 forward 中使用，容易在 DDP 中运行不同分支时发生。
-  2. 你可以手动在 config 设置 `find_unused_parameters = True` 进行训练 (会降低训练速度)。
+  1. 错误表明，您的模块有没用于产生损失的参数，这种现象可能是由于在DDP模式下运行代码中的不同分支造成的。
+  2. 您可以在配置中设置 `find_unused_parameters=True` 来解决上述问题，或者手动查找那些未使用的参数。
 
 
 
 ## Evaluation 相关
 
-- 使用 COCO Dataset 的测评接口时, 测评结果中 AP 或者 AR = -1
-  1. 根据COCO数据集的定义，一张图像中的中等物体与小物体面积的阈值分别为 9216（96\*96）与 1024（32\*32）。
+- 使用 COCO Dataset 的测评接口时, 测评结果中  AP 或者 AR = -1。
+  1. 根据 COCO 数据集的定义，一张图像中的中等物体与小物体面积的阈值分别为 9216（96\*96）与 1024（32\*32）。
   2. 如果在某个区间没有检测框 AP 与 AR 认定为 -1.
