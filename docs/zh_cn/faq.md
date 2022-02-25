@@ -12,15 +12,15 @@
 
   原因是安装了 `mmcv` 而不是 `mmcv-full`。
 
-  1. 使用`pip uninstall mmcv` 卸载。
+  1. 使用 `pip uninstall mmcv` 卸载。
   2. 根据 [安装说明](https://mmcv.readthedocs.io/zh/latest/#installation) 安装 `mmcv-full`。
 
 ## PyTorch/CUDA 环境相关
 
 - "RTX 30 series card fails when building MMCV or MMDet"
 
-  1. 常见报错信息为 `nvcc fatal: Unsupported gpu architecture 'compute_86'` 意思是你的编译器应该为 sm_86 进行优化，例如， 英伟达30系列的显卡，但这样的优化 CUDA toolkit 11.0 并不支持。
-     此解决方案通过添加 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 来修改编译标志，这告诉编译器 `nvcc` 为 **sm_80** 进行优化，例如 Nvidia A100，尽管 A100 不同于30系列的显卡，但他们使用相似的图灵架构。这种解决方案可能会丧失一些性能但的确有效。
+  1. 常见报错信息为 `nvcc fatal: Unsupported gpu architecture 'compute_86'` 意思是你的编译器应该为 sm_86 进行优化，例如， 英伟达 30 系列的显卡，但这样的优化 CUDA toolkit 11.0 并不支持。
+     此解决方案通过添加 `MMCV_WITH_OPS=1 MMCV_CUDA_ARGS='-gencode=arch=compute_80,code=sm_80' pip install -e .` 来修改编译标志，这告诉编译器 `nvcc` 为 **sm_80** 进行优化，例如 Nvidia A100，尽管 A100 不同于 30 系列的显卡，但他们使用相似的图灵架构。这种解决方案可能会丧失一些性能但的确有效。
   2. PyTorch 开发者已经在 [pytorch/pytorch#47585](https://github.com/pytorch/pytorch/pull/47585) 更新了 PyTorch 默认的编译标志，所以使用 PyTorch-nightly 可能也能解决这个问题，但是我们对此并没有验证这种方式是否有效。
 
 - "invalid device function" or "no kernel image is available for execution".
