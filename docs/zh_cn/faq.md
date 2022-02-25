@@ -27,7 +27,7 @@
 - "invalid device function" or "no kernel image is available for execution".
 
   1. 检查您的cuda运行时版本(一般在`/usr/local/`)、指令`nvcc --version`显示的版本以及`conda list cudatoolkit`指令显式的版本是否匹配。
-2. 通过运行`python mmdet/utils/collect_env.py`来检查是否为当前的GPU架构编译了正确的Pytorch、torchvision和MMCV,你可能需要设置`TORCH_CUDA_ARCH_LIST`来重新安装MMCV。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
+  2. 通过运行`python mmdet/utils/collect_env.py`来检查是否为当前的GPU架构编译了正确的Pytorch、torchvision和MMCV,你可能需要设置`TORCH_CUDA_ARCH_LIST`来重新安装MMCV。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
   3. 检查运行环境是否与mmcv/mmdet编译时相同，例如您可能使用CUDA 10.0编译mmcv，但在CUDA 9.0环境中运行它。
 
 - "undefined symbol" or "cannot open xxx.so".
