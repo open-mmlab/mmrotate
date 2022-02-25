@@ -28,12 +28,12 @@
 
   1. 检查您的cuda运行时版本(一般在 `/usr/local/` )、指令 `nvcc --version` 显示的版本以及 `conda list cudatoolkit` 指令显式的版本是否匹配。
   2. 通过运行 `python mmdet/utils/collect_env.py` 来检查是否为当前的GPU架构编译了正确的 Pytorch 、 torchvision 和 MMCV ,你可能需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV 。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV 。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 例如， Tesla K80。
-  3. 检查运行环境是否与 mmcv/mmdet 编译时相同，例如您可能使用 CUDA 10.0 编译    mmcv，但在 CUDA 9.0 环境中运行它。
+  3. 检查运行环境是否与 mmcv/mmdet 编译时相同，例如，您可能使用 CUDA 10.0 编译    mmcv，但在 CUDA 9.0 环境中运行它。
 
 - "undefined symbol" or "cannot open xxx.so".
 
-  1. 如果这些 symbol 属于 CUDA/C++ (如 libcudart.so 或者 GLIBCXX)，检查CUDA/GCC运行时环境是否与编译MMCV的一致。例如使用 `python mmdet/utils/collect_env.py` 检查 `"MMCV Complier"`/`"MMCV CUDA Complier"`是否和 `"GCC"`/`"CUDA_HOME"` 一致。
-  2. 如果这些 symbols 属于 PyTorch，(例如，symbols containing caffe, aten, and TH), 检查当前 Pytorch 版本是否与编译 MMCV 的版本一致。
+  1. 如果这些 symbol 属于 CUDA/C++ (例如， libcudart.so 或者 GLIBCXX)，检查CUDA/GCC运行时环境是否与编译MMCV的一致。例如使用 `python mmdet/utils/collect_env.py` 检查 `"MMCV Complier"`/`"MMCV CUDA Complier"`是否和 `"GCC"`/`"CUDA_HOME"` 一致。
+  2. 如果这些 symbols 属于 PyTorch，(例如， symbols containing caffe, aten, and TH), 检查当前 Pytorch 版本是否与编译 MMCV 的版本一致。
   3. 运行 `python mmdet/utils/collect_env.py` 检查 PyTorch， torchvision， MMCV 等的编译环境与运行环境一致。
 
 - "setuptools.sandbox.UnpickleableException: DistutilsSetupError("each element of 'ext_modules' option must be an Extension instance or 2-tuple")"
@@ -41,7 +41,7 @@
   1. 如果你在使用 miniconda 而不是 anaconda，检查是否正确的安装了 Cython 如 [#3379](https://github.com/open-mmlab/mmdetection/issues/3379)。您需要先手动安装 Cpython 然后运命令 `pip install -r requirements.txt`。
   2. 检查环境中的 `setuptools`, `Cython`, and `PyTorch` 相互之间版本是否匹配。
 
-- "Segmentation fault".
+- "Segmentation fault". 
 
   1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如 对于Pytorch GCC < 4.9 )，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
 
