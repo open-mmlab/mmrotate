@@ -28,7 +28,7 @@
 - "invalid device function" or "no kernel image is available for execution".
 
   1. 检查您的 cuda 运行时版本(一般在 `/usr/local/` )、指令 `nvcc --version` 显示的版本以及 `conda list cudatoolkit` 指令显式的版本是否匹配。
-  2. 通过运行 `python mmdet/utils/collect_env.py` 来检查是否为当前的GPU架构编译了正确的 PyTorch、torchvision 和 MMCV ，你可能需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现， 如 Tesla K80。
+  2. 通过运行 `python mmdet/utils/collect_env.py` 来检查是否为当前的GPU架构编译了正确的 PyTorch、torchvision 和 MMCV，你可能需要设置 `TORCH_CUDA_ARCH_LIST` 来重新安装 MMCV。可以参考 [GPU 架构表](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list)，例如通过运行 `TORCH_CUDA_ARCH_LIST=7.0 pip install mmcv-full` 为 Volta GPU 编译 MMCV。这种架构不匹配的问题一般会出现在使用一些旧型号的 GPU 时候出现，如 Tesla K80。
   3. 检查运行环境是否与 mmcv/mmdet 编译时相同，例如，您可能使用 CUDA 10.0 编译 MMCV，但在 CUDA 9.0 环境中运行它。
 
 - "undefined symbol" or "cannot open xxx.so".
@@ -44,7 +44,7 @@
 
 - "Segmentation fault". 
 
-  1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如，对于 Pytorch GCC < 4.9)，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
+  1. 检查 GCC 的版本，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如，对于 Pytorch GCC < 4.9)，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5，因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
 
   2. 检查是是否 PyTorch 被正确的安装并可以使用 CUDA 算子，例如在终端中键入如下的指令。
 
@@ -67,10 +67,10 @@
 ## Training 相关
 
 - "Loss goes Nan"
-  1. 检查数据的标注是否正常， 长或宽为 0 的框可能会导致回归 loss 变为 nan，一些小尺寸（宽度或高度小于 1）的框在数据增强（例如，instaboost）后也会导致此问题。因此，可以检查标注并过滤掉那些特别小甚至面积为 0 的框，并关闭一些可能会导致 0 面积框出现数据增强。
+  1. 检查数据的标注是否正常，长或宽为 0 的框可能会导致回归 loss 变为 nan，一些小尺寸（宽度或高度小于 1）的框在数据增强（例如，instaboost）后也会导致此问题。因此，可以检查标注并过滤掉那些特别小甚至面积为 0 的框，并关闭一些可能会导致 0 面积框出现数据增强。
   2. 降低学习率：由于某些原因，例如 batch size 大小的变化，导致当前学习率可能太大。 您可以降低为可以稳定训练模型的值。
   3. 延长 warm up 的时间：一些模型在训练初始时对学习率很敏感，您可以把 `warmup_iters` 从 500 更改为 1000 或 2000。
-  4. 添加 gradient clipping: 一些模型需要梯度裁剪来稳定训练过程。 默认的 `grad_clip` 是 `None`，  你可以在 config 设置 `optimizer_config=dict(_delete_=True, grad_clip=dict(max_norm=35, norm_type=2))`  如果你的 config 没有继承任何包含 `optimizer_config=dict(grad_clip=None)`，你可以直接设置`optimizer_config=dict(grad_clip=dict(max_norm=35, norm_type=2))`。
+  4. 添加 gradient clipping: 一些模型需要梯度裁剪来稳定训练过程。 默认的 `grad_clip` 是 `None`，你可以在 config 设置 `optimizer_config=dict(_delete_=True, grad_clip=dict(max_norm=35, norm_type=2))`  如果你的 config 没有继承任何包含 `optimizer_config=dict(grad_clip=None)`，你可以直接设置`optimizer_config=dict(grad_clip=dict(max_norm=35, norm_type=2))`。
 - ’GPU out of memory"
   1. 存在大量 ground truth boxes 或者大量 anchor 的场景，可能在 assigner 会 OOM。您可以在 assigner 的配置中设置 `gpu_assign_thr=N`，这样当超过 N 个 GT boxes 时，assigner 会通过 CPU 计算 IOU。
   2. 在 backbone 中设置 `with_cp=True`。这使用 PyTorch 中的 `sublinear strategy` 来降低 backbone 占用的 GPU 显存。
@@ -83,6 +83,6 @@
 
 ## Evaluation 相关
 
-- 使用 COCO Dataset 的测评接口时， 测评结果中  AP 或者 AR = -1。
+- 使用 COCO Dataset 的测评接口时，测评结果中  AP 或者 AR = -1。
   1. 根据 COCO 数据集的定义，一张图像中的中等物体与小物体面积的阈值分别为 9216（96\*96）与 1024（32\*32）。
   2. 如果在某个区间没有检测框 AP 与 AR 认定为 -1。
