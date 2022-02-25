@@ -76,7 +76,7 @@
 
 - "RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one"
   1. 错误表明，您的模块有没用于产生损失的参数，这种现象可能是由于在 DDP 模式下运行代码中的不同分支造成的。
-  2. 您可以在配置中设置 `find_unused_parameters=True` 来解决上述问题，或者手动查找那些未使用的参数。
+  2. 您可以在配置中设置 `find_unused_parameters = True` 来解决上述问题，或者手动查找那些未使用的参数。
 
 ## Evaluation 相关
 
