@@ -3,7 +3,6 @@ matplotlib
 mmcv-full
 mmdet
 numpy
-opencv-python
 pycocotools
 six
 terminaltables
