@@ -29,6 +29,6 @@
     116,
     124
   ],
-  "save_dir": "/cluster/home/it_stu198/main/datasets/split_1024_dota1_0_test/trainval/",
+  "save_dir": "/cluster/home/it_stu198/main/datasets/split_1024_dota1_0/trainval/",
   "save_ext": ".png"
 }
