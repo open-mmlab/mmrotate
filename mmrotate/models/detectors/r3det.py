@@ -1,5 +1,7 @@
 # Copyright (c) SJTU. All rights reserved.
-import torch.nn as nn
+import warnings
+
+from mmcv.runner import ModuleList
 
 from mmrotate.core import rbbox2result
 from ..builder import ROTATED_DETECTORS, build_backbone, build_head, build_neck
@@ -20,10 +22,13 @@ class R3Det(RotatedBaseDetector):
                  refine_heads=None,
                  train_cfg=None,
                  test_cfg=None,
-                 pretrained=None):
-        super(R3Det, self).__init__()
-
-        backbone.pretrained = pretrained
+                 pretrained=None,
+                 init_cfg=None):
+        super(R3Det, self).__init__(init_cfg)
+        if pretrained:
+            warnings.warn('DeprecationWarning: pretrained is deprecated, '
+                          'please use "init_cfg" instead')
+            backbone.pretrained = pretrained
         self.backbone = build_backbone(backbone)
         self.num_refine_stages = num_refine_stages
         if neck is not None:
@@ -32,9 +37,8 @@ class R3Det(RotatedBaseDetector):
             bbox_head.update(train_cfg=train_cfg['s0'])
         bbox_head.update(test_cfg=test_cfg)
         self.bbox_head = build_head(bbox_head)
-        self.bbox_head.init_weights()
-        self.feat_refine_module = nn.ModuleList()
-        self.refine_head = nn.ModuleList()
+        self.feat_refine_module = ModuleList()
+        self.refine_head = ModuleList()
         for i, (frm_cfg,
                 refine_head) in enumerate(zip(frm_cfgs, refine_heads)):
             self.feat_refine_module.append(FeatureRefineModule(**frm_cfg))
@@ -42,9 +46,6 @@ class R3Det(RotatedBaseDetector):
                 refine_head.update(train_cfg=train_cfg['sr'][i])
             refine_head.update(test_cfg=test_cfg)
             self.refine_head.append(build_head(refine_head))
-        for i in range(self.num_refine_stages):
-            self.feat_refine_module[i].init_weights()
-            self.refine_head[i].init_weights()
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
 

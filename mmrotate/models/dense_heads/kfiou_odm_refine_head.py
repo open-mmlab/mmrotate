@@ -1,6 +1,6 @@
 # Copyright (c) SJTU. All rights reserved.
 import torch.nn as nn
-from mmcv.cnn import ConvModule, bias_init_with_prob, normal_init
+from mmcv.cnn import ConvModule
 from mmcv.runner import force_fp32
 
 from ..builder import ROTATED_HEADS
@@ -28,6 +28,7 @@ class KFIoUODMRefineHead(KFIoURRetinaHead):
         loss_bbox (dict): Config of localization loss.
         train_cfg (dict): Training config of anchor head.
         test_cfg (dict): Testing config of anchor head.
+        init_cfg (dict or list[dict], optional): Initialization config dict.
     """  # noqa: W605
 
     def __init__(self,
@@ -39,6 +40,15 @@ class KFIoUODMRefineHead(KFIoURRetinaHead):
                  anchor_generator=dict(
                      type='PseudoAnchorGenerator',
                      strides=[8, 16, 32, 64, 128]),
+                 init_cfg=dict(
+                     type='Normal',
+                     layer='Conv2d',
+                     std=0.01,
+                     override=dict(
+                         type='Normal',
+                         name='odm_cls',
+                         std=0.01,
+                         bias_prob=0.01)),
                  **kwargs):
         self.bboxes_as_anchors = None
         self.stacked_convs = stacked_convs
@@ -49,6 +59,7 @@ class KFIoUODMRefineHead(KFIoURRetinaHead):
             in_channels,
             stacked_convs=2,
             anchor_generator=anchor_generator,
+            init_cfg=init_cfg,
             **kwargs)
 
     def _init_layers(self):
@@ -90,18 +101,6 @@ class KFIoUODMRefineHead(KFIoURRetinaHead):
             padding=1)
         self.odm_reg = nn.Conv2d(
             self.feat_channels, self.num_anchors * 5, 3, padding=1)
-
-    def init_weights(self):
-        """Initialize weights of the head."""
-
-        normal_init(self.or_conv, std=0.01)
-        for m in self.cls_convs:
-            normal_init(m.conv, std=0.01)
-        for m in self.reg_convs:
-            normal_init(m.conv, std=0.01)
-        bias_cls = bias_init_with_prob(0.01)
-        normal_init(self.odm_cls, std=0.01, bias=bias_cls)
-        normal_init(self.odm_reg, std=0.01)
 
     def forward_single(self, x):
         """Forward feature of a single scale level.
