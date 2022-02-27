@@ -49,7 +49,7 @@
 | ResNet50 (1024,1024,200) | 79.66 | le90 | 1x |   | 13.7 | MS+RR | 2 | [roi_trans_r50_fpn_1x_dota_ms_le90](../../configs/roi_trans/roi_trans_r50_fpn_1x_dota_ms_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_1x_dota_ms_rr_le90/roi_trans_r50_fpn_1x_dota_ms_rr_le90-fa99496f.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_1x_dota_ms_rr_le90/roi_trans_r50_fpn_1x_dota_ms_rr_le90_20220205_171729.log.json)
 | ReResNet50 (1024,1024,200) | 79.87 | le90 | 1x |  | 4.0 | MS+RR | 2 | [redet_re50_refpn_1x_dota_ms_rr_le90](../../configs/redet/redet_re50_refpn_1x_dota_ms_rr_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90-fc9217b5.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90_20220206_105343.log.json)
 
-- `MS` 表示多尺度图像分割增强。
+- `MS` 表示多尺度图像增强。
 - `RR` 表示随机旋转增强。
 
 上述模型都是使用 1 * 1080ti 训练得到的，并且在 1 * 2080ti 上进行推理测试。
