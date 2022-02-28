@@ -2,7 +2,10 @@
 
 <!-- [ALGORITHM] -->
 ## Abstract
-![illustration](https://raw.githubusercontent.com/zytx121/image-host/main/imgs/kfiou.png)
+
+<div align=center>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/kfiou.png" width="400"/>
+</div>
 
 Differing from the well-developed horizontal object detection area whereby the computing-friendly IoU based loss is
 readily adopted and well fits with the detection metrics. In contrast, rotation detectors often involve a more

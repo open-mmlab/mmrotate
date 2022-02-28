@@ -3,7 +3,9 @@
 <!-- [ALGORITHM] -->
 ## Abstract
 
-![illustration](https://raw.githubusercontent.com/zytx121/image-host/main/imgs/s2a.png)
+<div align=center>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/s2a.png" width="400"/>
+</div>
 
 The past decade has witnessed significant progress on detecting objects in aerial images that are often distributed with large-scale variations and arbitrary orientations. However, most of existing methods rely on heuristically defined anchors with different scales, angles, and aspect ratios, and usually suffer from severe misalignment between anchor boxes (ABs) and axis-aligned convolutional features, which lead to the common inconsistency between the classification score and localization accuracy. To address this issue, we propose a single-shot alignment network (S²A-Net) consisting of two modules: a feature alignment module (FAM) and an oriented detection module (ODM). The FAM can generate high-quality anchors with an anchor refinement network and adaptively align the convolutional features according to the ABs with a novel alignment convolution. The ODM first adopts active rotating filters to encode the orientation information and then produces orientation-sensitive and orientation-invariant features to alleviate the inconsistency between classification score and localization accuracy. Besides, we further explore the approach to detect objects in large-size images, which leads to a better trade-off between speed and accuracy. Extensive experiments demonstrate that our method can achieve the state-of-the-art performance on two commonly used aerial objects' data sets (i.e., DOTA and HRSC2016) while keeping high efficiency.
 
