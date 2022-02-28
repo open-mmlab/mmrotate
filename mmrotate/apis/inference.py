@@ -32,8 +32,7 @@ def inference_detector_by_patches(model,
         bs (int): Batch size, must greater than or equal to 1.
 
     Returns:
-        If imgs is a list or tuple, the same length list type results
-        will be returned, otherwise return the detection results directly.
+        list[np.ndarray]: Detection results.
     """
     assert bs >= 1, 'The batch size must greater than or equal to 1'
     cfg = model.cfg

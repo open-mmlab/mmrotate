@@ -18,11 +18,10 @@ class LoadPatchFromImage(LoadImageFromFile):
         """Call functions to add image meta information.
 
         Args:
-            results (dict): Result dict with Webcam read image in
-                ``results['img']``.
+            results (dict): Result dict with image in ``results['img']``.
 
         Returns:
-            dict: The dict contains loaded image and meta information.
+            dict: The dict contains the loaded patch and meta information.
         """
 
         img = results['img']

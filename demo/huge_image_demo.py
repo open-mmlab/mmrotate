@@ -1,4 +1,15 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+"""Inference on huge images.
+
+Example:
+```
+python demo/huge_image_demo.py \
+    demo/dota_demo.jpg \
+    configs/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_v3.py \
+    work_dirs/oriented_rcnn_r50_fpn_1x_dota_v3/epoch_12.pth \
+```
+"""  # nowq
+
 from argparse import ArgumentParser
 
 from mmdet.apis import init_detector, show_result_pyplot
@@ -45,7 +56,7 @@ def parse_args():
 def main(args):
     # build the model from a config file and a checkpoint file
     model = init_detector(args.config, args.checkpoint, device=args.device)
-    # test a single image
+    # test a huge image by patches
     result = inference_detector_by_patches(model, args.img, args.patch_sizes,
                                            args.patch_steps, args.img_ratios,
                                            args.merge_iou_thr)
