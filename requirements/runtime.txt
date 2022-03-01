@@ -4,6 +4,7 @@ mmcv-full
 mmdet
 numpy
 pycocotools
+shapely
 six
 terminaltables
 torch
