@@ -2,11 +2,13 @@
 """Inference on single image.
 
 Example:
+```
 python demo/image_demo.py \
     demo/demo.jpg \
-        configs/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_v3.py \
-        work_dirs/oriented_rcnn_r50_fpn_1x_dota_v3/epoch_12.pth \
-        demo/vis.jpg
+    configs/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_v3.py \
+    work_dirs/oriented_rcnn_r50_fpn_1x_dota_v3/epoch_12.pth \
+    demo/vis.jpg
+```
 """  # nowq
 
 from argparse import ArgumentParser

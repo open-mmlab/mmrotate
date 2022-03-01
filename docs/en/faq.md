@@ -61,6 +61,30 @@ We list some common troubles faced by many users and their corresponding solutio
 
     4. If MMCV and Pytorch is correctly installed, you man use `ipdb`, `pdb` to set breakpoints or directly add 'print' in mmdetection code and see which part leads the segmentation fault.
 
+## E2CNN
+
+- "ImportError: cannot import name 'container_bacs' from 'torch._six'"
+
+    1. This is because `container_abcs` has been removed since PyTorch 1.9.
+    2. Replace
+
+        ```shell
+        from torch.six import container_abcs
+        ```
+
+       in `python3.7/site-packages/e2cnn/nn/modules/module_list.py` with
+
+        ```shell
+        TORCH_MAJOR = int(torch.__version__.split('.')[0])
+        TORCH_MINOR = int(torch.__version__.split('.')[1])
+        if TORCH_MAJOR ==1 and TORCH_MINOR < 8:
+            from torch.six import container_abcs
+        else:
+            import collections.abs as container_abcs
+        ```
+
+     3. Or downgrade the version of Pytorch.
+
 ## Training
 
 - "Loss goes Nan"

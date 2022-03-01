@@ -16,7 +16,8 @@ class RotatedRetinaNet(RotatedSingleStageDetector):
                  bbox_head,
                  train_cfg=None,
                  test_cfg=None,
-                 pretrained=None):
-        super(RotatedRetinaNet, self).__init__(backbone, neck, bbox_head,
-                                               train_cfg, test_cfg, pretrained)
-        self.bbox_head.init_weights()
+                 pretrained=None,
+                 init_cfg=None):
+        super(RotatedRetinaNet,
+              self).__init__(backbone, neck, bbox_head, train_cfg, test_cfg,
+                             pretrained, init_cfg)

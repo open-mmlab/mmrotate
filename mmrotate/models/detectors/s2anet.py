@@ -28,7 +28,6 @@ class S2ANet(RotatedBaseDetector):
             fam_head.update(train_cfg=train_cfg['fam_cfg'])
         fam_head.update(test_cfg=test_cfg)
         self.fam_head = build_head(fam_head)
-        self.fam_head.init_weights()
 
         self.align_conv_type = align_cfgs['type']
         self.align_conv_size = align_cfgs['kernel_size']
@@ -44,7 +43,6 @@ class S2ANet(RotatedBaseDetector):
             odm_head.update(train_cfg=train_cfg['odm_cfg'])
         odm_head.update(test_cfg=test_cfg)
         self.odm_head = build_head(odm_head)
-        self.odm_head.init_weights()
 
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg

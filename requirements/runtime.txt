@@ -3,9 +3,7 @@ matplotlib
 mmcv-full
 mmdet
 numpy
-pycocotools; platform_system == "Linux"
-pycocotools-windows; platform_system == "Windows"
-shapely
+pycocotools
 six
 terminaltables
 torch

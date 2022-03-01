@@ -26,6 +26,7 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
         loss_bbox (dict): Config of localization loss.
         train_cfg (dict): Training config of anchor head.
         test_cfg (dict): Testing config of anchor head.
+        init_cfg (dict or list[dict], optional): Initialization config dict.
     """  # noqa: W605
 
     def __init__(self,
@@ -41,6 +42,15 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
                      type='DeltaXYWHABBoxCoder',
                      target_means=(.0, .0, .0, .0, .0),
                      target_stds=(1.0, 1.0, 1.0, 1.0, 1.0)),
+                 init_cfg=dict(
+                     type='Normal',
+                     layer='Conv2d',
+                     std=0.01,
+                     override=dict(
+                         type='Normal',
+                         name='retina_cls',
+                         std=0.01,
+                         bias_prob=0.01)),
                  **kwargs):
 
         self.bboxes_as_anchors = None
@@ -52,6 +62,7 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
             norm_cfg=norm_cfg,
             anchor_generator=anchor_generator,
             bbox_coder=bbox_coder,
+            init_cfg=init_cfg,
             **kwargs)
 
     @force_fp32(apply_to=('cls_scores', 'bbox_preds'))

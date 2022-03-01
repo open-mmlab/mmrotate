@@ -202,7 +202,6 @@ class DOTADataset(CustomDataset):
                 scale_ranges=scale_ranges,
                 iou_thr=iou_thr,
                 dataset=self.CLASSES,
-                version=self.version,
                 logger=logger,
                 nproc=nproc)
             eval_results['mAP'] = mean_ap
