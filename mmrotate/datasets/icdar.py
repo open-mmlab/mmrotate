@@ -17,14 +17,12 @@ class IcdarDataset(DOTADataset):
                  ann_file,
                  pipeline,
                  version='oc',
-                 difficulty=100,
                  select_first_k=-1,
                  **kwargs):
         self.version = version
         self.select_first_k = select_first_k
 
-        super(DOTADataset, self).__init__(ann_file, pipeline, version,
-                                          difficulty, **kwargs)
+        super().__init__(ann_file, pipeline, **kwargs)
 
     def load_annotations(self, ann_file):
         """Load annotation from COCO style annotation file.
@@ -39,7 +37,6 @@ class IcdarDataset(DOTADataset):
         self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
         self.img_ids = self.coco.get_img_ids()
         data_infos = []
-
         count = 0
         for i in self.img_ids:
             data_info = {}
@@ -61,13 +58,13 @@ class IcdarDataset(DOTADataset):
                 if ann['category_id'] not in self.cat_ids:
                     continue
                 try:
-                    x, y, w, h, a = poly2obb_np(ann['segmentation'],
+                    x, y, w, h, a = poly2obb_np(ann['segmentation'][0],
                                                 self.version)
                 except:  # noqa: E722
                     continue
                 gt_bboxes.append([x, y, w, h, a])
                 gt_labels.append(ann['category_id'])
-                gt_polygons.append(ann['segmentation'])
+                gt_polygons.append(ann['segmentation'][0])
 
                 if gt_bboxes:
                     data_info['ann']['bboxes'] = np.array(
