@@ -3,7 +3,6 @@ from inspect import signature
 
 import torch
 import torch.nn as nn
-from mmcv.cnn import normal_init
 from mmcv.runner import force_fp32
 from mmdet.core import images_to_levels, multi_apply, unmap
 from mmdet.models.dense_heads.base_dense_head import BaseDenseHead
@@ -33,6 +32,7 @@ class RotatedAnchorHead(BaseDenseHead):
         loss_bbox (dict): Config of localization loss.
         train_cfg (dict): Training config of anchor head.
         test_cfg (dict): Testing config of anchor head.
+        init_cfg (dict or list[dict], optional): Initialization config dict.
     """  # noqa: W605
 
     def __init__(self,
@@ -59,8 +59,9 @@ class RotatedAnchorHead(BaseDenseHead):
                      loss_weight=1.0),
                  loss_bbox=dict(type='L1Loss', loss_weight=1.0),
                  train_cfg=None,
-                 test_cfg=None):
-        super(RotatedAnchorHead, self).__init__()
+                 test_cfg=None,
+                 init_cfg=dict(type='Normal', layer='Conv2d', std=0.01)):
+        super(RotatedAnchorHead, self).__init__(init_cfg)
         self.in_channels = in_channels
         self.num_classes = num_classes
         self.feat_channels = feat_channels
@@ -104,11 +105,6 @@ class RotatedAnchorHead(BaseDenseHead):
         self.conv_cls = nn.Conv2d(self.in_channels,
                                   self.num_anchors * self.cls_out_channels, 1)
         self.conv_reg = nn.Conv2d(self.in_channels, self.num_anchors * 5, 1)
-
-    def init_weights(self):
-        """Initialize weights of the head."""
-        normal_init(self.conv_cls, std=0.01)
-        normal_init(self.conv_reg, std=0.01)
 
     def forward_single(self, x):
         """Forward feature of a single scale level.

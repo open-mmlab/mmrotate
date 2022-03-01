@@ -23,6 +23,7 @@ class KFIoURRetinaHead(RotatedRetinaHead):
         loss_bbox (dict): Config of localization loss.
         train_cfg (dict): Training config of anchor head.
         test_cfg (dict): Testing config of anchor head.
+        init_cfg (dict or list[dict], optional): Initialization config dict.
     """  # noqa: W605
 
     def __init__(self,
@@ -37,6 +38,15 @@ class KFIoURRetinaHead(RotatedRetinaHead):
                      scales_per_octave=3,
                      ratios=[0.5, 1.0, 2.0],
                      strides=[8, 16, 32, 64, 128]),
+                 init_cfg=dict(
+                     type='Normal',
+                     layer='Conv2d',
+                     std=0.01,
+                     override=dict(
+                         type='Normal',
+                         name='retina_cls',
+                         std=0.01,
+                         bias_prob=0.01)),
                  **kwargs):
         self.bboxes_as_anchors = None
         super(KFIoURRetinaHead, self).__init__(
@@ -46,6 +56,7 @@ class KFIoURRetinaHead(RotatedRetinaHead):
             conv_cfg=conv_cfg,
             norm_cfg=norm_cfg,
             anchor_generator=anchor_generator,
+            init_cfg=init_cfg,
             **kwargs)
 
     def loss_single(self, cls_score, bbox_pred, anchors, labels, label_weights,
