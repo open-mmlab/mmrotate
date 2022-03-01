@@ -5,6 +5,7 @@ mmdet
 numpy
 pycocotools; platform_system == "Linux"
 pycocotools-windows; platform_system == "Windows"
+shapely
 six
 terminaltables
 torch

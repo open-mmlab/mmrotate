@@ -235,9 +235,6 @@ def bbox_overlaps_iof(bboxes1, bboxes2, eps=1e-6):
 
     l, t, r, b = [bboxes2[..., i] for i in range(4)]
     polys2 = np.stack([l, t, r, t, r, b, l, b], axis=-1)
-    if shgeo is None:
-        raise ImportError('Please run "pip install shapely" '
-                          'to install shapely first.')
     sg_polys1 = [shgeo.Polygon(p) for p in bboxes1.reshape(rows, -1, 2)]
     sg_polys2 = [shgeo.Polygon(p) for p in polys2.reshape(cols, -1, 2)]
     overlaps = np.zeros(h_overlaps.shape)
