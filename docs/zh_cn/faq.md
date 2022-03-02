@@ -61,6 +61,30 @@
 
   4. 如果 MMCV 与 PyTorch 都被正确安装了，则使用 `ipdb`、`pdb` 设置断点，直接查找哪一部分的代码导致了 `segmentation fault`。
 
+## E2CNN
+
+- "ImportError: cannot import name 'container_bacs' from 'torch._six'"
+
+    1. 这是因为 `container_abcs` 在 PyTorch 1.9 之后被移除.
+    2. 将文件 `python3.7/site-packages/e2cnn/nn/modules/module_list.py` 中的
+
+        ```shell
+        from torch.six import container_abcs
+        ```
+
+       替换成
+
+        ```shell
+        TORCH_MAJOR = int(torch.__version__.split('.')[0])
+        TORCH_MINOR = int(torch.__version__.split('.')[1])
+        if TORCH_MAJOR ==1 and TORCH_MINOR < 8:
+            from torch.six import container_abcs
+        else:
+            import collections.abs as container_abcs
+        ```
+
+     3. 或者降低 Pytorch 的版本。
+
 ## Training 相关
 
 - "Loss goes Nan"
