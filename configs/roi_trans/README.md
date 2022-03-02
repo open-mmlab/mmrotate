@@ -4,7 +4,7 @@
 ## Abstract
 
 <div align=center>
-<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/roi_trans.png" width="400"/>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/roi_trans.png" width="800"/>
 </div>
 
 Object detection in aerial images is an active yet challenging task in computer vision because of the bird’s-eye view perspective, the highly complex backgrounds, and the variant appearances of objects. Especially when detecting densely packed objects in aerial images, methods relying on horizontal proposals for common object detection often introduce mismatches between the Region of Interests (RoIs) and objects. This leads to the common misalignment between the final object classification confidence and localization accuracy. In this paper, we propose a RoI Transformer to address these problems. The core idea of RoI Transformer is to apply spatial transformations on RoIs and learn the transformation parameters under the supervision of oriented bounding box (OBB) annotations. RoI Transformer is with lightweight and can be easily embedded into detectors for oriented object detection. Simply apply the RoI Transformer to light-head RCNN has achieved state-of-the-art performances on two common and challenging aerial datasets, i.e., DOTA and HRSC2016, with a neglectable reduction to detection speed. Our RoI Transformer exceeds the deformable Position Sensitive RoI pooling when oriented bounding-box annotations are available. Extensive experiments have also validated the flexibility and effectiveness of our RoI Transformer

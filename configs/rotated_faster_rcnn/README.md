@@ -5,7 +5,7 @@
 ## Abstract
 
 <div align=center>
-<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/faster_rcnn.png" width="400"/>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/faster_rcnn.png" width="800"/>
 </div>
 
 

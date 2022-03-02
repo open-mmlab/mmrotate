@@ -4,7 +4,7 @@
 ## Abstract
 
 <div align=center>
-<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/gwd.png" width="400"/>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/gwd.png" width="800"/>
 </div>
 
 Boundary discontinuity and its inconsistency to the final detection metric have been the bottleneck for rotating detection regression loss design. In this paper, we propose a novel regression loss based on Gaussian Wasserstein distance as a fundamental approach to solve the problem. Specifically, the rotated bounding box is converted to a 2- D Gaussian distribution, which enables to approximate the indifferentiable rotational IoU induced loss by the Gaussian Wasserstein distance (GWD) which can be learned efficiently by gradient back-propagation. GWD can still be informative for learning even there is no overlapping between two rotating bounding boxes which is often the case for small object detection. Thanks to its three unique properties, GWD can also elegantly solve the boundary discontinuity and square-like problem regardless how the bounding box is defined. Experiments on five datasets using different detectors show the effectiveness of our approach.

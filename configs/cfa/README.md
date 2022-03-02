@@ -4,7 +4,7 @@
 ## Abstract
 
 <div align=center>
-<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/cfa.png" width="400"/>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/cfa.png" width="800"/>
 </div>
 
 Detecting oriented and densely packed objects remains challenging for spatial feature aliasing caused by the intersection of reception fields between objects. In this paper, we propose a convex-hull feature adaptation (CFA) approach for configuring convolutional features in accordance with oriented and densely packed object layouts. CFA is rooted in convex-hull feature representation, which defines a set of dynamically predicted feature points guided by the convex intersection over union (CIoU) to bound the extent of objects. CFA pursues optimal feature assignment by constructing convex-hull sets and dynamically splitting positive or negative convex-hulls. By simultaneously considering overlapping convex-hulls and objects and penalizing convex-hulls shared by multiple objects, CFA alleviates spatial feature aliasing towards optimal feature adaptation. Experiments on DOTA and SKU110KR datasets show that CFA significantly outperforms the baseline approach, achieving new state-of-the-art detection performance.
