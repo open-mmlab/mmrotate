@@ -380,7 +380,7 @@ def eval_map(det_results,
     area_ranges = ([(rg[0]**2, rg[1]**2) for rg in scale_ranges]
                    if scale_ranges is not None else None)
 
-    pool = get_context("spawn").Pool(nproc)
+    pool = get_context('spawn').Pool(nproc)
     eval_results = []
     for i in range(num_classes):
         # get gt and det bboxes of this class
