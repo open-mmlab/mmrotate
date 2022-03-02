@@ -79,6 +79,12 @@ class IcdarDataset(DOTADataset):
                     data_info['ann']['labels'] = np.array([], dtype=np.int64)
                     data_info['ann']['polygons'] = np.zeros((0, 8),
                                                             dtype=np.float32)
+                data_info['ann']['bboxes_ignore'] = np.zeros(
+                    (0, 5), dtype=np.float32)
+                data_info['ann']['labels_ignore'] = np.array(
+                    [], dtype=np.int64)
+                data_info['ann']['polygons_ignore'] = np.zeros(
+                    (0, 8), dtype=np.float32)
 
                 data_infos.append(data_info)
             count = count + 1

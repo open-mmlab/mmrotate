@@ -26,7 +26,7 @@ model = dict(
         num_outs=5),
     fam_head=dict(
         type='RotatedRetinaHead',
-        num_classes=15,
+        num_classes=1,
         in_channels=256,
         stacked_convs=2,
         feat_channels=256,
@@ -58,7 +58,7 @@ model = dict(
         featmap_strides=[8, 16, 32, 64, 128]),
     odm_head=dict(
         type='ODMRefineHead',
-        num_classes=15,
+        num_classes=1,
         in_channels=256,
         stacked_convs=2,
         feat_channels=256,
@@ -107,26 +107,17 @@ model = dict(
         nms_pre=2000,
         min_bbox_size=0,
         score_thr=0.05,
-        nms=dict(iou_thr=0.1),
-        max_per_img=2000))
+        nms=dict(iou_thr=0.7),
+        max_per_img=1000))
 
-img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-train_pipeline = [
-    dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='RResize', img_scale=(1024, 1024)),
-    dict(
-        type='RRandomFlip',
-        flip_ratio=[0.25, 0.25, 0.25],
-        direction=['horizontal', 'vertical', 'diagonal'],
-        version=angle_version),
-    dict(type='Normalize', **img_norm_cfg),
-    dict(type='Pad', size_divisor=32),
-    dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
-]
-data = dict(
-    train=dict(pipeline=train_pipeline, version=angle_version),
-    val=dict(version=angle_version),
-    test=dict(version=angle_version))
+# evaluation
+evaluation = dict(interval=1, metric='mAP')
+# learning policy
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=1.0 / 3,
+    step=[24, 32, 38])
+runner = dict(type='EpochBasedRunner', max_epochs=40)
+checkpoint_config = dict(interval=10)
