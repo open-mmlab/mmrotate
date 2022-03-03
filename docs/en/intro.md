@@ -64,15 +64,17 @@ y (pi/2 rad)
 ```
 
 Rotation matrix of `CW`
-```{math}
+
+$$
 \begin{pmatrix}
 \cos\alpha & -\sin\alpha \\
 \sin\alpha & \cos\alpha
 \end{pmatrix}
-```
+$$
 
 Rotation transformation of `CW`
-```{math}
+
+$$
 P_A=
 \begin{pmatrix} x_A \\ y_A\end{pmatrix}
 =
@@ -84,7 +86,7 @@ P_A=
 \begin{pmatrix} x_{center}-0.5w\cos\alpha+0.5h\sin\alpha
 \\
 y_{center}-0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
-```
+$$
 
 - Counterclockwise（CCW）
 
@@ -102,15 +104,17 @@ y (-pi/2 rad)
 ```
 
 Rotation matrix of `CCW`
-```{math}
+
+$$
 \begin{pmatrix}
 \cos\alpha & \sin\alpha \\
 -\sin\alpha & \cos\alpha
 \end{pmatrix}
-```
+$$
 
 Rotation transformation of `CCW`
-```{math}
+
+$$
 P_A=
 \begin{pmatrix} x_A \\ y_A\end{pmatrix}
 =
@@ -122,7 +126,7 @@ P_A=
 \begin{pmatrix} x_{center}-0.5w\cos\alpha-0.5h\sin\alpha
 \\
 y_{center}+0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
-```
+$$
 
 The operators that can set the rotation direction in MMCV are:
 - box_iou_rotated (Defaults to `CW`)
@@ -137,13 +141,13 @@ In MMRotate, the rotation direction of the rotated boxes is `CW`.
 ### Definition of rotated box
 Due to the difference in the definition range of `theta`, the following three
 definitions of the rotated box gradually emerge in rotated object detection:
-- {math}`D_{oc^{\prime}}`: OpenCV Definition, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`,
+- $D_{oc^{\prime}}$: OpenCV Definition, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`,
 The angle between the height of the rectangle and the positive semi-axis of x is
 a positive acute angle. This definition comes from the `cv2.minAreaRect` function
 in OpenCV, which returns an angle in the range `(0, 90°]`.
-- {math}`D_{le135}`: Long Edge Definition (135°)，`angle∈[-45°, 135°)`,
+- $D_{le135}$: Long Edge Definition (135°)，`angle∈[-45°, 135°)`,
 `theta∈[-pi / 4, 3 * pi / 4)` and `height > width`.
-- {math}`D_{le90}`: Long Edge Definition (90°)，`angle∈[-90°, 90°)`,
+- $D_{le90}$: Long Edge Definition (90°)，`angle∈[-90°, 90°)`,
 `theta∈[-pi / 2, pi / 2)` and `height > width`.
 
 <div align=center>
@@ -162,25 +166,30 @@ which can be flexibly switched through the configuration file.
 It should be noted that if the OpenCV version is less than 4.5.1, the angle range
 of `cv2.minAreaRect` is between `[-90°, 0°)`. [Reference](https://github.com/opencv/opencv/issues/19749)
 In order to facilitate the distinction, the old version of the OpenCV definition
-is denoted as {math}`D_{oc}`.
-- {math}`D_{oc^{\prime}}` : OpenCV definition, `opencv>=4.5.1`, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`.
-- {math}`D_{oc}` : Old OpenCV definition, `opencv<4.5.1`, `angle∈[-90°, 0°)`, `theta∈[-pi / 2, 0)`.
+is denoted as $D_{oc}$.
+
+- $D_{oc^{\prime}}$ : OpenCV definition, `opencv>=4.5.1`, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`.
+- $D_{oc}$ : Old OpenCV definition, `opencv<4.5.1`, `angle∈[-90°, 0°)`, `theta∈[-pi / 2, 0)`.
+
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/opencv.png" width=50%/>
 </div>
 
 The conversion relationship between the two OpenCV definitions is as follows:
-```{math}
+
+$$
 D_{oc^{\prime}}\left( h_{oc^{\prime}},w_{oc^{\prime}},\theta _{oc^{\prime}} \right) =\begin{cases}
 	D_{oc}\left( w_{oc},h_{oc},\theta _{oc}+\pi /2 \right) , otherwise\\
 	D_{oc}\left( h_{oc},w_{oc},\theta _{oc}+\pi \right) ,\theta _{oc}=-\pi /2\\
 \end{cases}
-\\
+$$
+
+$$
 D_{oc}\left( h_{oc},w_{oc},\theta _{oc} \right) =\begin{cases}
 	D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta _{oc^{\prime}}-\pi /2 \right) , otherwise\\
 	D_{oc^{\prime}}\left( h_{oc^{\prime}},w_{oc^{\prime}},\theta _{oc^{\prime}}-\pi \right) , \theta _{oc^{\prime}}=\pi /2\\
 \end{cases}
-```
+$$
 
 ```{note}
 Regardless of the OpenCV version you are using, MMRotate will convert the theta
