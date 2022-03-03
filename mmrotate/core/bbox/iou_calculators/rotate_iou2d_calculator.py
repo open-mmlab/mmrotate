@@ -1,6 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from mmcv.ops import box_iou_rotated
-
+import torch
 from .builder import ROTATED_IOU_CALCULATORS
 
 
@@ -35,6 +35,7 @@ class RBboxOverlaps2D(object):
         """
         assert bboxes1.size(-1) in [0, 5, 6]
         assert bboxes2.size(-1) in [0, 5, 6]
+
         if bboxes2.size(-1) == 6:
             bboxes2 = bboxes2[..., :5]
         if bboxes1.size(-1) == 6:
@@ -68,6 +69,14 @@ def rbbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False):
     # Either the boxes are empty or the length of boxes's last dimension is 5
     assert (bboxes1.size(-1) == 5 or bboxes1.size(0) == 0)
     assert (bboxes2.size(-1) == 5 or bboxes2.size(0) == 0)
+
+    # resolve `rbbox_overlaps` abnormal when input rbbox is too small.
+    bboxes1_replace = bboxes1.new_ones((bboxes1.size(0), 2)) * 1e-3
+    bboxes2_replace = bboxes2.new_ones((bboxes2.size(0), 2)) * 1e-3
+    bboxes1[:, 2:4] = torch.where(bboxes1[:, 2:4] < 1e-3, bboxes1_replace,
+                                  bboxes1[:, 2:4])
+    bboxes2[:, 2:4] = torch.where(bboxes2[:, 2:4] < 1e-3, bboxes2_replace,
+                                  bboxes2[:, 2:4])
 
     rows = bboxes1.size(0)
     cols = bboxes2.size(0)
