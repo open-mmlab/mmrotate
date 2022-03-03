@@ -1,15 +1,18 @@
-# Tutorial 2: Customize Datasets
+# 教程2：自定义数据集
 
-## Support new data format
+## 支持新的数据格式
 
-To support a new data format, you can convert them to existing formats (DOTA format). You could choose to convert them offline (before training by a script) or online (implement a new dataset and do the conversion at training).
-In MMRotate, we recommend to convert the data into DOTA formats and do the conversion offline, thus you only need to modify the config's data annotation paths and classes after the conversion of your data.
 
-### Reorganize new data formats to existing format
+要支持新的数据格式，您可以将它们转换为现有的格式（DOTA 格式）。您可以选择离线（在通过脚本训练之前）或在线（实施新数据集并在训练时进行转换）进行转换。
+在 MMRotate 中，我们建议将数据转换为 DOTA 格式并离线进行转换，如此您只需在数据转换后修改 config 的数据注释路径和类别即可。
 
-The simplest way is to convert your dataset to existing dataset formats (DOTA).
 
-The annotation txt files in DOTA format:
+### 将新数据格式重构为现有格式
+
+
+最简单的方法是将数据集转换为现有数据集格式 (DOTA)
+
+DOTA格式的注解txt文件：
 
 ```text
 184 2875 193 2923 146 2932 137 2885 plane 0
@@ -17,33 +20,45 @@ The annotation txt files in DOTA format:
 ...
 ```
 
-Each line represents an object and records it as a 10-dimensional array `A`.
-- `A[0:8]`: Polygons with format `(x1, y1, x2, y2, x3, y3, x4, y4)`.
-- `A[8]`: Category.
-- `A[9]`: Difficulty.
 
-After the data pre-processing, there are two steps for users to train the customized new dataset with existing format (e.g. DOTA format):
+每行代表一个对象，并将其记录为一个 10 维数组`A`。
 
-1. Modify the config file for using the customized dataset.
-2. Check the annotations of the customized dataset.
+- `A[0:8]`:多边形的格式`(x1, y1, x2, y2, x3, y3, x4, y4)`。
+- `A[8]`:类别
+- `A[9]`:困难
 
-Here we give an example to show the above two steps, which uses a customized dataset of 5 classes with COCO format to train an existing Cascade Mask R-CNN R50-FPN detector.
 
-#### 1. Modify the config file for using the customized dataset
+在数据预处理之后，用户可以通过两个步骤来训练具有现有格式（例如 DOTA 格式）的自定义新数据集：
 
-There are two aspects involved in the modification of config file:
 
-1. The `data` field. Specifically, you need to explicitly add the `classes` fields in `data.train`, `data.val` and `data.test`.
-2. The `num_classes` field in the `model` part. Explicitly over-write all the `num_classes` from default value (e.g. 80 in COCO) to your classes number.
+1.修改配置文件以使用自定义数据集。
+2.检查自定义数据集的注释
 
-In `configs/my_custom_config.py`:
+
+下面给出两个例子展示上述两个步骤，它使用一个自定义的 5 类 COCO 格式的数据集来训练一个现有的 Cascade Mask R-CNN R50-FPN 检测器。
+
+
+#### 1.修改配置文件以使用自定义数据集
+
+
+配置文件的修改主要涉及两个方面:
+
+
+1.`data`部分。具体来说，您需要在 `data.train`, `data.val`和  `data.test`中显式添加classes字段。
+
+2. .`data`属性变量。具体来说，特别是您需要在 `data.train`, `data.val`和  `data.test`中添加classes字段。
+
+3. `model`部分中的` num_classes` 属性变量。特别是将所有num_classes的默认值（例如 COCO 中的 80）覆盖到您的类别编号中
+
+
+在 `configs/my_custom_config.py`:
 
 ```python
 
-# the new config inherits the base configs to highlight the necessary modification
+# 新的配置文件从基础配置文件中继承的修改用高亮突出
 _base_ = './rotated_retinanet_hbb_r50_fpn_1x_dota_oc'
 
-# 1. dataset settings
+# 1. 数据集的设置
 dataset_type = 'DOTADataset'
 classes = ('a', 'b', 'c', 'd', 'e')
 data = dict(
@@ -51,24 +66,27 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        # explicitly add your class names to the field `classes`
+
+        # 注意将你的类名添加到字段`classes` 
         classes=classes,
         ann_file='path/to/your/train/annotation_data',
         img_prefix='path/to/your/train/image_data'),
     val=dict(
         type=dataset_type,
-        # explicitly add your class names to the field `classes`
+
+        # 注意将你的类名添加到字段`class
         classes=classes,
         ann_file='path/to/your/val/annotation_data',
         img_prefix='path/to/your/val/image_data'),
     test=dict(
         type=dataset_type,
-        # explicitly add your class names to the field `classes`
+
+        # 注意将你的类名添加到字段`class
         classes=classes,
         ann_file='path/to/your/test/annotation_data',
         img_prefix='path/to/your/test/image_data'))
 
-# 2. model settings
+# 2. 模型设置
 model = dict(
     bbox_head=dict(
         type='RotatedRetinaHead',
@@ -76,27 +94,25 @@ model = dict(
         num_classes=15))
 ```
 
-#### 2. Check the annotations of the customized dataset
+#### 2.查看自定义数据集的注释
 
-Assuming your customized dataset is DOTA format, make sure you have the correct annotations in the customized dataset:
-
-- The `classes` fields in your config file should have exactly the same elements and the same order with the `A[8]` in txt annotations. MMRotate automatically maps the uncontinuous `id` in `categories` to the continuous label indices, so the string order of `name` in `categories` field affects the order of label indices. Meanwhile, the string order of `classes` in config affects the label text during visualization of predicted bounding boxes.
+假设您的自定义数据集是 DOTA 格式，请确保您在自定义数据集中具有正确的注释：
 
 
+- 配置文件中的 `classes` 字段应该与在txt注释的`A[8]`保持完全相同的元素和相同的顺序。
+MMRotate 会自动的将`categories`中不连续的 `id` 映射到连续的标签索引中，所以在 `categories`中 `name`的字符串顺序会影响标签索引的顺序。同时，配置文件中`classes`的字符串顺序也会影响预测边界框可视化过程中的标签文本信息。
 
-## Customize datasets by dataset wrappers
 
-MMRotate also supports many dataset wrappers to mix the dataset or modify the dataset distribution for training.
-Currently it supports to three dataset wrappers as below:
 
-- `RepeatDataset`: simply repeat the whole dataset.
-- `ClassBalancedDataset`: repeat dataset in a class balanced manner.
-- `ConcatDataset`: concat datasets.
+## 通过封装器自定义数据集
 
-### Repeat dataset
+MMRotate 还支持许多数据集封装器对数据集进行混合或修改数据集的分布以进行训练。目前它支持三个数据集封装器，如下所示：
 
-We use `RepeatDataset` as wrapper to repeat the dataset. For example, suppose the original dataset is `Dataset_A`, to repeat it, the config looks like the following
-
+- `RepeatDataset`: 简单地重复整个数据集。
+- `ClassBalancedDataset`: 以类平衡的方式重复数据集。
+- `ConcatDataset`: 拼接数据集
+### 重复数据集
+我们使用`RepeatDataset` 作为封装器来重复这个数据集。例如，假设原始数据集是`Dataset_A`,我们就重复一遍这个数据集。配置信息如下所示：
 ```python
 dataset_A_train = dict(
         type='RepeatDataset',
@@ -109,12 +125,8 @@ dataset_A_train = dict(
     )
 ```
 
-### Class balanced dataset
-
-We use `ClassBalancedDataset` as wrapper to repeat the dataset based on category
-frequency. The dataset to repeat needs to instantiate function `self.get_cat_ids(idx)`
-to support `ClassBalancedDataset`.
-For example, to repeat `Dataset_A` with `oversample_thr=1e-3`, the config looks like the following
+### 类别平衡数据集
+我们使用`ClassBalancedDataset`作为封装器，根据类别频率重复数据集。这个数据集的重复操作`ClassBalancedDataset`需要实例化函数`self.get_cat_ids(idx)`的支持。例如，重复`Dataset_A`需要使用`oversample_thr=1e-3`,配置信息如下所示：
 
 ```python
 dataset_A_train = dict(
@@ -128,11 +140,9 @@ dataset_A_train = dict(
     )
 ```
 
-### Concatenate dataset
-
-There are three ways to concatenate the dataset.
-
-1. If the datasets you want to concatenate are in the same type with different annotation files, you can concatenate the dataset configs like the following.
+### 拼接数据集
+这里用三种方式对数据集进行拼接。
+1. 如果要拼接的数据集属于同一类型且具有不同的注释文件，则可以通过如下所示的配置信息来拼接数据集：
 
     ```python
     dataset_A_train = dict(
@@ -141,9 +151,9 @@ There are three ways to concatenate the dataset.
         pipeline=train_pipeline
     )
     ```
-
-    If the concatenated dataset is used for test or evaluation, this manner supports to evaluate each dataset separately. To test the concatenated datasets as a whole, you can set `separate_eval=False` as below.
-
+    
+    如果拼接后的数据集用于测试或评估，我们这种方式是可以支持对每个数据集分别进行评估。如果要测试的整个拼接数据集，如下所示您可以直接通过设置separate_eval=False来实现。
+    
     ```python
     dataset_A_train = dict(
         type='Dataset_A',
@@ -153,12 +163,12 @@ There are three ways to concatenate the dataset.
     )
     ```
 
-2. In case the dataset you want to concatenate is different, you can concatenate the dataset configs like the following.
+
+2. 如果您要拼接不同的数据集，您可以通过如下所示的方法对拼接数据集配置信息进行设置。
 
     ```python
     dataset_A_train = dict()
     dataset_B_train = dict()
-
     data = dict(
         imgs_per_gpu=2,
         workers_per_gpu=2,
@@ -171,14 +181,15 @@ There are three ways to concatenate the dataset.
         )
     ```
 
-    If the concatenated dataset is used for test or evaluation, this manner also supports to evaluate each dataset separately.
 
-3. We also support to define `ConcatDataset` explicitly as the following.
+    如果拼接后的数据集用于测试或评估，这种方式还支持对每个数据集分别进行评估。
+
+
+3. 我们也支持如下所示的方法对 `ConcatDataset` 进行明确的定义
 
     ```python
     dataset_A_val = dict()
     dataset_B_val = dict()
-
     data = dict(
         imgs_per_gpu=2,
         workers_per_gpu=2,
@@ -189,14 +200,14 @@ There are three ways to concatenate the dataset.
             separate_eval=False))
     ```
 
-    This manner allows users to evaluate all the datasets as a single one by setting `separate_eval=False`.
+    这种方式允许用户通过设置`separate_eval=False`将所有数据集转为单个数据集进行评估。
 
-**Note:**
-
-1. The option `separate_eval=False` assumes the datasets use `self.data_infos` during evaluation. Therefore, COCO datasets do not support this behavior since COCO datasets do not fully rely on `self.data_infos` for evaluation. Combining different types of datasets and evaluating them as a whole is not tested thus is not suggested.
-2. Evaluating `ClassBalancedDataset` and `RepeatDataset` is not supported thus evaluating concatenated datasets of these types is also not supported.
+**笔记:**
+1.  假设数据集在评估期间使用 `self.data_infos`，就要把选项设置为`separate_eval=False`。因为 COCO 数据集不完全依赖 `self.data_infos` 进行评估，所以，COCO 数据集并不支持这种设置操作。没有在组合不同类型的数据集并对其进行整体评估的场景进行测试，因此我们不建议使用这样的操作。
+2. 不支持评估`ClassBalancedDataset`和 `RepeatDataset`，所以也不支持评估这些类型的串联组合后的数据集。
 
 A more complex example that repeats `Dataset_A` and `Dataset_B` by N and M times, respectively, and then concatenates the repeated datasets is as the following.
+一个更复杂的例子，分别将`Dataset_A`和`Dataset_B` 重复 N 次和 M 次，然后将重复的数据集连接起来，如下所示。
 
 ```python
 dataset_A_train = dict(
@@ -235,5 +246,4 @@ data = dict(
     val = dataset_A_val,
     test = dataset_A_test
 )
-
 ```
