@@ -1,5 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import torch
 from mmcv.ops import box_iou_rotated
 
 from .builder import ROTATED_IOU_CALCULATORS
@@ -72,12 +71,8 @@ def rbbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False):
     assert (bboxes2.size(-1) == 5 or bboxes2.size(0) == 0)
 
     # resolve `rbbox_overlaps` abnormal when input rbbox is too small.
-    bboxes1_replace = bboxes1.new_ones((bboxes1.size(0), 2)) * 1e-3
-    bboxes2_replace = bboxes2.new_ones((bboxes2.size(0), 2)) * 1e-3
-    bboxes1[:, 2:4] = torch.where(bboxes1[:, 2:4] < 1e-3, bboxes1_replace,
-                                  bboxes1[:, 2:4])
-    bboxes2[:, 2:4] = torch.where(bboxes2[:, 2:4] < 1e-3, bboxes2_replace,
-                                  bboxes2[:, 2:4])
+    bboxes1 = bboxes1.clamp(min=1e-3)
+    bboxes2 = bboxes2.clamp(min=1e-3)
 
     rows = bboxes1.size(0)
     cols = bboxes2.size(0)
