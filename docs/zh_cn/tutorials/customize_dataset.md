@@ -80,7 +80,7 @@ data = dict(
     test=dict(
         type=dataset_type,
 
-        # 注意将你的类名添加到字段`class
+        # 注意将你的类名添加到字段`class`
         classes=classes,
         ann_file='path/to/your/test/annotation_data',
         img_prefix='path/to/your/test/image_data'))
@@ -89,7 +89,7 @@ data = dict(
 model = dict(
     bbox_head=dict(
         type='RotatedRetinaHead',
-        # explicitly over-write all the `num_classes` field from default 15 to 5.
+        # 准确的覆盖所有的 `num_classes` 字段，从默认值 15 到 5
         num_classes=15))
 ```
 
@@ -149,7 +149,8 @@ dataset_A_train = dict(
         ann_file = ['anno_file_1', 'anno_file_2'],
         pipeline=train_pipeline
     )
-    ```如果拼接后的数据集用于测试或评估，我们这种方式是可以支持对每个数据集分别进行评估。如果要测试的整个拼接数据集，如下所示您可以直接通过设置separate_eval=False来实现。
+    ```
+如果拼接后的数据集用于测试或评估，我们这种方式是可以支持对每个数据集分别进行评估。如果要测试的整个拼接数据集，如下所示您可以直接通过设置 `separate_eval=False` 来实现。
 
     ```python
     dataset_A_train = dict(
