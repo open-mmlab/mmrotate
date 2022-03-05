@@ -25,3 +25,15 @@ Models:
         Metrics:
           mAP: 73.91
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_1x_dota_le135/s2anet_r50_fpn_1x_dota_le135-5dfcf396.pth
+
+  - Name: s2anet_r50_fpn_fp16_1x_dota_le135
+    In Collection: s2anet
+    Config: configs/s2anet/s2anet_r50_fpn_fp16_1x_dota_le135.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 74.19
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_fp16_1x_dota_le135/s2anet_r50_fpn_fp16_1x_dota_le135-5cac515c.pth

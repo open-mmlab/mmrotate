@@ -3,5 +3,3 @@ _base_ = [
 ]
 
 fp16 = dict(loss_scale='dynamic')
-model = dict(train_cfg=dict(rpn=dict(assigner=dict(gpu_assign_thr=200))))
-
