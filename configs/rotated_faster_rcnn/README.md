@@ -1,4 +1,5 @@
-# [Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks](https://papers.nips.cc/paper/2015/file/14bfa6bb14875e45bba028a21ed38046-Paper.pdf)
+# Rotated Faster R-CNN
+> [Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks](https://papers.nips.cc/paper/2015/file/14bfa6bb14875e45bba028a21ed38046-Paper.pdf)
 
 
 <!-- [ALGORITHM] -->
@@ -14,7 +15,7 @@ State-of-the-art object detection networks depend on region proposal algorithms 
 
 ## Results and models
 
-### DOTA1.0
+DOTA1.0
 
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|

@@ -1,4 +1,5 @@
-# [Rethinking Rotated Object Detection with Gaussian Wasserstein Distance Loss](https://arxiv.org/pdf/2101.11952.pdf)
+# GWD
+> [Rethinking Rotated Object Detection with Gaussian Wasserstein Distance Loss](https://arxiv.org/pdf/2101.11952.pdf)
 
 <!-- [ALGORITHM] -->
 ## Abstract
@@ -11,9 +12,8 @@ Boundary discontinuity and its inconsistency to the final detection metric have 
 
 ## Results and models
 
-### DOTA1.0
+DOTA1.0
 
-#### RotatedRetinaNet
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
 | ResNet50 (1024,1024,200) | 64.55 | oc | 1x | 3.38 | 14.8 | - | 2 | [rotated_retinanet_hbb_r50_fpn_1x_dota_oc](../rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc-e8a7c7df.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc_20220121_095315.log.json)

@@ -1,4 +1,5 @@
-# [Oriented R-CNN for Object Detection](https://openaccess.thecvf.com/content/ICCV2021/papers/Xie_Oriented_R-CNN_for_Object_Detection_ICCV_2021_paper.pdf)
+# Oriented R-CNN
+> [Oriented R-CNN for Object Detection](https://openaccess.thecvf.com/content/ICCV2021/papers/Xie_Oriented_R-CNN_for_Object_Detection_ICCV_2021_paper.pdf)
 
 <!-- [ALGORITHM] -->
 ## Abstract
@@ -12,8 +13,7 @@ Current state-of-the-art two-stage detectors generate oriented proposals through
 
 ## Results and models
 
-### DOTA1.0
-
+DOTA1.0
 
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|

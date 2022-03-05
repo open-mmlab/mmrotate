@@ -1,4 +1,5 @@
-# [Align Deep Features for Oriented Object Detection](https://ieeexplore.ieee.org/document/9377550)
+# S2ANet
+> [Align Deep Features for Oriented Object Detection](https://ieeexplore.ieee.org/document/9377550)
 
 <!-- [ALGORITHM] -->
 ## Abstract
@@ -11,7 +12,7 @@ The past decade has witnessed significant progress on detecting objects in aeria
 
 ## Results and models
 
-### DOTA1.0
+DOTA1.0
 
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|

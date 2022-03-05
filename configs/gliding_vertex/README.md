@@ -1,4 +1,5 @@
-# [Gliding Vertex on the Horizontal Bounding Box for Multi-Oriented Object Detection](https://arxiv.org/pdf/1911.09358.pdf)
+# Gliding Vertex
+> [Gliding Vertex on the Horizontal Bounding Box for Multi-Oriented Object Detection](https://arxiv.org/pdf/1911.09358.pdf)
 
 <!-- [ALGORITHM] -->
 ## Abstract
@@ -12,8 +13,7 @@ Object detection has recently experienced substantial progress. Yet, the widely 
 
 ## Results and models
 
-### DOTA1.0
-
+DOTA1.0
 
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|

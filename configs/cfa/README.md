@@ -1,6 +1,8 @@
-# [Beyond Bounding-Box: Convex-hull Feature Adaptation for Oriented and Densely Packed Object Detection.](https://openaccess.thecvf.com/content/CVPR2021/papers/Guo_Beyond_Bounding-Box_Convex-Hull_Feature_Adaptation_for_Oriented_and_Densely_Packed_CVPR_2021_paper.pdf)
+# CFA
+> [Beyond Bounding-Box: Convex-hull Feature Adaptation for Oriented and Densely Packed Object Detection.](https://openaccess.thecvf.com/content/CVPR2021/papers/Guo_Beyond_Bounding-Box_Convex-Hull_Feature_Adaptation_for_Oriented_and_Densely_Packed_CVPR_2021_paper.pdf)
 
 <!-- [ALGORITHM] -->
+
 ## Abstract
 
 <div align=center>
@@ -11,9 +13,8 @@ Detecting oriented and densely packed objects remains challenging for spatial fe
 
 ## Results and models
 
-### DOTA1.0
+DOTA1.0
 
-#### RepPoints
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
 | ResNet50 (1024,1024,200) | 59.44 | oc | 1x | 3.45 | 15.9 | - | 2 | [rotated_reppoints_r50_fpn_1x_dota_oc](../rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc/rotated_reppoints_r50_fpn_1x_dota_oc-d38ce217.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc/rotated_reppoints_r50_fpn_1x_dota_oc_20220205_145010.log.json)

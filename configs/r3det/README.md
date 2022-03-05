@@ -1,4 +1,5 @@
-# [R3Det: Refined Single-Stage Detector with Feature Refinement for Rotating Object](https://arxiv.org/pdf/1908.05612.pdf)
+# R3Det
+> [R3Det: Refined Single-Stage Detector with Feature Refinement for Rotating Object](https://arxiv.org/pdf/1908.05612.pdf)
 
 <!-- [ALGORITHM] -->
 ## Abstract
@@ -11,7 +12,7 @@ Rotation detection is a challenging task due to the difficulties of locating the
 
 ## Results and models
 
-### DOTA1.0
+DOTA1.0
 
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
