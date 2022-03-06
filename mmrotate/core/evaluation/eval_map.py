@@ -17,10 +17,10 @@ def tpfp_default(det_bboxes,
     """Check if detected bboxes are true positive or false positive.
 
     Args:
-        det_bboxes (ndarray): Detected bboxes of this image, of shape (m, 9).
-        gt_bboxes (ndarray): GT bboxes of this image, of shape (n, 8).
+        det_bboxes (ndarray): Detected bboxes of this image, of shape (m, 6).
+        gt_bboxes (ndarray): GT bboxes of this image, of shape (n, 5).
         gt_bboxes_ignore (ndarray): Ignored gt bboxes of this image,
-            of shape (k, 8). Default: None
+            of shape (k, 5). Default: None
         iou_thr (float): IoU threshold to be considered as matched.
             Default: 0.5.
         area_ranges (list[tuple] | None): Range of bbox areas to be evaluated,
@@ -123,15 +123,15 @@ def get_cls_results(det_results, annotations, class_id):
     return cls_dets, cls_gts, cls_gts_ignore
 
 
-def eval_map(det_results,
-             annotations,
-             scale_ranges=None,
-             iou_thr=0.5,
-             use_07_metric=True,
-             dataset=None,
-             logger=None,
-             nproc=4):
-    """Evaluate mAP of a dataset.
+def eval_rbbox_map(det_results,
+                   annotations,
+                   scale_ranges=None,
+                   iou_thr=0.5,
+                   use_07_metric=True,
+                   dataset=None,
+                   logger=None,
+                   nproc=4):
+    """Evaluate mAP of a rotated dataset.
 
     Args:
         det_results (list[list]): [[cls1_det, cls2_det, ...], ...].
@@ -140,9 +140,9 @@ def eval_map(det_results,
         annotations (list[dict]): Ground truth annotations where each item of
             the list indicates an image. Keys of annotations are:
 
-            - `bboxes`: numpy array of shape (n, 4)
+            - `bboxes`: numpy array of shape (n, 5)
             - `labels`: numpy array of shape (n, )
-            - `bboxes_ignore` (optional): numpy array of shape (k, 4)
+            - `bboxes_ignore` (optional): numpy array of shape (k, 5)
             - `labels_ignore` (optional): numpy array of shape (k, )
         scale_ranges (list[tuple] | None): Range of scales to be evaluated,
             in the format [(min1, max1), (min2, max2), ...]. A range of

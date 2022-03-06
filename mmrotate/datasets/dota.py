@@ -16,7 +16,7 @@ from mmcv.ops import nms_rotated
 from mmdet.datasets.custom import CustomDataset
 
 from mmrotate.core import obb2poly_np, poly2obb_np
-from mmrotate.core.evaluation import eval_map
+from mmrotate.core.evaluation import eval_rbbox_map
 from .builder import ROTATED_DATASETS
 
 
@@ -193,7 +193,7 @@ class DOTADataset(CustomDataset):
         eval_results = {}
         if metric == 'mAP':
             assert isinstance(iou_thr, float)
-            mean_ap, _ = eval_map(
+            mean_ap, _ = eval_rbbox_map(
                 results,
                 annotations,
                 scale_ranges=scale_ranges,
