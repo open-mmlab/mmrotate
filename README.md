@@ -71,7 +71,7 @@ Please refer to [install.md](docs/en/install.md) for installation guide.
 ## Get Started
 
 Please see [get_started.md](docs/en/get_started.md) for the basic usage of MMRotate.
-We provide [colab tutorial](demo/inference_demo.ipynb) for beginners.
+We provide [colab tutorial](demo/MMRotate_Tutorial.ipynb) for beginners.
 There are also tutorials:
 
 * [learn the basics](docs/en/intro.md)
