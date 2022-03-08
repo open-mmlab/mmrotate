@@ -1,16 +1,19 @@
-# [Gliding Vertex on the Horizontal Bounding Box for Multi-Oriented Object Detection](https://arxiv.org/pdf/1911.09358.pdf)
+# Gliding Vertex
+> [Gliding Vertex on the Horizontal Bounding Box for Multi-Oriented Object Detection](https://arxiv.org/pdf/1911.09358.pdf)
 
 <!-- [ALGORITHM] -->
 ## Abstract
 
-![illustration](https://raw.githubusercontent.com/zytx121/image-host/main/imgs/gv.png)
+<div align=center>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/gv.png" width="800"/>
+</div>
+
 Object detection has recently experienced substantial progress. Yet, the widely adopted horizontal bounding box representation is not appropriate for ubiquitous oriented objects such as objects in aerial images and scene texts. In this paper, we propose a simple yet effective framework to detect multi-oriented objects. Instead of directly regressing the four vertices, we glide the vertex of the horizontal bounding box on each corresponding side to accurately describe a multi-oriented object. Specifically, We regress four length ratios characterizing the relative gliding offset on each corresponding side. This may facilitate the offset learning and avoid the confusion issue of sequential label points for oriented objects. To further remedy the confusion issue for nearly horizontal objects, we also introduce an obliquity factor based on area ratio between the object and its horizontal bounding box, guiding the selection of horizontal or oriented detection for each object. We add these five extra target variables to the regression head of rotated faster R-CNN, which requires ignorable extra computation time. Extensive experimental results demonstrate that without bells and whistles, the proposed method achieves superior performances on multiple multi-oriented object detection benchmarks including object detection in aerial images, scene text detection, pedestrian detection in fisheye images.
 
 
 ## Results and models
 
-### DOTA1.0
-
+DOTA1.0
 
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
