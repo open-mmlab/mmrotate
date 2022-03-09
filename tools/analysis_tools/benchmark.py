@@ -33,8 +33,8 @@ def parse_args():
         help='Whether to fuse conv and bn, this will slightly increase'
         'the inference speed')
     parser.add_argument(
-        '--use-fp16', 
-        action='store_true', 
+        '--use-fp16',
+        action='store_true',
         help='Whether to use fp16 to inference')
     parser.add_argument(
         '--cfg-options',
