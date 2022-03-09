@@ -13,6 +13,7 @@ from mmdet.datasets import build_dataloader, replace_ImageToTensor
 from mmrotate.datasets import build_dataset
 from mmrotate.models import build_detector
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description='mmrotate benchmark a model')
     parser.add_argument('config', help='test config file path')
@@ -32,7 +33,9 @@ def parse_args():
         help='Whether to fuse conv and bn, this will slightly increase'
         'the inference speed')
     parser.add_argument(
-        '--use-fp16', action='store_true', help='Whether to use fp16 to inference')
+        '--use-fp16', 
+        action='store_true', 
+        help='Whether to use fp16 to inference')
     parser.add_argument(
         '--cfg-options',
         nargs='+',
@@ -103,7 +106,6 @@ def measure_inference_speed(cfg, checkpoint, max_iter, log_interval,
 
     # benchmark with 2000 image and take the average
     for i, data in enumerate(data_loader):
-        
         torch.cuda.synchronize()
         start_time = time.perf_counter()
 
