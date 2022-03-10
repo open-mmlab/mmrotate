@@ -21,6 +21,12 @@ DOTA1.0
 | ResNet50 (1024,1024,200) | 69.79 | le135 | 1x | 3.38 | 16.6 | - | 2 | [rotated_retinanet_obb_r50_fpn_1x_dota_le135](./rotated_retinanet_obb_r50_fpn_1x_dota_le135.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135-e4131166.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135_20220128_130755.log.json)
 | ResNet50 (1024,1024,200) | 76.50 | le90 | 1x |   | 16.7 | MS+RR | 2 | [rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90](./rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90-1da1ec9c.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90_20220210_114843.log.json)
 
+HRSC
+
+|       Backbone        |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                            Configs                                            | Download |
+|:---------------------:|:-----:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------------------------------------------------------------------------------------------:|:-------------:|
+|  ResNet50 (800,800)   | 72.60 | le90 | 1x |  |  | - | 2 | [rotated_retinanet_obb_r50_fpn_3x_hrsc_le90](./rotated_retinanet_obb_r50_fpn_3x_hrsc_le90.py) |
+
 Notes:
 - `MS` means multiple scale image split.
 - `RR` means random rotation.
