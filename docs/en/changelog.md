@@ -30,7 +30,7 @@
 - Add Chinese translation of `docs/zh_cn/tutorials/customize_models.md` (#27)
 - Add Chinese translation of `docs/zh_cn/model_zoo.md` (#28)
 - Add Chinese translation of `docs/zh_cn/faq.md` (#33)
-  
+
 #### Contributors
 
 A total of 13 developers contributed to this release.
