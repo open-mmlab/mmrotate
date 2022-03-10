@@ -5,12 +5,10 @@ from collections import Sequence
 from pathlib import Path
 
 import mmcv
-import numpy as np
 from mmcv import Config, DictAction
-
-from mmdet.core.utils import mask2ndarray
-from mmrotate.core.visualization import imshow_det_rbboxes
 from mmdet.datasets.builder import build_dataset
+
+from mmrotate.core.visualization import imshow_det_rbboxes
 
 
 def parse_args():
@@ -48,6 +46,13 @@ def parse_args():
 
 
 def retrieve_data_cfg(config_path, skip_type, cfg_options):
+    """Retrieve the dataset config file.
+
+    Args:
+        config_path (str): Path of the config file.
+        skip_type (list[str]): List of the useless pipeline to skip.
+        cfg_options (dict): dict of configs to merge from.
+    """
 
     def skip_pipeline_steps(config):
         config['pipeline'] = [
