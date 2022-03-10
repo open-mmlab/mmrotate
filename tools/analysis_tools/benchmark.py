@@ -61,13 +61,13 @@ def parse_args():
 
 def measure_inference_speed(cfg, checkpoint, max_iter, log_interval,
                             is_fuse_conv_bn, use_fp16):
-    """ inference speed statistics 
+    """ inference speed statistics
         Args:
             cfg (object): Test config object.
             checkpoint (str): Checkpoint file path.
             max_iter (int): Num of max iter.
             log_interval (int): Interval of logging.
-            is_fuse_conv_bn (bool): Whether to fuse conv and bn, 
+            is_fuse_conv_bn (bool): Whether to fuse conv and bn,
                 this will slightly increase the inference speed
             use_fp16 (bool): Whether to use fp16 to inference.
         Returns:
@@ -161,14 +161,14 @@ def repeat_measure_inference_speed(cfg,
             checkpoint (str): Checkpoint file path.
             max_iter (int): Num of max iter.
             log_interval (int): Interval of logging.
-            is_fuse_conv_bn (bool): Whether to fuse conv and bn, 
+            is_fuse_conv_bn (bool): Whether to fuse conv and bn,
                 this will slightly increase the inference speed
             use_fp16 (bool): Whether to use fp16 to inference.
             repeat_num (int): Number of repeat times of measurement
                 for averaging the results.
         Returns:
-            fps (float of list(float)): Inference speed(fps) or 
-                list of inference speed(fps) for repeating measurements. 
+            fps (float of list(float)): Inference speed(fps) or
+                list of inference speed(fps) for repeating measurements.
         """
     assert repeat_num >= 1
 
