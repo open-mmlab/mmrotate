@@ -320,16 +320,16 @@ class SAMRepPointsHead(BaseDenseHead):
             assigner = self.init_assigner
             pos_weight = self.train_cfg.init.pos_weight
             assign_result = assigner.assign(
-                proposals, gt_bboxes, overlaps, gt_bboxes_ignore,
-                None if self.sampling else gt_labels)
+                proposals, gt_bboxes, gt_bboxes_ignore,
+                None if self.sampling else gt_labels,overlaps)
         else:
             assigner = self.refine_assigner
             pos_weight = self.train_cfg.refine.pos_weight
             if self.train_cfg.refine.assigner.type not in (
                     'ATSSAssigner', 'ATSSConvexAssigner', 'SASAssigner'):
                 assign_result = assigner.assign(
-                    proposals, gt_bboxes, overlaps, gt_bboxes_ignore,
-                    None if self.sampling else gt_labels)
+                    proposals, gt_bboxes, gt_bboxes_ignore,
+                    None if self.sampling else gt_labels,overlaps)
             else:
                 assign_result = assigner.assign(
                     proposals, num_level_anchors_inside, gt_bboxes,
@@ -491,7 +491,8 @@ class SAMRepPointsHead(BaseDenseHead):
             gt_bboxes_ignore_list = [None for _ in range(num_imgs)]
         if gt_labels_list is None:
             gt_labels_list = [None for _ in range(num_imgs)]
-        all_overlaps_rotate_list = [None] * 4
+        len_gt_labels = len(gt_labels_list)
+        all_overlaps_rotate_list = [None] * len_gt_labels
         (all_labels, all_label_weights, all_bbox_gt, all_proposals,
          all_proposal_weights, pos_inds_list, neg_inds_list, all_gt_inds_list,
          all_sam_init_weights) = multi_apply(
