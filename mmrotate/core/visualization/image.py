@@ -63,17 +63,20 @@ def imshow_det_rbboxes(img,
     assert labels.ndim == 1
     img = imread(img)
 
-    scores = bboxes[:, -1]
-    inds = scores > score_thr
-    bboxes = bboxes[inds, :]
-    labels = labels[inds]
+    if score_thr > 0:
+        assert bboxes is not None and bboxes.shape[1] == 6
+        scores = bboxes[:, -1]
+        inds = scores > score_thr
+        bboxes = bboxes[inds, :]
+        labels = labels[inds]
 
     bbox_color = (226, 43,
                   138) if bbox_color is None else color_val(bbox_color)
     text_color = (255, 255,
                   255) if text_color is None else color_val(text_color)
     for bbox, label in zip(bboxes, labels):
-        xc, yc, w, h, ag, score = bbox.tolist()
+        xc, yc, w, h, ag = bbox[:5]
+        score = bbox[5] if bboxes.shape[1] == 6 else None
         wx, wy = w / 2 * math.cos(ag), w / 2 * math.sin(ag)
         hx, hy = -h / 2 * math.sin(ag), h / 2 * math.cos(ag)
         p1 = (xc - wx - hx, yc - wy - hy)
@@ -84,7 +87,8 @@ def imshow_det_rbboxes(img,
         cv2.drawContours(img, [ps], -1, bbox_color, thickness=thickness)
         label_text = class_names[
             label] if class_names is not None else 'cls {}'.format(label)
-        label_text += '|{:.02f}'.format(score)
+        if score:
+            label_text += '|{:.02f}'.format(score)
         font = cv2.FONT_HERSHEY_COMPLEX
         text_size = cv2.getTextSize(label_text, font, font_scale, 1)
         text_width = text_size[0][0]
