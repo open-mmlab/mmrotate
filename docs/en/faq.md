@@ -6,12 +6,12 @@ We list some common troubles faced by many users and their corresponding solutio
 
 - Compatibility issue between MMCV and MMDetection; "ConvWS is already registered in conv layer"; "AssertionError: MMCV==xxx is used but incompatible. Please install mmcv>=xxx, <=xxx."
 
-  Please install the correct version of MMCV for the version of your MMDetection following the [installation instruction](https://mmdetection.readthedocs.io/en/latest/get_started.html#installation).
+  Please install the correct version of MMCV for the version of your MMRotate following the [installation instruction](https://mmrotate.readthedocs.io/en/latest/install.html).
 
 - "No module named 'mmcv.ops'"; "No module named 'mmcv._ext'".
 
     1. Uninstall existing mmcv in the environment using `pip uninstall mmcv`.
-    2. Install mmcv-full following the [installation instruction](https://mmcv.readthedocs.io/en/latest/#installation).
+    2. Install mmcv-full following the [installation instruction](https://mmcv.readthedocs.io/en/latest/get_started/installation.html).
 
 ## PyTorch/CUDA Environment
 

@@ -1,8 +1,12 @@
-# [The KFIoU Loss for Rotated Object Detection](https://arxiv.org/pdf/2101.11952.pdf)
+# KFIoU
+> [The KFIoU Loss for Rotated Object Detection](https://arxiv.org/pdf/2101.11952.pdf)
 
 <!-- [ALGORITHM] -->
 ## Abstract
-![illustration](https://raw.githubusercontent.com/zytx121/image-host/main/imgs/kfiou.png)
+
+<div align=center>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/kfiou.png" width="800"/>
+</div>
 
 Differing from the well-developed horizontal object detection area whereby the computing-friendly IoU based loss is
 readily adopted and well fits with the detection metrics. In contrast, rotation detectors often involve a more
@@ -19,9 +23,8 @@ base detectors show the effectiveness of our approach.
 
 ## Results and models
 
-### DOTA1.0
+DOTA1.0
 
-#### RotatedRetinaNet
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
 | ResNet50 (1024,1024,200) | 64.55 | oc | 1x | 3.38 | 15.7 | - | 2 | [rotated_retinanet_hbb_r50_fpn_1x_dota_oc](../rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc-e8a7c7df.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc_20220121_095315.log.json)
@@ -29,7 +32,6 @@ base detectors show the effectiveness of our approach.
 | ResNet50 (1024,1024,200) | 69.76 | oc | 1x | 3.39 | 15.6 | - | 2 | [rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc](./rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc-c00be030.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_oc_20220126_081643.log.json)
 | ResNet50 (1024,1024,200) | 69.77 | le135 | 1x | 3.38 | 15.3 | - | 2 | [rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135](./rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135-0eaa4156.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/kfiou/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135/rotated_retinanet_hbb_kfiou_r50_fpn_1x_dota_le135_20220209_173257.log.json)
 
-#### R3Det
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
 | ResNet50 (1024,1024,200) | 69.80 | oc | 1x | 3.54 | 12.4 | - | 2 | [r3det_r50_fpn_1x_dota_oc](../r3det/r3det_r50_fpn_1x_dota_oc.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/r3det/r3det_r50_fpn_1x_dota_oc/r3det_r50_fpn_1x_dota_oc-b1fb045c.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/r3det/r3det_r50_fpn_1x_dota_oc/r3det_r50_fpn_1x_dota_oc_20220126_191226.log.json)

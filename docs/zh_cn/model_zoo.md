@@ -1,4 +1,4 @@
-## Benchmark and Model Zoo
+## 基准和模型库
 
 - [Rotated RetinaNet-OBB/HBB](../../configs/rotated_retinanet/README.md) (ICCV'2017)
 - [Rotated FasterRCNN-OBB](../../configs/rotated_faster_rcnn/README.md) (TPAMI'2017)
@@ -16,9 +16,9 @@
 - [KFIoU](../../configs/kfiou/README.md) (arXiv)
 - [G-Rep](../../configs/g_reppoints/README.md) (stay tuned)
 
-### Results on DOTA v1.0
+### DOTA v1.0 数据集上的结果
 
-|    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
+|    骨干网络   |    mAP   | 角度编码方式 | 训练策略 | 显存占用 (GB) | 推理时间 (fps) | 增强方法 | 批量大小 | 配置 | 下载 |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
 | ResNet50 (1024,1024,200) | 59.44 | oc | 1x | 3.45 | 15.6 | - | 2 | [rotated_reppoints_r50_fpn_1x_dota_oc](../../configs/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc/rotated_reppoints_r50_fpn_1x_dota_oc-d38ce217.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc/rotated_reppoints_r50_fpn_1x_dota_oc_20220205_145010.log.json)
 | ResNet50 (1024,1024,200) | 64.55 | oc | 1x | 3.38 | 15.7 | - | 2 | [rotated_retinanet_hbb_r50_fpn_1x_dota_oc](../../configs/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc-e8a7c7df.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc_20220121_095315.log.json)
@@ -54,7 +54,7 @@
 | ResNet50 (1024,1024,200) | 79.66 | le90 | 1x |   | 14.4 | MS+RR | 2 | [roi_trans_r50_fpn_1x_dota_ms_le90](../../configs/roi_trans/roi_trans_r50_fpn_1x_dota_ms_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_1x_dota_ms_rr_le90/roi_trans_r50_fpn_1x_dota_ms_rr_le90-fa99496f.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_1x_dota_ms_rr_le90/roi_trans_r50_fpn_1x_dota_ms_rr_le90_20220205_171729.log.json)
 | ReResNet50 (1024,1024,200) | 79.87 | le90 | 1x |  | 10.9 | MS+RR | 2 | [redet_re50_refpn_1x_dota_ms_rr_le90](../../configs/redet/redet_re50_refpn_1x_dota_ms_rr_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90-fc9217b5.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90_20220206_105343.log.json)
 
-- `MS` means multiple scale image split.
-- `RR` means random rotation.
+- `MS` 表示多尺度图像增强。
+- `RR` 表示随机旋转增强。
 
-The above models are trained with 1 * 1080Ti and inferred with 1 * 2080Ti.
+上述模型都是使用 1 * 1080ti 训练得到的，并且在 1 * 2080ti 上进行推理测试。

@@ -1,17 +1,19 @@
-# [Oriented R-CNN for Object Detection](https://openaccess.thecvf.com/content/ICCV2021/papers/Xie_Oriented_R-CNN_for_Object_Detection_ICCV_2021_paper.pdf)
+# Oriented R-CNN
+> [Oriented R-CNN for Object Detection](https://openaccess.thecvf.com/content/ICCV2021/papers/Xie_Oriented_R-CNN_for_Object_Detection_ICCV_2021_paper.pdf)
 
 <!-- [ALGORITHM] -->
 ## Abstract
 
-![illustration](https://raw.githubusercontent.com/zytx121/image-host/main/imgs/oriented_rcnn.png)
+<div align=center>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/oriented_rcnn.png" width="800"/>
+</div>
 
 Current state-of-the-art two-stage detectors generate oriented proposals through time-consuming schemes. This diminishes the detectors’ speed, thereby becoming the computational bottleneck in advanced oriented object detection systems. This work proposes an effective and simple oriented object detection framework, termed Oriented R-CNN, which is a general two-stage oriented detector with promising accuracy and efficiency. To be specific, in the first stage, we propose an oriented Region Proposal Network (oriented RPN) that directly generates high-quality oriented proposals in a nearly cost-free manner. The second stage is oriented R-CNN head for refining oriented Regions of Interest (oriented RoIs) and recognizing them.
 
 
 ## Results and models
 
-### DOTA1.0
-
+DOTA1.0
 
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|

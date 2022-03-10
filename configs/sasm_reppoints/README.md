@@ -1,4 +1,5 @@
-# SASM-RepPoints
+# SASM
+> SASM-RepPoints
 
 <!-- [ALGORITHM] -->
 ## Abstract
@@ -7,7 +8,7 @@ Coming soon!
 
 ## Results and models
 
-### DOTA1.0
+DOTA1.0
 
 #### RepPoints
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
