@@ -114,29 +114,27 @@ class HRSCDataset(CustomDataset):
                 else:
                     label = 0
 
-                    # Add an extra score to use obb2poly_np
-                    bbox = np.array([[
-                        float(obj.find('mbox_cx').text),
-                        float(obj.find('mbox_cy').text),
-                        float(obj.find('mbox_w').text),
-                        float(obj.find('mbox_h').text),
-                        float(obj.find('mbox_ang').text), 0
-                    ]],
-                                    dtype=np.float32)
+                # Add an extra score to use obb2poly_np
+                bbox = np.array([[
+                    float(obj.find('mbox_cx').text),
+                    float(obj.find('mbox_cy').text),
+                    float(obj.find('mbox_w').text),
+                    float(obj.find('mbox_h').text),
+                    float(obj.find('mbox_ang').text), 0
+                ]],
+                                dtype=np.float32)
 
-                    polygon = obb2poly_np(bbox,
-                                          'le90')[0, :-1].astype(np.float32)
-                    if self.version != 'le90':
-                        bbox = np.array(
-                            poly2obb_np(polygon, self.version),
-                            dtype=np.float32)
-                    else:
-                        bbox = bbox[0, :-1]
-                    head = np.array([
-                        int(obj.find('header_x').text),
-                        int(obj.find('header_y').text)
-                    ],
-                                    dtype=np.int64)
+                polygon = obb2poly_np(bbox, 'le90')[0, :-1].astype(np.float32)
+                if self.version != 'le90':
+                    bbox = np.array(
+                        poly2obb_np(polygon, self.version), dtype=np.float32)
+                else:
+                    bbox = bbox[0, :-1]
+                head = np.array([
+                    int(obj.find('header_x').text),
+                    int(obj.find('header_y').text)
+                ],
+                                dtype=np.int64)
 
                 gt_bboxes.append(bbox)
                 gt_labels.append(label)
