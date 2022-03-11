@@ -9,8 +9,7 @@ from mmcv import print_log
 from mmdet.datasets import CustomDataset
 from PIL import Image
 
-from mmrotate.core.bbox import obb2poly_np, poly2obb_np
-from mmrotate.core.evaluation import eval_map
+from mmrotate.core import eval_rbbox_map, obb2poly_np, poly2obb_np
 from .builder import ROTATED_DATASETS
 
 
@@ -115,7 +114,6 @@ class HRSCDataset(CustomDataset):
                 else:
                     label = 0
 
-                try:
                     # Add an extra score to use obb2poly_np
                     bbox = np.array([[
                         float(obj.find('mbox_cx').text),
@@ -139,8 +137,6 @@ class HRSCDataset(CustomDataset):
                         int(obj.find('header_y').text)
                     ],
                                     dtype=np.int64)
-                except:  # noqa: E722
-                    continue
 
                 gt_bboxes.append(bbox)
                 gt_labels.append(label)
@@ -237,7 +233,7 @@ class HRSCDataset(CustomDataset):
             mean_aps = []
             for iou_thr in iou_thrs:
                 print_log(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}')
-                mean_ap, _ = eval_map(
+                mean_ap, _ = eval_rbbox_map(
                     results,
                     annotations,
                     scale_ranges=scale_ranges,

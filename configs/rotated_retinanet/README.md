@@ -25,7 +25,7 @@ HRSC
 
 |       Backbone        |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                            Configs                                            | Download |
 |:---------------------:|:-----:|:-----------:|:-------:|:---------:|:---------:|:---------:|:---------:|:---------------------------------------------------------------------------------------------:|:-------------:|
-|  ResNet50 (800,800)   | 72.60 | le90 |   3x    |  |  | - | 2 | [rotated_retinanet_obb_r50_fpn_3x_hrsc_le90](./rotated_retinanet_obb_r50_fpn_3x_hrsc_le90.py) |
+|  ResNet50 (800,800)   | 72.62 | le90 |   3x    |  |  | - | 2 | [rotated_retinanet_obb_r50_fpn_3x_hrsc_le90](./rotated_retinanet_obb_r50_fpn_3x_hrsc_le90.py) |
 
 Notes:
 - `MS` means multiple scale image split.
