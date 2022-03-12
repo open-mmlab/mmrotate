@@ -328,8 +328,8 @@ class SAMRepPointsHead(BaseDenseHead):
             if self.train_cfg.refine.assigner.type not in (
                     'ATSSAssigner', 'ATSSConvexAssigner', 'SASAssigner'):
                 assign_result = assigner.assign(
-                    proposals, gt_bboxes, gt_bboxes_ignore,
-                    None if self.sampling else gt_labels, overlaps)
+                    proposals, gt_bboxes, overlaps, gt_bboxes_ignore,
+                    None if self.sampling else gt_labels)
             else:
                 assign_result = assigner.assign(
                     proposals, num_level_anchors_inside, gt_bboxes,
