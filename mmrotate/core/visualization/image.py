@@ -59,12 +59,13 @@ def imshow_det_rbboxes(img,
         wait_time (int): Value of waitKey param.
         out_file (str or None): The filename to write the image.
     """
-    assert bboxes.ndim == 2
+    assert bboxes is not None and bboxes.ndim == 2
     assert labels.ndim == 1
+
     img = imread(img)
 
     if score_thr > 0:
-        assert bboxes is not None and bboxes.shape[1] == 6
+        assert bboxes.shape[1] == 6
         scores = bboxes[:, -1]
         inds = scores > score_thr
         bboxes = bboxes[inds, :]
