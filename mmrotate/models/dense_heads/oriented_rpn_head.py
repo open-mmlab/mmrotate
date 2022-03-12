@@ -13,7 +13,7 @@ from .rotated_rpn_head import RotatedRPNHead
 
 @ROTATED_HEADS.register_module()
 class OrientedRPNHead(RotatedRPNHead):
-    """Oriented RPN head for rotated bboxes."""
+    """Oriented RPN head for Oriented R-CNN."""
 
     def _init_layers(self):
         """Initialize layers of the head."""

@@ -17,7 +17,7 @@ from ..builder import ROTATED_HEADS, build_loss
 
 @ROTATED_HEADS.register_module()
 class RotatedAnchorHead(BaseDenseHead):
-    """Anchor-based head (RotatedRPN, RotatedRetinaNet, etc.).
+    """Rotated Anchor-based head (RotatedRPN, RotatedRetinaNet, etc.).
 
     Args:
         num_classes (int): Number of categories excluding the background

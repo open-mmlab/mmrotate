@@ -10,7 +10,7 @@ from .kfiou_rotate_retina_head import KFIoURRetinaHead
 
 @ROTATED_HEADS.register_module()
 class KFIoUODMRefineHead(KFIoURRetinaHead):
-    """Rotational Anchor-based refine head.
+    """Rotated Anchor-based refine head for KFIoU.
 
     Args:
         num_classes (int): Number of categories excluding the background

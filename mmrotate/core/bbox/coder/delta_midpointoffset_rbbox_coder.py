@@ -16,6 +16,7 @@ class MidpointOffsetCoder(BaseBBoxCoder):
     This coder encodes bbox (x1, y1, x2, y2) into delta
         (dx, dy, dw, dh, da, db) and decodes delta (dx, dy, dw, dh, da, db)
         back to original bbox (x1, y1, x2, y2).
+
     Args:
         target_means (Sequence[float]): Denormalizing means of target for
             delta coordinates

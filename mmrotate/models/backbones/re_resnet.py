@@ -35,6 +35,7 @@ class BasicBlock(enn.EquivariantModule):
             Default: None
         norm_cfg (dict): dictionary to construct and config norm layer.
             Default: dict(type='BN')
+        init_cfg (dict or list[dict], optional): Initialization config dict.
     """
 
     def __init__(self,

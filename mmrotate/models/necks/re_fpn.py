@@ -12,7 +12,31 @@ from ..utils import (build_enn_feature, build_enn_norm_layer, ennConv,
 
 
 class ConvModule(enn.EquivariantModule):
-    """ConvModule."""
+    """ConvModule.
+
+    Args:
+        in_channels (List[int]): Number of input channels per scale.
+        out_channels (int): Number of output channels (used at each scale).
+        kernel_size (int, optional): The size of kernel.
+        stride (int, optional): Stride of the convolution. Default: 1.
+        padding (int or tuple): Zero-padding added to both sides of the input.
+            Default: 0.
+        dilation (int or tuple): Spacing between kernel elements. Default: 1.
+        groups (int): Number of blocked connections from input.
+            channels to output channels. Default: 1.
+        bias (bool): If True, adds a learnable bias to the output.
+            Default: False.
+        conv_cfg (dict, optional): Config dict for convolution layer.
+            Default: None.
+        norm_cfg (dict, optional): Config dict for normalization layer.
+            Default: None.
+        activation (str, optional): Activation layer in ConvModule.
+            Default: None.
+        inplace (bool): can optionally do the operation in-place.
+        order (tuple[str]): The order of conv/norm/activation layers. It is a
+            sequence of "conv", "norm" and "act". Common examples are
+            ("conv", "norm", "act") and ("act", "conv", "norm").
+    """
 
     def __init__(self,
                  in_channels,

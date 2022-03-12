@@ -18,7 +18,7 @@ from .utils import get_num_level_anchors_inside, points_center_pts
 
 @ROTATED_HEADS.register_module()
 class SAMRepPointsHead(BaseDenseHead):
-    """CFA head.
+    """Rotated RepPoints head for SASM.
 
     Args:
         num_classes (int): Number of classes.

@@ -43,7 +43,7 @@ class RotatedRepPointsHead(BaseDenseHead):
         center_init (bool, optional): Whether to use center point assignment.
         transform_method (str, optional): The methods to transform RepPoints
             to bbox.
-        use_reassign (bool, optional): Whether to use cfa.
+        use_reassign (bool, optional): Whether to reassign samples.
         topk (int, optional): Number of the highest topk points. Defaults to 9.
         anti_factor (float, optional): Feature anti-aliasing coefficient.
         version (str, optional): Angle representations. Defaults to 'oc'.

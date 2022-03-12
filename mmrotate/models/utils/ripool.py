@@ -3,7 +3,12 @@ from torch import nn
 
 
 class RotationInvariantPooling(nn.Module):
-    """Rotating invariant pooling module."""
+    """Rotating invariant pooling module.
+
+    Args:
+        nInputPlane (int): The number of Input plane.
+        nOrientation (int, optional): The number of oriented channels.
+    """
 
     def __init__(self, nInputPlane, nOrientation=8):
         super(RotationInvariantPooling, self).__init__()

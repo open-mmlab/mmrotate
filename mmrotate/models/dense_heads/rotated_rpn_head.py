@@ -20,6 +20,7 @@ class RotatedRPNHead(AnchorHead):
     Args:
         in_channels (int): Number of channels in the input feature map.
         init_cfg (dict or list[dict], optional): Initialization config dict.
+        version (str, optional): Angle representations. Defaults to 'oc'.
     """  # noqa: W605
 
     def __init__(self,
