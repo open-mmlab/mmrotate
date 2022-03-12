@@ -28,6 +28,10 @@ class RotatedAnchorHead(BaseDenseHead):
         bbox_coder (dict): Config of bounding box coder.
         reg_decoded_bbox (bool): If true, the regression loss would be
             applied on decoded bounding boxes. Default: False
+        assign_by_circumhbbox (str): If None, assigner will assign according to
+            the IoU between anchor and GT (OBB), called RetinaNet-OBB.  
+            If angle definition method, assigner will assign according to the
+            IoU between anchor and GT's circumbox (HBB), called RetinaNet-HBB.     
         loss_cls (dict): Config of classification loss.
         loss_bbox (dict): Config of localization loss.
         train_cfg (dict): Training config of anchor head.
