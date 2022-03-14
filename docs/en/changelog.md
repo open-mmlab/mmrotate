@@ -12,6 +12,7 @@
 - Add confusion matrix analysis [tool](tools/analysis_tools/confusion_matrix.py) (#93)
 
 #### Bug Fixes
+
 - Fix URL error of Swin pretrained model (#111)
 - Fix bug for SASM during training (#105)
 - Fix rbbox_overlaps abnormal when the box is too small (#61)

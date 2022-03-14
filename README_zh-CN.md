@@ -60,6 +60,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 </details>
 
 ## 更新日志
+
 最新的 **0.1.1** 版本已经在 2022.03.14 发布:
 
 - 支持了[大图推理](deom/huge_image_demo.py)
