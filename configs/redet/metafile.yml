@@ -14,6 +14,18 @@ Collections:
   README: configs/redet/README.md
 
 Models:
+  - Name: redet_re50_refpn_fp16_1x_dota_le90
+    In Collection: redet
+    Config: configs/redet/redet_re50_refpn_fp16_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 75.99
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_refpn_fp16_1x_dota_le90/redet_re50_refpn_fp16_1x_dota_le90-1e34da2d.pth
+
   - Name: redet_re50_refpn_1x_dota_le90
     In Collection: redet
     Config: configs/redet/redet_re50_refpn_1x_dota_le90.py

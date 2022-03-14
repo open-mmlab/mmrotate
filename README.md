@@ -62,7 +62,18 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 </details>
 
+## Changelog
 
+**0.1.1** was released in 14/3/2022:
+
+- Add [colab tutorial](demo/MMRotate_Tutorial.ipynb) for beginners (#66)
+- Support [huge image inference](deom/huge_image_demo.py) (#34)
+- Support HRSC Dataset (#96)
+- Support mixed precision training (#72)
+- Add inference speed statistics [tool](tools/analysis_tools/benchmark.py) (#86)
+- Add confusion matrix analysis [tool](tools/analysis_tools/confusion_matrix.py) (#93)
+
+Please refer to [changelog.md](docs/en/changelog.md) for details and release history.
 
 ## Installation
 

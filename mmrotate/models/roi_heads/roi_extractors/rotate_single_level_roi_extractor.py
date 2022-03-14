@@ -37,6 +37,7 @@ class RotatedSingleRoIExtractor(BaseRoIExtractor):
               self).__init__(roi_layer, out_channels, featmap_strides,
                              init_cfg)
         self.finest_scale = finest_scale
+        self.fp16_enabled = False
 
     def build_roi_layers(self, layer_cfg, featmap_strides):
         """Build RoI operator to extract feature from each level feature map.
