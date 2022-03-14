@@ -35,6 +35,7 @@ class RBboxOverlaps2D(object):
         """
         assert bboxes1.size(-1) in [0, 5, 6]
         assert bboxes2.size(-1) in [0, 5, 6]
+
         if bboxes2.size(-1) == 6:
             bboxes2 = bboxes2[..., :5]
         if bboxes1.size(-1) == 6:
@@ -68,6 +69,10 @@ def rbbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False):
     # Either the boxes are empty or the length of boxes's last dimension is 5
     assert (bboxes1.size(-1) == 5 or bboxes1.size(0) == 0)
     assert (bboxes2.size(-1) == 5 or bboxes2.size(0) == 0)
+
+    # resolve `rbbox_overlaps` abnormal when input rbbox is too small.
+    bboxes1[2:4].clamp_(min=1e-3)
+    bboxes2[2:4].clamp_(min=1e-3)
 
     rows = bboxes1.size(0)
     cols = bboxes2.size(0)

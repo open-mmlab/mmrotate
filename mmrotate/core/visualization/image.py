@@ -66,6 +66,7 @@ def imshow_det_rbboxes(img,
     scores = bboxes[:, -1]
     inds = scores > score_thr
     bboxes = bboxes[inds, :]
+    labels = labels[inds]
 
     bbox_color = (226, 43,
                   138) if bbox_color is None else color_val(bbox_color)

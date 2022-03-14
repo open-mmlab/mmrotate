@@ -6,14 +6,14 @@
 
 - MMCV 与 MMDetection 的兼容问题: "ConvWS is already registered in conv layer"; "AssertionError: MMCV==xxx is used but incompatible. Please install mmcv>=xxx, <=xxx."
 
-  请按 [安装说明](https://mmdetection.readthedocs.io/zh_CN/latest/get_started.html#installation) 为你的 MMDetection 安装正确版本的 MMCV。
+  请按 [安装说明](https://mmrotate.readthedocs.io/zh_CN/latest/install.html) 为你的 MMRotate 安装正确版本的 MMCV。
 
 - "No module named 'mmcv.ops'"; "No module named 'mmcv._ext'".
 
   原因是安装了 `mmcv` 而不是 `mmcv-full`。
 
   1. 使用 `pip uninstall mmcv` 卸载。
-  2. 根据 [安装说明](https://mmcv.readthedocs.io/zh/latest/#installation) 安装 `mmcv-full`。
+  2. 根据 [安装说明](https://mmcv.readthedocs.io/zh_CN/latest/get_started/installation.html) 安装 `mmcv-full`。
 
 ## PyTorch/CUDA 环境相关
 
@@ -61,6 +61,30 @@
 
   4. 如果 MMCV 与 PyTorch 都被正确安装了，则使用 `ipdb`、`pdb` 设置断点，直接查找哪一部分的代码导致了 `segmentation fault`。
 
+## E2CNN
+
+- "ImportError: cannot import name 'container_bacs' from 'torch._six'"
+
+    1. 这是因为 `container_abcs` 在 PyTorch 1.9 之后被移除.
+    2. 将文件 `python3.7/site-packages/e2cnn/nn/modules/module_list.py` 中的
+
+        ```shell
+        from torch.six import container_abcs
+        ```
+
+       替换成
+
+        ```shell
+        TORCH_MAJOR = int(torch.__version__.split('.')[0])
+        TORCH_MINOR = int(torch.__version__.split('.')[1])
+        if TORCH_MAJOR ==1 and TORCH_MINOR < 8:
+            from torch.six import container_abcs
+        else:
+            import collections.abs as container_abcs
+        ```
+
+     3. 或者降低 Pytorch 的版本。
+
 ## Training 相关
 
 - "Loss goes Nan"
@@ -72,7 +96,7 @@
 - "GPU out of memory"
   1. 存在大量 ground truth boxes 或者大量 anchor 的场景，可能在 assigner 会 OOM。您可以在 assigner 的配置中设置 `gpu_assign_thr=N`，这样当超过 N 个 GT boxes 时，assigner 会通过 CPU 计算 IoU。
   2. 在 backbone 中设置 `with_cp=True`。这使用 PyTorch 中的 `sublinear strategy` 来降低 backbone 占用的 GPU 显存。
-  3. 使用 `config/fp16` 中的示例尝试混合精度训练。`loss_scale` 可能需要针对不同模型进行调整。
+  3. 通过在配置文件中设置 `fp16 = dict(loss_scale='dynamic')` 来尝试混合精度训练。
 
 - "RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one"
   1. 错误表明，您的模块有没用于产生损失的参数，这种现象可能是由于在 DDP 模式下运行代码中的不同分支造成的。

@@ -6,12 +6,12 @@ We list some common troubles faced by many users and their corresponding solutio
 
 - Compatibility issue between MMCV and MMDetection; "ConvWS is already registered in conv layer"; "AssertionError: MMCV==xxx is used but incompatible. Please install mmcv>=xxx, <=xxx."
 
-  Please install the correct version of MMCV for the version of your MMDetection following the [installation instruction](https://mmdetection.readthedocs.io/en/latest/get_started.html#installation).
+  Please install the correct version of MMCV for the version of your MMRotate following the [installation instruction](https://mmrotate.readthedocs.io/en/latest/install.html).
 
 - "No module named 'mmcv.ops'"; "No module named 'mmcv._ext'".
 
     1. Uninstall existing mmcv in the environment using `pip uninstall mmcv`.
-    2. Install mmcv-full following the [installation instruction](https://mmcv.readthedocs.io/en/latest/#installation).
+    2. Install mmcv-full following the [installation instruction](https://mmcv.readthedocs.io/en/latest/get_started/installation.html).
 
 ## PyTorch/CUDA Environment
 
@@ -61,6 +61,30 @@ We list some common troubles faced by many users and their corresponding solutio
 
     4. If MMCV and Pytorch is correctly installed, you man use `ipdb`, `pdb` to set breakpoints or directly add 'print' in mmdetection code and see which part leads the segmentation fault.
 
+## E2CNN
+
+- "ImportError: cannot import name 'container_bacs' from 'torch._six'"
+
+    1. This is because `container_abcs` has been removed since PyTorch 1.9.
+    2. Replace
+
+        ```shell
+        from torch.six import container_abcs
+        ```
+
+       in `python3.7/site-packages/e2cnn/nn/modules/module_list.py` with
+
+        ```shell
+        TORCH_MAJOR = int(torch.__version__.split('.')[0])
+        TORCH_MINOR = int(torch.__version__.split('.')[1])
+        if TORCH_MAJOR ==1 and TORCH_MINOR < 8:
+            from torch.six import container_abcs
+        else:
+            import collections.abs as container_abcs
+        ```
+
+     3. Or downgrade the version of Pytorch.
+
 ## Training
 
 - "Loss goes Nan"
@@ -71,7 +95,7 @@ We list some common troubles faced by many users and their corresponding solutio
 - "GPU out of memory"
     1. There are some scenarios when there are large amounts of ground truth boxes, which may cause OOM during target assignment. You can set `gpu_assign_thr=N` in the config of assigner thus the assigner will calculate box overlaps through CPU when there are more than N GT boxes.
     2. Set `with_cp=True` in the backbone. This uses the sublinear strategy in PyTorch to reduce GPU memory cost in the backbone.
-    3. Try mixed precision training using following the examples in `config/fp16`. The `loss_scale` might need further tuning for different models.
+    3. Try mixed precision training by setting `fp16 = dict(loss_scale='dynamic')` in the config file.
 
 - "RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one"
     1. This error indicates that your module has parameters that were not used in producing loss. This phenomenon may be caused by running different branches in your code in DDP mode.

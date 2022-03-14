@@ -26,6 +26,18 @@ Models:
           mAP: 68.42
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90/rotated_retinanet_obb_r50_fpn_1x_dota_le90-c0097bc4.pth
 
+  - Name: rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 68.79
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90-01de71b5.pth
+
   - Name: rotated_retinanet_obb_r50_fpn_1x_dota_le135
     In Collection: rotated_retinanet
     Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135.py

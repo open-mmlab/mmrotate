@@ -16,6 +16,18 @@ Collections:
   README: configs/roi_trans/README.md
 
 Models:
+  - Name: roi_trans_r50_fpn_fp16_1x_dota_le90
+    In Collection: roi_trans
+    Config: configs/roi_trans/roi_trans_r50_fpn_fp16_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 75.75
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_fp16_1x_dota_le90/roi_trans_r50_fpn_fp16_1x_dota_le90-62eb88b1.pth
+
   - Name: roi_trans_r50_fpn_1x_dota_le90
     In Collection: roi_trans
     Config: configs/roi_trans/roi_trans_r50_fpn_1x_dota_le90.py
