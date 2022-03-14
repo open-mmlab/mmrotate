@@ -13,6 +13,7 @@ class GVFixCoder(BaseBBoxCoder):
 
     this coder encodes bbox (cx, cy, w, h, a) into delta (dt, dr, dd, dl) and
     decodes delta (dt, dr, dd, dl) back to original bbox (cx, cy, w, h, a).
+
     Args:
         angle_range (str, optional): Angle representations. Defaults to 'oc'.
     """
@@ -27,6 +28,7 @@ class GVFixCoder(BaseBBoxCoder):
 
         Args:
             rbboxes (torch.Tensor): Source boxes, e.g., object proposals.
+
         Returns:
             torch.Tensor: Box transformation deltas
         """
@@ -66,12 +68,14 @@ class GVFixCoder(BaseBBoxCoder):
 
     def decode(self, hbboxes, fix_deltas):
         """Apply transformation `fix_deltas` to `boxes`.
+
         Args:
             hbboxes (torch.Tensor): Basic boxes. Shape (B, N, 4) or (N, 4)
             fix_deltas (torch.Tensor): Encoded offsets with respect to each
                 roi. Has shape (B, N, num_classes * 4) or (B, N, 4) or
                (N, num_classes * 4) or (N, 4). Note N = num_anchors * W * H
                when rois is a grid of anchors.Offset encoding follows [1]_.
+
         Returns:
             torch.Tensor: Decoded boxes.
         """
@@ -100,6 +104,7 @@ class GVRatioCoder(BaseBBoxCoder):
     """Gliding vertex ratio coder.
 
     this coder encodes bbox (cx, cy, w, h, a) into delta (ratios).
+
     Args:
         angle_range (str, optional): Angle representations. Defaults to 'oc'.
     """
@@ -113,6 +118,7 @@ class GVRatioCoder(BaseBBoxCoder):
 
         Args:
             rbboxes (torch.Tensor): Source boxes, e.g., object proposals.
+
         Returns:
             torch.Tensor: Box transformation deltas
         """
@@ -140,12 +146,5 @@ class GVRatioCoder(BaseBBoxCoder):
         return ratios[:, None]
 
     def decode(self, bboxes, bboxes_pred):
-        """Apply transformation `fix_deltas` to `boxes`.
-
-        Args:
-            bboxes (torch.Tensor)
-            bboxes_pred (torch.Tensor)
-        Returns:
-            NotImplementedError
-        """
+        """Apply transformation `fix_deltas` to `boxes`."""
         raise NotImplementedError

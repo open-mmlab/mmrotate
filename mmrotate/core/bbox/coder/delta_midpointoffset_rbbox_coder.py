@@ -59,6 +59,7 @@ class MidpointOffsetCoder(BaseBBoxCoder):
                max_shape=None,
                wh_ratio_clip=16 / 1000):
         """Apply transformation `pred_bboxes` to `bboxes`.
+
         Args:
             bboxes (torch.Tensor): Basic boxes. Shape (B, N, 4) or (N, 4)
             pred_bboxes (torch.Tensor): Encoded offsets with respect to each
@@ -97,6 +98,7 @@ def bbox2delta(proposals,
     We usually compute the deltas of x, y, w, h, a, b of proposals w.r.t ground
     truth bboxes to get regression target.
     This is the inverse function of :func:`delta2bbox`.
+
     Args:
         proposals (torch.Tensor): Boxes to be transformed, shape (N, ..., 4)
         gt (torch.Tensor): Gt bboxes to be used as base, shape (N, ..., 5)
@@ -157,10 +159,11 @@ def delta2bbox(rois,
                stds=(1., 1., 1., 1., 1., 1.),
                wh_ratio_clip=16 / 1000,
                version='oc'):
-    """Apply deltas to shift/scale base boxes.
-    Typically the rois are anchor or proposed bounding boxes and the deltas are
-    network outputs used to shift/scale those boxes.
-    This is the inverse function of :func:`bbox2delta`.
+    """Apply deltas to shift/scale base boxes. Typically the rois are anchor or
+    proposed bounding boxes and the deltas are network outputs used to
+    shift/scale those boxes. This is the inverse function of
+    :func:`bbox2delta`.
+
     Args:
         rois (torch.Tensor): Boxes to be transformed. Has shape (N, 4).
         deltas (torch.Tensor): Encoded offsets relative to each roi.

@@ -279,6 +279,7 @@ class RotatedStandardRoIHead(BaseModule, metaclass=ABCMeta):
             rcnn_test_cfg (obj:`ConfigDict`): `test_cfg` of R-CNN.
             rescale (bool): If True, return boxes in original image space.
                 Default: False.
+
         Returns:
             tuple[list[Tensor], list[Tensor]]: The first list contains
                 the boxes of the corresponding image in a batch, each

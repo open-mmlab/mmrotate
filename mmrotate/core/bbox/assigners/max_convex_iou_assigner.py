@@ -15,6 +15,7 @@ class MaxConvexIoUAssigner(BaseAssigner):
 
     - -1: negative sample, no assigned gt
     - semi-positive integer: positive sample, index (0-based) of assigned gt
+
     Args:
         pos_iou_thr (float): IoU threshold for positive bboxes.
         neg_iou_thr (float or tuple): IoU threshold for negative bboxes.
@@ -71,6 +72,7 @@ class MaxConvexIoUAssigner(BaseAssigner):
         5. select these candidates whose iou are greater than or equal to
            the threshold as positive
         6. limit the positive sample's center in gt
+
         Args:
             points (torch.Tensor): Points to be assigned, shape(n, 18).
             gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
@@ -79,6 +81,7 @@ class MaxConvexIoUAssigner(BaseAssigner):
             gt_rbboxes_ignore (Tensor, optional): Ground truth polygons that
                 are labelled as `ignored`, e.g., crowd boxes in COCO.
             gt_labels (Tensor, optional): Label of gt_bboxes, shape (k, ).
+
         Returns:
             :obj:`AssignResult`: The assign result.
         """
@@ -121,10 +124,12 @@ class MaxConvexIoUAssigner(BaseAssigner):
         """Assign w.r.t.
 
         the overlaps of bboxes with gts.
+
         Args:
             overlaps (torch.Tensor): Overlaps between k gt_bboxes and n bboxes,
                 shape(k, n).
             gt_labels (Tensor, optional): Labels of k gt_bboxes, shape (k, ).
+
         Returns:
             :obj:`AssignResult`: The assign result.
         """
@@ -196,10 +201,12 @@ class MaxConvexIoUAssigner(BaseAssigner):
             num_gts, assigned_gt_inds, max_overlaps, labels=assigned_labels)
 
     def convex_overlaps(self, gt_rbboxes, points):
-        """ Compute overlaps between polygons and points
+        """Compute overlaps between polygons and points.
+
         Args:
             gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
             points (torch.Tensor): Points to be assigned, shape(n, 18).
+
         Returns:
             overlaps (torch.Tensor): Overlaps between k gt_bboxes and n bboxes,
                 shape(k, n).

@@ -8,10 +8,12 @@ from ..builder import ROTATED_BBOX_ASSIGNERS
 
 
 def convex_overlaps(gt_rbboxes, points):
-    """ Compute overlaps between polygons and points
+    """Compute overlaps between polygons and points.
+
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
         points (torch.Tensor): Points to be assigned, shape(n, 18).
+
     Returns:
         overlaps (torch.Tensor): Overlaps between k gt_bboxes and n bboxes,
             shape(k, n).
@@ -27,6 +29,7 @@ def get_horizontal_bboxes(gt_rbboxes):
 
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
+
     Returns:
         gt_rect_bboxes (torch.Tensor): The horizontal bboxes, shape (k, 4).
     """
@@ -43,9 +46,11 @@ def get_horizontal_bboxes(gt_rbboxes):
 
 
 def AspectRatio(gt_rbboxes):
-    """compute the aspect ratio of all gts
+    """compute the aspect ratio of all gts.
+
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
+
     Returns:
         ratios (torch.Tensor): The aspect ratio of gt_rbboxes, shape (k, 1).
     """
@@ -71,6 +76,7 @@ class SASAssigner(BaseAssigner):
 
     - 0: negative sample, no assigned gt
     - positive integer: positive sample, index (1-based) of assigned gt
+
     Args:
         scale (float): IoU threshold for positive bboxes.
         pos_num (float): find the nearest pos_num points to gt center in this
@@ -100,7 +106,6 @@ class SASAssigner(BaseAssigner):
         5. select these candidates whose iou are greater than or equal to
            the threshold as positive
         6. limit the positive sample's center in gt
-
 
         Args:
             bboxes (torch.Tensor): Bounding boxes to be assigned, shape(n, 4).

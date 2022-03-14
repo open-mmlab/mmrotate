@@ -14,6 +14,7 @@ class ConvexAssigner(BaseAssigner):
 
     - 0: negative sample, no assigned gt
     - positive integer: positive sample, index (1-based) of assigned gt
+
     Args:
         scale (float): IoU threshold for positive bboxes.
         pos_num (float): find the nearest pos_num points to gt center in this
@@ -29,6 +30,7 @@ class ConvexAssigner(BaseAssigner):
 
         Args:
             gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
+
         Returns:
             gt_rect_bboxes (torch.Tensor): The horizontal bboxes, shape (k, 4).
         """
@@ -64,12 +66,14 @@ class ConvexAssigner(BaseAssigner):
         5. select these candidates whose iou are greater than or equal to
            the threshold as positive
         6. limit the positive sample's center in gt
+
         Args:
             points (torch.Tensor): Points to be assigned, shape(n, 18).
             gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
             gt_rbboxes_ignore (Tensor, optional): Ground truth polygons that
                 are labelled as `ignored`, e.g., crowd boxes in COCO.
             gt_labels (Tensor, optional): Label of gt_bboxes, shape (k, ).
+
         Returns:
             :obj:`AssignResult`: The assign result.
         """

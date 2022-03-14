@@ -70,10 +70,12 @@ class ConvexGIoULoss(nn.Module):
 
     Computing the Convex GIoU loss between a set of predicted convexes and
     target convexes.
+
     Args:
         reduction (str, optional): The reduction method of the loss. Defaults
             to 'mean'.
         loss_weight (float, optional): The weight of loss. Defaults to 1.0.
+
     Return:
         torch.Tensor: Loss tensor.
     """
@@ -264,10 +266,12 @@ class BCConvexGIoULoss(nn.Module):
 
     Computing the BCConvex GIoU loss between a set of predicted convexes and
     target convexes.
+
     Args:
         reduction (str, optional): The reduction method of the loss. Defaults
             to 'mean'.
         loss_weight (float, optional): The weight of loss. Defaults to 1.0.
+
     Return:
         torch.Tensor: Loss tensor.
     """
@@ -308,9 +312,11 @@ class BCConvexGIoULoss(nn.Module):
 
 
 def AspectRatio(gt_rbboxes):
-    """compute the aspect ratio of all gts
+    """compute the aspect ratio of all gts.
+
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
+
     Returns:
         ratios (torch.Tensor): The aspect ratio of gt_rbboxes, shape (k, 1).
     """

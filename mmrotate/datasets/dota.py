@@ -52,7 +52,7 @@ class DOTADataset(CustomDataset):
 
     def load_annotations(self, ann_folder):
         """
-            Params:
+            Args:
                 ann_folder: folder that contains DOTA v1 annotations txt files
         """
         cls_map = {c: i
@@ -210,7 +210,7 @@ class DOTADataset(CustomDataset):
     def merge_det(self, results, nproc=4):
         """Merging patch bboxes into full image.
 
-        Params:
+        Args:
             results (list): Testing results of the dataset.
             nproc (int): number of process. Default: 4.
         """
@@ -252,7 +252,7 @@ class DOTADataset(CustomDataset):
     def _results2submission(self, id_list, dets_list, out_folder=None):
         """Generate the submission of full images.
 
-        Params:
+        Args:
             id_list (list): Id of images.
             dets_list (list): Detection results of per class.
             out_folder (str, optional): Folder of submission.
@@ -330,7 +330,7 @@ class DOTADataset(CustomDataset):
 def _merge_func(info, CLASSES, iou_thr):
     """Merging patch bboxes into full image.
 
-    Params:
+    Args:
         CLASSES (list): Label category.
         iou_thr (float): Threshold of IoU.
     """
