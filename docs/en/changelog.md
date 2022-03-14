@@ -5,12 +5,15 @@
 #### New Features
 
 - Support [huge image inference](deom/huge_image_demo.py) (#34)
-- Support mix precision training (#72)
+- Support HRSC Dataset (#96)
+- Support mixed precision training (#72)
 - Add [colab tutorial](demo/MMRotate_Tutorial.ipynb) for beginners (#66)
-- Add confusion matrix [analysis tool](tools/analysis_tools/confusion_matrix.py) (#93)
+- Add inference speed statistics [tool](tools/analysis_tools/benchmark.py) (#86)
+- Add confusion matrix analysis [tool](tools/analysis_tools/confusion_matrix.py) (#93)
 
 #### Bug Fixes
-
+- Fix URL error of Swin pretrained model (#111)
+- Fix bug for SASM during training (#105)
 - Fix rbbox_overlaps abnormal when the box is too small (#61)
 - Fix bug for visualization (#12, #81)
 - Fix stuck when compute mAP (#14, #52)

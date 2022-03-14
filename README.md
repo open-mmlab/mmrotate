@@ -66,7 +66,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 **0.1.1** was released in 18/3/2022:
 
 - Support [huge image inference](deom/huge_image_demo.py)
-- Support mix precision training.
+- Support mixed precision training.
 - Add [colab tutorial](demo/MMRotate_Tutorial.ipynb) for beginners.
 - Add confusion matrix [analysis tool](tools/analysis_tools/confusion_matrix.py).
 
