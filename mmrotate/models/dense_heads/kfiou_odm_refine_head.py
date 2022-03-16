@@ -10,7 +10,11 @@ from .kfiou_rotate_retina_head import KFIoURRetinaHead
 
 @ROTATED_HEADS.register_module()
 class KFIoUODMRefineHead(KFIoURRetinaHead):
-    """Rotated Anchor-based refine head for KFIoU.
+    """Rotated Anchor-based refine head for KFIoU. It's a part of the Oriented
+    Detection Module (ODM), which produces orientation-sensitive features for
+    classification and orientation-invariant features for localization. The
+    difference from `ODMRefineHead` is that its loss_bbox requires bbox_pred,
+    bbox_targets, pred_decode and targets_decode as inputs.
 
     Args:
         num_classes (int): Number of categories excluding the background

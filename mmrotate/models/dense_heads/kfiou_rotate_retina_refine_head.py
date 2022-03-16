@@ -8,7 +8,9 @@ from .kfiou_rotate_retina_head import KFIoURRetinaHead
 
 @ROTATED_HEADS.register_module()
 class KFIoURRetinaRefineHead(KFIoURRetinaHead):
-    """Rotational Anchor-based refine head.
+    """Rotational Anchor-based refine head. The difference from
+    `RRetinaRefineHead` is that its loss_bbox requires bbox_pred, bbox_targets,
+    pred_decode and targets_decode as inputs.
 
     Args:
         num_classes (int): Number of categories excluding the background

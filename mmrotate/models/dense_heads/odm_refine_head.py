@@ -10,7 +10,9 @@ from .rotated_retina_head import RotatedRetinaHead
 
 @ROTATED_HEADS.register_module()
 class ODMRefineHead(RotatedRetinaHead):
-    """Rotated Anchor-based refine head for S2ANet.
+    """Rotated Anchor-based refine head. It's a part of the Oriented Detection
+    Module (ODM), which produces orientation-sensitive features for
+    classification and orientation-invariant features for localization.
 
     Args:
         num_classes (int): Number of categories excluding the background

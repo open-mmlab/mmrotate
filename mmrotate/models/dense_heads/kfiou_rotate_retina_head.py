@@ -5,7 +5,9 @@ from .rotated_retina_head import RotatedRetinaHead
 
 @ROTATED_HEADS.register_module()
 class KFIoURRetinaHead(RotatedRetinaHead):
-    """Rotated Anchor-based head for KFIoU.
+    """Rotated Anchor-based head for KFIoU. The difference from `RRetinaHead`
+    is that its loss_bbox requires bbox_pred, bbox_targets, pred_decode and
+    targets_decode as inputs.
 
     Args:
         num_classes (int): Number of categories excluding the background
