@@ -6,6 +6,7 @@ from mmdet.core.anchor import AnchorGenerator
 from .builder import ROTATED_ANCHOR_GENERATORS
 from ..bbox.transforms import hbb2obb
 
+
 @ROTATED_ANCHOR_GENERATORS.register_module()
 class RotatedAnchorGenerator(AnchorGenerator):
     """Fake rotate anchor generator for 2D anchor-based detectors."""
@@ -42,6 +43,7 @@ class RotatedAnchorGenerator(AnchorGenerator):
 
         return anchors
 
+
 @ROTATED_ANCHOR_GENERATORS.register_module()
 class FakeRotatedAnchorGenerator(AnchorGenerator):
     """Fake rotate anchor generator for 2D anchor-based detectors."""
@@ -73,7 +75,8 @@ class FakeRotatedAnchorGenerator(AnchorGenerator):
         Returns:
             torch.Tensor: Anchors in the overall feature maps.
         """
-        anchors = super(FakeRotatedAnchorGenerator, self).single_level_grid_priors(
+        anchors = super(FakeRotatedAnchorGenerator,
+                        self).single_level_grid_priors(
             featmap_size, level_idx, dtype=dtype, device=device)
 
         anchors = hbb2obb(anchors, self.angle_version)

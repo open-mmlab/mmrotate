@@ -34,7 +34,6 @@ def smooth_focal_loss(pred,
         torch.Tensor: The calculated loss
     """
 
-
     pred_sigmoid = pred.sigmoid()
     target = target.type_as(pred)
     pt = (1 - pred_sigmoid) * target + pred_sigmoid * (1 - target)

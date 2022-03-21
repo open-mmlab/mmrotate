@@ -1,5 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import math
 
 import torch
 import torch.nn as nn
@@ -107,10 +106,10 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 weight shape (N, num_total_anchors, 5).
             bbox_weights (torch.Tensor): BBox regression loss weights of each
                 anchor with shape (N, num_total_anchors, 5).
-            angle_targets (torch.Tensor): Angle classification targets of each anchor
-                weight shape (N, num_total_anchors, coding_len).
-            angle_weights (torch.Tensor): Angle classification loss weights of each
-                anchor with shape (N, num_total_anchors, 1).
+            angle_targets (torch.Tensor): Angle classification targets of
+                each anchor weight shape (N, num_total_anchors, coding_len).
+            angle_weights (torch.Tensor): Angle classification loss weights
+                of each anchor with shape (N, num_total_anchors, 1).
             num_total_samples (int): If sampling, num total samples equal to
                 the number of total anchors; Otherwise, it is the number of
                 positive anchors.
@@ -323,7 +322,8 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 angle_targets[pos_inds, :] = pos_bbox_targets[:, 4:5]
             else:
                 # Get gt angle as target
-                angle_targets[pos_inds, :] = sampling_result.pos_gt_bboxes[:, 4:5]
+                angle_targets[pos_inds, :] = \
+                    sampling_result.pos_gt_bboxes[:, 4:5]
             # csl encoder
             angle_targets = self.angle_coder.encode(angle_targets)
             angle_weights[pos_inds, :] = 1.0

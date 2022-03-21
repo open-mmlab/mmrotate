@@ -13,10 +13,12 @@ class CSLCoder(BaseBBoxCoder):
 
         Args:
             angle_version (str): Angle definition.
-            omega (float, optional): Angle discretization granularity. Default: 1.
+            omega (float, optional): Angle discretization granularity.
+                Default: 1.
             window (str, optional): Window function. Default: gaussian.
-            radius (int/float): window radius, int type for ['triangle', 'rect', 'pulse'],
-                float type for ['gaussian']. Default: 6.
+            radius (int/float): window radius, int type for
+                ['triangle', 'rect', 'pulse'], float type for
+                ['gaussian']. Default: 6.
 
     """
 
@@ -41,8 +43,8 @@ class CSLCoder(BaseBBoxCoder):
                 Has shape (num_anchors * H * W, 1)
 
         Returns:
-            list[Tensor]: The csl encoding of angle offset for each scale level.
-                Has shape (num_anchors * H * W, coding_len)
+            list[Tensor]: The csl encoding of angle offset for each
+                scale level. Has shape (num_anchors * H * W, coding_len)
 
         """
 
@@ -97,11 +99,13 @@ class CSLCoder(BaseBBoxCoder):
         """Circular Smooth Label Decoder.
 
         Args:
-            angle_preds (Tensor): The csl encoding of angle offset for each scale level.
+            angle_preds (Tensor): The csl encoding of angle offset
+                for each scale level.
                 Has shape (num_anchors * H * W, coding_len)
 
         Returns:
-            list[Tensor]: Angle offset for each scale level. Has shape (num_anchors * H * W, 1)
+            list[Tensor]: Angle offset for each scale level.
+                Has shape (num_anchors * H * W, 1)
 
         """
         angle_cls_inds = torch.argmax(angle_preds, dim=1)
