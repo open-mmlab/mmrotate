@@ -3,7 +3,7 @@ from .assigners import (ATSSKldAssigner, ConvexAssigner, MaxConvexIoUAssigner,
                         SASAssigner)
 from .builder import build_assigner, build_bbox_coder, build_sampler
 from .coder import (DeltaXYWHAHBBoxCoder, DeltaXYWHAOBBoxCoder, GVFixCoder,
-                    GVRatioCoder, MidpointOffsetCoder, CSLCoder)
+                    GVRatioCoder, MidpointOffsetCoder)
 from .iou_calculators import RBboxOverlaps2D, rbbox_overlaps
 from .samplers import RRandomSampler
 from .transforms import (bbox_mapping_back, gaussian2bbox, gt2gaussian,
