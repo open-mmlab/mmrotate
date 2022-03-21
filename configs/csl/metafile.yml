@@ -1,0 +1,27 @@
+Collections:
+- Name: CSL
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 2080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: None
+    Title: 'Arbitrary-Oriented Object Detection with Circular Smooth Label'
+  README: configs/csl/README.md
+
+Models:
+  - Name: rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90
+    In Collection: csl
+    Config: configs/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.51
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.1/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90-b4271aed.pth

@@ -187,7 +187,7 @@ class RotatedAnchorHead(BaseDenseHead):
         Args:
             flat_anchors (torch.Tensor): Multi-level anchors of the image,
                 which are concatenated into a single tensor of shape
-                (num_anchors ,4)
+                (num_anchors, 5)
             valid_flags (torch.Tensor): Multi level valid flags of the image,
                 which are concatenated into a single tensor of
                     shape (num_anchors,).
@@ -296,7 +296,7 @@ class RotatedAnchorHead(BaseDenseHead):
             anchor_list (list[list[Tensor]]): Multi level anchors of each
                 image. The outer list indicates images, and the inner list
                 corresponds to feature levels of the image. Each element of
-                the inner list is a tensor of shape (num_anchors, 4).
+                the inner list is a tensor of shape (num_anchors, 5).
             valid_flag_list (list[list[Tensor]]): Multi level valid flags of
                 each image. The outer list indicates images, and the inner list
                 corresponds to feature levels of the image. Each element of
