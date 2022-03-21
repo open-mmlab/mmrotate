@@ -102,6 +102,31 @@ def gwd_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, normalize=True):
 
     Returns:
         loss (torch.Tensor)
+
+    Derivation and simplification:
+        Given any positive-definite symmetrical 2*2 matrix Z:
+            Tr(Z^(1/2)) = sqrt(λ_1) + sqrt(λ_2)
+        where λ_1 and λ_2 are the eigen values of Z
+        Meanwhile we have:
+            Tr(Z) = λ_1 + λ_2
+            det(Z) = λ_1 * λ_2
+        Combination with following formula:
+            (sqrt(λ_1) + sqrt(λ_2))^2 = λ_1 + λ_2 + 2 * sqrt(λ_1 * λ_2)
+        Yield:
+            Tr(Z^(1/2)) = sqrt(Tr(Z) + 2 * sqrt(det(Z)))
+        For gwd loss the frustrating coupling part is:
+            Tr((Σp^(1/2) * Σt * Σp^(1/2))^(1/2))
+        Assuming Z = Σp^(1/2) * Σt * Σp^(1/2) then:
+            Tr(Z) = Tr(Σp^(1/2) * Σt * Σp^(1/2))
+                  = Tr(Σp^(1/2) * Σp^(1/2) * Σt)
+                  = Tr(Σp * Σt)
+            det(Z) = det(Σp^(1/2) * Σt * Σp^(1/2))
+                   = det(Σp^(1/2)) * det(Σt) * det(Σp^(1/2))
+                   = det(Σp * Σt)
+        and thus we can rewrite the coupling part as:
+            Tr((Σp^(1/2) * Σt * Σp^(1/2))^(1/2))
+                = Tr{Z^(1/2)} = sqrt(Tr(Z) + 2 * sqrt(det(Z)))
+                = sqrt(Tr(Σp * Σt) + 2 * sqrt(det(Σp * Σt)))
     """
     xy_p, Sigma_p = pred
     xy_t, Sigma_t = target
@@ -114,14 +139,13 @@ def gwd_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, normalize=True):
 
     _t_tr = (Sigma_p.bmm(Sigma_t)).diagonal(dim1=-2, dim2=-1).sum(dim=-1)
     _t_det_sqrt = (Sigma_p.det() * Sigma_t.det()).clamp(0).sqrt()
-    whr_distance = whr_distance + (-2) * (
-        (_t_tr + 2 * _t_det_sqrt).clamp(0).sqrt())
+    whr_distance += (-2) * ((_t_tr + 2 * _t_det_sqrt).clamp(0).sqrt())
 
     distance = (xy_distance + alpha * alpha * whr_distance).clamp(0).sqrt()
 
     if normalize:
         scale = 2 * (_t_det_sqrt.sqrt().sqrt()).clamp(1e-7)
-        distance = distance / scale
+        distance /= scale
 
     return postprocess(distance, fun=fun, tau=tau)
 
