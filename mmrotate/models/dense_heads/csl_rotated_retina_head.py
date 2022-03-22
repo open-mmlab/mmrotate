@@ -115,7 +115,9 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 positive anchors.
 
         Returns:
-            dict[str, Tensor]: A dictionary of loss components.
+            loss_cls (torch.Tensor): cls. loss for each scale level.
+            loss_bbox (torch.Tensor): reg. loss for each scale level.
+            loss_angle (torch.Tensor): angle cls. loss for each scale level.
         """
         # classification loss
         labels = labels.reshape(-1)
@@ -153,7 +155,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
 
         return loss_cls, loss_bbox, loss_angle
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'angle_classes'))
+    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'angle_clses'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -464,7 +466,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
         else:
             return mlvl_bboxes, mlvl_scores
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'angle_classes'))
+    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'angle_clses'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

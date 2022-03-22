@@ -109,29 +109,3 @@ class CSLCoder(BaseBBoxCoder):
         angle_pred = ((angle_cls_inds + 0.5) *
                       self.omega) % self.angle_range - self.angle_offset
         return angle_pred * (math.pi / 180)
-
-
-@ROTATED_BBOX_CODERS.register_module()
-class BCLCoder(BaseBBoxCoder):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def encode(self, angle_targets):
-        pass
-
-    def decode(self, angle_preds):
-        pass
-
-
-@ROTATED_BBOX_CODERS.register_module()
-class GCLCoder(BaseBBoxCoder):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def encode(self, angle_targets):
-        pass
-
-    def decode(self, angle_preds):
-        pass
