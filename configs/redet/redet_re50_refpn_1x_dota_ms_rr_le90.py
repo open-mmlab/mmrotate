@@ -1,4 +1,4 @@
-_base_ = ['./redet_re50_fpn_1x_dota_le90.py']
+_base_ = ['./redet_re50_refpn_1x_dota_le90.py']
 
 data_root = '/cluster/home/it_stu198/main/datasets/split_ms_dota1_0/'
 angle_version = 'le90'
