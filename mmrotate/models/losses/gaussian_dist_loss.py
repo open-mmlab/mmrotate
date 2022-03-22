@@ -139,13 +139,14 @@ def gwd_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, normalize=True):
 
     _t_tr = (Sigma_p.bmm(Sigma_t)).diagonal(dim1=-2, dim2=-1).sum(dim=-1)
     _t_det_sqrt = (Sigma_p.det() * Sigma_t.det()).clamp(0).sqrt()
-    whr_distance += (-2) * ((_t_tr + 2 * _t_det_sqrt).clamp(0).sqrt())
+    whr_distance = whr_distance + (-2) * (
+        (_t_tr + 2 * _t_det_sqrt).clamp(0).sqrt())
 
     distance = (xy_distance + alpha * alpha * whr_distance).clamp(0).sqrt()
 
     if normalize:
         scale = 2 * (_t_det_sqrt.sqrt().sqrt()).clamp(1e-7)
-        distance /= scale
+        distance = distance / scale
 
     return postprocess(distance, fun=fun, tau=tau)
 
