@@ -80,7 +80,7 @@ def rbbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False):
 
     # resolve `rbbox_overlaps` abnormal when input rbbox is too small.
     clamped_bboxes1 = bboxes1.detach().clone()
-    clamped_bboxes2 = bboxes1.detach().clone()
+    clamped_bboxes2 = bboxes2.detach().clone()
     clamped_bboxes1[:, 2:4].clamp_(min=1e-3)
     clamped_bboxes2[:, 2:4].clamp_(min=1e-3)
 
