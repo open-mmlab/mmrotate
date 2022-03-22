@@ -71,8 +71,8 @@ def rbbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False):
     assert (bboxes2.size(-1) == 5 or bboxes2.size(0) == 0)
 
     # resolve `rbbox_overlaps` abnormal when input rbbox is too small.
-    bboxes1[2:4].clamp_(min=1e-3)
-    bboxes2[2:4].clamp_(min=1e-3)
+    bboxes1[:, 2:4].clamp_(min=1e-3)
+    bboxes2[:, 2:4].clamp_(min=1e-3)
 
     rows = bboxes1.size(0)
     cols = bboxes2.size(0)
