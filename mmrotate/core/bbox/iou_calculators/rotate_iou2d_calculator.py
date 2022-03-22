@@ -70,10 +70,6 @@ def rbbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False):
     assert (bboxes1.size(-1) == 5 or bboxes1.size(0) == 0)
     assert (bboxes2.size(-1) == 5 or bboxes2.size(0) == 0)
 
-    # resolve `rbbox_overlaps` abnormal when input rbbox is too small.
-    bboxes1[:, 2:4].clamp_(min=1e-3)
-    bboxes2[:, 2:4].clamp_(min=1e-3)
-
     rows = bboxes1.size(0)
     cols = bboxes2.size(0)
     if is_aligned:
@@ -82,4 +78,10 @@ def rbbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False):
     if rows * cols == 0:
         return bboxes1.new(rows, 1) if is_aligned else bboxes1.new(rows, cols)
 
-    return box_iou_rotated(bboxes1, bboxes2, mode, is_aligned)
+    # resolve `rbbox_overlaps` abnormal when input rbbox is too small.
+    clamped_bboxes1 = bboxes1.detach().clone()
+    clamped_bboxes2 = bboxes1.detach().clone()
+    clamped_bboxes1[:, 2:4].clamp_(min=1e-3)
+    clamped_bboxes2[:, 2:4].clamp_(min=1e-3)
+
+    return box_iou_rotated(clamped_bboxes1, clamped_bboxes2, mode, is_aligned)
