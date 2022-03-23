@@ -84,7 +84,7 @@ class RRandomFlip(RandomFlip):
         if self.version == 'oc':
             rotated_flag = (bboxes[:, 4] != np.pi / 2)
             flipped[rotated_flag, 4] = np.pi / 2 - bboxes[rotated_flag, 4]
-            flipped[rotated_flag, 2] = bboxes[rotated_flag, 3],
+            flipped[rotated_flag, 2] = bboxes[rotated_flag, 3]
             flipped[rotated_flag, 3] = bboxes[rotated_flag, 2]
         else:
             flipped[:, 4] = norm_angle(np.pi - bboxes[:, 4], self.version)
