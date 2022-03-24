@@ -130,17 +130,17 @@ class CSLRRetinaHead(RotatedRetinaHead):
             loss_bbox (torch.Tensor): reg. loss for each scale level.
             loss_angle (torch.Tensor): angle cls. loss for each scale level.
         """
-        # classification loss
+        # Classification loss
         labels = labels.reshape(-1)
         label_weights = label_weights.reshape(-1)
         cls_score = cls_score.permute(0, 2, 3,
                                       1).reshape(-1, self.cls_out_channels)
         loss_cls = self.loss_cls(
             cls_score, labels, label_weights, avg_factor=num_total_samples)
-        # regression loss
+        # Regression loss
         bbox_targets = bbox_targets.reshape(-1, 5)
         bbox_weights = bbox_weights.reshape(-1, 5)
-        # shield angle in reg. branch
+        # Shield angle in reg. branch
         if self.shield_reg_angle:
             bbox_weights[:, -1] = 0.
         bbox_pred = bbox_pred.permute(0, 2, 3, 1).reshape(-1, 5)
@@ -219,9 +219,9 @@ class CSLRRetinaHead(RotatedRetinaHead):
         num_total_samples = (
             num_total_pos + num_total_neg if self.sampling else num_total_pos)
 
-        # anchor number of multi levels
+        # Anchor number of multi levels
         num_level_anchors = [anchors.size(0) for anchors in anchor_list[0]]
-        # concat all level anchors and flags to a single tensor
+        # Concat all level anchors and flags to a single tensor
         concat_anchor_list = []
         for i, _ in enumerate(anchor_list):
             concat_anchor_list.append(torch.cat(anchor_list[i]))
@@ -293,7 +293,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
             self.train_cfg.allowed_border)
         if not inside_flags.any():
             return (None, ) * 9
-        # assign gt and sample anchors
+        # Assign gt and sample anchors
         anchors = flat_anchors[inside_flags, :]
 
         if self.assign_by_circumhbbox is not None:
@@ -337,7 +337,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 # Get gt angle as target
                 angle_targets[pos_inds, :] = \
                     sampling_result.pos_gt_bboxes[:, 4:5]
-            # csl encoder
+            # CSL encoder
             angle_targets = self.angle_coder.encode(angle_targets)
             angle_weights[pos_inds, :] = 1.0
 
@@ -355,7 +355,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
         if len(neg_inds) > 0:
             label_weights[neg_inds] = 1.0
 
-        # map up to original set of anchors
+        # Map up to original set of anchors
         if unmap_outputs:
             num_total_anchors = flat_anchors.size(0)
             labels = unmap(
@@ -425,6 +425,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 scores = cls_score.softmax(-1)
             bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, 5)
 
+            # CSL decoder
             angle_cls = angle_cls.permute(1, 2, 0).reshape(
                 -1, self.coding_len).sigmoid()
             angle_pred = self.angle_coder.decode(angle_cls)
@@ -435,7 +436,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 if self.use_sigmoid_cls:
                     max_scores, _ = scores.max(dim=1)
                 else:
-                    # remind that we set FG labels to [0, num_class-1]
+                    # Remind that we set FG labels to [0, num_class-1]
                     # since mmdet v2.0
                     # BG cat_id: num_class
                     max_scores, _ = scores[:, :-1].max(dim=1)
@@ -444,7 +445,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 bbox_pred = bbox_pred[topk_inds, :]
                 scores = scores[topk_inds, :]
                 angle_pred = angle_pred[topk_inds]
-            # csl decoder
+
             if self.use_encoded_angle:
                 bbox_pred[..., -1] = angle_pred
                 bboxes = self.bbox_coder.decode(
@@ -458,13 +459,13 @@ class CSLRRetinaHead(RotatedRetinaHead):
             mlvl_scores.append(scores)
         mlvl_bboxes = torch.cat(mlvl_bboxes)
         if rescale:
-            # angle should not be rescaled
+            # Angle should not be rescaled
             mlvl_bboxes[:, :4] = mlvl_bboxes[:, :4] / mlvl_bboxes.new_tensor(
                 scale_factor)
         mlvl_scores = torch.cat(mlvl_scores)
         if self.use_sigmoid_cls:
             # Add a dummy background class to the backend when using sigmoid
-            # remind that we set FG labels to [0, num_class-1] since mmdet v2.0
+            # Remind that we set FG labels to [0, num_class-1] since mmdet v2.0
             # BG cat_id: num_class
             padding = mlvl_scores.new_zeros(mlvl_scores.shape[0], 1)
             mlvl_scores = torch.cat([mlvl_scores, padding], dim=1)
@@ -529,7 +530,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
             >>>     max_per_img=10))
             >>> feat = torch.rand(1, 1, 3, 3)
             >>> cls_score, bbox_pred = self.forward_single(feat)
-            >>> # note the input lists are over different levels, not images
+            >>> # Note the input lists are over different levels, not images
             >>> cls_scores, bbox_preds = [cls_score], [bbox_pred]
             >>> result_list = self.get_bboxes(cls_scores, bbox_preds,
             >>>                               img_metas, cfg)
@@ -560,7 +561,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
             img_shape = img_metas[img_id]['img_shape']
             scale_factor = img_metas[img_id]['scale_factor']
             if with_nms:
-                # some heads don't support with_nms argument
+                # Some heads don't support with_nms argument
                 proposals = self._get_bboxes_single(cls_score_list,
                                                     bbox_pred_list,
                                                     angle_cls_list,
