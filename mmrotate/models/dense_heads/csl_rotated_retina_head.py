@@ -13,6 +13,17 @@ from .rotated_retina_head import RotatedRetinaHead
 
 @ROTATED_HEADS.register_module()
 class CSLRRetinaHead(RotatedRetinaHead):
+    """Rotational Anchor-based refine head.
+
+    Args:
+        use_encoded_angle (bool): Decide whether to use encoded angle or
+            gt angle as target. Default: True.
+        shield_reg_angle (bool): Decide whether to use the angle loss of
+            the reg branch. Default: False.
+        angle_coder (dict): Config of angle coder.
+        loss_angle (dict): Config of angle classification loss.
+        init_cfg (dict or list[dict], optional): Initialization config dict.
+    """  # noqa: W605
 
     def __init__(self,
                  use_encoded_angle=True,
