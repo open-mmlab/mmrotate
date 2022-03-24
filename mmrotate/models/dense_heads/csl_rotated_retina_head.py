@@ -18,8 +18,8 @@ class CSLRRetinaHead(RotatedRetinaHead):
     Args:
         use_encoded_angle (bool): Decide whether to use encoded angle or
             gt angle as target. Default: True.
-        shield_reg_angle (bool): Decide whether to use the angle loss of
-            the reg branch. Default: False.
+        shield_reg_angle (bool): Decide whether to shield the angle loss from
+            reg branch. Default: False.
         angle_coder (dict): Config of angle coder.
         loss_angle (dict): Config of angle classification loss.
         init_cfg (dict or list[dict], optional): Initialization config dict.
