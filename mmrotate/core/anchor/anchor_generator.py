@@ -40,6 +40,7 @@ class RotatedAnchorGenerator(AnchorGenerator):
         # The correct usage is：
         #       from ..bbox.transforms import hbb2obb
         #       anchors = hbb2obb(anchors, self.angle_version)
+        # instead of rudely setting the angle to all 0.
         # However, the experiment shows that the performance has decreased.
         num_anchors = anchors.size(0)
         xy = (anchors[:, 2:] + anchors[:, :2]) / 2
