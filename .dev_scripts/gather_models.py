@@ -91,9 +91,7 @@ def get_final_results(log_json_path, epoch, results_lut):
 def get_dataset_name(config):
     # If there are more dataset, add here.
     name_map = dict(
-        HRSCDataset='HRSC 2016',
-        SARDataset='SAR',
-        DOTADataset='DOTA v1.0')
+        HRSCDataset='HRSC 2016', SARDataset='SAR', DOTADataset='DOTA v1.0')
     cfg = mmcv.Config.fromfile('./configs/' + config)
     return name_map[cfg.dataset_type]
 
@@ -178,6 +176,7 @@ def main():
     # and parse the best performance
     model_infos = []
     for used_config in used_configs:
+        print(used_config)
         exp_dir = osp.join(models_root, used_config)
         # check whether the exps is finished
         if args.best is True:
@@ -188,6 +187,7 @@ def main():
 
         model_path = osp.join(exp_dir, final_model)
         # skip if the model is still training
+        print(model_path)
         if not osp.exists(model_path):
             continue
 
@@ -199,6 +199,7 @@ def main():
         results_lut = cfg.evaluation.metric
         if not isinstance(results_lut, list):
             results_lut = [results_lut]
+        print(log_json_path, final_epoch, results_lut)
         model_performance = get_final_results(log_json_path, final_epoch,
                                               results_lut)
 
