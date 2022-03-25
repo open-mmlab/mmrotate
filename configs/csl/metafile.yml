@@ -5,11 +5,11 @@ Collections:
     Training Techniques:
       - SGD with Momentum
       - Weight Decay
-    Training Resources: 1x GeForce GTX 2080 Ti
+    Training Resources: 1x Quadro RTX 8000
     Architecture:
       - ResNet
   Paper:
-    URL: None
+    URL: https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40
     Title: 'Arbitrary-Oriented Object Detection with Circular Smooth Label'
   README: configs/csl/README.md
 
@@ -24,4 +24,4 @@ Models:
         Dataset: DOTAv1.0
         Metrics:
           mAP: 69.51
-    Weights: https://download.openmmlab.com/mmrotate/v0.1.1/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90-b4271aed.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90-b4271aed.pth
