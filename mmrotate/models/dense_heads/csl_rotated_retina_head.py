@@ -337,7 +337,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 # Get gt angle as target
                 angle_targets[pos_inds, :] = \
                     sampling_result.pos_gt_bboxes[:, 4:5]
-            # CSL encoder
+            # Angle encoder
             angle_targets = self.angle_coder.encode(angle_targets)
             angle_weights[pos_inds, :] = 1.0
 
@@ -425,10 +425,8 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 scores = cls_score.softmax(-1)
             bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, 5)
 
-            # CSL decoder
             angle_cls = angle_cls.permute(1, 2, 0).reshape(
                 -1, self.coding_len).sigmoid()
-            angle_pred = self.angle_coder.decode(angle_cls)
 
             nms_pre = cfg.get('nms_pre', -1)
             if scores.shape[0] > nms_pre > 0:
@@ -444,7 +442,10 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 anchors = anchors[topk_inds, :]
                 bbox_pred = bbox_pred[topk_inds, :]
                 scores = scores[topk_inds, :]
-                angle_pred = angle_pred[topk_inds]
+                angle_cls = angle_cls[topk_inds, :]
+
+            # Angle decoder
+            angle_pred = self.angle_coder.decode(angle_cls)
 
             if self.use_encoded_angle:
                 bbox_pred[..., -1] = angle_pred
