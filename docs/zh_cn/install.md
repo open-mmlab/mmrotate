@@ -94,7 +94,7 @@ MIM 能够自动地安装 OpenMMLab 的项目以及对应的依赖包。
 
 3. 安装 MMRotate.
 
-    你可以直接通过如下命令从 pip 安装使用 mmrotate：
+    你可以直接通过如下命令从 pip 安装使用 MMRotate：
 
     ```shell
     pip install mmrotate

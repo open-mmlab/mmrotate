@@ -85,7 +85,7 @@ Or you can still install MMRotate manually:
 
 3. Install MMRotate.
 
-    You can simply install mmrotate with the following command:
+    You can simply install MMRotate with the following command:
 
     ```shell
     pip install mmrotate
