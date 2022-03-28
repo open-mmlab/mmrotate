@@ -13,7 +13,10 @@ def smooth_focal_loss(pred,
                       alpha=0.25,
                       reduction='mean',
                       avg_factor=None):
-    """Smooth Focal Loss.
+    """Smooth Focal Loss proposed in Circular Smooth Label (CSL).
+
+    `Circular Smooth Label (CSL)
+    <https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40>`_ .
 
     Args:
         pred (torch.Tensor): The prediction.

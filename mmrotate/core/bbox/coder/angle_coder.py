@@ -11,6 +11,9 @@ from ..builder import ROTATED_BBOX_CODERS
 class CSLCoder(BaseBBoxCoder):
     """Circular Smooth Label Coder.
 
+    `Circular Smooth Label (CSL)
+    <https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40>`_ .
+
     Args:
         angle_version (str): Angle definition.
         omega (float, optional): Angle discretization granularity.
