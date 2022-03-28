@@ -85,7 +85,25 @@ python tools/train.py ${CONFIG_FILE} [optional arguments]
 `resume-from` 读取模型的权重和优化器的状态，并且 epoch 也会继承于指定的检查点。通常用于恢复意外中断的训练过程。
 `load-from` 只读取模型的权重并且训练的 epoch 会从 0 开始。通常用于微调。
 
-### 多机多 GPU 训练
+### 使用多台机器训练
+
+如果您想使用由 ethernet 连接起来的多台机器， 您可以使用以下命令:
+
+在第一台机器上:
+
+```shell
+NNODES=2 NODE_RANK=0 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_train.sh $CONFIG $GPUS
+```
+
+在第二台机器上:
+
+```shell
+NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_train.sh $CONFIG $GPUS
+```
+
+但是，如果您不使用高速网路连接这几台机器的话，训练将会非常慢。
+
+### 使用 Slurm 来管理任务
 
 如果您在 [slurm](https://slurm.schedmd.com/) 管理的集群上运行 MMRotate，您可以使用脚本 `slurm_train.sh` (此脚本还支持单机训练)。
 
