@@ -61,30 +61,28 @@ def smooth_focal_loss(pred,
 
 @ROTATED_LOSSES.register_module()
 class SmoothFocalLoss(nn.Module):
+    """Smooth Focal Loss. Implementation of `Circular Smooth Label
+    (CSL). <https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40>`_
+
+    Args:
+        gamma (float, optional): The gamma for calculating the modulating
+            factor. Defaults to 2.0.
+        alpha (float, optional): A balanced form for Focal Loss.
+            Defaults to 0.25.
+        reduction (str, optional): The method used to reduce the loss into
+            a scalar. Defaults to 'mean'. Options are "none", "mean" and
+            "sum".
+        loss_weight (float, optional): Weight of loss. Defaults to 1.0.
+
+    Returns:
+        loss (torch.Tensor)
+    """
 
     def __init__(self,
                  gamma=2.0,
                  alpha=0.25,
                  reduction='mean',
                  loss_weight=1.0):
-        """Smooth Focal Loss.
-
-        `Circular Smooth Label (CSL).
-        <https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40>`_
-
-        Args:
-            gamma (float, optional): The gamma for calculating the modulating
-                factor. Defaults to 2.0.
-            alpha (float, optional): A balanced form for Focal Loss.
-                Defaults to 0.25.
-            reduction (str, optional): The method used to reduce the loss into
-                a scalar. Defaults to 'mean'. Options are "none", "mean" and
-                "sum".
-            loss_weight (float, optional): Weight of loss. Defaults to 1.0.
-
-        Returns:
-            loss (torch.Tensor)
-        """
         super(SmoothFocalLoss, self).__init__()
         self.gamma = gamma
         self.alpha = alpha
