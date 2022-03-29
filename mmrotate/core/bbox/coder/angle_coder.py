@@ -60,7 +60,7 @@ class CSLCoder(BaseBBoxCoder):
         angle_targets_long = angle_targets_deg.long()
 
         if self.window == 'pulse':
-            radius_range = angle_targets_long
+            radius_range = angle_targets_long % self.coding_len
             smooth_value = 1.0
         elif self.window == 'rect':
             base_radius_range = torch.arange(
