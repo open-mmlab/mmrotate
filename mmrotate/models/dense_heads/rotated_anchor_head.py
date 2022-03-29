@@ -326,6 +326,7 @@ class RotatedAnchorHead(BaseDenseHead):
                     images.
                 - num_total_neg (int): Number of negative samples in all \
                     images.
+
             additional_returns: This function enables user-defined returns from
                 `self._get_targets_single`. These returns are currently refined
                 to properties at each feature map (i.e. having HxW dimension).

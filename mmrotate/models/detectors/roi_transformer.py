@@ -6,13 +6,9 @@ from .two_stage import RotatedTwoStageDetector
 @ROTATED_DETECTORS.register_module()
 class RoITransformer(RotatedTwoStageDetector):
     """Implementation of `Learning RoI Transformer for Oriented Object
-    Detection in Aerial Images.
+    Detection in Aerial Images.`__
 
-    <https://openaccess.thecvf.com/content_CVPR_2019/papers/Ding_
-    Learning_RoI_Transformer_for_Oriented_Object_Detection_in_
-    Aerial_Images_CVPR_2019_paper.pdf#:~:text=The%20core%20idea
-    %20of%20RoI%20Transformer%20is%20to,embed-%20ded%20into%20
-    detectors%20for%20oriented%20object%20detection.>`_
+    __ https://openaccess.thecvf.com/content_CVPR_2019/papers/Ding_Learning_RoI_Transformer_for_Oriented_Object_Detection_in_Aerial_Images_CVPR_2019_paper.pdf#:~:text=The%20core%20idea%20of%20RoI%20Transformer%20is%20to,embed-%20ded%20into%20detectors%20for%20oriented%20object%20detection # noqa: E501, E261.
     """
 
     def __init__(self,

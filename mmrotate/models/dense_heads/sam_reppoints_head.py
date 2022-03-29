@@ -441,6 +441,7 @@ class SAMRepPointsHead(BaseDenseHead):
                     unmap_outputs=True):
         """Compute corresponding GT box and classification targets for
         proposals.
+
         Args:
             proposals_list (list[list]): Multi level points/bboxes of each
                 image.
@@ -461,16 +462,16 @@ class SAMRepPointsHead(BaseDenseHead):
             tuple:
                 - labels_list (list[Tensor]): Labels of each level.
                 - label_weights_list (list[Tensor]): Label weights of each
-                 level.
+                    level.
                 - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
                 - proposal_list (list[Tensor]): Proposals(points/bboxes) of
-                 each level.
+                    each level.
                 - proposal_weights_list (list[Tensor]): Proposal weights of
-                 each level.
+                    each level.
                 - num_total_pos (int): Number of positive samples in all
-                 images.
+                    images.
                 - num_total_neg (int): Number of negative samples in all
-                 images.
+                    images.
         """
         assert stage in ['init', 'refine']
         num_imgs = len(img_metas)
@@ -685,6 +686,7 @@ class SAMRepPointsHead(BaseDenseHead):
                    with_nms=True,
                    **kwargs):
         """Transform network outputs of a batch into bbox results.
+
         Args:
             cls_scores (list[Tensor]): Classification scores for all
                 scale levels, each is a 4D-tensor, has shape
@@ -745,6 +747,7 @@ class SAMRepPointsHead(BaseDenseHead):
                            with_nms=True,
                            **kwargs):
         """Transform outputs of a single image into bbox predictions.
+
         Args:
             cls_score_list (list[Tensor]): Box scores from all scale
                 levels of a single image, each item has shape

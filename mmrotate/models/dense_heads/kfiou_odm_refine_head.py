@@ -196,10 +196,9 @@ class KFIoUODMRefineHead(KFIoURRetinaHead):
                 level with shape (N, num_anchors * 5, H, W)
             img_metas (list[dict]): size / scale info for each image
             cfg (mmcv.Config): test / postprocessing configuration
-            rois (list[list[Tensor]]): input rbboxes of each level of each
-             image.
-                rois output by former stages and are to be refined
             rescale (bool): if True, return boxes in original image space
+            rois (list[list[Tensor]]): input rbboxes of each level of each
+                image. rois output by former stages and are to be refined.
 
         Returns:
             list[tuple[Tensor, Tensor]]: each item in result_list is 2-tuple.

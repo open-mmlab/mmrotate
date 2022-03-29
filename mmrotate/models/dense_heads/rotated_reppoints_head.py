@@ -378,6 +378,7 @@ class RotatedRepPointsHead(BaseDenseHead):
                     unmap_outputs=True):
         """Compute corresponding GT box and classification targets for
         proposals.
+
         Args:
             proposals_list (list[list]): Multi level points/bboxes of each
                 image.
@@ -464,6 +465,7 @@ class RotatedRepPointsHead(BaseDenseHead):
                         unmap_outputs=True):
         """Compute corresponding GT box and classification targets for
         proposals.
+
         Args:
             proposals_list (list[list]): Multi level points/bboxes of each
                 image.
@@ -596,6 +598,7 @@ class RotatedRepPointsHead(BaseDenseHead):
              img_metas,
              gt_bboxes_ignore=None):
         """Loss function of CFA head."""
+
         featmap_sizes = [featmap.size()[-2:] for featmap in cls_scores]
         assert len(featmap_sizes) == self.prior_generator.num_levels
         label_channels = self.cls_out_channels if self.use_sigmoid_cls else 1
@@ -804,6 +807,7 @@ class RotatedRepPointsHead(BaseDenseHead):
                 (num_anchors, 4).
             pos_inds (Tensor): Index of all positive samples got from
                 first assign process.
+
         Returns:
             Tensor: Losses of all positive samples in single image.
         """
@@ -841,6 +845,7 @@ class RotatedRepPointsHead(BaseDenseHead):
                  num_proposals_each_level=None,
                  num_level=None):
         """CFA reassign process.
+
         Args:
             pos_losses (Tensor): Losses of all positive samples in
                 single image.
@@ -999,6 +1004,7 @@ class RotatedRepPointsHead(BaseDenseHead):
                    with_nms=True,
                    **kwargs):
         """Transform network outputs of a batch into bbox results.
+
         Args:
             cls_scores (list[Tensor]): Classification scores for all
                 scale levels, each is a 4D-tensor, has shape
@@ -1016,6 +1022,7 @@ class RotatedRepPointsHead(BaseDenseHead):
                 Default False.
             with_nms (bool): If True, do nms before return boxes.
                 Default True.
+
         Returns:
             list[list[Tensor, Tensor]]: Each item in result_list is 2-tuple.
                 The first item is an (n, 6) tensor, where the first 4 columns
