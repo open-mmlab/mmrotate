@@ -18,13 +18,12 @@
 - Add Chinese translation of `docs/zh_cn/tutorials/customize_dataset.md` (#65)
 - Add different seeds to different ranks (#102)
 - Add install command in README(_zh-CN).md (#166)
-- Improve the arguments of all mmrotate scripts (#168) 
+- Improve the arguments of all mmrotate scripts (#168)
 
 #### Contributors
 
 A total of 6 developers contributed to this release.
 Thanks @zytx121 @yangxue0827 @ZwwWayne @jbwang1997 @canoe-Z @matrixgame2018
-
 
 ### v0.1.1 (14/3/2022)
 
