@@ -573,10 +573,10 @@ def hbb2obb_oc(hbboxes):
     Returns:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
     """
-    x = (hbboxes[:, 0::4] + hbboxes[:, 2::4]) * 0.5
-    y = (hbboxes[:, 1::4] + hbboxes[:, 3::4]) * 0.5
-    w = hbboxes[:, 2::4] - hbboxes[:, 0::4]
-    h = hbboxes[:, 3::4] - hbboxes[:, 1::4]
+    x = (hbboxes[..., 0] + hbboxes[..., 2]) * 0.5
+    y = (hbboxes[..., 1] + hbboxes[..., 3]) * 0.5
+    w = hbboxes[..., 2] - hbboxes[..., 0]
+    h = hbboxes[..., 3] - hbboxes[..., 1]
     theta = x.new_zeros(*x.shape)
     rbboxes = torch.stack([x, y, h, w, theta + np.pi / 2], dim=-1)
     return rbboxes

@@ -100,6 +100,7 @@ MMRotate 也提供了其他更详细的教程:
 * [x] [Rotated RepPoints-OBB](configs/rotated_reppoints/README.md) (ICCV'2019)
 * [x] [RoI Transformer](configs/roi_trans/README.md) (CVPR'2019)
 * [x] [Gliding Vertex](configs/gliding_vertex/README.md) (TPAMI'2020)
+* [x] [CSL](configs/csl/README.md) (ECCV'2020)
 * [x] [R<sup>3</sup>Det](configs/r3det/README.md) (AAAI'2021)
 * [x] [S<sup>2</sup>A-Net](configs/s2anet/README.md) (TGRS'2021)
 * [x] [ReDet](configs/redet/README.md) (CVPR'2021)
