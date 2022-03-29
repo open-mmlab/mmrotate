@@ -61,8 +61,9 @@ def smooth_focal_loss(pred,
 
 @ROTATED_LOSSES.register_module()
 class SmoothFocalLoss(nn.Module):
-    """Smooth Focal Loss. Implementation of `Circular Smooth Label
-    (CSL). <https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40>`_
+    """Smooth Focal Loss. Implementation of `Circular Smooth Label (CSL).`__
+
+    __ https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40
 
     Args:
         gamma (float, optional): The gamma for calculating the modulating
