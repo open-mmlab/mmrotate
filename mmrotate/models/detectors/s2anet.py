@@ -7,9 +7,9 @@ from .utils import AlignConvModule
 
 @ROTATED_DETECTORS.register_module()
 class S2ANet(RotatedBaseDetector):
-    """Implementation of `Align Deep Features for Oriented Object Detection`.
+    """Implementation of `Align Deep Features for Oriented Object Detection.`__
 
-    <https://ieeexplore.ieee.org/document/9377550>`_
+    __ https://ieeexplore.ieee.org/document/9377550
     """
 
     def __init__(self,

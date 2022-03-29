@@ -15,9 +15,6 @@ def smooth_focal_loss(pred,
                       avg_factor=None):
     """Smooth Focal Loss proposed in Circular Smooth Label (CSL).
 
-    `Circular Smooth Label (CSL)
-    <https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40>`_ .
-
     Args:
         pred (torch.Tensor): The prediction.
         target (torch.Tensor): The learning label of the prediction.
@@ -71,6 +68,9 @@ class SmoothFocalLoss(nn.Module):
                  reduction='mean',
                  loss_weight=1.0):
         """Smooth Focal Loss.
+
+        `Circular Smooth Label (CSL).
+        <https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40>`_
 
         Args:
             gamma (float, optional): The gamma for calculating the modulating
