@@ -91,6 +91,31 @@ def postprocess(distance, fun='log1p', tau=1.0):
 @weighted_loss
 def gwd_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, normalize=True):
     """Gaussian Wasserstein distance loss.
+    Derivation and simplification:
+        Given any positive-definite symmetrical 2*2 matrix Z:
+            :math:`Tr(Z^{1/2}) = λ_1^{1/2} + λ_2^{1/2}`
+        where :math:`λ_1` and :math:`λ_2` are the eigen values of Z
+        Meanwhile we have:
+            :math:`Tr(Z) = λ_1 + λ_2`
+
+            :math:`det(Z) = λ_1 * λ_2`
+        Combination with following formula:
+            :math:`(λ_1^{1/2}+λ_2^{1/2})^2 = λ_1+λ_2+2 *(λ_1 * λ_2)^{1/2}`
+        Yield:
+            :math:`Tr(Z^{1/2}) = (Tr(Z) + 2 * (det(Z))^{1/2})^{1/2}`
+        For gwd loss the frustrating coupling part is:
+            :math:`Tr((Σ_p^{1/2} * Σ_t * Σp^{1/2})^{1/2})`
+        Assuming :math:`Z = Σ_p^{1/2} * Σ_t * Σ_p^{1/2}` then:
+            :math:`Tr(Z) = Tr(Σ_p^{1/2} * Σ_t * Σ_p^{1/2})
+            = Tr(Σ_p^{1/2} * Σ_p^{1/2} * Σ_t)
+            = Tr(Σ_p * Σ_t)`
+            :math:`det(Z) = det(Σ_p^{1/2} * Σ_t * Σ_p^{1/2})
+            = det(Σ_p^{1/2}) * det(Σ_t) * det(Σ_p^{1/2})
+            = det(Σ_p * Σ_t)`
+        and thus we can rewrite the coupling part as:
+            :math:`Tr(Z^{1/2}) = (Tr(Z) + 2 * (det(Z))^{1/2})^{1/2}`
+            :math:`Tr((Σ_p^{1/2} * Σ_t * Σ_p^{1/2})^{1/2})
+            = (Tr(Σ_p * Σ_t) + 2 * (det(Σ_p * Σ_t))^{1/2})^{1/2}`
 
     Args:
         pred (torch.Tensor): Predicted bboxes.
@@ -102,6 +127,7 @@ def gwd_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, normalize=True):
 
     Returns:
         loss (torch.Tensor)
+
     """
     xy_p, Sigma_p = pred
     xy_t, Sigma_t = target
