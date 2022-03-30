@@ -9,9 +9,10 @@ from .base import RotatedBaseDetector
 
 @ROTATED_DETECTORS.register_module()
 class RotatedTwoStageDetector(RotatedBaseDetector):
-    """Base class for rotated two-stage detectors. Two-stage detectors
-    typically consisting of a region proposal network and a task-specific
-    regression head.
+    """Base class for rotated two-stage detectors.
+
+    Two-stage detectors typically consisting of a region proposal network and a
+    task-specific regression head.
     """
 
     def __init__(self,
