@@ -30,7 +30,7 @@ except ImportError:
 def add_parser(parser):
     """Add arguments."""
     parser.add_argument(
-        '--base_json',
+        '--base-json',
         type=str,
         default=None,
         help='json config file for split images')
@@ -39,25 +39,17 @@ def add_parser(parser):
 
     # argument for loading data
     parser.add_argument(
-        '--load_type', type=str, default=None, help='loading function type')
-    parser.add_argument(
-        '--img_dirs',
+        '--img-dirs',
         nargs='+',
         type=str,
         default=None,
         help='images dirs, must give a value')
     parser.add_argument(
-        '--ann_dirs',
+        '--ann-dirs',
         nargs='+',
         type=str,
         default=None,
         help='annotations dirs, optional')
-    parser.add_argument(
-        '--classes',
-        nargs='+',
-        type=str,
-        default=None,
-        help='the classes and order for loading data')
 
     # argument for splitting image
     parser.add_argument(
@@ -79,21 +71,21 @@ def add_parser(parser):
         default=[1.],
         help='same as DOTA devkit rate, but only change windows size')
     parser.add_argument(
-        '--img_rate_thr',
+        '--img-rate-thr',
         type=float,
         default=0.6,
         help='the minimal rate of image in window and window')
     parser.add_argument(
-        '--iof_thr',
+        '--iof-thr',
         type=float,
         default=0.7,
         help='the minimal iof between a object and a window')
     parser.add_argument(
-        '--no_padding',
+        '--no-padding',
         action='store_true',
         help='not padding patches in regular size')
     parser.add_argument(
-        '--padding_value',
+        '--padding-value',
         nargs='+',
         type=int,
         default=[0],
@@ -101,12 +93,12 @@ def add_parser(parser):
 
     # argument for saving
     parser.add_argument(
-        '--save_dir',
+        '--save-dir',
         type=str,
         default='.',
         help='to save pkl and split images')
     parser.add_argument(
-        '--save_ext',
+        '--save-ext',
         type=str,
         default='.png',
         help='the extension of saving images')
@@ -127,10 +119,9 @@ def parse_args():
                     not hasattr(action, 'default'):
                 continue
             action.default = prior_config[action.dest]
-            args = parser.parse_args()
+        args = parser.parse_args()
 
     # assert arguments
-    assert args.load_type is not None, "argument load_type can't be None"
     assert args.img_dirs is not None, "argument img_dirs can't be None"
     assert args.ann_dirs is None or len(args.ann_dirs) == len(args.img_dirs)
     assert len(args.sizes) == len(args.gaps)
