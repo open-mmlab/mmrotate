@@ -20,6 +20,22 @@ MMRotate 和 MMCV, MMDet 版本兼容性如下所示，需要安装正确的版�
 
 ## 安装流程
 
+### 从零开始设置脚本
+
+假设当前已经成功安装 CUDA 10.1，这里提供了一个完整的基于 conda 安装 MMRotate 的脚本。您可以参考下一节中的分步安装说明。
+
+```shell
+conda create -n open-mmlab python=3.7 pytorch==1.7.0 cudatoolkit=10.1 torchvision -c pytorch -y
+conda activate open-mmlab
+pip install openmim
+mim install mmcv-full
+mim install mmdet
+git clone https://github.com/open-mmlab/mmrotate.git
+cd mmrotate
+pip install -r requirements/build.txt
+pip install -v -e .
+```
+
 ### 准备环境
 
 1. 使用 conda 新建虚拟环境，并进入该虚拟环境；
@@ -130,29 +146,6 @@ docker build -t mmrotate docker/
 
 ```shell
 docker run --gpus all --shm-size=8g -it -v {DATA_DIR}:/mmrotate/data mmrotate
-```
-
-### 从零开始设置脚本
-
-假设当前已经成功安装 CUDA 10.1，这里提供了一个完整的基于 conda 安装 MMDetection 的脚本：
-
-```shell
-conda create -n openmmlab python=3.7 -y
-conda activate openmmlab
-
-conda install pytorch==1.7.0 torchvision==0.8.0 cudatoolkit=10.1 -c pytorch
-
-# 安装最新版本的 mmcv
-pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.7.0/index.html
-
-# 安装 mmdetection
-pip install mmdet
-
-# 安装 mmrotate
-git clone https://github.com/open-mmlab/mmrotate.git
-cd mmrotate
-pip install -r requirements/build.txt
-pip install -v -e .  # or "python setup.py develop"
 ```
 
 
