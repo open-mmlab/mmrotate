@@ -7,7 +7,7 @@
 - Support Circular Smooth Label (CSL, ECCV'20) (#153)
 - Support multiple machines dist_train (#143)
 - Add [browse_dataset](tools/misc/browse_dataset.py) tool (#98)
-- Add [gather_models] script (#162)
+- Add [gather_models](.dev_scripts/gather_models.py) script (#162)
 
 #### Bug Fixes
 
