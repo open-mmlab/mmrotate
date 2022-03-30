@@ -77,7 +77,7 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
 
         Returns:
             list[list[Tensor]]: best or refined rbboxes of each level of each
-             image.
+                image.
         """
         num_levels = len(cls_scores)
         assert num_levels == len(bbox_preds)
@@ -114,9 +114,10 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple:
-                anchor_list (list[Tensor]): Anchors of each image
-                valid_flag_list (list[Tensor]): Valid flags of each image
+            tuple(list[Tensor]):
+
+                - anchor_list (list[Tensor]): Anchors of each image
+                - valid_flag_list (list[Tensor]): Valid flags of each image
         """
         anchor_list = [[
             bboxes_img_lvl.clone().detach() for bboxes_img_lvl in bboxes_img

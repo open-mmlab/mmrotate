@@ -80,12 +80,14 @@ class RotatedRPNHead(AnchorHead):
 
         Returns:
             tuple:
-                labels_list (list[Tensor]): Labels of each level
-                label_weights_list (list[Tensor]): Label weights of each level
-                bbox_targets_list (list[Tensor]): BBox targets of each level
-                bbox_weights_list (list[Tensor]): BBox weights of each level
-                num_total_pos (int): Number of positive samples in all images
-                num_total_neg (int): Number of negative samples in all images
+
+                - labels_list (list[Tensor]): Labels of each level
+                - label_weights_list (list[Tensor]): Label weights of each \
+                    level
+                - bbox_targets_list (list[Tensor]): BBox targets of each level
+                - bbox_weights_list (list[Tensor]): BBox weights of each level
+                - num_total_pos (int): Number of positive samples in all images
+                - num_total_neg (int): Number of negative samples in all images
         """
         inside_flags = rotated_anchor_inside_flags(
             flat_anchors, valid_flags, img_meta['img_shape'][:2],
@@ -193,7 +195,7 @@ class RotatedRPNHead(AnchorHead):
                 - num_total_neg (int): Number of negative samples in all \
                     images.
 
-            additional_returns: This function enables user-defined returns from
+            additional_https://github.com/open-mmlab/mmrotate/tree/main/This function enables user-defined returns from
                 `self._get_targets_single`. These returns are currently refined
                 to properties at each feature map (i.e. having HxW dimension).
                 The results will be concatenated after the end
@@ -276,8 +278,10 @@ class RotatedRPNHead(AnchorHead):
                 positive anchors.
 
         Returns:
-            loss_cls (torch.Tensor): cls. loss for each scale level.
-            loss_bbox (torch.Tensor): reg. loss for each scale level.
+            tuple(torch.Tensor):
+
+            - loss_cls (torch.Tensor): cls. loss for each scale level.
+            - loss_bbox (torch.Tensor): reg. loss for each scale level.
         """
         # classification loss
         labels = labels.reshape(-1)

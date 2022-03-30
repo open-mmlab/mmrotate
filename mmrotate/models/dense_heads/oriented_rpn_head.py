@@ -54,13 +54,15 @@ class OrientedRPNHead(RotatedRPNHead):
                 set of anchors.
 
         Returns:
-            tuple:
-                labels_list (list[Tensor]): Labels of each level
-                label_weights_list (list[Tensor]): Label weights of each level
-                bbox_targets_list (list[Tensor]): BBox targets of each level
-                bbox_weights_list (list[Tensor]): BBox weights of each level
-                num_total_pos (int): Number of positive samples in all images
-                num_total_neg (int): Number of negative samples in all images
+            tuple(list[Tensor]):
+
+                - labels_list (list[Tensor]): Labels of each level
+                - label_weights_list (list[Tensor]): Label weights of each \
+                  level
+                - bbox_targets_list (list[Tensor]): BBox targets of each level
+                - bbox_weights_list (list[Tensor]): BBox weights of each level
+                - num_total_pos (int): Number of positive samples in all images
+                - num_total_neg (int): Number of negative samples in all images
         """
         inside_flags = rotated_anchor_inside_flags(
             flat_anchors, valid_flags, img_meta['img_shape'][:2],
@@ -155,8 +157,10 @@ class OrientedRPNHead(RotatedRPNHead):
                 positive anchors.
 
         Returns:
-            loss_cls (torch.Tensor): cls. loss for each scale level.
-            loss_bbox (torch.Tensor): reg. loss for each scale level.
+            tuple(torch.Tensor):
+
+                - loss_cls (torch.Tensor): cls. loss for each scale level.
+                - loss_bbox (torch.Tensor): reg. loss for each scale level.
         """
         # classification loss
         labels = labels.reshape(-1)

@@ -113,9 +113,10 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple:
-                anchor_list (list[Tensor]): Anchors of each image
-                valid_flag_list (list[Tensor]): Valid flags of each image
+            tuple(list[Tensor]):
+
+                - anchor_list (list[Tensor]): Anchors of each image
+                - valid_flag_list (list[Tensor]): Valid flags of each image
         """
         anchor_list = [[
             bboxes_img_lvl.clone().detach() for bboxes_img_lvl in bboxes_img

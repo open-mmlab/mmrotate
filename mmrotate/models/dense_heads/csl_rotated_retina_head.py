@@ -78,12 +78,13 @@ class CSLRRetinaHead(RotatedRetinaHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple:
-                cls_score (torch.Tensor): Cls scores for a single scale level
-                    the channels number is num_anchors * num_classes.
-                bbox_pred (torch.Tensor): Box energies / deltas for a single
-                    scale level, the channels number is num_anchors * 5.
-                angle_cls (torch.Tensor): Angle for a single scale level
+            tuple(torch.Tensor):
+
+                - cls_score (torch.Tensor): Cls scores for a single scale \
+                    level the channels number is num_anchors * num_classes.
+                - bbox_pred (torch.Tensor): Box energies / deltas for a \
+                    single scale level, the channels number is num_anchors * 5.
+                - angle_cls (torch.Tensor): Angle for a single scale level \
                     the channels number is num_anchors * coding_len.
         """
         cls_feat = x
@@ -126,9 +127,12 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 positive anchors.
 
         Returns:
-            loss_cls (torch.Tensor): cls. loss for each scale level.
-            loss_bbox (torch.Tensor): reg. loss for each scale level.
-            loss_angle (torch.Tensor): angle cls. loss for each scale level.
+            tuple(torch.Tensor):
+
+                - loss_cls (torch.Tensor): cls. loss for each scale level.
+                - loss_bbox (torch.Tensor): reg. loss for each scale level.
+                - loss_angle (torch.Tensor): angle cls. loss for each scale \
+                  level.
         """
         # Classification loss
         labels = labels.reshape(-1)
@@ -278,15 +282,19 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 set of anchors. Default: True.
 
         Returns:
-            tuple:
-                labels_list (list[Tensor]): Labels of each level
-                label_weights_list (list[Tensor]): Label weights of each level
-                bbox_targets_list (list[Tensor]): BBox targets of each level
-                bbox_weights_list (list[Tensor]): BBox weights of each level
-                angle_targets_list (list[Tensor]): Angle targets of each level
-                angle_weights_list (list[Tensor]): Angle weights of each level
-                num_total_pos (int): Number of positive samples in all images
-                num_total_neg (int): Number of negative samples in all images
+            tuple(list[Tensor]):
+
+                - labels_list (list[Tensor]): Labels of each level
+                - label_weights_list (list[Tensor]): Label weights of each \
+                  level
+                - bbox_targets_list (list[Tensor]): BBox targets of each level
+                - bbox_weights_list (list[Tensor]): BBox weights of each level
+                - angle_targets_list (list[Tensor]): Angle targets of each \
+                  level
+                - angle_weights_list (list[Tensor]): Angle weights of each
+                  level
+                - num_total_pos (int): Number of positive samples in all images
+                - num_total_neg (int): Number of negative samples in all images
         """
         inside_flags = rotated_anchor_inside_flags(
             flat_anchors, valid_flags, img_meta['img_shape'][:2],

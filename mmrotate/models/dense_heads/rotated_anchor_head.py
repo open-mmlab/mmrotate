@@ -117,11 +117,12 @@ class RotatedAnchorHead(BaseDenseHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple:
-                cls_score (torch.Tensor): Cls scores for a single scale level
-                    the channels number is num_anchors * num_classes.
-                bbox_pred (torch.Tensor): Box energies / deltas for a single
-                    scale level, the channels number is num_anchors * 5.
+            tuple(torch.Tensor):
+
+                - cls_score (torch.Tensor): Cls scores for a single scale \
+                    level the channels number is num_anchors * num_classes.
+                - bbox_pred (torch.Tensor): Box energies / deltas for a \
+                    single scale level, the channels number is num_anchors * 5.
         """
         cls_score = self.conv_cls(x)
         bbox_pred = self.conv_reg(x)
@@ -137,11 +138,11 @@ class RotatedAnchorHead(BaseDenseHead):
         Returns:
             tuple: A tuple of classification scores and bbox prediction.
 
-                - cls_scores (list[Tensor]): Classification scores for all
-                    scale levels, each is a 4D-tensor, the channels number
+                - cls_scores (list[Tensor]): Classification scores for all \
+                    scale levels, each is a 4D-tensor, the channels number \
                     is num_anchors * num_classes.
-                - bbox_preds (list[Tensor]): Box energies / deltas for all
-                    scale levels, each is a 4D-tensor, the channels number
+                - bbox_preds (list[Tensor]): Box energies / deltas for all \
+                    scale levels, each is a 4D-tensor, the channels number \
                     is num_anchors * 5.
         """
         return multi_apply(self.forward_single, feats)
@@ -155,9 +156,10 @@ class RotatedAnchorHead(BaseDenseHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple:
-                anchor_list (list[Tensor]): Anchors of each image.
-                valid_flag_list (list[Tensor]): Valid flags of each image.
+            tuple(list[Tensor]):
+
+                - anchor_list (list[Tensor]): Anchors of each image.
+                - valid_flag_list (list[Tensor]): Valid flags of each image.
         """
         num_imgs = len(img_metas)
 
@@ -208,13 +210,15 @@ class RotatedAnchorHead(BaseDenseHead):
                 set of anchors.
 
         Returns:
-            tuple:
-                labels_list (list[Tensor]): Labels of each level
-                label_weights_list (list[Tensor]): Label weights of each level
-                bbox_targets_list (list[Tensor]): BBox targets of each level
-                bbox_weights_list (list[Tensor]): BBox weights of each level
-                num_total_pos (int): Number of positive samples in all images
-                num_total_neg (int): Number of negative samples in all images
+            tuple(list[Tensor]):
+
+                - labels_list (list[Tensor]): Labels of each level
+                - label_weights_list (list[Tensor]): Label weights of each \
+                  level
+                - bbox_targets_list (list[Tensor]): BBox targets of each level
+                - bbox_weights_list (list[Tensor]): BBox weights of each level
+                - num_total_pos (int): Number of positive samples in all images
+                - num_total_neg (int): Number of negative samples in all images
         """
         inside_flags = rotated_anchor_inside_flags(
             flat_anchors, valid_flags, img_meta['img_shape'][:2],
@@ -410,8 +414,10 @@ class RotatedAnchorHead(BaseDenseHead):
                 positive anchors.
 
         Returns:
-            loss_cls (torch.Tensor): cls. loss for each scale level.
-            loss_bbox (torch.Tensor): reg. loss for each scale level.
+            tuple(torch.Tensor):
+
+                - loss_cls (torch.Tensor): cls. loss for each scale level.
+                - loss_bbox (torch.Tensor): reg. loss for each scale level.
         """
         # classification loss
         labels = labels.reshape(-1)

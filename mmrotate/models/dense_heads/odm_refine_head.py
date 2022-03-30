@@ -105,11 +105,12 @@ class ODMRefineHead(RotatedRetinaHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple:
-                cls_score (torch.Tensor): Cls scores for a single scale level
-                    the channels number is num_anchors * num_classes.
-                bbox_pred (torch.Tensor): Box energies / deltas for a single
-                    scale level, the channels number is num_anchors * 4.
+            tuple(torch.Tensor):
+
+                - cls_score (torch.Tensor): Cls scores for a single scale \
+                    level the channels number is num_anchors * num_classes.
+                - bbox_pred (torch.Tensor): Box energies / deltas for a \
+                    single scale level, the channels number is num_anchors * 4.
         """
         or_feat = self.or_conv(x)
         reg_feat = or_feat
@@ -133,9 +134,10 @@ class ODMRefineHead(RotatedRetinaHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple:
-                anchor_list (list[Tensor]): Anchors of each image
-                valid_flag_list (list[Tensor]): Valid flags of each image
+            tuple(list[Tensor]):
+
+                - anchor_list (list[Tensor]): Anchors of each image
+                - valid_flag_list (list[Tensor]): Valid flags of each image
         """
         anchor_list = [[
             bboxes_img_lvl.clone().detach() for bboxes_img_lvl in bboxes_img

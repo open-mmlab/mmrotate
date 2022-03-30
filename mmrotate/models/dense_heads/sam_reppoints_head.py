@@ -459,18 +459,19 @@ class SAMRepPointsHead(BaseDenseHead):
                 set of anchors.
 
         Returns:
-            tuple:
+            tuple(list[Tensor]):
+
                 - labels_list (list[Tensor]): Labels of each level.
-                - label_weights_list (list[Tensor]): Label weights of each
+                - label_weights_list (list[Tensor]): Label weights of each \
                     level.
                 - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
-                - proposal_list (list[Tensor]): Proposals(points/bboxes) of
+                - proposal_list (list[Tensor]): Proposals(points/bboxes) of \
                     each level.
-                - proposal_weights_list (list[Tensor]): Proposal weights of
+                - proposal_weights_list (list[Tensor]): Proposal weights of \
                     each level.
-                - num_total_pos (int): Number of positive samples in all
+                - num_total_pos (int): Number of positive samples in all \
                     images.
-                - num_total_neg (int): Number of negative samples in all
+                - num_total_neg (int): Number of negative samples in all \
                     images.
         """
         assert stage in ['init', 'refine']
@@ -775,6 +776,7 @@ class SAMRepPointsHead(BaseDenseHead):
                 mlvl_scores, else return mlvl_bboxes, mlvl_scores and
                 mlvl_score_factor. Usually with_nms is False is used for aug
                 test. If with_nms is True, then return the following format
+
                 - det_bboxes (Tensor): Predicted bboxes with shape \
                     [num_bboxes, 5], where the first 4 columns are bounding \
                     box positions (cx, cy, w, h, a) and the 5-th \
