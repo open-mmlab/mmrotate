@@ -117,7 +117,7 @@ class RotatedAnchorHead(BaseDenseHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple(torch.Tensor):
+            tuple (torch.Tensor):
 
                 - cls_score (torch.Tensor): Cls scores for a single scale \
                     level the channels number is num_anchors * num_classes.
@@ -156,7 +156,7 @@ class RotatedAnchorHead(BaseDenseHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple(list[Tensor]):
+            tuple (list[Tensor]):
 
                 - anchor_list (list[Tensor]): Anchors of each image.
                 - valid_flag_list (list[Tensor]): Valid flags of each image.
@@ -210,7 +210,7 @@ class RotatedAnchorHead(BaseDenseHead):
                 set of anchors.
 
         Returns:
-            tuple(list[Tensor]):
+            tuple (list[Tensor]):
 
                 - labels_list (list[Tensor]): Labels of each level
                 - label_weights_list (list[Tensor]): Label weights of each \
@@ -414,7 +414,7 @@ class RotatedAnchorHead(BaseDenseHead):
                 positive anchors.
 
         Returns:
-            tuple(torch.Tensor):
+            tuple (torch.Tensor):
 
                 - loss_cls (torch.Tensor): cls. loss for each scale level.
                 - loss_bbox (torch.Tensor): reg. loss for each scale level.

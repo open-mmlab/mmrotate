@@ -101,7 +101,7 @@ class RotatedRetinaHead(RotatedAnchorHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple(torch.Tensor):
+            tuple (torch.Tensor):
 
                 - cls_score (torch.Tensor): Cls scores for a single scale \
                     level the channels number is num_anchors * num_classes.

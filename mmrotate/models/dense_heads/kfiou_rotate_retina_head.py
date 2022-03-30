@@ -79,7 +79,7 @@ class KFIoURRetinaHead(RotatedRetinaHead):
                 positive anchors.
 
         Returns:
-            tuple(torch.Tensor):
+            tuple (torch.Tensor):
 
                 - loss_cls (torch.Tensor): cls. loss for each scale level.
                 - loss_bbox (torch.Tensor): reg. loss for each scale level.

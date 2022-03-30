@@ -78,7 +78,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple(torch.Tensor):
+            tuple (torch.Tensor):
 
                 - cls_score (torch.Tensor): Cls scores for a single scale \
                     level the channels number is num_anchors * num_classes.
@@ -127,7 +127,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 positive anchors.
 
         Returns:
-            tuple(torch.Tensor):
+            tuple (torch.Tensor):
 
                 - loss_cls (torch.Tensor): cls. loss for each scale level.
                 - loss_bbox (torch.Tensor): reg. loss for each scale level.
@@ -282,7 +282,7 @@ class CSLRRetinaHead(RotatedRetinaHead):
                 set of anchors. Default: True.
 
         Returns:
-            tuple(list[Tensor]):
+            tuple (list[Tensor]):
 
                 - labels_list (list[Tensor]): Labels of each level
                 - label_weights_list (list[Tensor]): Label weights of each \

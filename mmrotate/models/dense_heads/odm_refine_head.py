@@ -105,7 +105,7 @@ class ODMRefineHead(RotatedRetinaHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple(torch.Tensor):
+            tuple (torch.Tensor):
 
                 - cls_score (torch.Tensor): Cls scores for a single scale \
                     level the channels number is num_anchors * num_classes.
@@ -134,7 +134,7 @@ class ODMRefineHead(RotatedRetinaHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple(list[Tensor]):
+            tuple (list[Tensor]):
 
                 - anchor_list (list[Tensor]): Anchors of each image
                 - valid_flag_list (list[Tensor]): Valid flags of each image

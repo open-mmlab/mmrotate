@@ -114,7 +114,7 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple(list[Tensor]):
+            tuple (list[Tensor]):
 
                 - anchor_list (list[Tensor]): Anchors of each image
                 - valid_flag_list (list[Tensor]): Valid flags of each image

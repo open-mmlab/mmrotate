@@ -459,7 +459,7 @@ class SAMRepPointsHead(BaseDenseHead):
                 set of anchors.
 
         Returns:
-            tuple(list[Tensor]):
+            tuple (list[Tensor]):
 
                 - labels_list (list[Tensor]): Labels of each level.
                 - label_weights_list (list[Tensor]): Label weights of each \
