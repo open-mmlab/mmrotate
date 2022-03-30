@@ -119,7 +119,7 @@ class R3Det(RotatedBaseDetector):
                 Defaults to False.
 
         Returns:
-            list[list[np.ndarray]]: BBox results of each image and classes.
+            list[list[np.ndarray]]: BBox results of each image and classes. \
                 The outer list corresponds to each image. The inner list
                 corresponds to each class.
         """

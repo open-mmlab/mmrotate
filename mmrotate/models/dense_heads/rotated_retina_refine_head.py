@@ -75,7 +75,7 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
 
         Returns:
             list[list[Tensor]]: best or refined rbboxes of each level of each
-             image.
+                image.
         """
         num_levels = len(cls_scores)
         assert num_levels == len(bbox_preds)

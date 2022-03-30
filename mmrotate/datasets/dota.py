@@ -296,14 +296,16 @@ class DOTADataset(CustomDataset):
         Args:
             results (list): Testing results of the dataset.
             submission_dir (str, optional): The folder that contains submission
-            files.
-                If not specified, a temp folder will be created. Default: None.
+                files. If not specified, a temp folder will be created.
+                Default: None.
             nproc (int, optional): number of process.
 
         Returns:
-            tuple: (result_files, tmp_dir), result_files is a dict containing
-                the json filepaths, tmp_dir is the temporal directory created
-                for saving json files when submission_dir is not specified.
+            tuple:
+
+                - result_files (dict): a dict containing the json filepaths
+                - tmp_dir (str): the temporal directory created for saving \
+                    json files when submission_dir is not specified.
         """
         nproc = min(nproc, os.cpu_count())
         assert isinstance(results, list), 'results must be a list'
