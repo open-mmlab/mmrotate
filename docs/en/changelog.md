@@ -12,12 +12,13 @@
 #### Bug Fixes
 
 - Remove in-place operations in rbbox_overlaps (#155)
+- Fix bug in docstring. (#137)
 
 #### Improvements
 
 - Add Chinese translation of `docs/zh_cn/tutorials/customize_dataset.md` (#65)
 - Add different seeds to different ranks (#102)
-- Add install command in README(_zh-CN).md (#166)
+- Update from-scratch install script in install.md (#166)
 - Improve the arguments of all mmrotate scripts (#168)
 
 #### Contributors
