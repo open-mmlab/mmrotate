@@ -28,13 +28,13 @@ Assuming that you already have CUDA 10.1 installed, here is a full script for se
 ```shell
 conda create -n open-mmlab python=3.7 pytorch==1.7.0 cudatoolkit=10.1 torchvision -c pytorch -y
 conda activate open-mmlab
-pip3 install openmim
+pip install openmim
 mim install mmcv-full
 mim install mmdet
 git clone https://github.com/open-mmlab/mmrotate.git
 cd mmrotate
 pip install -r requirements/build.txt
-pip3 install -e .
+pip install -v -e .
 ```
 
 ### Prepare environment
