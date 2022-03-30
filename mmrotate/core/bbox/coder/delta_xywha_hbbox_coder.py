@@ -12,26 +12,26 @@ from ..transforms import norm_angle
 class DeltaXYWHAHBBoxCoder(BaseBBoxCoder):
     """Delta XYWHA HBBox coder.
 
-    this coder encodes bbox (x1, y1, x2, y2) into delta (dx, dy, dw, dh, da)
-        and decodes delta (dx, dy, dw, dh, da) back to original bbox
-        (cx, cy, w, h, a).
+    this coder encodes bbox (x1, y1, x2, y2) into delta (dx, dy, dw, dh, da) \
+    and decodes delta (dx, dy, dw, dh, da) back to original bbox \
+    (cx, cy, w, h, a).
 
     Args:
-        target_means (Sequence[float]): Denormalizing means of target for
+        target_means (Sequence[float]): Denormalizing means of target for \
             delta coordinates
-        target_stds (Sequence[float]): Denormalizing standard deviation of
+        target_stds (Sequence[float]): Denormalizing standard deviation of \
             target for delta coordinates
         angle_range (str, optional): Angle representations. Defaults to 'oc'.
         norm_factor (None|float, optional): Regularization factor of angle.
-        edge_swap (bool, optional): Whether swap the edge if w < h.
+        edge_swap (bool, optional): Whether swap the edge if w < h. \
             Defaults to False.
-        clip_border (bool, optional): Whether clip the objects outside the
+        clip_border (bool, optional): Whether clip the objects outside the \
             border of the image. Defaults to True.
-        add_ctr_clamp (bool): Whether to add center clamp, when added, the
-            predicted box is clamped is its center is too far away from
+        add_ctr_clamp (bool): Whether to add center clamp, when added, the \
+            predicted box is clamped is its center is too far away from \
             the original anchor's center. Only used by YOLOF. Default False.
-        ctr_clamp (int): the maximum pixel shift to clamp. Only used by YOLOF.
-            Default 32.
+        ctr_clamp (int): the maximum pixel shift to clamp. Only used by \
+            YOLOF. Default 32.
     """
 
     def __init__(self,
@@ -54,12 +54,12 @@ class DeltaXYWHAHBBoxCoder(BaseBBoxCoder):
         self.ctr_clamp = ctr_clamp
 
     def encode(self, bboxes, gt_bboxes):
-        """Get box regression transformation deltas that can be used to
+        """Get box regression transformation deltas that can be used to \
         transform the ``bboxes`` into the ``gt_bboxes``.
 
         Args:
             bboxes (torch.Tensor): Source boxes, e.g., object proposals.
-            gt_bboxes (torch.Tensor): Target of the transformation, e.g.,
+            gt_bboxes (torch.Tensor): Target of the transformation, e.g., \
                 ground-truth boxes.
 
         Returns:
@@ -84,16 +84,16 @@ class DeltaXYWHAHBBoxCoder(BaseBBoxCoder):
 
         Args:
             bboxes (torch.Tensor): Basic boxes. Shape (B, N, 4) or (N, 4)
-            pred_bboxes (torch.Tensor): Encoded offsets with respect to each
-                roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or
-               (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H
+            pred_bboxes (torch.Tensor): Encoded offsets with respect to each \
+                roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or \
+               (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H \
                when rois is a grid of anchors.Offset encoding follows [1]_.
-            max_shape (Sequence[int] or torch.Tensor or Sequence[
-               Sequence[int]],optional): Maximum bounds for boxes, specifies
-               (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then
-               the max_shape should be a Sequence[Sequence[int]]
+            max_shape (Sequence[int] or torch.Tensor or Sequence[ \
+               Sequence[int]],optional): Maximum bounds for boxes, specifies \
+               (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then \
+               the max_shape should be a Sequence[Sequence[int]] \
                and the length of max_shape should also be B.
-            wh_ratio_clip (float, optional): The allowed ratio between
+            wh_ratio_clip (float, optional): The allowed ratio between \
                 width and height.
 
         Returns:
@@ -129,14 +129,14 @@ def bbox2delta(proposals,
         proposals (torch.Tensor): Boxes to be transformed, shape (N, ..., 4)
         gt (torch.Tensor): Gt bboxes to be used as base, shape (N, ..., 5)
         means (Sequence[float]): Denormalizing means for delta coordinates
-        stds (Sequence[float]): Denormalizing standard deviation for delta
+        stds (Sequence[float]): Denormalizing standard deviation for delta \
             coordinates.
         norm_factor (None|float, optional): Regularization factor of angle.
-        edge_swap (bool, optional): Whether swap the edge if w < h.
+        edge_swap (bool, optional): Whether swap the edge if w < h. \
             Defaults to False.
 
     Returns:
-        Tensor: deltas with shape (N, 5), where columns represent dx, dy,
+        Tensor: deltas with shape (N, 5), where columns represent dx, dy, \
             dw, dh, da.
     """
     proposals = proposals.float()
@@ -190,35 +190,35 @@ def delta2bbox(rois,
                angle_range='oc',
                norm_factor=None,
                edge_swap=False):
-    """Apply deltas to shift/scale base boxes. Typically the rois are anchor or
-    proposed bounding boxes and the deltas are network outputs used to
-    shift/scale those boxes. This is the inverse function of
+    """Apply deltas to shift/scale base boxes. Typically the rois are anchor \
+    or proposed bounding boxes and the deltas are network outputs used to \
+    shift/scale those boxes. This is the inverse function of \
     :func:`bbox2delta`.
 
     Args:
         rois (torch.Tensor): Boxes to be transformed. Has shape (N, 4).
-        deltas (torch.Tensor): Encoded offsets relative to each roi.
-            Has shape (N, num_classes * 5) or (N, 5). Note
-            N = num_base_anchors * W * H, when rois is a grid of
+        deltas (torch.Tensor): Encoded offsets relative to each roi. \
+            Has shape (N, num_classes * 5) or (N, 5). Note \
+            N = num_base_anchors * W * H, when rois is a grid of \
             anchors. Offset encoding follows [1]_.
-        means (Sequence[float]): Denormalizing means for delta coordinates.
+        means (Sequence[float]): Denormalizing means for delta coordinates. \
             Default (0., 0., 0., 0., 0.).
-        stds (Sequence[float]): Denormalizing standard deviation for delta
+        stds (Sequence[float]): Denormalizing standard deviation for delta \
             coordinates. Default (1., 1., 1., 1., 1.).
-        wh_ratio_clip (float): Maximum aspect ratio for boxes. Default
+        wh_ratio_clip (float): Maximum aspect ratio for boxes. Default \
             16 / 1000.
-        add_ctr_clamp (bool): Whether to add center clamp, when added, the
-            predicted box is clamped is its center is too far away from
+        add_ctr_clamp (bool): Whether to add center clamp, when added, the \
+            predicted box is clamped is its center is too far away from \
             the original anchor's center. Only used by YOLOF. Default False.
-        ctr_clamp (int): the maximum pixel shift to clamp. Only used by YOLOF.
-            Default 32.
+        ctr_clamp (int): the maximum pixel shift to clamp. Only used by \
+            YOLOF. Default 32.
         angle_range (str, optional): Angle representations. Defaults to 'oc'.
         norm_factor (None|float, optional): Regularization factor of angle.
-        edge_swap (bool, optional): Whether swap the edge if w < h.
+        edge_swap (bool, optional): Whether swap the edge if w < h. \
             Defaults to False.
 
     Returns:
-        Tensor: Boxes with shape (N, num_classes * 5) or (N, 5), where 5
+        Tensor: Boxes with shape (N, num_classes * 5) or (N, 5), where 5 \
            represent cx, cy, w, h, a.
     """
     means = deltas.new_tensor(means).view(1,

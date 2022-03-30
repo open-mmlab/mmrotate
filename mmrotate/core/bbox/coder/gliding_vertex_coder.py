@@ -11,7 +11,7 @@ from ..transforms import obb2poly, poly2obb
 class GVFixCoder(BaseBBoxCoder):
     """Gliding vertex fix coder.
 
-    this coder encodes bbox (cx, cy, w, h, a) into delta (dt, dr, dd, dl) and
+    this coder encodes bbox (cx, cy, w, h, a) into delta (dt, dr, dd, dl) and \
     decodes delta (dt, dr, dd, dl) back to original bbox (cx, cy, w, h, a).
 
     Args:
@@ -70,10 +70,10 @@ class GVFixCoder(BaseBBoxCoder):
         """Apply transformation `fix_deltas` to `boxes`.
 
         Args:
-            hbboxes (torch.Tensor): Basic boxes. Shape (B, N, 4) or (N, 4)
-            fix_deltas (torch.Tensor): Encoded offsets with respect to each
-                roi. Has shape (B, N, num_classes * 4) or (B, N, 4) or
-               (N, num_classes * 4) or (N, 4). Note N = num_anchors * W * H
+            hbboxes (torch.Tensor): Basic boxes. Shape (B, N, 4) or (N, 4) \
+            fix_deltas (torch.Tensor): Encoded offsets with respect to each \
+                roi. Has shape (B, N, num_classes * 4) or (B, N, 4) or \
+               (N, num_classes * 4) or (N, 4). Note N = num_anchors * W * H \
                when rois is a grid of anchors.Offset encoding follows [1]_.
 
         Returns:
@@ -146,5 +146,13 @@ class GVRatioCoder(BaseBBoxCoder):
         return ratios[:, None]
 
     def decode(self, bboxes, bboxes_pred):
-        """Apply transformation `fix_deltas` to `boxes`."""
+        """Apply transformation `fix_deltas` to `boxes`.
+
+        Args:
+            bboxes (torch.Tensor)
+            bboxes_pred (torch.Tensor)
+
+        Returns:
+            NotImplementedError
+        """
         raise NotImplementedError

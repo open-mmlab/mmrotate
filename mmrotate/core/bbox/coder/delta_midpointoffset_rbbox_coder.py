@@ -13,9 +13,9 @@ from ..transforms import obb2poly, obb2xyxy, poly2obb
 class MidpointOffsetCoder(BaseBBoxCoder):
     """Mid point offset coder.
 
-    This coder encodes bbox (x1, y1, x2, y2) into delta
-        (dx, dy, dw, dh, da, db) and decodes delta (dx, dy, dw, dh, da, db)
-        back to original bbox (x1, y1, x2, y2).
+    This coder encodes bbox (x1, y1, x2, y2) into delta \
+    (dx, dy, dw, dh, da, db) and decodes delta (dx, dy, dw, dh, da, db) \
+    back to original bbox (x1, y1, x2, y2).
 
     Args:
         target_means (Sequence[float]): Denormalizing means of target for
@@ -62,16 +62,16 @@ class MidpointOffsetCoder(BaseBBoxCoder):
 
         Args:
             bboxes (torch.Tensor): Basic boxes. Shape (B, N, 4) or (N, 4)
-            pred_bboxes (torch.Tensor): Encoded offsets with respect to each
-                roi. Has shape (B, N, 5) or (N, 5).
-                Note N = num_anchors * W * H
-               when rois is a grid of anchors.Offset encoding follows [1]_.
-            max_shape (Sequence[int] or torch.Tensor or Sequence[
-               Sequence[int]],optional): Maximum bounds for boxes, specifies
-               (H, W, C) or (H, W). If bboxes shape is (B, N, 6), then
-               the max_shape should be a Sequence[Sequence[int]]
+            pred_bboxes (torch.Tensor): Encoded offsets with respect to each \
+                roi. Has shape (B, N, 5) or (N, 5). \
+                Note N = num_anchors * W * H when rois is a grid of anchors. \
+                Offset encoding follows [1]_.
+            max_shape (Sequence[int] or torch.Tensor or Sequence[ \
+               Sequence[int]],optional): Maximum bounds for boxes, specifies \
+               (H, W, C) or (H, W). If bboxes shape is (B, N, 6), then \
+               the max_shape should be a Sequence[Sequence[int]] \
                and the length of max_shape should also be B.
-            wh_ratio_clip (float, optional): The allowed ratio between
+            wh_ratio_clip (float, optional): The allowed ratio between \
                 width and height.
 
         Returns:
@@ -92,23 +92,22 @@ def bbox2delta(proposals,
                means=(0., 0., 0., 0., 0., 0.),
                stds=(1., 1., 1., 1., 1., 1.),
                version='oc'):
-    """Compute deltas of proposals w.r.t.
+    """Compute deltas of proposals w.r.t. gt.
 
-    gt.
     We usually compute the deltas of x, y, w, h, a, b of proposals w.r.t ground
-    truth bboxes to get regression target.
+    truth bboxes to get regression target. \
     This is the inverse function of :func:`delta2bbox`.
 
     Args:
         proposals (torch.Tensor): Boxes to be transformed, shape (N, ..., 4)
         gt (torch.Tensor): Gt bboxes to be used as base, shape (N, ..., 5)
         means (Sequence[float]): Denormalizing means for delta coordinates
-        stds (Sequence[float]): Denormalizing standard deviation for delta
+        stds (Sequence[float]): Denormalizing standard deviation for delta \
             coordinates.
         version (str, optional): Angle representations. Defaults to 'oc'.
 
     Returns:
-        Tensor: deltas with shape (N, 6), where columns represent dx, dy,
+        Tensor: deltas with shape (N, 6), where columns represent dx, dy, \
             dw, dh, da, db.
     """
     proposals = proposals.float()
@@ -159,27 +158,29 @@ def delta2bbox(rois,
                stds=(1., 1., 1., 1., 1., 1.),
                wh_ratio_clip=16 / 1000,
                version='oc'):
-    """Apply deltas to shift/scale base boxes. Typically the rois are anchor or
-    proposed bounding boxes and the deltas are network outputs used to
-    shift/scale those boxes. This is the inverse function of
-    :func:`bbox2delta`.
+    """Apply deltas to shift/scale base boxes.
+
+    Typically the rois are anchor or proposed bounding boxes and the deltas \
+    are network outputs used to shift/scale those boxes. \
+    This is the inverse function of :func:`bbox2delta`.
+
 
     Args:
         rois (torch.Tensor): Boxes to be transformed. Has shape (N, 4).
-        deltas (torch.Tensor): Encoded offsets relative to each roi.
-            Has shape (N, num_classes * 4) or (N, 4). Note
-            N = num_base_anchors * W * H, when rois is a grid of
+        deltas (torch.Tensor): Encoded offsets relative to each roi. \
+            Has shape (N, num_classes * 4) or (N, 4). Note \
+            N = num_base_anchors * W * H, when rois is a grid of \
             anchors. Offset encoding follows [1]_.
-        means (Sequence[float]): Denormalizing means for delta coordinates.
+        means (Sequence[float]): Denormalizing means for delta coordinates. \
             Default (0., 0., 0., 0., 0., 0.).
-        stds (Sequence[float]): Denormalizing standard deviation for delta
+        stds (Sequence[float]): Denormalizing standard deviation for delta \
             coordinates. Default (1., 1., 1., 1., 1., 1.).
-        wh_ratio_clip (float): Maximum aspect ratio for boxes. Default
+        wh_ratio_clip (float): Maximum aspect ratio for boxes. Default \
             16 / 1000.
         version (str, optional): Angle representations. Defaults to 'oc'.
 
     Returns:
-        Tensor: Boxes with shape (N, num_classes * 5) or (N, 5), where 5
+        Tensor: Boxes with shape (N, num_classes * 5) or (N, 5), where 5 \
            represent cx, cy, w, h, a.
     """
     means = deltas.new_tensor(means).repeat(1, deltas.size(1) // 6)

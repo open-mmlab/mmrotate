@@ -62,6 +62,7 @@ class MaxConvexIoUAssigner(BaseAssigner):
         """Assign gt to bboxes.
 
         The assignment is done in following steps
+
         1. compute iou between all bbox (bbox of all pyramid levels) and gt
         2. compute center distance between all bbox and gt
         3. on each pyramid level, for each gt, select k bbox whose center
