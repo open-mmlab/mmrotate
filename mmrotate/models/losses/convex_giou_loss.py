@@ -312,7 +312,7 @@ class BCConvexGIoULoss(nn.Module):
 
 
 def AspectRatio(gt_rbboxes):
-    """compute the aspect ratio of all gts.
+    """Compute the aspect ratio of all gts.
 
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).

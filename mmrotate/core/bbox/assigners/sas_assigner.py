@@ -25,7 +25,7 @@ def convex_overlaps(gt_rbboxes, points):
 
 
 def get_horizontal_bboxes(gt_rbboxes):
-    """get_horizontal_bboxes from polygons.
+    """Get horizontal bboxes from polygons.
 
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
@@ -46,7 +46,7 @@ def get_horizontal_bboxes(gt_rbboxes):
 
 
 def AspectRatio(gt_rbboxes):
-    """compute the aspect ratio of all gts.
+    """Compute the aspect ratio of all gts.
 
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).

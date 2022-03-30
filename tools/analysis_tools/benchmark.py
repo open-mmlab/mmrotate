@@ -61,7 +61,7 @@ def parse_args():
 
 def measure_inference_speed(cfg, checkpoint, max_iter, log_interval,
                             is_fuse_conv_bn, use_fp16):
-    """inference speed statistics.
+    """Inference speed statistics.
 
     Args:
         cfg (object): Test config object.
@@ -157,7 +157,7 @@ def repeat_measure_inference_speed(cfg,
                                    is_fuse_conv_bn,
                                    use_fp16,
                                    repeat_num=1):
-    """repeat to inference several times and take the average.
+    """Repeat to inference several times and take the average.
 
     Args:
         cfg (object): Test config object.
