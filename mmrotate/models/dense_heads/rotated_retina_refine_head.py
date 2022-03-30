@@ -74,7 +74,7 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
                 image. rois output by former stages and are to be refined
 
         Returns:
-            list[list[Tensor]]: best or refined rbboxes of each level of each
+            list[list[Tensor]]: best or refined rbboxes of each level of each \
                 image.
         """
         num_levels = len(cls_scores)

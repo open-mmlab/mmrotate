@@ -27,7 +27,7 @@ def multiclass_nms_rotated(multi_bboxes,
             bboxes. Default to False.
 
     Returns:
-        tuple: (dets, labels, indices (optional)), tensors of shape (k, 5),
+        tuple (dets, labels, indices (optional)): tensors of shape (k, 5), \
         (k), and (k). Dets are boxes with scores. Labels are 0-based.
     """
     num_classes = multi_scores.size(1) - 1
@@ -102,7 +102,7 @@ def aug_multiclass_nms_rotated(merged_bboxes, merged_labels, score_thr, nms,
         classes (int): number of classes.
 
     Returns:
-        tuple: (dets, labels), tensors of shape (k, 5), and (k). Dets are boxes
+        tuple (dets, labels): tensors of shape (k, 5), and (k). Dets are boxes
             with scores. Labels are 0-based.
     """
     bboxes, labels = [], []

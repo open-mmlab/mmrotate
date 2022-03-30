@@ -132,7 +132,7 @@ class RotatedRetinaHead(RotatedAnchorHead):
                 level with shape (N, num_anchors * 5, H, W)
 
         Returns:
-            list[list[Tensor]]: best or refined rbboxes of each level
+            list[list[Tensor]]: best or refined rbboxes of each level \
                 of each image.
         """
         num_levels = len(cls_scores)

@@ -191,8 +191,8 @@ class GaussianMixture():
             x (torch.Tensor): (T, n, d) or (T, n, 1, d)
 
         Returns:
-            torch.Tensor: log-likelihood probability that samples belong to the
-                k-th Gaussian with dimensions (T, n, k, 1).
+            torch.Tensor: log-likelihood probability that samples belong to \
+                the k-th Gaussian with dimensions (T, n, k, 1).
         """
         x = self.check_size(x)
 
@@ -225,9 +225,10 @@ class GaussianMixture():
 
         Returns:
             tuple:
-                log_prob_norm (torch.Tensor): the mean of the mean of the
+
+                log_prob_norm (torch.Tensor): the mean of the mean of the \
                     logarithms of the probabilities.
-                log_resp (torch.Tensor): log-responses that indicate the
+                log_resp (torch.Tensor): log-responses that indicate the \
                     posterior belief.
         """
         x = self.check_size(x)
@@ -250,6 +251,7 @@ class GaussianMixture():
 
         Returns:
             tuple:
+
                 pi (torch.Tensor): (T, k, 1)
                 mu (torch.Tensor): (T, k, d)
                 var (torch.Tensor): (T, k, d) or (T, k, d, d)

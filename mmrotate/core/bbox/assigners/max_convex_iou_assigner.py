@@ -209,8 +209,8 @@ class MaxConvexIoUAssigner(BaseAssigner):
             points (torch.Tensor): Points to be assigned, shape(n, 18).
 
         Returns:
-            overlaps (torch.Tensor): Overlaps between k gt_bboxes and n bboxes,
-                shape(k, n).
+            overlaps (torch.Tensor): Overlaps between k gt_bboxes and n \
+                bboxes, shape(k, n).
         """
         overlaps = convex_iou(points, gt_rbboxes)
         overlaps = overlaps.transpose(1, 0)
