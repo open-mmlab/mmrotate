@@ -25,7 +25,7 @@ MMRotate 和 MMCV, MMDet 版本兼容性如下所示，需要安装正确的版�
 假设当前已经成功安装 CUDA 10.1，这里提供了一个完整的基于 conda 安装 MMRotate 的脚本：
 
 ```shell
-conda create -n open-mmlab python=3.7 pytorch==1.7.0 torchvision==0.8.0 cudatoolkit=10.1 -c pytorch -y
+conda create -n open-mmlab python=3.7 pytorch==1.7.0 cudatoolkit=10.1 torchvision -c pytorch -y
 conda activate open-mmlab
 pip3 install openmim
 mim install mmcv-full

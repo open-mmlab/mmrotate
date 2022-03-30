@@ -26,7 +26,7 @@ If mmcv and mmcv-full are both installed, there will be `ModuleNotFoundError`.
 Assuming that you already have CUDA 10.1 installed, here is a full script for setting up MMRotate with conda.
 
 ```shell
-conda create -n open-mmlab python=3.7 pytorch==1.7.0 torchvision==0.8.0 cudatoolkit=10.1 -c pytorch -y
+conda create -n open-mmlab python=3.7 pytorch==1.7.0 cudatoolkit=10.1 torchvision -c pytorch -y
 conda activate open-mmlab
 pip3 install openmim
 mim install mmcv-full
