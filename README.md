@@ -77,20 +77,7 @@ Please refer to [changelog.md](docs/en/changelog.md) for details and release his
 
 ## Installation
 
-MMRotate depends on [PyTorch](https://pytorch.org/), [MMCV](https://github.com/open-mmlab/mmcv) and [MMDetection](https://github.com/open-mmlab/mmdetection).
-Below are quick steps for installation.
-Please refer to [install.md](docs/en/install.md) for more detailed instruction.
-
-```shell
-conda create -n open-mmlab python=3.7 pytorch==1.7.0 torchvision==0.8.0 cudatoolkit=10.1 -c pytorch -y
-conda activate open-mmlab
-pip3 install openmim
-mim install mmcv-full
-mim install mmdet
-git clone https://github.com/open-mmlab/mmrotate.git
-cd mmrotate
-pip3 install -e .
-```
+Please refer to [install.md](docs/en/install.md) for installation guide.
 
 ## Get Started
 
