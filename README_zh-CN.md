@@ -61,14 +61,10 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## 更新日志
 
-最新的 **0.1.1** 版本已经在 2022.03.14 发布:
+最新的 **0.2.0** 版本已经在 2022.03.14 发布:
 
-- 为初学者添加了 [Colab 教程](demo/MMRotate_Tutorial.ipynb)
-- 支持了[大图推理](deom/huge_image_demo.py)
-- 支持了 HRSC 遥感数据集
-- 支持了混合精度训练
-- 添加了推理速度[统计工具](tools/analysis_tools/benchmark.py)
-- 添加了混淆矩阵[分析工具](tools/analysis_tools/confusion_matrix.py).
+- 支持了 Circular Sommth Label (CSL, ECCV'20) 模型 (#153)
+- 增加了[数据集浏览工具](tools/misc/browse_dataset.py) (#98)
 
 如果想了解更多版本更新细节和历史信息，请阅读[更新日志](docs/en/changelog.md)。
 
@@ -100,6 +96,7 @@ MMRotate 也提供了其他更详细的教程:
 * [x] [Rotated RepPoints-OBB](configs/rotated_reppoints/README.md) (ICCV'2019)
 * [x] [RoI Transformer](configs/roi_trans/README.md) (CVPR'2019)
 * [x] [Gliding Vertex](configs/gliding_vertex/README.md) (TPAMI'2020)
+* [x] [CSL](configs/csl/README.md) (ECCV'2020)
 * [x] [R<sup>3</sup>Det](configs/r3det/README.md) (AAAI'2021)
 * [x] [S<sup>2</sup>A-Net](configs/s2anet/README.md) (TGRS'2021)
 * [x] [ReDet](configs/redet/README.md) (CVPR'2021)

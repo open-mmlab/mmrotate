@@ -270,6 +270,7 @@ def poly2obb_le135(polys):
 
     Args:
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
+
     Returns:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
     """
@@ -302,6 +303,7 @@ def poly2obb_le90(polys):
 
     Args:
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
+
     Returns:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
     """
@@ -334,6 +336,7 @@ def poly2obb_np_oc(poly):
 
     Args:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3]
+
     Returns:
         obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
     """
@@ -359,6 +362,7 @@ def poly2obb_np_le135(poly):
 
     Args:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3]
+
     Returns:
         obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
     """
@@ -391,6 +395,7 @@ def poly2obb_np_le90(poly):
 
     Args:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3]
+
     Returns:
         obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
     """
@@ -418,6 +423,7 @@ def obb2poly_oc(rboxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
     """
@@ -442,6 +448,7 @@ def obb2poly_le135(rboxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
     """
@@ -469,6 +476,7 @@ def obb2poly_le90(rboxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
     """
@@ -496,6 +504,7 @@ def obb2hbb_oc(rbboxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         hbbs (torch.Tensor): [x_ctr,y_ctr,w,h,pi/2]
     """
@@ -518,6 +527,7 @@ def obb2hbb_le135(rotatex_boxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         hbbs (torch.Tensor): [x_ctr,y_ctr,w,h,-pi/2]
     """
@@ -545,6 +555,7 @@ def obb2hbb_le90(obboxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         hbbs (torch.Tensor): [x_ctr,y_ctr,w,h,-pi/2]
     """
@@ -570,13 +581,14 @@ def hbb2obb_oc(hbboxes):
 
     Args:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
+
     Returns:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
     """
-    x = (hbboxes[:, 0::4] + hbboxes[:, 2::4]) * 0.5
-    y = (hbboxes[:, 1::4] + hbboxes[:, 3::4]) * 0.5
-    w = hbboxes[:, 2::4] - hbboxes[:, 0::4]
-    h = hbboxes[:, 3::4] - hbboxes[:, 1::4]
+    x = (hbboxes[..., 0] + hbboxes[..., 2]) * 0.5
+    y = (hbboxes[..., 1] + hbboxes[..., 3]) * 0.5
+    w = hbboxes[..., 2] - hbboxes[..., 0]
+    h = hbboxes[..., 3] - hbboxes[..., 1]
     theta = x.new_zeros(*x.shape)
     rbboxes = torch.stack([x, y, h, w, theta + np.pi / 2], dim=-1)
     return rbboxes
@@ -587,6 +599,7 @@ def hbb2obb_le135(hbboxes):
 
     Args:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
+
     Returns:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
     """
@@ -606,6 +619,7 @@ def hbb2obb_le90(hbboxes):
 
     Args:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
+
     Returns:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
     """
@@ -625,6 +639,7 @@ def obb2xyxy_oc(rbboxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
     """
@@ -652,6 +667,7 @@ def obb2xyxy_le135(rotatex_boxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
     """
@@ -671,6 +687,7 @@ def obb2xyxy_le90(obboxes):
 
     Args:
         obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+
     Returns:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
     """
@@ -690,6 +707,7 @@ def obb2poly_np_oc(rbboxes):
 
     Args:
         obbs (ndarray): [x_ctr,y_ctr,w,h,angle,score]
+
     Returns:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3,score]
     """
@@ -717,6 +735,7 @@ def obb2poly_np_le135(rrects):
 
     Args:
         obbs (ndarray): [x_ctr,y_ctr,w,h,angle,score]
+
     Returns:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3,score]
     """
@@ -743,6 +762,7 @@ def obb2poly_np_le90(obboxes):
 
     Args:
         obbs (ndarray): [x_ctr,y_ctr,w,h,angle,score]
+
     Returns:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3,score]
     """
@@ -769,6 +789,7 @@ def cal_line_length(point1, point2):
     Args:
         point1 (List): [x,y]
         point2 (List): [x,y]
+
     Returns:
         length (float)
     """
@@ -782,6 +803,7 @@ def get_best_begin_point_single(coordinate):
 
     Args:
         coordinate (List): [x1, y1, x2, y2, x3, y3, x4, y4, score]
+
     Returns:
         reorder coordinate (List): [x1, y1, x2, y2, x3, y3, x4, y4, score]
     """
@@ -816,6 +838,7 @@ def get_best_begin_point(coordinates):
 
     Args:
         coordinate (ndarray): shape(n, 9).
+
     Returns:
         reorder coordinate (ndarray): shape(n, 9).
     """
@@ -830,6 +853,7 @@ def norm_angle(angle, angle_range):
     Args:
         angle (ndarray): shape(n, ).
         angle_range (Str): angle representations.
+
     Returns:
         angle (ndarray): shape(n, ).
     """
@@ -849,6 +873,7 @@ def dist_torch(point1, point2):
     Args:
         point1 (torch.Tensor): shape(n, 2).
         point2 (torch.Tensor): shape(n, 2).
+
     Returns:
         distance (torch.Tensor): shape(n, 1).
     """

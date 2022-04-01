@@ -255,6 +255,7 @@ def print_map_summary(mean_ap,
 
     A table will be printed to show the gts/dets/recall/AP of each class and
     the mAP.
+
     Args:
         mean_ap (float): Calculated from `eval_map()`.
         results (list[dict]): Calculated from `eval_map()`.

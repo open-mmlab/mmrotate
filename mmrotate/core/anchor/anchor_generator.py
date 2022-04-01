@@ -8,7 +8,10 @@ from .builder import ROTATED_ANCHOR_GENERATORS
 
 @ROTATED_ANCHOR_GENERATORS.register_module()
 class RotatedAnchorGenerator(AnchorGenerator):
-    """Standard rotate anchor generator for 2D anchor-based detectors."""
+    """Fake rotate anchor generator for 2D anchor-based detectors.
+
+    Horizontal bounding box represented by (x,y,w,h,theta).
+    """
 
     def single_level_grid_priors(self,
                                  featmap_size,
@@ -34,6 +37,11 @@ class RotatedAnchorGenerator(AnchorGenerator):
         anchors = super(RotatedAnchorGenerator, self).single_level_grid_priors(
             featmap_size, level_idx, dtype=dtype, device=device)
 
+        # The correct usage is：
+        #       from ..bbox.transforms import hbb2obb
+        #       anchors = hbb2obb(anchors, self.angle_version)
+        # instead of rudely setting the angle to all 0.
+        # However, the experiment shows that the performance has decreased.
         num_anchors = anchors.size(0)
         xy = (anchors[:, 2:] + anchors[:, :2]) / 2
         wh = anchors[:, 2:] - anchors[:, :2]

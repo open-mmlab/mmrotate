@@ -304,8 +304,6 @@ class RotatedBBoxHead(BaseModule):
             reduction_override (str, optional): The reduction method used to
                override the original reduction method of the loss.
                Defaults to None.
-
-        Returns:
         """
         losses = dict()
         if cls_score is not None:

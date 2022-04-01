@@ -14,12 +14,30 @@ Compatible MMCV, MMClassification and MMDetection versions are shown as below. P
 | MMRotate version   |    MMCV version   |      MMDetection version     |
 |:-------------------:|:-----------------:|:---------------------------------:|
 | master              | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
+| 0.1.1               | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
 | 0.1.0               | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
 
 **Note:** You need to run `pip uninstall mmcv` first if you have mmcv installed.
 If mmcv and mmcv-full are both installed, there will be `ModuleNotFoundError`.
 
 ## Installation
+
+### A from-scratch setup script
+
+Assuming that you already have CUDA 10.1 installed, here is a full script for setting up MMRotate with conda.
+You can refer to the step-by-step installation instructions in the next section.
+
+```shell
+conda create -n open-mmlab python=3.7 pytorch==1.7.0 cudatoolkit=10.1 torchvision -c pytorch -y
+conda activate open-mmlab
+pip install openmim
+mim install mmcv-full
+mim install mmdet
+git clone https://github.com/open-mmlab/mmrotate.git
+cd mmrotate
+pip install -r requirements/build.txt
+pip install -v -e .
+```
 
 ### Prepare environment
 
@@ -85,7 +103,7 @@ Or you can still install MMRotate manually:
 
 3. Install MMRotate.
 
-    You can simply install mmrotate with the following command:
+    You can simply install MMRotate with the following command:
 
     ```shell
     pip install mmrotate
@@ -125,30 +143,6 @@ Run it with
 ```shell
 docker run --gpus all --shm-size=8g -it -v {DATA_DIR}:/mmrotate/data mmrotate
 ```
-
-### A from-scratch setup script
-
-Assuming that you already have CUDA 10.1 installed, here is a full script for setting up MMDetection with conda.
-
-```shell
-conda create -n openmmlab python=3.7 -y
-conda activate openmmlab
-
-conda install pytorch==1.7.0 torchvision==0.8.0 cudatoolkit=10.1 -c pytorch
-
-# install the latest mmcv
-pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.7.0/index.html
-
-# install mmdetection
-pip install mmdet
-
-# install mmrotate
-git clone https://github.com/open-mmlab/mmrotate.git
-cd mmrotate
-pip install -r requirements/build.txt
-pip install -v -e .  # or "python setup.py develop"
-```
-
 
 ## Verification
 

@@ -279,12 +279,13 @@ class RotatedStandardRoIHead(BaseModule, metaclass=ABCMeta):
             rcnn_test_cfg (obj:`ConfigDict`): `test_cfg` of R-CNN.
             rescale (bool): If True, return boxes in original image space.
                 Default: False.
+
         Returns:
-            tuple[list[Tensor], list[Tensor]]: The first list contains
-                the boxes of the corresponding image in a batch, each
-                tensor has the shape (num_boxes, 5) and last dimension
-                5 represent (tl_x, tl_y, br_x, br_y, score). Each Tensor
-                in the second list is the labels with shape (num_boxes, ).
+            tuple[list[Tensor], list[Tensor]]: The first list contains \
+                the boxes of the corresponding image in a batch, each \
+                tensor has the shape (num_boxes, 5) and last dimension \
+                5 represent (tl_x, tl_y, br_x, br_y, score). Each Tensor \
+                in the second list is the labels with shape (num_boxes, ). \
                 The length of both lists should be equal to batch_size.
         """
 

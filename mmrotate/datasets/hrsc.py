@@ -108,9 +108,9 @@ class HRSCDataset(CustomDataset):
             for obj in root.findall('HRSC_Objects/HRSC_Object'):
                 if self.classwise:
                     class_id = obj.find('Class_ID').text
-                    if class_id not in self.CLASSES_ID:
+                    label = self.catid2label.get(class_id)
+                    if label is None:
                         continue
-                    label = self.catid2label[class_id]
                 else:
                     label = 0
 

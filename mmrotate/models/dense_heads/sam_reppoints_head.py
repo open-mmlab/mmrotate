@@ -18,7 +18,7 @@ from .utils import get_num_level_anchors_inside, points_center_pts
 
 @ROTATED_HEADS.register_module()
 class SAMRepPointsHead(BaseDenseHead):
-    """CFA head.
+    """Rotated RepPoints head for SASM.
 
     Args:
         num_classes (int): Number of classes.
@@ -441,6 +441,7 @@ class SAMRepPointsHead(BaseDenseHead):
                     unmap_outputs=True):
         """Compute corresponding GT box and classification targets for
         proposals.
+
         Args:
             proposals_list (list[list]): Multi level points/bboxes of each
                 image.
@@ -458,19 +459,20 @@ class SAMRepPointsHead(BaseDenseHead):
                 set of anchors.
 
         Returns:
-            tuple:
+            tuple (list[Tensor]):
+
                 - labels_list (list[Tensor]): Labels of each level.
-                - label_weights_list (list[Tensor]): Label weights of each
-                 level.
+                - label_weights_list (list[Tensor]): Label weights of each \
+                    level.
                 - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
-                - proposal_list (list[Tensor]): Proposals(points/bboxes) of
-                 each level.
-                - proposal_weights_list (list[Tensor]): Proposal weights of
-                 each level.
-                - num_total_pos (int): Number of positive samples in all
-                 images.
-                - num_total_neg (int): Number of negative samples in all
-                 images.
+                - proposal_list (list[Tensor]): Proposals(points/bboxes) of \
+                    each level.
+                - proposal_weights_list (list[Tensor]): Proposal weights of \
+                    each level.
+                - num_total_pos (int): Number of positive samples in all \
+                    images.
+                - num_total_neg (int): Number of negative samples in all \
+                    images.
         """
         assert stage in ['init', 'refine']
         num_imgs = len(img_metas)
@@ -685,6 +687,7 @@ class SAMRepPointsHead(BaseDenseHead):
                    with_nms=True,
                    **kwargs):
         """Transform network outputs of a batch into bbox results.
+
         Args:
             cls_scores (list[Tensor]): Classification scores for all
                 scale levels, each is a 4D-tensor, has shape
@@ -745,6 +748,7 @@ class SAMRepPointsHead(BaseDenseHead):
                            with_nms=True,
                            **kwargs):
         """Transform outputs of a single image into bbox predictions.
+
         Args:
             cls_score_list (list[Tensor]): Box scores from all scale
                 levels of a single image, each item has shape
@@ -772,6 +776,7 @@ class SAMRepPointsHead(BaseDenseHead):
                 mlvl_scores, else return mlvl_bboxes, mlvl_scores and
                 mlvl_score_factor. Usually with_nms is False is used for aug
                 test. If with_nms is True, then return the following format
+
                 - det_bboxes (Tensor): Predicted bboxes with shape \
                     [num_bboxes, 5], where the first 4 columns are bounding \
                     box positions (cx, cy, w, h, a) and the 5-th \

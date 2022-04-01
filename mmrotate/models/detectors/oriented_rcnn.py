@@ -5,10 +5,9 @@ from .two_stage import RotatedTwoStageDetector
 
 @ROTATED_DETECTORS.register_module()
 class OrientedRCNN(RotatedTwoStageDetector):
-    """Implementation of `Oriented R-CNN for Object Detection.
+    """Implementation of `Oriented R-CNN for Object Detection.`__
 
-    <https://openaccess.thecvf.com/content/ICCV2021/papers
-    /Xie_Oriented_R-CNN_for_Object_Detection_ICCV_2021_paper.pdf>`_
+    __ https://openaccess.thecvf.com/content/ICCV2021/papers/Xie_Oriented_R-CNN_for_Object_Detection_ICCV_2021_paper.pdf  # noqa: E501, E261.
     """
 
     def __init__(self,

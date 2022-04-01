@@ -15,17 +15,18 @@ class RotatedRetinaHead(RotatedAnchorHead):
     The head contains two subnetworks. The first classifies anchor boxes and
     the second regresses deltas for the anchors.
 
-    Example:
-        >>> import torch
-        >>> self = RetinaHead(11, 7)
-        >>> x = torch.rand(1, 7, 32, 32)
-        >>> cls_score, bbox_pred = self.forward_single(x)
-        >>> # Each anchor predicts a score for each class except background
-        >>> cls_per_anchor = cls_score.shape[1] / self.num_anchors
-        >>> box_per_anchor = bbox_pred.shape[1] / self.num_anchors
-        >>> assert cls_per_anchor == (self.num_classes)
-        >>> assert box_per_anchor == 4
-    """
+    Args:
+        num_classes (int): Number of categories excluding the background
+            category.
+        in_channels (int): Number of channels in the input feature map.
+        stacked_convs (int, optional): Number of stacked convolutions.
+        conv_cfg (dict, optional): Config dict for convolution layer.
+            Default: None.
+        norm_cfg (dict, optional): Config dict for normalization layer.
+            Default: None.
+        anchor_generator (dict): Config dict for anchor generator
+        init_cfg (dict or list[dict], optional): Initialization config dict.
+    """  # noqa: W605
 
     def __init__(self,
                  num_classes,
@@ -49,6 +50,7 @@ class RotatedRetinaHead(RotatedAnchorHead):
                          std=0.01,
                          bias_prob=0.01)),
                  **kwargs):
+
         self.stacked_convs = stacked_convs
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
@@ -99,11 +101,12 @@ class RotatedRetinaHead(RotatedAnchorHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple:
-                cls_score (torch.Tensor): Cls scores for a single scale level
-                    the channels number is num_anchors * num_classes.
-                bbox_pred (torch.Tensor): Box energies / deltas for a single
-                    scale level, the channels number is num_anchors * 4.
+            tuple (torch.Tensor):
+
+                - cls_score (torch.Tensor): Cls scores for a single scale \
+                    level the channels number is num_anchors * num_classes.
+                - bbox_pred (torch.Tensor): Box energies / deltas for a \
+                    single scale level, the channels number is num_anchors * 4.
         """
         cls_feat = x
         reg_feat = x
@@ -129,7 +132,7 @@ class RotatedRetinaHead(RotatedAnchorHead):
                 level with shape (N, num_anchors * 5, H, W)
 
         Returns:
-            list[list[Tensor]]: best or refined rbboxes of each level
+            list[list[Tensor]]: best or refined rbboxes of each level \
                 of each image.
         """
         num_levels = len(cls_scores)

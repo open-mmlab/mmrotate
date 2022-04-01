@@ -4,10 +4,16 @@ from mmcv.ops import convex_iou
 
 
 def points_center_pts(RPoints, y_first=True):
-    '''
-    RPoints:[:, 18]  the  lists of Pointsets (9 points)
-    center_pts: the mean_center coordination of Pointsets
-    '''
+    """Compute center point of Pointsets.
+
+    Args:
+        RPoints (torch.Tensor): the  lists of Pointsets, shape (k, 18).
+        y_first (bool, optional): if True, the sequence of Pointsets is (y,x).
+
+    Returns:
+        center_pts (torch.Tensor): the mean_center coordination of Pointsets,
+            shape (k, 18).
+    """
     RPoints = RPoints.reshape(-1, 9, 2)
 
     if y_first:
@@ -28,6 +34,7 @@ def convex_overlaps(gt_bboxes, points):
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
         points (torch.Tensor): Points to be assigned, shape(n, 18).
+
     Returns:
         overlaps (torch.Tensor): Overlaps between k gt_bboxes and n bboxes,
             shape(k, n).
@@ -50,6 +57,7 @@ def levels_to_images(mlvl_tensor, flatten=False):
             corresponding level. Each element is of shape (N, C, H, W)
         flatten (bool, optional): if shape of mlvl_tensor is (N, C, H, W)
             set False, if shape of mlvl_tensor is  (N, H, W, C) set True.
+
     Returns:
         list[torch.Tensor]: A list that contains N tensors and each tensor is
             of shape (num_elements, C)

@@ -6,11 +6,9 @@ from .two_stage import RotatedTwoStageDetector
 @ROTATED_DETECTORS.register_module()
 class ReDet(RotatedTwoStageDetector):
     """Implementation of `ReDet: A Rotation-equivariant Detector for Aerial
-    Object Detection.
+    Object Detection.`__
 
-    <https://openaccess.thecvf.com/content/CVPR2021/papers/
-    Han_ReDet_A_Rotation-Equivariant_Detector_for_Aerial_Object_
-    Detection_CVPR_2021_paper.pdf>`_
+    __ https://openaccess.thecvf.com/content/CVPR2021/papers/Han_ReDet_A_Rotation-Equivariant_Detector_for_Aerial_Object_Detection_CVPR_2021_paper.pdf  # noqa: E501, E261.
     """
 
     def __init__(self,
