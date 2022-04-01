@@ -1,5 +1,32 @@
 ## Changelog
 
+### v0.2.0 (30/3/2022)
+
+#### New Features
+
+- Support Circular Smooth Label (CSL, ECCV'20) (#153)
+- Support multiple machines dist_train (#143)
+- Add [browse_dataset](tools/misc/browse_dataset.py) tool (#98)
+- Add [gather_models](.dev_scripts/gather_models.py) script (#162)
+
+#### Bug Fixes
+
+- Remove in-place operations in rbbox_overlaps (#155)
+- Fix bug in docstring. (#137)
+- Fix bug in HRSCDataset with `clasesswise=ture` (#175)
+
+#### Improvements
+
+- Add Chinese translation of `docs/zh_cn/tutorials/customize_dataset.md` (#65)
+- Add different seeds to different ranks (#102)
+- Update from-scratch install script in install.md (#166)
+- Improve the arguments of all mmrotate scripts (#168)
+
+#### Contributors
+
+A total of 6 developers contributed to this release.
+Thanks @zytx121 @yangxue0827 @ZwwWayne @jbwang1997 @canoe-Z @matrixgame2018
+
 ### v0.1.1 (14/3/2022)
 
 #### New Features
