@@ -83,14 +83,14 @@ class DeltaXYWHAOBBoxCoder(BaseBBoxCoder):
 
         Args:
             bboxes (torch.Tensor): Basic boxes. Shape (B, N, 5) or (N, 5)
-            pred_bboxes (torch.Tensor): Encoded offsets with respect to each
-                roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or
-               (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H
+            pred_bboxes (torch.Tensor): Encoded offsets with respect to each \
+                roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or \
+               (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H \
                when rois is a grid of anchors.
-            max_shape (Sequence[int] or torch.Tensor or Sequence[
-               Sequence[int]],optional): Maximum bounds for boxes, specifies
-               (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then
-               the max_shape should be a Sequence[Sequence[int]]
+            max_shape (Sequence[int] or torch.Tensor or Sequence[ \
+               Sequence[int]],optional): Maximum bounds for boxes, specifies \
+               (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then \
+               the max_shape should be a Sequence[Sequence[int]] \
                and the length of max_shape should also be B.
             wh_ratio_clip (float, optional): The allowed ratio between
                 width and height.

@@ -71,9 +71,9 @@ class GVFixCoder(BaseBBoxCoder):
 
         Args:
             hbboxes (torch.Tensor): Basic boxes. Shape (B, N, 4) or (N, 4)
-            fix_deltas (torch.Tensor): Encoded offsets with respect to each
-                roi. Has shape (B, N, num_classes * 4) or (B, N, 4) or
-               (N, num_classes * 4) or (N, 4). Note N = num_anchors * W * H
+            fix_deltas (torch.Tensor): Encoded offsets with respect to each \
+                roi. Has shape (B, N, num_classes * 4) or (B, N, 4) or \
+               (N, num_classes * 4) or (N, 4). Note N = num_anchors * W * H \
                when rois is a grid of anchors.
 
         Returns:
