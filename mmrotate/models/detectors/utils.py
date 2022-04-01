@@ -6,9 +6,14 @@ from mmcv.ops import DeformConv2d, rotated_feature_align
 
 
 class AlignConv(nn.Module):
-    """Implementation of `Align Deep Features for Oriented Object Detection.
+    """Align Conv of `S2ANet`.
 
-    <https://ieeexplore.ieee.org/document/9377550>`_
+    Args:
+        in_channels (int): Number of input channels.
+        featmap_strides (list): The strides of featmap.
+        kernel_size (int, optional): The size of kernel.
+        stride (int, optional): Stride of the convolution. Default: None
+        deform_groups (int, optional): Number of deformable group partitions.
     """
 
     def __init__(self,
@@ -129,7 +134,16 @@ class AlignConvModule(nn.Module):
 
 
 class FeatureRefineModule(nn.Module):
-    """Feature refine module."""
+    """Feature refine module for `R3Det`.
+
+    Args:
+        in_channels (int): Number of input channels.
+        featmap_strides (list): The strides of featmap.
+        conv_cfg (dict, optional): Config dict for convolution layer.
+            Default: None.
+        norm_cfg (dict, optional): Config dict for normalization layer.
+            Default: None.
+    """
 
     def __init__(self,
                  in_channels,

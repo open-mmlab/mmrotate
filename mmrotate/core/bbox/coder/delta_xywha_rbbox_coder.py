@@ -29,8 +29,8 @@ class DeltaXYWHAOBBoxCoder(BaseBBoxCoder):
         add_ctr_clamp (bool): Whether to add center clamp, when added, the
             predicted box is clamped is its center is too far away from
             the original anchor's center. Only used by YOLOF. Default False.
-        ctr_clamp (int): the maximum pixel shift to clamp. Only used by YOLOF.
-            Default 32.
+        ctr_clamp (int): the maximum pixel shift to clamp. Only used by
+            YOLOF. Default 32.
     """
 
     def __init__(self,
@@ -83,14 +83,14 @@ class DeltaXYWHAOBBoxCoder(BaseBBoxCoder):
 
         Args:
             bboxes (torch.Tensor): Basic boxes. Shape (B, N, 5) or (N, 5)
-            pred_bboxes (torch.Tensor): Encoded offsets with respect to each
-                roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or
-               (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H
-               when rois is a grid of anchors.Offset encoding follows [1]_.
-            max_shape (Sequence[int] or torch.Tensor or Sequence[
-               Sequence[int]],optional): Maximum bounds for boxes, specifies
-               (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then
-               the max_shape should be a Sequence[Sequence[int]]
+            pred_bboxes (torch.Tensor): Encoded offsets with respect to each \
+                roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or \
+               (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H \
+               when rois is a grid of anchors.
+            max_shape (Sequence[int] or torch.Tensor or Sequence[ \
+               Sequence[int]],optional): Maximum bounds for boxes, specifies \
+               (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then \
+               the max_shape should be a Sequence[Sequence[int]] \
                and the length of max_shape should also be B.
             wh_ratio_clip (float, optional): The allowed ratio between
                 width and height.
@@ -189,8 +189,8 @@ def delta2bbox(rois,
                norm_factor=None,
                edge_swap=False,
                proj_xy=False):
-    """Apply deltas to shift/scale base boxes. Typically the rois are anchor or
-    proposed bounding boxes and the deltas are network outputs used to
+    """Apply deltas to shift/scale base boxes. Typically the rois are anchor
+    or proposed bounding boxes and the deltas are network outputs used to
     shift/scale those boxes. This is the inverse function of
     :func:`bbox2delta`.
 
@@ -199,7 +199,7 @@ def delta2bbox(rois,
         deltas (torch.Tensor): Encoded offsets relative to each roi.
             Has shape (N, num_classes * 5) or (N, 5). Note
             N = num_base_anchors * W * H, when rois is a grid of
-            anchors. Offset encoding follows [1]_.
+            anchors.
         means (Sequence[float]): Denormalizing means for delta coordinates.
             Default (0., 0., 0., 0., 0.).
         stds (Sequence[float]): Denormalizing standard deviation for delta
@@ -214,8 +214,8 @@ def delta2bbox(rois,
         add_ctr_clamp (bool): Whether to add center clamp, when added, the
             predicted box is clamped is its center is too far away from
             the original anchor's center. Only used by YOLOF. Default False.
-        ctr_clamp (int): the maximum pixel shift to clamp. Only used by YOLOF.
-            Default 32.
+        ctr_clamp (int): the maximum pixel shift to clamp. Only used by
+            YOLOF. Default 32.
         angle_range (str, optional): Angle representations. Defaults to 'oc'.
         norm_factor (None|float, optional): Regularization factor of angle.
         edge_swap (bool, optional): Whether swap the edge if w < h.

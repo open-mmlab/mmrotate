@@ -11,7 +11,23 @@ from torch.nn.parameter import Parameter
 
 
 class ORConv2d(Conv2d):
-    """Oriented 2-D convolution."""
+    """Oriented 2-D convolution.
+
+    Args:
+        in_channels (List[int]): Number of input channels per scale.
+        out_channels (int): Number of output channels (used at each scale).
+        kernel_size (int, optional): The size of kernel.
+        arf_config (tuple, optional): a tuple consist of nOrientation and
+            nRotation.
+        stride (int, optional): Stride of the convolution. Default: 1.
+        padding (int or tuple): Zero-padding added to both sides of the input.
+            Default: 0.
+        dilation (int or tuple): Spacing between kernel elements. Default: 1.
+        groups (int): Number of blocked connections from input.
+            channels to output channels. Default: 1.
+        bias (bool): If True, adds a learnable bias to the output.
+            Default: False.
+    """
 
     def __init__(self,
                  in_channels,

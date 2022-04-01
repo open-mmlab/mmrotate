@@ -5,9 +5,9 @@ from .two_stage import RotatedTwoStageDetector
 
 @ROTATED_DETECTORS.register_module()
 class RotatedFasterRCNN(RotatedTwoStageDetector):
-    """Implementation of Rotated `Faster R-CNN.
+    """Implementation of Rotated `Faster R-CNN.`__
 
-    <https://arxiv.org/abs/1506.01497>`_
+    __ https://arxiv.org/abs/1506.01497
     """
 
     def __init__(self,

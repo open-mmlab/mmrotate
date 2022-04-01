@@ -18,7 +18,7 @@ def multiclass_nms_rotated(multi_bboxes,
             contains scores of the background class, but this will be ignored.
         score_thr (float): bbox threshold, bboxes with scores lower than it
             will not be considered.
-        nms (float): NMS
+        nms (float): Config of NMS.
         max_num (int, optional): if there are more than max_num bboxes after
             NMS, only top max_num will be kept. Default to -1.
         score_factors (Tensor, optional): The factors multiplied to scores
@@ -27,7 +27,7 @@ def multiclass_nms_rotated(multi_bboxes,
             bboxes. Default to False.
 
     Returns:
-        tuple: (dets, labels, indices (optional)), tensors of shape (k, 5),
+        tuple (dets, labels, indices (optional)): tensors of shape (k, 5), \
         (k), and (k). Dets are boxes with scores. Labels are 0-based.
     """
     num_classes = multi_scores.size(1) - 1
@@ -88,6 +88,23 @@ def multiclass_nms_rotated(multi_bboxes,
 
 def aug_multiclass_nms_rotated(merged_bboxes, merged_labels, score_thr, nms,
                                max_num, classes):
+    """NMS for aug multi-class bboxes.
+
+    Args:
+        multi_bboxes (torch.Tensor): shape (n, #class*5) or (n, 5)
+        multi_scores (torch.Tensor): shape (n, #class), where the last column
+            contains scores of the background class, but this will be ignored.
+        score_thr (float): bbox threshold, bboxes with scores lower than it
+            will not be considered.
+        nms (float): Config of NMS.
+        max_num (int, optional): if there are more than max_num bboxes after
+            NMS, only top max_num will be kept. Default to -1.
+        classes (int): number of classes.
+
+    Returns:
+        tuple (dets, labels): tensors of shape (k, 5), and (k). Dets are boxes
+            with scores. Labels are 0-based.
+    """
     bboxes, labels = [], []
 
     for cls in range(classes):

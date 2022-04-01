@@ -10,24 +10,20 @@ from .rotated_retina_head import RotatedRetinaHead
 
 @ROTATED_HEADS.register_module()
 class ODMRefineHead(RotatedRetinaHead):
-    """Rotational Anchor-based refine head.
+    """Rotated Anchor-based refine head. It's a part of the Oriented Detection
+    Module (ODM), which produces orientation-sensitive features for
+    classification and orientation-invariant features for localization.
 
     Args:
         num_classes (int): Number of categories excluding the background
             category.
         in_channels (int): Number of channels in the input feature map.
-        feat_channels (int): Number of hidden channels. Used in child classes.
+        stacked_convs (int, optional): Number of stacked convolutions.
+        conv_cfg (dict, optional): Config dict for convolution layer.
+            Default: None.
+        norm_cfg (dict, optional): Config dict for normalization layer.
+            Default: None.
         anchor_generator (dict): Config dict for anchor generator
-        bbox_coder (dict): Config of bounding box coder.
-        reg_decoded_bbox (bool): If true, the regression loss would be
-            applied on decoded bounding boxes. Default: False
-        background_label (int | None): Label ID of background, set as 0 for
-            RPN and num_classes for other heads. It will automatically set as
-            num_classes if None is given.
-        loss_cls (dict): Config of classification loss.
-        loss_bbox (dict): Config of localization loss.
-        train_cfg (dict): Training config of anchor head.
-        test_cfg (dict): Testing config of anchor head.
         init_cfg (dict or list[dict], optional): Initialization config dict.
     """  # noqa: W605
 
@@ -109,11 +105,12 @@ class ODMRefineHead(RotatedRetinaHead):
             x (torch.Tensor): Features of a single scale level.
 
         Returns:
-            tuple:
-                cls_score (torch.Tensor): Cls scores for a single scale level
-                    the channels number is num_anchors * num_classes.
-                bbox_pred (torch.Tensor): Box energies / deltas for a single
-                    scale level, the channels number is num_anchors * 4.
+            tuple (torch.Tensor):
+
+                - cls_score (torch.Tensor): Cls scores for a single scale \
+                    level the channels number is num_anchors * num_classes.
+                - bbox_pred (torch.Tensor): Box energies / deltas for a \
+                    single scale level, the channels number is num_anchors * 4.
         """
         or_feat = self.or_conv(x)
         reg_feat = or_feat
@@ -137,9 +134,10 @@ class ODMRefineHead(RotatedRetinaHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple:
-                anchor_list (list[Tensor]): Anchors of each image
-                valid_flag_list (list[Tensor]): Valid flags of each image
+            tuple (list[Tensor]):
+
+                - anchor_list (list[Tensor]): Anchors of each image
+                - valid_flag_list (list[Tensor]): Valid flags of each image
         """
         anchor_list = [[
             bboxes_img_lvl.clone().detach() for bboxes_img_lvl in bboxes_img
@@ -182,7 +180,7 @@ class ODMRefineHead(RotatedRetinaHead):
                    cfg=None,
                    rescale=False,
                    rois=None):
-        """Transform network output for a batch into labeled boxes.s.
+        """Transform network output for a batch into labeled boxes.
 
         Args:
             cls_scores (list[Tensor]): Box scores for each scale level

@@ -15,6 +15,7 @@ class RBboxOverlaps2D(object):
                  is_aligned=False,
                  version='oc'):
         """Calculate IoU between 2D bboxes.
+
         Args:
             bboxes1 (torch.Tensor): bboxes have shape (m, 5) in
                 <cx, cy, w, h, a> format, or shape (m, 6) in
@@ -62,6 +63,7 @@ def rbbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False):
             Default "iou".
         is_aligned (bool, optional): If True, then m and n must be equal.
             Default False.
+
     Returns:
         Tensor: shape (m, n) if ``is_aligned`` is False else shape (m,)
     """

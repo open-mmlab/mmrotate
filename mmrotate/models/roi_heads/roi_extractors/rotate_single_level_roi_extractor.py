@@ -52,7 +52,7 @@ class RotatedSingleRoIExtractor(BaseRoIExtractor):
                 coordinate system.
 
         Returns:
-            nn.ModuleList: The RoI extractor modules for each level feature
+            nn.ModuleList: The RoI extractor modules for each level feature \
                 map.
         """
 

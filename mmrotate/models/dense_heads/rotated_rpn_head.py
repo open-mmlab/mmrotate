@@ -274,8 +274,7 @@ class RotatedRPNHead(AnchorHead):
                 positive anchors.
 
         Returns:
-            loss_cls (torch.Tensor): cls. loss for each scale level.
-            loss_bbox (torch.Tensor): reg. loss for each scale level.
+            dict[str, Tensor]: A dictionary of loss components.
         """
         # classification loss
         labels = labels.reshape(-1)

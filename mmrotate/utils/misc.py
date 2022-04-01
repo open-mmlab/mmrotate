@@ -6,12 +6,15 @@ import warnings
 
 def find_latest_checkpoint(path, suffix='pth'):
     """Find the latest checkpoint from the working directory.
+
     Args:
         path(str): The path to find checkpoints.
         suffix(str): File extension.
             Defaults to pth.
+
     Returns:
         latest_path(str | None): File path of the latest checkpoint.
+
     References:
         .. [1] https://github.com/microsoft/SoftTeacher
                   /blob/main/ssod/utils/patch.py

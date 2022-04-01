@@ -5,9 +5,9 @@ from .single_stage import RotatedSingleStageDetector
 
 @ROTATED_DETECTORS.register_module()
 class RotatedRetinaNet(RotatedSingleStageDetector):
-    """Implementation of Rotated `RetinaNet.
+    """Implementation of Rotated `RetinaNet.`__
 
-    <https://arxiv.org/abs/1708.02002>`_
+    __ https://arxiv.org/abs/1708.02002
     """
 
     def __init__(self,

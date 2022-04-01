@@ -5,7 +5,7 @@ from .single_stage import RotatedSingleStageDetector
 
 @ROTATED_DETECTORS.register_module()
 class RotatedRepPoints(RotatedSingleStageDetector):
-    """Implementation of RepPoints."""
+    """Implementation of Rotated RepPoints."""
 
     def __init__(self,
                  backbone,

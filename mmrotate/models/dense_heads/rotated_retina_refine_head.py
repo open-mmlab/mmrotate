@@ -8,24 +8,20 @@ from . import RotatedRetinaHead
 
 @ROTATED_HEADS.register_module()
 class RotatedRetinaRefineHead(RotatedRetinaHead):
-    """Rotational Anchor-based refine head.
+    """Rotated Anchor-based refine head.
 
     Args:
         num_classes (int): Number of categories excluding the background
             category.
         in_channels (int): Number of channels in the input feature map.
-        feat_channels (int): Number of hidden channels. Used in child classes.
+        stacked_convs (int, optional): Number of stacked convolutions.
+        conv_cfg (dict, optional): Config dict for convolution layer.
+            Default: None.
+        norm_cfg (dict, optional): Config dict for normalization layer.
+            Default: None.
         anchor_generator (dict): Config dict for anchor generator
         bbox_coder (dict): Config of bounding box coder.
-        reg_decoded_bbox (bool): If true, the regression loss would be
-            applied on decoded bounding boxes. Default: False
-        background_label (int | None): Label ID of background, set as 0 for
-            RPN and num_classes for other heads. It will automatically set as
-            num_classes if None is given.
-        loss_cls (dict): Config of classification loss.
-        loss_bbox (dict): Config of localization loss.
-        train_cfg (dict): Training config of anchor head.
-        test_cfg (dict): Testing config of anchor head.
+        init_cfg (dict or list[dict], optional): Initialization config dict.
     """  # noqa: W605
 
     def __init__(self,
@@ -75,12 +71,11 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
             bbox_preds (list[Tensor]): Box energies / deltas for each scale
                 level with shape (N, 5, H, W)
             rois (list[list[Tensor]]): input rbboxes of each level of each
-             image.
-                rois output by former stages and are to be refined
+                image. rois output by former stages and are to be refined
 
         Returns:
-            list[list[Tensor]]: best or refined rbboxes of each level of each
-             image.
+            list[list[Tensor]]: best or refined rbboxes of each level of each \
+                image.
         """
         num_levels = len(cls_scores)
         assert num_levels == len(bbox_preds)
@@ -118,9 +113,10 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
             device (torch.device | str): Device for returned tensors
 
         Returns:
-            tuple:
-                anchor_list (list[Tensor]): Anchors of each image
-                valid_flag_list (list[Tensor]): Valid flags of each image
+            tuple (list[Tensor]):
+
+                - anchor_list (list[Tensor]): Anchors of each image
+                - valid_flag_list (list[Tensor]): Valid flags of each image
         """
         anchor_list = [[
             bboxes_img_lvl.clone().detach() for bboxes_img_lvl in bboxes_img
@@ -163,7 +159,7 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
                    cfg=None,
                    rescale=False,
                    rois=None):
-        """Transform network output for a batch into labeled boxes.s.
+        """Transform network output for a batch into labeled boxes.
 
         Args:
             cls_scores (list[Tensor]): Box scores for each scale level
@@ -173,8 +169,7 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
             img_metas (list[dict]): size / scale info for each image
             cfg (mmcv.Config): test / postprocessing configuration
             rois (list[list[Tensor]]): input rbboxes of each level of each
-             image.
-                rois output by former stages and are to be refined
+             image. rois output by former stages and are to be refined
             rescale (bool): if True, return boxes in original image space
 
         Returns:

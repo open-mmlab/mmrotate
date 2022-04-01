@@ -7,7 +7,10 @@ from .utils import AlignConvModule
 
 @ROTATED_DETECTORS.register_module()
 class S2ANet(RotatedBaseDetector):
-    """Rotated Refinement RetinaNet."""
+    """Implementation of `Align Deep Features for Oriented Object Detection.`__
+
+    __ https://ieeexplore.ieee.org/document/9377550
+    """
 
     def __init__(self,
                  backbone,
@@ -108,8 +111,8 @@ class S2ANet(RotatedBaseDetector):
                 Defaults to False.
 
         Returns:
-            list[list[np.ndarray]]: BBox results of each image and classes.
-                The outer list corresponds to each image. The inner list
+            list[list[np.ndarray]]: BBox results of each image and classes. \
+                The outer list corresponds to each image. The inner list \
                 corresponds to each class.
         """
         x = self.extract_feat(img)

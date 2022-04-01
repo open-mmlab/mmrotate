@@ -1,4 +1,4 @@
-## Test a model
+## 测试一个模型
 
 - 单个 GPU
 - 单个节点多个 GPU
@@ -20,7 +20,7 @@ python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments] --la
 
 例子:
 
-在 DOTA-1.0 数据集推理 RotatedRetinaNet，可以生成压缩文件用于在线[提交](https://captain-whu.github.io/DOTA/evaluation.html)。(首先请修改 [data_root](../../configs/_base_/datasets/dotav1.py))
+在 DOTA-1.0 数据集推理 RotatedRetinaNet 并生成压缩文件用于在线[提交](https://captain-whu.github.io/DOTA/evaluation.html) (首先请修改 [data_root](https://github.com/open-mmlab/mmrotate/tree/main/configs/_base_/datasets/dotav1.py))。
 ```shell
 python ./tools/test.py  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -35,7 +35,7 @@ python ./tools/test.py  \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
 
-您可以修改 [data_root](../../configs/_base_/datasets/dotav1.py) 中测试集的路径为验证集或训练集路径用于离线的验证。
+您可以修改 [data_root](https://github.com/open-mmlab/mmrotate/tree/main/configs/_base_/datasets/dotav1.py) 中测试集的路径为验证集或训练集路径用于离线的验证。
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \

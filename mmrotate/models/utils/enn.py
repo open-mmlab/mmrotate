@@ -42,7 +42,21 @@ def ennConv(inplanes,
             groups=1,
             bias=False,
             dilation=1):
-    """enn convolution."""
+    """enn convolution.
+
+    Args:
+        in_channels (List[int]): Number of input channels per scale.
+        out_channels (int): Number of output channels (used at each scale).
+        kernel_size (int, optional): The size of kernel.
+        stride (int, optional): Stride of the convolution. Default: 1.
+        padding (int or tuple): Zero-padding added to both sides of the input.
+            Default: 0.
+        groups (int): Number of blocked connections from input.
+            channels to output channels. Default: 1.
+        bias (bool): If True, adds a learnable bias to the output.
+            Default: False.
+        dilation (int or tuple): Spacing between kernel elements. Default: 1.
+    """
     in_type = build_enn_divide_feature(inplanes)
     out_type = build_enn_divide_feature(outplanes)
     return enn.R2Conv(
@@ -67,7 +81,22 @@ def ennTrivialConv(inplanes,
                    groups=1,
                    bias=False,
                    dilation=1):
-    """enn convolution with trivial input featurn."""
+    """enn convolution with trivial input featurn.
+
+    Args:
+        in_channels (List[int]): Number of input channels per scale.
+        out_channels (int): Number of output channels (used at each scale).
+        kernel_size (int, optional): The size of kernel.
+        stride (int, optional): Stride of the convolution. Default: 1.
+        padding (int or tuple): Zero-padding added to both sides of the input.
+            Default: 0.
+        groups (int): Number of blocked connections from input.
+            channels to output channels. Default: 1.
+        bias (bool): If True, adds a learnable bias to the output.
+            Default: False.
+        dilation (int or tuple): Spacing between kernel elements. Default: 1.
+    """
+
     in_type = build_enn_trivial_feature(inplanes)
     out_type = build_enn_divide_feature(outplanes)
     return enn.R2Conv(
@@ -95,7 +124,17 @@ def ennAvgPool(inplanes,
                stride=None,
                padding=0,
                ceil_mode=False):
-    """enn Average Pooling."""
+    """enn Average Pooling.
+
+    Args:
+        inplanes (int): The number of input channel.
+        kernel_size (int, optional): The size of kernel.
+        stride (int, optional): Stride of the convolution. Default: 1.
+        padding (int or tuple): Zero-padding added to both sides of the input.
+            Default: 0.
+        ceil_mode (bool, optional): if True, keep information in the corner of
+            feature map.
+    """
     in_type = build_enn_divide_feature(inplanes)
     return enn.PointwiseAvgPool(
         in_type,

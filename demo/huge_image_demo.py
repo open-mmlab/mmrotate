@@ -3,10 +3,11 @@
 
 Example:
 ```
+wget -P checkpoint https://download.openmmlab.com/mmrotate/v0.1.0/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90/oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth  # noqa: E501, E261.
 python demo/huge_image_demo.py \
     demo/dota_demo.jpg \
     configs/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_v3.py \
-    work_dirs/oriented_rcnn_r50_fpn_1x_dota_v3/epoch_12.pth \
+    checkpoint/oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth \
 ```
 """  # nowq
 
