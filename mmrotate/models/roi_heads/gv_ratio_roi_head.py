@@ -24,10 +24,12 @@ class GVRatioRoIHead(RotatedStandardRoIHead):
         rois = bbox2roi([proposals])
         if self.with_bbox:
             bbox_results = self._bbox_forward(x, rois)
-            outs = outs + (bbox_results['cls_score'],
-                           bbox_results['bbox_pred'], bbox_results['fix_pred'])
-            if self.bbox_head.ratio_on:
-                outs = outs + (bbox_results['ratio_pred'], )
+            outs = outs + (
+                bbox_results['cls_score'],
+                bbox_results['bbox_pred'],
+                bbox_results['fix_pred'],
+                bbox_results['ratio_pred'],
+            )
         return outs
 
     def _bbox_forward(self, x, rois):
