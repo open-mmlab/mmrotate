@@ -14,6 +14,18 @@ Collections:
   README: configs/rotated_retinanet/README.md
 
 Models:
+  - Name: rotated_retinanet_hbb_r50_fpn_1x_dota_oc
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 64.55
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc-e8a7c7df.pth
+
   - Name: rotated_retinanet_obb_r50_fpn_1x_dota_le90
     In Collection: rotated_retinanet
     Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py
