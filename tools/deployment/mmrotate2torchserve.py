@@ -20,14 +20,14 @@ def mmrotate2torchserve(
     model_version: str = '1.0',
     force: bool = False,
 ):
-    """Converts mmrotateection model (config + checkpoint) to TorchServe `.mar`.
+    """Converts MMRotate model (config + checkpoint) to TorchServe `.mar`.
 
     Args:
         config_file:
-            In mmrotateection config format.
+            In MMRotate config format.
             The contents vary for each task repository.
         checkpoint_file:
-            In mmrotateection checkpoint format.
+            In MMRotate checkpoint format.
             The contents vary for each task repository.
         output_folder:
             Folder where `{model_name}.mar` will be created.
@@ -69,7 +69,7 @@ def mmrotate2torchserve(
 
 def parse_args():
     parser = ArgumentParser(
-        description='Convert mmrotate models to TorchServe `.mar` format.')
+        description='Convert MMRotate models to TorchServe `.mar` format.')
     parser.add_argument('config', type=str, help='config file path')
     parser.add_argument('checkpoint', type=str, help='checkpoint file path')
     parser.add_argument(
@@ -107,4 +107,4 @@ if __name__ == '__main__':
                           'Try: pip install torch-model-archiver')
 
     mmrotate2torchserve(args.config, args.checkpoint, args.output_folder,
-                     args.model_name, args.model_version, args.force)
+                        args.model_name, args.model_version, args.force)

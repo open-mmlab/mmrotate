@@ -10,7 +10,7 @@ from ts.torch_handler.base_handler import BaseHandler
 import mmrotate  # noqa: F401
 
 
-class MMrotateHandler(BaseHandler):
+class MMRotateHandler(BaseHandler):
     threshold = 0.5
 
     def initialize(self, context):
