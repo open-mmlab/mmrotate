@@ -4,9 +4,10 @@ import os
 
 import mmcv
 import torch
+from mmdet.apis import inference_detector, init_detector
 from ts.torch_handler.base_handler import BaseHandler
 
-from mmrotatte.apis import inference_detector, init_detector
+import mmrotate  # noqa: F401
 
 
 class MMrotateHandler(BaseHandler):

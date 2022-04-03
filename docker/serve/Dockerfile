@@ -3,9 +3,10 @@ ARG CUDA="10.1"
 ARG CUDNN="7"
 FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
 
-ARG MMCV="1.4.15"
+ARG MMCV="1.4.5"
 ARG MMDET="2.19.0"
-ARG MMROTATE="0.1.0"
+ARG MMROTATE="0.1.1"
+ARG TORCHSERVE="0.2.0"
 
 ENV PYTHONUNBUFFERED TRUE
 
@@ -22,7 +23,8 @@ ENV PATH="/opt/conda/bin:$PATH"
 RUN export FORCE_CUDA=1
 
 # TORCHSEVER
-RUN pip install torchserve torch-model-archiver
+# torchserve>0.2.0 is compatible with pytorch>=1.8.1
+RUN pip install torchserv==${TORCHSERVE}} torch-model-archiver
 
 # MMLAB
 ARG PYTORCH
