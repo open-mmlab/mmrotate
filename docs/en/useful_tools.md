@@ -106,10 +106,10 @@ python tools/model_converters/publish_model.py ${INPUT_FILENAME} ${OUTPUT_FILENA
 E.g.,
 
 ```shell
-python tools/model_converters/publish_model.py work_dirs/faster_rcnn/latest.pth faster_rcnn_r50_fpn_1x_20190801.pth
+python tools/model_converters/publish_model.py work_dirs/rotated_faster_rcnn/latest.pth rotated_faster_rcnn_r50_fpn_1x_dota_le90_20190801.pth
 ```
 
-The final output filename will be `faster_rcnn_r50_fpn_1x_20190801-{hash id}.pth`.
+The final output filename will be `rotated_faster_rcnn_r50_fpn_1x_dota_le90_20190801-{hash id}.pth`.
 
 ## Benchmark
 

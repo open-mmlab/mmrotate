@@ -1,8 +1,8 @@
-除了训练和测试脚本，我们在`tools/`文件夹内还提供了一些有用的工具。
+除了训练和测试脚本，我们在 `tools/` 文件夹内还提供了一些有用的工具。
 
 ## 日志分析
 
-`tools/analysis_tools/analyze_logs.py` 通过给定的日志文件绘制loss/mAP曲线。 需首先执行`pip install seaborn`安装依赖。
+`tools/analysis_tools/analyze_logs.py` 通过给定的日志文件绘制 loss/mAP 曲线。 需首先执行 `pip install seaborn` 安装依赖。
 
  ```shell
 python tools/analysis_tools/analyze_logs.py plot_curve [--keys ${KEYS}] [--title ${TITLE}] [--legend ${LEGEND}] [--backend ${BACKEND}] [--style ${STYLE}] [--out ${OUT_FILE}]
@@ -17,13 +17,13 @@ python tools/analysis_tools/analyze_logs.py plot_curve [--keys ${KEYS}] [--title
     ```shell
     python tools/analysis_tools/analyze_logs.py plot_curve log.json --keys loss_cls --legend loss_cls
     ```
-- 绘制某次执行的分类和回归损失，同时将图像保存到pdf文件
+- 绘制某次执行的分类和回归损失，同时将图像保存到 pdf 文件
 
     ```shell
     python tools/analysis_tools/analyze_logs.py plot_curve log.json --keys loss_cls loss_bbox --out losses.pdf
     ```
 
-- 在同一张图像中比较两次执行的mAP
+- 在同一张图像中比较两次执行的 mAP
 
     ```shell
     python tools/analysis_tools/analyze_logs.py plot_curve log1.json log2.json --keys bbox_mAP --legend run1 run2
@@ -57,7 +57,7 @@ python tools/misc/browse_dataset.py ${CONFIG} [-h] [--skip-type ${SKIP_TYPE[SKIP
 
 ## 模型复杂度
 
-`tools/analysis_tools/get_flops.py` 是改编自 [flops-counter.pytorch](https://github.com/sovrasov/flops-counter.pytorch) 的脚本，用于计算给定模型的FLOPs和参数量.
+`tools/analysis_tools/get_flops.py` 是改编自 [flops-counter.pytorch](https://github.com/sovrasov/flops-counter.pytorch) 的脚本，用于计算给定模型的 FLOPs 和参数量.
 
 ```shell
 python tools/analysis_tools/get_flops.py ${CONFIG_FILE} [--shape ${INPUT_SHAPE}]
@@ -77,7 +77,7 @@ Params: 36.42 M
 但在技术报告或论文中采用之前请仔细检查
 
 1. FLOPs 与输入大小相关，但参数量与其无关。默认输入大小是(1, 3, 1024, 1024).
-2. 一些算子例如DCN或自定义算子并未包含在FLOPs计算中，所以S<sup>2</sup>A-Net和基于RepPoints的模型的FLOPs计算是错误的。
+2. 一些算子例如 DCN 或自定义算子并未包含在 FLOPs 计算中，所以 S<sup>2</sup>A-Net 和基于 RepPoints 的模型的 FLOPs 计算是错误的。
 详细信息请查看 [`mmcv.cnn.get_model_complexity_info()`](https://github.com/open-mmlab/mmcv/blob/master/mmcv/cnn/utils/flops_counter.py)。
 3. 两阶段检测器的 FLOPs 取决于候选的数量。
 
@@ -87,7 +87,7 @@ Params: 36.42 M
 
 在将模型上传到 AWS 之前，你可能需要
 
-1. 将模型权重转换至CPU
+1. 将模型权重转换至 CPU
 2. 删除优化器的状态
 3. 计算权重文件的哈希值并附加到文件名后
 
@@ -98,16 +98,16 @@ python tools/model_converters/publish_model.py ${INPUT_FILENAME} ${OUTPUT_FILENA
 例如,
 
 ```shell
-python tools/model_converters/publish_model.py work_dirs/faster_rcnn/latest.pth faster_rcnn_r50_fpn_1x_20190801.pth
+python tools/model_converters/publish_model.py work_dirs/rotated_faster_rcnn/latest.pth rotated_faster_rcnn_r50_fpn_1x_dota_le90_20190801.pth
 ```
 
-最终输出的文件名是 `faster_rcnn_r50_fpn_1x_20190801-{hash id}.pth`.
+最终输出的文件名是 `rotated_faster_rcnn_r50_fpn_1x_dota_le90_20190801-{hash id}.pth`.
 
 ## 基准测试
 
-### FPS基准
+### FPS 基准
 
-`tools/analysis_tools/benchmark.py` 帮助用户计算FPS。 FPS值包括模型前向传播和后处理。为了得到更准确的数值，目前只支持单GPU分布式启动。
+`tools/analysis_tools/benchmark.py` 帮助用户计算 FPS。 FPS 值包括模型前向传播和后处理。为了得到更准确的数值，目前只支持单 GPU 分布式启动。
 
 ```shell
 python -m torch.distributed.launch --nproc_per_node=1 --master_port=${PORT} tools/analysis_tools/benchmark.py \
