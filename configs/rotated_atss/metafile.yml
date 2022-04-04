@@ -36,7 +36,7 @@ Models:
         Dataset: DOTAv1.0
         Metrics:
           mAP: 70.64
-    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/rotated_atss/rotated_atss_obb_r50_fpn_1x_dota_le90/rotated_atss_obb_r50_fpn_1x_dota_le90-eab7bc12.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/rotated_atss/rotated_atss_obb_r50_fpn_1x_dota_le90/rotated_atss_obb_r50_fpn_1x_dota_le90-e029ca06.pth
 
   - Name: rotated_atss_obb_r50_fpn_1x_dota_le135
     In Collection: rotated_atss
@@ -48,4 +48,4 @@ Models:
         Dataset: DOTAv1.0
         Metrics:
           mAP: 72.29
-    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/rotated_atss/rotated_atss_obb_r50_fpn_1x_dota_le135/rotated_atss_obb_r50_fpn_1x_dota_le135-e029ca06.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/rotated_atss/rotated_atss_obb_r50_fpn_1x_dota_le135/rotated_atss_obb_r50_fpn_1x_dota_le135-eab7bc12.pth
