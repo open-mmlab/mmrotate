@@ -57,7 +57,7 @@ python tools/misc/browse_dataset.py ${CONFIG} [-h] [--skip-type ${SKIP_TYPE[SKIP
 
 ## 模型复杂度
 
-`tools/analysis_tools/get_flops.py` 是改编自 [flops-counter.pytorch](https://github.com/sovrasov/flops-counter.pytorch) 的脚本，用于计算给定模型的 FLOPs 和参数量.
+`tools/analysis_tools/get_flops.py` 是改编自 [flops-counter.pytorch](https://github.com/sovrasov/flops-counter.pytorch) 的脚本，用于计算给定模型的 FLOPs 和参数量。
 
 ```shell
 python tools/analysis_tools/get_flops.py ${CONFIG_FILE} [--shape ${INPUT_SHAPE}]
@@ -76,7 +76,7 @@ Params: 36.42 M
 **注意**: 此工具仍处于实验阶段，我们并不能保证计算结果是绝对正确的。你可以将结果用于简单的比较，
 但在技术报告或论文中采用之前请仔细检查
 
-1. FLOPs 与输入大小相关，但参数量与其无关。默认输入大小是(1, 3, 1024, 1024).
+1. FLOPs 与输入大小相关，但参数量与其无关。默认输入大小是(1, 3, 1024, 1024)。
 2. 一些算子例如 DCN 或自定义算子并未包含在 FLOPs 计算中，所以 S<sup>2</sup>A-Net 和基于 RepPoints 的模型的 FLOPs 计算是错误的。
 详细信息请查看 [`mmcv.cnn.get_model_complexity_info()`](https://github.com/open-mmlab/mmcv/blob/master/mmcv/cnn/utils/flops_counter.py)。
 3. 两阶段检测器的 FLOPs 取决于候选的数量。
@@ -101,7 +101,7 @@ python tools/model_converters/publish_model.py ${INPUT_FILENAME} ${OUTPUT_FILENA
 python tools/model_converters/publish_model.py work_dirs/rotated_faster_rcnn/latest.pth rotated_faster_rcnn_r50_fpn_1x_dota_le90_20190801.pth
 ```
 
-最终输出的文件名是 `rotated_faster_rcnn_r50_fpn_1x_dota_le90_20190801-{hash id}.pth`.
+最终输出的文件名是 `rotated_faster_rcnn_r50_fpn_1x_dota_le90_20190801-{hash id}.pth`。
 
 ## 基准测试
 
