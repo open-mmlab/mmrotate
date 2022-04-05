@@ -34,7 +34,7 @@ DOTA1.0
 
 ## Citation
 ```
-@inproceedings{yang2021r3det,
+@inproceedings{hou2022shape,
     title={Shape-Adaptive Selection and Measurement for Oriented Object Detection},
     author={Hou, Liping and Lu, Ke and Xue, Jian and Li, Yuqiu},
     booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
