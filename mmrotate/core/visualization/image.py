@@ -37,8 +37,8 @@ def _get_adaptive_scales(areas, min_area=800, max_area=30000):
     return scales
 
 
-def draw_bboxes(ax, bboxes, color='g', alpha=0.8, thickness=2):
-    """Draw bounding boxes on the axes.
+def draw_rbboxes(ax, bboxes, color='g', alpha=0.8, thickness=2):
+    """Draw oriented bounding boxes on the axes.
 
     Args:
         ax (matplotlib.Axes): The input axes.
@@ -170,7 +170,7 @@ def imshow_det_rbboxes(img,
         num_bboxes = bboxes.shape[0]
         bbox_palette = palette_val(get_palette(bbox_color, max_label + 1))
         colors = [bbox_palette[label] for label in labels[:num_bboxes]]
-        draw_bboxes(ax, bboxes, colors, alpha=0.8, thickness=thickness)
+        draw_rbboxes(ax, bboxes, colors, alpha=0.8, thickness=thickness)
 
         horizontal_alignment = 'left'
         positions = bboxes[:, :2].astype(np.int32) + thickness
