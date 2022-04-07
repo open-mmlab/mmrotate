@@ -13,8 +13,9 @@ Compatible MMCV, MMClassification and MMDetection versions are shown as below. P
 
 | MMRotate version   |    MMCV version   |      MMDetection version     |
 |:-------------------:|:-----------------:|:---------------------------------:|
-| master              | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
-| 0.1.1               | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
+| master              | mmcv-full>=1.4.6 |      mmdet >= 2.19.0              |
+| 0.2.0               | mmcv-full>=1.4.6 |      mmdet >= 2.19.0              |
+| 0.1.1               | mmcv-full>=1.4.6 |      mmdet >= 2.19.0              |
 | 0.1.0               | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
 
 **Note:** You need to run `pip uninstall mmcv` first if you have mmcv installed.
