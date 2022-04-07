@@ -125,7 +125,7 @@ def imshow_det_rbboxes(img,
     assert labels.ndim == 1, \
         f' labels ndim should be 1, but its ndim is {labels.ndim}.'
     assert bboxes is None or bboxes.shape[1] == 5 or bboxes.shape[1] == 6, \
-        f' bboxes.shape[1] should be 4 or 5, but its {bboxes.shape[1]}.'
+        f' bboxes.shape[1] should be 5 or 6, but its {bboxes.shape[1]}.'
     assert bboxes is None or bboxes.shape[0] <= labels.shape[0], \
         'labels.shape[0] should not be less than bboxes.shape[0].'
     assert segms is None or segms.shape[0] == labels.shape[0], \
