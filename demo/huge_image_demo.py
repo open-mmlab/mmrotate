@@ -51,7 +51,7 @@ def parse_args():
     parser.add_argument(
         '--palette',
         default='dota',
-        choices=['dota', 'random'],
+        choices=['dota', 'sar', 'hrsc', 'hrsc_classwise', 'random'],
         help='Color palette used for visualization')
     parser.add_argument(
         '--score-thr', type=float, default=0.3, help='bbox score threshold')
