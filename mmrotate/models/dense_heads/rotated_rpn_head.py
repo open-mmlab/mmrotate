@@ -9,7 +9,8 @@ from mmcv.runner import force_fp32
 from mmdet.core import images_to_levels, multi_apply, unmap
 from mmdet.models.dense_heads.anchor_head import AnchorHead
 
-from mmrotate.core import obb2xyxy, rotated_anchor_inside_flags
+from mmrotate.core import obb2xyxy
+from mmdet.core import anchor_inside_flags
 from ..builder import ROTATED_HEADS
 
 
@@ -86,7 +87,7 @@ class RotatedRPNHead(AnchorHead):
                 num_total_pos (int): Number of positive samples in all images
                 num_total_neg (int): Number of negative samples in all images
         """
-        inside_flags = rotated_anchor_inside_flags(
+        inside_flags = anchor_inside_flags(
             flat_anchors, valid_flags, img_meta['img_shape'][:2],
             self.train_cfg.allowed_border)
         if not inside_flags.any():
