@@ -265,10 +265,9 @@ class RRandomCrop(RandomCrop):
     Note:
         - If the image is smaller than the absolute crop size, return the
             original image.
-        - The keys for bboxes, labels and masks must be aligned. That is,
-          `gt_bboxes` corresponds to `gt_labels` and `gt_masks`, and
-          `gt_bboxes_ignore` corresponds to `gt_labels_ignore` and
-          `gt_masks_ignore`.
+        - The keys for bboxes, labels must be aligned. That is, `gt_bboxes`
+          corresponds to `gt_labels`, and `gt_bboxes_ignore` corresponds to
+          `gt_labels_ignore`.
         - If the crop does not contain any gt-bbox region and
           `allow_negative_crop` is set to False, skip this image.
     """
