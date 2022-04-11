@@ -76,7 +76,7 @@ def postprocess(distance, fun='log1p', tau=1.0):
     if fun == 'log1p':
         distance = torch.log1p(distance)
     elif fun == 'sqrt':
-        distance = torch.sqrt(distance)
+        distance = torch.sqrt(distance.clamp(1e-7))
     elif fun == 'none':
         pass
     else:
