@@ -39,7 +39,7 @@ HRSC
 |       Backbone        |  mAP | AP50 | AP75  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                            Configs                                            | Download |
 |:---------------------:|:-----:|:-----:|:-----:|:-----------:|:-------:|:---------:|:---------:|:---------:|:---------:|:---------------------------------------------------------------------------------------------:|:-------------:|
 |  ResNet50 (800,512)   | 52.06 | 84.80 | 58.10 |   le90   | 6x | 1.56 | 38.2 | RR | 2 | [rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90](../rotated_retinanet/rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90.py) |
-|  ResNet50 (800,512)   | 54.15 | 86.20 | 60.60 |   le90   | 6x | 1.56 |      | RR | 2 | [rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90](./rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90.py) |
+|  ResNet50 (800,512)   | 54.15 | 86.20 | 60.60 |   le90   | 6x | 1.56 | 38.2 | RR | 2 | [rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90](./rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90.py) |
 |  ResNet50 (800,512)   | 45.09 | 79.30 | 46.90 |    oc    | 6x | 1.56 | 39.2 | RR | 2 | [rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc](../rotated_retinanet/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc.py) |
 |  ResNet50 (800,512)   | 58.19 | 86.20 | 69.80 |    oc    | 6x | 1.56 | 39.5 | RR | 2 | [rotated_retinanet_hbb_kld_stable_r50_fpn_6x_hrsc_rr_oc](./rotated_retinanet_hbb_kld_stable_r50_fpn_6x_hrsc_rr_oc.py) |
 
