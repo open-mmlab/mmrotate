@@ -24,9 +24,10 @@ DOTA1.0
 
 HRSC
 
-|       Backbone        |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                            Configs                                            | Download |
-|:---------------------:|:-----:|:-----------:|:-------:|:---------:|:---------:|:---------:|:---------:|:---------------------------------------------------------------------------------------------:|:-------------:|
-|  ResNet50 (800,800)   | 72.62 | le90 |   3x    |  |  | - | 2 | [rotated_retinanet_obb_r50_fpn_3x_hrsc_le90](./rotated_retinanet_obb_r50_fpn_3x_hrsc_le90.py) |
+|       Backbone        |  mAP | AP50 | AP75  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                            Configs                                            | Download |
+|:---------------------:|:-----:|:-----:|:-----:|:-----------:|:-------:|:---------:|:---------:|:---------:|:---------:|:---------------------------------------------------------------------------------------------:|:-------------:|
+|  ResNet50 (800,512)   | 45.09 | 79.30 | 46.90 |   oc   | 6x | 1.56 | 39.2 | RR | 2 | [rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc](./rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc.py) |
+|  ResNet50 (800,512)   | 52.06 | 84.80 | 58.10 |   le90   | 6x | 1.56 | 38.2 | RR | 2 | [rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90](./rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90.py) |
 
 Notes:
 - `MS` means multiple scale image split.
