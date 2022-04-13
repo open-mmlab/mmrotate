@@ -13,9 +13,9 @@ MMRotate 和 MMCV, MMDet 版本兼容性如下所示，需要安装正确的版�
 
 | MMRotate 版本   |    MMCV 版本   |      MMDetection 版本     |
 |:-------------------:|:-----------------:|:---------------------------------:|
-| master              | mmcv-full>=1.4.6 |      mmdet >= 2.19.0              |
-| 0.2.0               | mmcv-full>=1.4.6 |      mmdet >= 2.19.0              |
-| 0.1.1               | mmcv-full>=1.4.6 |      mmdet >= 2.19.0               |
+| master              | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
+| 0.2.0               | mmcv-full>=1.4.5 |      mmdet >= 2.19.0              |
+| 0.1.1               | mmcv-full>=1.4.5 |      mmdet >= 2.19.0               |
 | 0.1.0               | mmcv-full>=1.4.5 |      mmdet >= 2.19.0               |
 
 **注意：**如果已经安装了 mmcv，首先需要使用 `pip uninstall mmcv` 卸载已安装的 mmcv，如果同时安装了 mmcv 和 mmcv-full，将会报 `ModuleNotFoundError` 错误。
