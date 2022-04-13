@@ -24,11 +24,12 @@ hope that the proposed FCOS framework can serve as a simple and strong alternati
 
 DOTA1.0
 
-|         Backbone         |  mAP  |   Angle    | Separate Angle | Tricks | lr schd | Mem (GB) | Inf Time (fps) |   Aug    | Batch Size |                                                 Configs                                                  |          Download          |
-|:------------------------:|:-----:|:----------:|:--------------:|:------:|:-------:|:--------:|:--------------:|:--------:|:----------:|:--------------------------------------------------------------------------------------------------------:|:--------------------------:|
-| ResNet50 (1024,1024,200) | 70.70 |    le90    |       Y        |   Y    |   1x    |    -     |       -        |    -     |     2      |    [rotated_fcos_sep_angle_r50_fpn_1x_dota_le90.py](./rotated_fcos_sep_angle_r50_fpn_1x_dota_le90.py)    | [model](-) &#124; [log](-) |
-| ResNet50 (1024,1024,200) | 71.76 |    le90    |       Y        |   Y    |   1x    |    -     |       -        |    -     |     2      | [rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90.py](./rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90.py) | [model](-) &#124; [log](-) |
-| ResNet50 (1024,1024,200) | 71.89 |    le90    |       N        |   Y    |   1x    |    -     |       -        |    -     |     2      |           [rotated_fcos_kld_r50_fpn_1x_dota_le90](./rotated_fcos_kld_r50_fpn_1x_dota_le90.py)            | [model](-) &#124; [log](-) |
+|         Backbone         |  mAP  | Angle | Separate Angle | Tricks | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                                Configs                                                |          Download          |
+|:------------------------:|:-----:|:-----:|:--------------:|:------:|:-------:|:--------:|:--------------:|:---:|:----------:|:-----------------------------------------------------------------------------------------------------:|:--------------------------:|
+| ResNet50 (1024,1024,200) | 70.70 | le90  |       Y        |   Y    |   1x    |    -     |       -        |  -  |     2      |    [rotated_fcos_sep_angle_r50_fpn_1x_dota_le90](./rotated_fcos_sep_angle_r50_fpn_1x_dota_le90.py)    | [model](-) &#124; [log](-) |
+| ResNet50 (1024,1024,200) | 71.28 | le90  |       N        |   Y    |   1x    |    -     |       -        |  -  |     2      |              [rotated_fcos_r50_fpn_1x_dota_le90](./rotated_fcos_r50_fpn_1x_dota_le90.py)              | [model](-) &#124; [log](-) |
+| ResNet50 (1024,1024,200) | 71.76 | le90  |       Y        |   Y    |   1x    |    -     |       -        |  -  |     2      | [rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90](./rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90.py) | [model](-) &#124; [log](-) |
+| ResNet50 (1024,1024,200) | 71.89 | le90  |       N        |   Y    |   1x    |    -     |       -        |  -  |     2      |          [rotated_fcos_kld_r50_fpn_1x_dota_le90](./rotated_fcos_kld_r50_fpn_1x_dota_le90.py)          | [model](-) &#124; [log](-) |
 
 **Notes:**
 
