@@ -61,3 +61,27 @@ Models:
         Metrics:
           mAP: 76.50
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90-1da1ec9c.pth
+
+  - Name: rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc.py
+    Metadata:
+      Training Data: HRSC2016
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC2016
+        Metrics:
+          mAP: 45.09/79.30/46.90
+    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc-f37eada6.pth
+
+  - Name: rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90.py
+    Metadata:
+      Training Data: HRSC2016
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC2016
+        Metrics:
+          mAP: 52.06/84.80/58.10
+    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90/rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90-ee4f18af.pth
