@@ -26,7 +26,7 @@ HRSC
 
 |       Backbone        |  mAP | AP50 | AP75  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                            Configs                                            | Download |
 |:---------------------:|:-----:|:-----:|:-----:|:-----------:|:-------:|:---------:|:---------:|:---------:|:---------:|:---------------------------------------------------------------------------------------------:|:-------------:|
-|  ReResNet50 (800,512)   | 72.31 | 90.40 | 89.50 |   le90   | 3x | 2.30 | 17.5 | - | 2 | [redet_re50_refpn_3x_hrsc_le90](./redet_re50_refpn_3x_hrsc_le90.py) |
+|  ReResNet50 (800,512)   | 72.31 | 90.40 | 89.50 |   le90   | 3x | 2.30 | 17.5 | - | 2 | [redet_re50_refpn_3x_hrsc_le90](./redet_re50_refpn_3x_hrsc_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.2.0/redet/redet_re50_refpn_3x_hrsc_le90/redet_re50_refpn_3x_hrsc_le90-241e217b.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.2.0/redet/redet_re50_refpn_3x_hrsc_le90/redet_re50_refpn_3x_hrsc_le90_20220411_113223.log.json)
 
 Notes:
 - `MS` means multiple scale image split.
