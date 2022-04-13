@@ -5,7 +5,7 @@
 - PyTorch 1.6+
 - CUDA 9.2+
 - GCC 5+
-- [mmcv](https://mmcv.readthedocs.io/en/latest/#installation) 1.4.6+
+- [mmcv](https://mmcv.readthedocs.io/en/latest/#installation) 1.4.5+
 - [mmdet](https://mmdetection.readthedocs.io/en/latest/#installation) 2.19.0+
 
 
