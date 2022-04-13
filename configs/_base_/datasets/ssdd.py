@@ -44,4 +44,11 @@ data = dict(
         type=dataset_type,
         ann_file=data_root + 'test/offshore/labelTxt/',
         img_prefix=data_root + 'test/offshore/images/',
-        pipeline=test_pipeline))
+        pipeline=test_pipeline),
+    # parameters for specific dataloader,
+    # have priority to default value.
+    train_dataloader=dict(persistent_workers=False),
+    val_dataloader=dict(
+        persistent_workers=False, samples_per_gpu=1, workers_per_gpu=2),
+    test_dataloader=dict(
+        persistent_workers=False, samples_per_gpu=1, workers_per_gpu=2))

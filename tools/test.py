@@ -130,24 +130,6 @@ def main():
             if cfg.model.neck.rfp_backbone.get('pretrained'):
                 cfg.model.neck.rfp_backbone.pretrained = None
 
-    # in case the test dataset is concatenated
-    samples_per_gpu = 1
-    if isinstance(cfg.data.test, dict):
-        cfg.data.test.test_mode = True
-        samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 1)
-        if samples_per_gpu > 1:
-            # Replace 'ImageToTensor' to 'DefaultFormatBundle'
-            cfg.data.test.pipeline = replace_ImageToTensor(
-                cfg.data.test.pipeline)
-    elif isinstance(cfg.data.test, list):
-        for ds_cfg in cfg.data.test:
-            ds_cfg.test_mode = True
-        samples_per_gpu = max(
-            [ds_cfg.pop('samples_per_gpu', 1) for ds_cfg in cfg.data.test])
-        if samples_per_gpu > 1:
-            for ds_cfg in cfg.data.test:
-                ds_cfg.pipeline = replace_ImageToTensor(ds_cfg.pipeline)
-
     if args.gpu_ids is not None:
         cfg.gpu_ids = args.gpu_ids
     else:
@@ -166,6 +148,49 @@ def main():
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
+    test_dataloader_default_args = dict(
+        samples_per_gpu=1, workers_per_gpu=2, dist=distributed, shuffle=False)
+    # update overall dataloader(for train, val and test) setting
+    test_dataloader_default_args.update({
+        k: v
+        for k, v in cfg.data.items() if k not in [
+            'train', 'val', 'test', 'train_dataloader', 'val_dataloader',
+            'test_dataloader', 'samples_per_gpu'
+        ]
+    })
+
+    # in case the test dataset is concatenated
+    if isinstance(cfg.data.test, dict):
+        cfg.data.test.test_mode = True
+        if 'samples_per_gpu' in cfg.data.test:
+            warnings.warn('`samples_per_gpu` in `test` field of '
+                          'data will be deprecated, you should'
+                          ' move it to `test_dataloader` field')
+            test_dataloader_default_args['samples_per_gpu'] = \
+                cfg.data.test.pop('samples_per_gpu')
+        if test_dataloader_default_args['samples_per_gpu'] > 1:
+            # Replace 'ImageToTensor' to 'DefaultFormatBundle'
+            cfg.data.test.pipeline = replace_ImageToTensor(
+                cfg.data.test.pipeline)
+    elif isinstance(cfg.data.test, list):
+        for ds_cfg in cfg.data.test:
+            ds_cfg.test_mode = True
+            if 'samples_per_gpu' in ds_cfg:
+                warnings.warn('`samples_per_gpu` in `test` field of '
+                              'data will be deprecated, you should'
+                              ' move it to `test_dataloader` field')
+        samples_per_gpu = max(
+            [ds_cfg.pop('samples_per_gpu', 1) for ds_cfg in cfg.data.test])
+        test_dataloader_default_args['samples_per_gpu'] = samples_per_gpu
+        if samples_per_gpu > 1:
+            for ds_cfg in cfg.data.test:
+                ds_cfg.pipeline = replace_ImageToTensor(ds_cfg.pipeline)
+
+    train_loader_cfg = {
+        **test_dataloader_default_args,
+        **cfg.data.get('train_dataloader', {})
+    }
+
     rank, _ = get_dist_info()
     # allows not to create
     if args.work_dir is not None and rank == 0:
@@ -175,12 +200,7 @@ def main():
 
     # build the dataloader
     dataset = build_dataset(cfg.data.test)
-    data_loader = build_dataloader(
-        dataset,
-        samples_per_gpu=samples_per_gpu,
-        workers_per_gpu=cfg.data.workers_per_gpu,
-        dist=distributed,
-        shuffle=False)
+    data_loader = build_dataloader(dataset, **train_loader_cfg)
 
     # build the model and load checkpoint
     cfg.model.train_cfg = None

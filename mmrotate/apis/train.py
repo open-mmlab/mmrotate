@@ -42,19 +42,30 @@ def train_detector(model,
 
     runner_type = 'EpochBasedRunner' if 'runner' not in cfg else cfg.runner[
         'type']
-    data_loaders = [
-        build_dataloader(
-            ds,
-            cfg.data.samples_per_gpu,
-            cfg.data.workers_per_gpu,
-            # `num_gpus` will be ignored if distributed
-            num_gpus=len(cfg.gpu_ids),
-            dist=distributed,
-            seed=cfg.seed,
-            runner_type=runner_type,
-            persistent_workers=cfg.data.get('persistent_workers', False))
-        for ds in dataset
-    ]
+
+    train_dataloader_default_args = dict(
+        samples_per_gpu=2,
+        workers_per_gpu=2,
+        # `num_gpus` will be ignored if distributed
+        num_gpus=len(cfg.gpu_ids),
+        dist=distributed,
+        seed=cfg.seed,
+        runner_type=runner_type,
+        persistent_workers=False)
+    # update overall dataloader(for train, val and test) setting
+    train_dataloader_default_args.update({
+        k: v
+        for k, v in cfg.data.items() if k not in [
+            'train', 'val', 'test', 'train_dataloader', 'val_dataloader',
+            'test_dataloader'
+        ]
+    })
+    train_loader_cfg = {
+        **train_dataloader_default_args,
+        **cfg.data.get('train_dataloader', {})
+    }
+
+    data_loaders = [build_dataloader(ds, **train_loader_cfg) for ds in dataset]
 
     # put model on gpus
     if distributed:
@@ -122,19 +133,42 @@ def train_detector(model,
 
     # register eval hooks
     if validate:
+        val_dataloader_default_args = dict(
+            samples_per_gpu=1,
+            workers_per_gpu=2,
+            dist=distributed,
+            shuffle=False,
+            persistent_workers=False)
+
+        # update overall dataloader(for train, val and test) setting
+        val_dataloader_default_args.update({
+            k: v
+            for k, v in cfg.data.items() if k not in [
+                'train', 'val', 'test', 'train_dataloader', 'val_dataloader',
+                'test_dataloader', 'samples_per_gpu'
+            ]
+        })
+        if 'samples_per_gpu' in cfg.data.val:
+            logger.warning('`samples_per_gpu` in `val` field of '
+                           'data will be deprecated, you should'
+                           ' move it to `val_dataloader` field')
+            # keep default value of `sample_per_gpu` is 1
+            val_dataloader_default_args['samples_per_gpu'] = \
+                cfg.data.val.pop('samples_per_gpu')
+
+        val_dataloader_args = {
+            **val_dataloader_default_args,
+            **cfg.data.get('val_dataloader', {})
+        }
         # Support batch_size > 1 in validation
-        val_samples_per_gpu = cfg.data.val.pop('samples_per_gpu', 1)
-        if val_samples_per_gpu > 1:
+
+        if val_dataloader_args['samples_per_gpu'] > 1:
             # Replace 'ImageToTensor' to 'DefaultFormatBundle'
             cfg.data.val.pipeline = replace_ImageToTensor(
                 cfg.data.val.pipeline)
         val_dataset = build_dataset(cfg.data.val, dict(test_mode=True))
-        val_dataloader = build_dataloader(
-            val_dataset,
-            samples_per_gpu=val_samples_per_gpu,
-            workers_per_gpu=cfg.data.workers_per_gpu,
-            dist=distributed,
-            shuffle=False)
+
+        val_dataloader = build_dataloader(val_dataset, **val_dataloader_args)
         eval_cfg = cfg.get('evaluation', {})
         eval_cfg['by_epoch'] = cfg.runner['type'] != 'IterBasedRunner'
         eval_hook = DistEvalHook if distributed else EvalHook
