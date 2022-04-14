@@ -6,11 +6,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from mmcv.ops import batched_nms
 from mmcv.runner import force_fp32
-from mmdet.core import images_to_levels, multi_apply, unmap
+from mmdet.core import (anchor_inside_flags, images_to_levels, multi_apply,
+                        unmap)
 from mmdet.models.dense_heads.anchor_head import AnchorHead
 
 from mmrotate.core import obb2xyxy
-from mmdet.core import anchor_inside_flags
 from ..builder import ROTATED_HEADS
 
 
@@ -87,9 +87,9 @@ class RotatedRPNHead(AnchorHead):
                 num_total_pos (int): Number of positive samples in all images
                 num_total_neg (int): Number of negative samples in all images
         """
-        inside_flags = anchor_inside_flags(
-            flat_anchors, valid_flags, img_meta['img_shape'][:2],
-            self.train_cfg.allowed_border)
+        inside_flags = anchor_inside_flags(flat_anchors, valid_flags,
+                                           img_meta['img_shape'][:2],
+                                           self.train_cfg.allowed_border)
         if not inside_flags.any():
             return (None, ) * 7
         # assign gt and sample anchors
