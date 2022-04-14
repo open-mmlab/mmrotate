@@ -119,9 +119,9 @@ def analyze_per_img_dets(confusion_matrix,
             change the nms IoU threshold. Default: None.
     """
     true_positives = np.zeros_like(gt_labels)
+    gt_bboxes = torch.from_numpy(gt_bboxes).float()
     for det_label, det_bboxes in enumerate(result):
         det_bboxes = torch.from_numpy(det_bboxes).float()
-        gt_bboxes = torch.from_numpy(gt_bboxes).float()
         if nms_iou_thr:
             det_bboxes, _ = nms_rotated(
                 det_bboxes[:, :5],
