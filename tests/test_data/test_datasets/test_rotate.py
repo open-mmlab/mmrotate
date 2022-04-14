@@ -1,7 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import numpy as np
 import pytest
-import torch
 from mmdet.datasets import build_dataset
 
 from mmrotate.datasets.sar import SARDataset
@@ -18,11 +17,9 @@ def _create_dummy_results():
     return [boxes]
 
 
-@pytest.mark.skipif(
-    not torch.cuda.is_available(), reason='requires CUDA support')
 @pytest.mark.parametrize('angle_version', ['oc'])
-def test_dota_dataset(angle_version):
-    """Test DOTA dataset.
+def test_sar_dataset(angle_version):
+    """Test SAR dataset.
 
     Args:
         angle_version (str, optional): Angle representations.
