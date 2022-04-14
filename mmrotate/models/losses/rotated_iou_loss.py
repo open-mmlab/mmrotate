@@ -10,10 +10,11 @@ from ..builder import ROTATED_LOSSES
 
 
 @weighted_loss
-def poly_iou_loss(pred, target, linear=False, mode='log', eps=1e-6):
-    """Poly IoU loss.
+def rotated_iou_loss(pred, target, linear=False, mode='log', eps=1e-6):
+    """Rotated IoU loss.
 
-    Computing the IoU loss between a set of predicted bboxes and target bboxes.
+    Computing the IoU loss between a set of predicted rbboxes and target
+     rbboxes.
     The loss is calculated as negative log of IoU.
 
     Args:
@@ -51,11 +52,11 @@ def poly_iou_loss(pred, target, linear=False, mode='log', eps=1e-6):
 
 
 @ROTATED_LOSSES.register_module()
-class PolyIoULoss(nn.Module):
-    """PolyIoULoss.
+class RotatedIoULoss(nn.Module):
+    """RotatedIoULoss.
 
-    Computing the Poly IoU loss between a set of predicted rbboxes
-    and target rbboxes.
+    Computing the IoU loss between a set of predicted rbboxes and
+    target rbboxes.
     Args:
         linear (bool): If True, use linear scale of loss else determined
             by mode. Default: False.
@@ -72,7 +73,7 @@ class PolyIoULoss(nn.Module):
                  reduction='mean',
                  loss_weight=1.0,
                  mode='log'):
-        super(PolyIoULoss, self).__init__()
+        super(RotatedIoULoss, self).__init__()
         assert mode in ['linear', 'square', 'log']
         if linear:
             mode = 'linear'
@@ -119,7 +120,7 @@ class PolyIoULoss(nn.Module):
             # iou_loss of shape (n,)
             assert weight.shape == pred.shape
             weight = weight.mean(-1)
-        loss = self.loss_weight * poly_iou_loss(
+        loss = self.loss_weight * rotated_iou_loss(
             pred,
             target,
             weight,
