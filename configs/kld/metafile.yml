@@ -36,7 +36,7 @@ Models:
         Dataset: DOTAv1.0
         Metrics:
           mAP: 69.86
-    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/kld/rotated_retinanet_hbb_kld_stable_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_kld_stable_r50_fpn_1x_dota_oc-92a76443.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_hbb_kld_stable_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_kld_stable_r50_fpn_1x_dota_oc-92a76443.pth
 
   - Name: rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90
     In Collection: kld
@@ -48,7 +48,7 @@ Models:
         Dataset: DOTAv1.0
         Metrics:
           mAP: 70.22
-    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/kld/rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90/rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90-31193e00.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90/rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90-31193e00.pth
 
   - Name: r3det_kld_r50_fpn_1x_dota_oc
     In Collection: kld
@@ -72,7 +72,7 @@ Models:
         Dataset: DOTAv1.0
         Metrics:
           mAP: 72.12
-    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/kld/r3det_kld_stable_r50_fpn_1x_dota_oc/r3det_kld_stable_r50_fpn_1x_dota_oc-e011059d.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/r3det_kld_stable_r50_fpn_1x_dota_oc/r3det_kld_stable_r50_fpn_1x_dota_oc-e011059d.pth
 
   - Name: r3det_tiny_kld_r50_fpn_1x_dota_oc
     In Collection: kld
@@ -96,7 +96,7 @@ Models:
         Dataset: HRSC2016
         Metrics:
           mAP: 58.17/87.00/69.30
-    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/kld/rotated_retinanet_hbb_kld_stable_r50_fpn_6x_hrsc_rr_oc/rotated_retinanet_hbb_kld_stable_r50_fpn_6x_hrsc_rr_oc-9a4ac8e2.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_hbb_kld_stable_r50_fpn_6x_hrsc_rr_oc/rotated_retinanet_hbb_kld_stable_r50_fpn_6x_hrsc_rr_oc-9a4ac8e2.pth
 
   - Name: rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90
     In Collection: kld
@@ -108,4 +108,4 @@ Models:
         Dataset: HRSC2016
         Metrics:
           mAP: 54.15/86.20/60.60
-    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/kld/rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90/rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90-58665364.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90/rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90-58665364.pth
