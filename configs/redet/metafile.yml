@@ -60,4 +60,4 @@ Models:
         Dataset: HRSC2016
         Metrics:
           mAP: 72.31/90.40/89.50
-    Weights: https://download.openmmlab.com/mmrotate/v0.2.0/redet/redet_re50_refpn_3x_hrsc_le90/redet_re50_refpn_3x_hrsc_le90-241e217b.pth
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_refpn_3x_hrsc_le90/redet_re50_refpn_3x_hrsc_le90-241e217b.pth
