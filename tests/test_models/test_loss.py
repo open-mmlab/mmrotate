@@ -3,7 +3,8 @@ import pytest
 import torch
 
 from mmrotate.models.losses import (BCConvexGIoULoss, ConvexGIoULoss, GDLoss,
-                                    GDLoss_v1, KFLoss, KLDRepPointsLoss)
+                                    GDLoss_v1, KFLoss, KLDRepPointsLoss,
+                                    RotatedIoULoss)
 
 
 @pytest.mark.skipif(
@@ -128,4 +129,42 @@ def test_kfiou_regression_losses():
         pred_decode=pred_decode,
         targets_decode=targets_decode,
         avg_factor=10)
+    assert isinstance(loss, torch.Tensor)
+
+
+@pytest.mark.skipif(
+    not torch.cuda.is_available(), reason='requires CUDA support')
+def test_rotated_iou_losses():
+    """Tests convex regression losses."""
+    pred = torch.rand((10, 5)).cuda()
+    target = torch.rand((10, 5)).cuda()
+    weight = torch.rand((10, )).cuda()
+
+    # Test loss mode
+    loss = RotatedIoULoss(linear=True)(pred, target)
+    assert isinstance(loss, torch.Tensor)
+
+    loss = RotatedIoULoss(mode='linear')(pred, target)
+    assert isinstance(loss, torch.Tensor)
+
+    loss = RotatedIoULoss(mode='log')(pred, target)
+    assert isinstance(loss, torch.Tensor)
+
+    loss = RotatedIoULoss(mode='square')(pred, target)
+    assert isinstance(loss, torch.Tensor)
+
+    # Test loss forward
+    loss = RotatedIoULoss()(pred, target)
+    assert isinstance(loss, torch.Tensor)
+
+    # Test loss forward with weight
+    loss = RotatedIoULoss()(pred, target, weight)
+    assert isinstance(loss, torch.Tensor)
+
+    # Test loss forward with reduction_override
+    loss = RotatedIoULoss()(pred, target, reduction_override='mean')
+    assert isinstance(loss, torch.Tensor)
+
+    # Test loss forward with avg_factor
+    loss = RotatedIoULoss()(pred, target, avg_factor=10)
     assert isinstance(loss, torch.Tensor)

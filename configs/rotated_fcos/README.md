@@ -26,10 +26,10 @@ DOTA1.0
 
 |         Backbone         |  mAP  | Angle | Separate Angle | Tricks | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                                Configs                                                |          Download          |
 |:------------------------:|:-----:|:-----:|:--------------:|:------:|:-------:|:--------:|:--------------:|:---:|:----------:|:-----------------------------------------------------------------------------------------------------:|:--------------------------:|
-| ResNet50 (1024,1024,200) | 70.70 | le90  |       Y        |   Y    |   1x    |    -     |       -        |  -  |     2      |    [rotated_fcos_sep_angle_r50_fpn_1x_dota_le90](./rotated_fcos_sep_angle_r50_fpn_1x_dota_le90.py)    | [model](-) &#124; [log](-) |
-| ResNet50 (1024,1024,200) | 71.28 | le90  |       N        |   Y    |   1x    |    -     |       -        |  -  |     2      |              [rotated_fcos_r50_fpn_1x_dota_le90](./rotated_fcos_r50_fpn_1x_dota_le90.py)              | [model](-) &#124; [log](-) |
-| ResNet50 (1024,1024,200) | 71.76 | le90  |       Y        |   Y    |   1x    |    -     |       -        |  -  |     2      | [rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90](./rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90.py) | [model](-) &#124; [log](-) |
-| ResNet50 (1024,1024,200) | 71.89 | le90  |       N        |   Y    |   1x    |    -     |       -        |  -  |     2      |          [rotated_fcos_kld_r50_fpn_1x_dota_le90](./rotated_fcos_kld_r50_fpn_1x_dota_le90.py)          | [model](-) &#124; [log](-) |
+| ResNet50 (1024,1024,200) | 70.70 | le90  |       Y        |   Y    |   1x    |   4.18   |      26.4      |  -  |     2      |    [rotated_fcos_sep_angle_r50_fpn_1x_dota_le90](./rotated_fcos_sep_angle_r50_fpn_1x_dota_le90.py)    | [model](-) &#124; [log](-) |
+| ResNet50 (1024,1024,200) | 71.28 | le90  |       N        |   Y    |   1x    |   4.18   |      25.9      |  -  |     2      |              [rotated_fcos_r50_fpn_1x_dota_le90](./rotated_fcos_r50_fpn_1x_dota_le90.py)              | [model](-) &#124; [log](-) |
+| ResNet50 (1024,1024,200) | 71.76 | le90  |       Y        |   Y    |   1x    |   4.23   |      25.7      |  -  |     2      | [rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90](./rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90.py) | [model](-) &#124; [log](-) |
+| ResNet50 (1024,1024,200) | 71.89 | le90  |       N        |   Y    |   1x    |   4.18   |      26.2      |  -  |     2      |          [rotated_fcos_kld_r50_fpn_1x_dota_le90](./rotated_fcos_kld_r50_fpn_1x_dota_le90.py)          | [model](-) &#124; [log](-) |
 
 **Notes:**
 
@@ -37,6 +37,7 @@ DOTA1.0
 - `RR` means random rotation.
 - `Separate Angle` means angle loss is calculated separately.
 - Tricks means setting `norm_on_bbox`, `centerness_on_reg`, `center_sampling` as `True`.
+- Inf time was tested on a single RTX3090.
 
 ## Citation
 
