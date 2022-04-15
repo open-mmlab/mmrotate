@@ -118,7 +118,7 @@ def get_cls_results(det_results, annotations, class_id):
             cls_gts_ignore.append(ann['bboxes_ignore'][ignore_inds, :])
 
         else:
-            cls_gts_ignore.append(torch.zeros((0, 6), dtype=torch.float64))
+            cls_gts_ignore.append(torch.zeros((0, 5), dtype=torch.float64))
 
     return cls_dets, cls_gts, cls_gts_ignore
 

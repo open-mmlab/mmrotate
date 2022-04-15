@@ -76,7 +76,7 @@ def postprocess(distance, fun='log1p', tau=1.0):
     if fun == 'log1p':
         distance = torch.log1p(distance)
     elif fun == 'sqrt':
-        distance = torch.sqrt(distance)
+        distance = torch.sqrt(distance.clamp(1e-7))
     elif fun == 'none':
         pass
     else:
@@ -139,14 +139,15 @@ def gwd_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, normalize=True):
         dim1=-2, dim2=-1).sum(dim=-1)
 
     _t_tr = (Sigma_p.bmm(Sigma_t)).diagonal(dim1=-2, dim2=-1).sum(dim=-1)
-    _t_det_sqrt = (Sigma_p.det() * Sigma_t.det()).clamp(0).sqrt()
+    _t_det_sqrt = (Sigma_p.det() * Sigma_t.det()).clamp(1e-7).sqrt()
     whr_distance = whr_distance + (-2) * (
-        (_t_tr + 2 * _t_det_sqrt).clamp(0).sqrt())
+        (_t_tr + 2 * _t_det_sqrt).clamp(1e-7).sqrt())
 
-    distance = (xy_distance + alpha * alpha * whr_distance).clamp(0).sqrt()
+    distance = (xy_distance + alpha * alpha * whr_distance).clamp(1e-7).sqrt()
 
     if normalize:
-        scale = 2 * (_t_det_sqrt.sqrt().sqrt()).clamp(1e-7)
+        scale = 2 * (
+            _t_det_sqrt.clamp(1e-7).sqrt().clamp(1e-7).sqrt()).clamp(1e-7)
         distance = distance / scale
 
     return postprocess(distance, fun=fun, tau=tau)
@@ -194,7 +195,7 @@ def kld_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, sqrt=True):
     whr_distance = whr_distance - 1
     distance = (xy_distance / (alpha * alpha) + whr_distance)
     if sqrt:
-        distance = distance.clamp(0).sqrt()
+        distance = distance.clamp(1e-7).sqrt()
 
     distance = distance.reshape(_shape[:-1])
 
@@ -234,7 +235,7 @@ def jd_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, sqrt=True):
         reduction='none')
     jd = jd * 0.5
     if sqrt:
-        jd = jd.clamp(0).sqrt()
+        jd = jd.clamp(1e-7).sqrt()
     return postprocess(jd, fun=fun, tau=tau)
 
 

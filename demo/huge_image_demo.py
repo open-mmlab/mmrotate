@@ -49,6 +49,11 @@ def parse_args():
     parser.add_argument(
         '--device', default='cuda:0', help='Device used for inference')
     parser.add_argument(
+        '--palette',
+        default='dota',
+        choices=['dota', 'sar', 'hrsc', 'hrsc_classwise', 'random'],
+        help='Color palette used for visualization')
+    parser.add_argument(
         '--score-thr', type=float, default=0.3, help='bbox score threshold')
     args = parser.parse_args()
     return args
@@ -62,7 +67,12 @@ def main(args):
                                            args.patch_steps, args.img_ratios,
                                            args.merge_iou_thr)
     # show the results
-    show_result_pyplot(model, args.img, result, score_thr=args.score_thr)
+    show_result_pyplot(
+        model,
+        args.img,
+        result,
+        palette=args.palette,
+        score_thr=args.score_thr)
 
 
 if __name__ == '__main__':
