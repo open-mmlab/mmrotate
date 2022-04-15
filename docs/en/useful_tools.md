@@ -143,7 +143,6 @@ You should obtain a response similar to:
     ],
     "score": 0.972826361656189
   },
-  # ...
   {
     "class_name": "large-vehicle",
     "bbox": [
