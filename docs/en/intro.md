@@ -24,10 +24,10 @@ robotic grasping, etc.
 The most notable difference between rotated object detection and generic detection is
 the replacement of horizontal box annotations with rotated box annotations.
 They are defined as follows:
-- Horizontal box: A rectangle with the width along the x-axis and height along
-the y-axis. Usually, it can be represented by the coordinates of 2 diagonal
+- Horizontal box: A rectangle with the `width` along the `x-axis` and `height` along
+the `y-axis`. Usually, it can be represented by the coordinates of 2 diagonal
 vertices `(x_i, y_i)`  (i = 1, 2), or it can be represented by the coordinates
-of the center point and the width and height `(x_center, y_center, width, height)`.
+of the center point and the `width` and `height`, `(x_center, y_center, width, height)`.
 - Rotated box: It is obtained by rotating the horizontal box around the center
 point by an `angle`, and the definition method of its rotated box is
 obtained by adding a radian parameter `(x_center, y_center, width, height, theta)`,
@@ -138,7 +138,7 @@ In MMRotate, the rotation direction of the rotated boxes is `CW`.
 Due to the difference in the definition range of `theta`, the following three
 definitions of the rotated box gradually emerge in rotated object detection:
 - {math}`D_{oc^{\prime}}`: OpenCV Definition, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`,
-The angle between the width of the rectangle and the positive semi-axis of x is
+The angle between the `width` of the rectangle and the positive semi-axis of x is
 a positive acute angle. This definition comes from the `cv2.minAreaRect` function
 in OpenCV, which returns an angle in the range `(0, 90°]`.
 - {math}`D_{le135}`: Long Edge Definition (135°)，`angle∈[-45°, 135°)`,

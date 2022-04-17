@@ -17,9 +17,9 @@
 - 水平框: 宽沿x轴方向，高沿y轴方向的矩形。通常可以用2个对角顶点的坐标表示
 `(x_i, y_i)`  (i = 1, 2)，也可以用中心点坐标以及宽和高表示
 `(x_center, y_center, width, height)`。
-- 旋转框: 由水平框绕中心点旋转一个角度`angle`得到，通过添加一个弧度参数得到其旋转框定义法
+- 旋转框: 由水平框绕中心点旋转一个角度 `angle` 得到，通过添加一个弧度参数得到其旋转框定义法
 `(x_center, y_center, width, height, theta)`。其中，`theta = angle * pi / 180`，
-单位为`rad`。当旋转的角度为90°的倍数时，旋转框退化为水平框。标注软件导出的旋转框标注通常为多边形
+单位为 `rad`。当旋转的角度为90°的倍数时，旋转框退化为水平框。标注软件导出的旋转框标注通常为多边形
 `(xr_i, yr_i)` (i = 1, 2, 3, 4)，在训练时需要转换为旋转框定义法。
 
 ```{note}
@@ -29,10 +29,10 @@
 ### 旋转方向
 
 旋转框可以由水平框绕其中心点顺时针旋转或逆时针旋转得到。旋转方向和坐标系的选择密切相关。
-图像空间采用右手坐标系`(y，x)`，其中 y 是`上->下`，x 是`左->右`。
+图像空间采用右手坐标系 `(y，x)`，其中 y 是`上->下`，x 是`左->右`。
 此时存在2种相反的旋转方向：
 
-- 顺时针（CW）
+- 顺时针 (`CW`)
 
 `CW` 的示意图
 ```
@@ -70,7 +70,7 @@ P_A=
 y_{center}-0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
 ```
 
-- 逆时针（CCW）
+- 逆时针 (`CCW`)
 
 `CCW` 的示意图
 ```
@@ -109,38 +109,37 @@ y_{center}+0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
 ```
 
 在MMCV中可以设置旋转方向的算子有：
-- box_iou_rotated (默认为`CW`)
-- nms_rotated (默认为`CW`)
-- RoIAlignRotated (默认为`CCW`)
-- RiRoIAlignRotated (默认为`CCW`)。
+- box_iou_rotated (默认为 `CW`)
+- nms_rotated (默认为 `CW`)
+- RoIAlignRotated (默认为 `CCW`)
+- RiRoIAlignRotated (默认为 `CCW`)。
 
 ```{note}
-在MMRotate中，旋转框的旋转方向均为`CW`。
+在MMRotate 中，旋转框的旋转方向均为 `CW`。
 ```
 
 ### 旋转框定义法
 由于 `theta` 定义范围的不同，在旋转目标检测中逐渐派生出如下3种旋转框定义法：
-- {math}`D_{oc^{\prime}}` : OpenCV 定义法，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`，
-width 与 x 正半轴之间的夹角为正的锐角。该定义法源于OpenCV中的`cv2.minAreaRect`函数，
-其返回值为`(0, 90°]`。
-- {math}`D_{le135}` : 长边135°定义法，`angle∈[-45°, 135°)`，`theta∈[-pi / 4, 3 * pi / 4)` 并且 `width > height`。
-- {math}`D_{le90}` : 长边90°定义法，`angle∈[-90°, 90°)`，`theta∈[-pi / 2, pi / 2)` 并且 `width > height`。
+- {math}`D_{oc^{\prime}}` : OpenCV 定义法，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`， `width` 与 x 正半轴之间的夹角为正的锐角。该定义法源于 OpenCV 中的 `cv2.minAreaRect` 函数，
+其返回值为 `(0, 90°]`。
+- {math}`D_{le135}` : 长边 135° 定义法，`angle∈[-45°, 135°)`，`theta∈[-pi / 4, 3 * pi / 4)` 并且 `width > height`。
+- {math}`D_{le90}` : 长边 90° 定义法，`angle∈[-90°, 90°)`，`theta∈[-pi / 2, pi / 2)` 并且 `width > height`。
 
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/angle_def.png" width=100%/>
 </div>
 
-三种定义法之间的转换关系在MMRotate内部并不涉及，因此不多做介绍。如果想了解更多的细节，可以参考这篇[博客](https://zhuanlan.zhihu.com/p/459018810)。
+三种定义法之间的转换关系在 MMRotate 内部并不涉及，因此不多做介绍。如果想了解更多的细节，可以参考这篇[博客](https://zhuanlan.zhihu.com/p/459018810)。
 
 ```{note}
-MMRotate同时支持上述三种旋转框定义法，可以通过配置文件灵活切换。
+MMRotate 同时支持上述三种旋转框定义法，可以通过配置文件灵活切换。
 ```
 
 
-需要注意的是，在4.5.1之前的版本中，`cv2.minAreaRect`的返回值为`[-90°, 0°)`
+需要注意的是，在 4.5.1 之前的版本中，`cv2.minAreaRect` 的返回值为 `[-90°, 0°)`
 （[参考资料](https://github.com/opencv/opencv/issues/19749)）。为了便于区分，
-将老版本的OpenCV定义法记作 {math}`D_{oc}`。
-- {math}`D_{oc^{\prime}}` : OpenCV 定义法，`opencv>=4.5.1`，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`。
+将老版本的 OpenCV 定义法记作 {math}`D_{oc}`。
+- {math}`D_{oc^{\prime}}`: OpenCV 定义法，`opencv>=4.5.1`，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`。
 - {math}`D_{oc}` : 老版的 OpenCV 定义法，`opencv<4.5.1`，`angle∈[-90°, 0°)`，`theta∈[-pi / 2, 0)`。
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/opencv.png" width=50%/>
@@ -165,7 +164,7 @@ D_{oc}\left( w_{oc},h_{oc},\theta _{oc} \right) =\begin{cases}
 
 ### 评估
 评估 mAP 的代码中涉及 IoU 的计算，可以直接计算旋转框 IoU，也可以将旋转框转换为多边形，然后
-计算多边形 IoU (DOTA在线评估使用的是计算多边形 IoU)。
+计算多边形 IoU (DOTA 在线评估使用的是计算多边形 IoU)。
 
 
 ## 什么是 MMRotate
@@ -184,7 +183,7 @@ MMRotate 包括四个部分, `datasets`, `models`, `core` and `apis`.
 
 - `core` 为模型训练和评估提供工具。
 
-- `apis` 为模型训练、测试和推理提供高级API。
+- `apis` 为模型训练、测试和推理提供高级 API。
 
 MMRotate 的模块设计如下图所示：
 <div align=center>
