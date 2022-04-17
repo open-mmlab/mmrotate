@@ -78,7 +78,7 @@ def rbbox2roi(bbox_list):
             of images.
 
     Returns:
-        Tensor: shape (n, 6), [batch_ind, cx, cy, w, h, a]
+        Tensor: shape (n, 6), [batch_ind, cx, cy, h, w, a]
     """
     rois_list = []
     for img_id, bboxes in enumerate(bbox_list):
@@ -100,7 +100,7 @@ def poly2obb(polys, version='oc'):
         version (Str): angle representations.
 
     Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
     """
     if version == 'oc':
         results = poly2obb_oc(polys)
@@ -121,7 +121,7 @@ def poly2obb_np(polys, version='oc'):
         version (Str): angle representations.
 
     Returns:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
+        obbs (ndarray): [x_ctr,y_ctr,h,w,angle]
     """
     if version == 'oc':
         results = poly2obb_np_oc(polys)
@@ -138,11 +138,11 @@ def obb2hbb(rbboxes, version='oc'):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
         version (Str): angle representations.
 
     Returns:
-        hbbs (torch.Tensor): [x_ctr,y_ctr,w,h,-pi/2]
+        hbbs (torch.Tensor): [x_ctr,y_ctr,h,w,-pi/2]
     """
     if version == 'oc':
         results = obb2hbb_oc(rbboxes)
@@ -159,7 +159,7 @@ def obb2poly(rbboxes, version='oc'):
     """Convert oriented bounding boxes to polygons.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
         version (Str): angle representations.
 
     Returns:
@@ -180,7 +180,7 @@ def obb2poly_np(rbboxes, version='oc'):
     """Convert oriented bounding boxes to polygons.
 
     Args:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
+        obbs (ndarray): [x_ctr,y_ctr,h,w,angle]
         version (Str): angle representations.
 
     Returns:
@@ -201,7 +201,7 @@ def obb2xyxy(rbboxes, version='oc'):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
         version (Str): angle representations.
 
     Returns:
@@ -226,7 +226,7 @@ def hbb2obb(hbboxes, version='oc'):
         version (Str): angle representations.
 
     Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
     """
     if version == 'oc':
         results = hbb2obb_oc(hbboxes)
@@ -246,7 +246,7 @@ def poly2obb_oc(polys):
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
 
     Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
     """
     points = torch.reshape(polys, [-1, 4, 2])
     cxs = torch.unsqueeze(torch.sum(points[:, :, 0], axis=1), axis=1) / 4.
@@ -272,7 +272,7 @@ def poly2obb_le135(polys):
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
 
     Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
     """
     polys = torch.reshape(polys, [-1, 8])
     pt1, pt2, pt3, pt4 = polys[..., :8].chunk(4, 1)
@@ -305,7 +305,7 @@ def poly2obb_le90(polys):
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
 
     Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
     """
     polys = torch.reshape(polys, [-1, 8])
     pt1, pt2, pt3, pt4 = polys[..., :8].chunk(4, 1)
@@ -338,11 +338,11 @@ def poly2obb_np_oc(poly):
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3]
 
     Returns:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
+        obbs (ndarray): [x_ctr,y_ctr,h,w,angle]
     """
     bboxps = np.array(poly).reshape((4, 2))
     rbbox = cv2.minAreaRect(bboxps)
-    x, y, w, h, a = rbbox[0][0], rbbox[0][1], rbbox[1][0], rbbox[1][1], rbbox[
+    x, y, h, w, a = rbbox[0][0], rbbox[0][1], rbbox[1][0], rbbox[1][1], rbbox[
         2]
     if w < 2 or h < 2:
         return
@@ -351,10 +351,10 @@ def poly2obb_np_oc(poly):
             a += 180
         else:
             a += 90
-            w, h = h, w
+            h, w = w, h
     a = a / 180 * np.pi
     assert 0 < a <= np.pi / 2
-    return x, y, w, h, a
+    return x, y, h, w, a
 
 
 def poly2obb_np_le135(poly):
@@ -364,7 +364,7 @@ def poly2obb_np_le135(poly):
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3]
 
     Returns:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
+        obbs (ndarray): [x_ctr,y_ctr,h,w,angle]
     """
     poly = np.array(poly[:8], dtype=np.float32)
     pt1 = (poly[0], poly[1])
@@ -397,17 +397,17 @@ def poly2obb_np_le90(poly):
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3]
 
     Returns:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
+        obbs (ndarray): [x_ctr,y_ctr,h,w,angle]
     """
     bboxps = np.array(poly).reshape((4, 2))
     rbbox = cv2.minAreaRect(bboxps)
-    x, y, w, h, a = rbbox[0][0], rbbox[0][1], rbbox[1][0], rbbox[1][1], rbbox[
+    x, y, h, w, a = rbbox[0][0], rbbox[0][1], rbbox[1][0], rbbox[1][1], rbbox[
         2]
     if w < 2 or h < 2:
         return
     a = a / 180 * np.pi
-    if w < h:
-        w, h = h, w
+    if h < w:
+        h, w = w, h
         a += np.pi / 2
     while not np.pi / 2 > a >= -np.pi / 2:
         if a >= np.pi / 2:
@@ -415,31 +415,31 @@ def poly2obb_np_le90(poly):
         else:
             a += np.pi
     assert np.pi / 2 > a >= -np.pi / 2
-    return x, y, w, h, a
+    return x, y, h, w, a
 
 
 def obb2poly_oc(rboxes):
     """Convert oriented bounding boxes to polygons.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
     """
     x = rboxes[:, 0]
     y = rboxes[:, 1]
-    w = rboxes[:, 2]
-    h = rboxes[:, 3]
+    h = rboxes[:, 2]
+    w = rboxes[:, 3]
     a = rboxes[:, 4]
     cosa = torch.cos(a)
     sina = torch.sin(a)
-    wx, wy = w / 2 * cosa, w / 2 * sina
-    hx, hy = -h / 2 * sina, h / 2 * cosa
-    p1x, p1y = x - wx - hx, y - wy - hy
-    p2x, p2y = x + wx - hx, y + wy - hy
-    p3x, p3y = x + wx + hx, y + wy + hy
-    p4x, p4y = x - wx + hx, y - wy + hy
+    hx, hy = h / 2 * cosa, h / 2 * sina
+    wx, wy = -w / 2 * sina, w / 2 * cosa
+    p1x, p1y = x - hx - wx, y - hy - wy
+    p2x, p2y = x + hx - wx, y + hy - wy
+    p3x, p3y = x + hx + wx, y + hy + wy
+    p4x, p4y = x - hx + wx, y - hy + wy
     return torch.stack([p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y], dim=-1)
 
 
@@ -447,7 +447,7 @@ def obb2poly_le135(rboxes):
     """Convert oriented bounding boxes to polygons.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
@@ -475,7 +475,7 @@ def obb2poly_le90(rboxes):
     """Convert oriented bounding boxes to polygons.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
         polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
@@ -503,21 +503,21 @@ def obb2hbb_oc(rbboxes):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
-        hbbs (torch.Tensor): [x_ctr,y_ctr,w,h,pi/2]
+        hbbs (torch.Tensor): [x_ctr,y_ctr,h,w,pi/2]
     """
-    w = rbboxes[:, 2::5]
-    h = rbboxes[:, 3::5]
+    h = rbboxes[:, 2::5]
+    w = rbboxes[:, 3::5]
     a = rbboxes[:, 4::5]
     cosa = torch.cos(a)
     sina = torch.sin(a)
-    hbbox_w = cosa * w + sina * h
-    hbbox_h = sina * w + cosa * h
+    hbbox_h = cosa * h + sina * w
+    hbbox_w = sina * h + cosa * w
     hbboxes = rbboxes.clone().detach()
-    hbboxes[:, 2::5] = hbbox_h
-    hbboxes[:, 3::5] = hbbox_w
+    hbboxes[:, 2::5] = hbbox_w
+    hbboxes[:, 3::5] = hbbox_h
     hbboxes[:, 4::5] = np.pi / 2
     return hbboxes
 
@@ -526,10 +526,10 @@ def obb2hbb_le135(rotatex_boxes):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
-        hbbs (torch.Tensor): [x_ctr,y_ctr,w,h,-pi/2]
+        hbbs (torch.Tensor): [x_ctr,y_ctr,h,w,-pi/2]
     """
     polys = obb2poly_le135(rotatex_boxes)
     xmin, _ = polys[:, ::2].min(1)
@@ -554,25 +554,25 @@ def obb2hbb_le90(obboxes):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
-        hbbs (torch.Tensor): [x_ctr,y_ctr,w,h,-pi/2]
+        hbbs (torch.Tensor): [x_ctr,y_ctr,h,w,-pi/2]
     """
-    center, w, h, theta = torch.split(obboxes, [2, 1, 1, 1], dim=-1)
+    center, h, w, theta = torch.split(obboxes, [2, 1, 1, 1], dim=-1)
     Cos, Sin = torch.cos(theta), torch.sin(theta)
-    x_bias = torch.abs(w / 2 * Cos) + torch.abs(h / 2 * Sin)
-    y_bias = torch.abs(w / 2 * Sin) + torch.abs(h / 2 * Cos)
+    x_bias = torch.abs(h / 2 * Cos) + torch.abs(w / 2 * Sin)
+    y_bias = torch.abs(h / 2 * Sin) + torch.abs(w / 2 * Cos)
     bias = torch.cat([x_bias, y_bias], dim=-1)
     hbboxes = torch.cat([center - bias, center + bias], dim=-1)
     _x = (hbboxes[..., 0] + hbboxes[..., 2]) * 0.5
     _y = (hbboxes[..., 1] + hbboxes[..., 3]) * 0.5
-    _w = hbboxes[..., 2] - hbboxes[..., 0]
-    _h = hbboxes[..., 3] - hbboxes[..., 1]
+    _h = hbboxes[..., 2] - hbboxes[..., 0]
+    _w = hbboxes[..., 3] - hbboxes[..., 1]
     _theta = theta.new_zeros(theta.size(0))
-    obboxes1 = torch.stack([_x, _y, _w, _h, _theta], dim=-1)
-    obboxes2 = torch.stack([_x, _y, _h, _w, _theta - np.pi / 2], dim=-1)
-    obboxes = torch.where((_w >= _h)[..., None], obboxes1, obboxes2)
+    obboxes1 = torch.stack([_x, _y, _h, _w, _theta], dim=-1)
+    obboxes2 = torch.stack([_x, _y, _w, _h, _theta - np.pi / 2], dim=-1)
+    obboxes = torch.where((_h >= _w)[..., None], obboxes1, obboxes2)
     return obboxes
 
 
@@ -583,12 +583,12 @@ def hbb2obb_oc(hbboxes):
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
 
     Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
     """
     x = (hbboxes[..., 0] + hbboxes[..., 2]) * 0.5
     y = (hbboxes[..., 1] + hbboxes[..., 3]) * 0.5
-    w = hbboxes[..., 2] - hbboxes[..., 0]
-    h = hbboxes[..., 3] - hbboxes[..., 1]
+    h = hbboxes[..., 2] - hbboxes[..., 0]
+    w = hbboxes[..., 3] - hbboxes[..., 1]
     theta = x.new_zeros(*x.shape)
     rbboxes = torch.stack([x, y, h, w, theta + np.pi / 2], dim=-1)
     return rbboxes
@@ -601,16 +601,16 @@ def hbb2obb_le135(hbboxes):
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
 
     Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
     """
     x = (hbboxes[..., 0] + hbboxes[..., 2]) * 0.5
     y = (hbboxes[..., 1] + hbboxes[..., 3]) * 0.5
-    w = hbboxes[..., 2] - hbboxes[..., 0]
-    h = hbboxes[..., 3] - hbboxes[..., 1]
+    h = hbboxes[..., 2] - hbboxes[..., 0]
+    w = hbboxes[..., 3] - hbboxes[..., 1]
     theta = x.new_zeros(*x.shape)
-    obboxes1 = torch.stack([x, y, w, h, theta], dim=-1)
-    obboxes2 = torch.stack([x, y, h, w, theta + np.pi / 2], dim=-1)
-    obboxes = torch.where((w >= h)[..., None], obboxes1, obboxes2)
+    obboxes1 = torch.stack([x, y, h, w, theta], dim=-1)
+    obboxes2 = torch.stack([x, y, w, h, theta + np.pi / 2], dim=-1)
+    obboxes = torch.where((h >= w)[..., None], obboxes1, obboxes2)
     return obboxes
 
 
@@ -621,16 +621,16 @@ def hbb2obb_le90(hbboxes):
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
 
     Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
     """
     x = (hbboxes[..., 0] + hbboxes[..., 2]) * 0.5
     y = (hbboxes[..., 1] + hbboxes[..., 3]) * 0.5
-    w = hbboxes[..., 2] - hbboxes[..., 0]
-    h = hbboxes[..., 3] - hbboxes[..., 1]
+    h = hbboxes[..., 2] - hbboxes[..., 0]
+    w = hbboxes[..., 3] - hbboxes[..., 1]
     theta = x.new_zeros(*x.shape)
-    obboxes1 = torch.stack([x, y, w, h, theta], dim=-1)
-    obboxes2 = torch.stack([x, y, h, w, theta - np.pi / 2], dim=-1)
-    obboxes = torch.where((w >= h)[..., None], obboxes1, obboxes2)
+    obboxes1 = torch.stack([x, y, h, w, theta], dim=-1)
+    obboxes2 = torch.stack([x, y, w, h, theta - np.pi / 2], dim=-1)
+    obboxes = torch.where((h >= w)[..., None], obboxes1, obboxes2)
     return obboxes
 
 
@@ -638,27 +638,27 @@ def obb2xyxy_oc(rbboxes):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
     """
-    w = rbboxes[:, 2::5]
-    h = rbboxes[:, 3::5]
+    h = rbboxes[:, 2::5]
+    w = rbboxes[:, 3::5]
     a = rbboxes[:, 4::5]
     cosa = torch.cos(a)
     sina = torch.sin(a)
-    hbbox_w = cosa * w + sina * h
-    hbbox_h = sina * w + cosa * h
+    hbbox_h = cosa * h + sina * w
+    hbbox_w = sina * h + cosa * w
     # pi/2 >= a > 0, so cos(a)>0, sin(a)>0
     dx = rbboxes[..., 0]
     dy = rbboxes[..., 1]
-    dw = hbbox_w.reshape(-1)
     dh = hbbox_h.reshape(-1)
-    x1 = dx - dw / 2
-    y1 = dy - dh / 2
-    x2 = dx + dw / 2
-    y2 = dy + dh / 2
+    dw = hbbox_w.reshape(-1)
+    x1 = dx - dh / 2
+    y1 = dy - dw / 2
+    x2 = dx + dh / 2
+    y2 = dy + dw / 2
     return torch.stack((x1, y1, x2, y2), -1)
 
 
@@ -666,7 +666,7 @@ def obb2xyxy_le135(rotatex_boxes):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
@@ -686,7 +686,7 @@ def obb2xyxy_le90(obboxes):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
     Args:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
+        obbs (torch.Tensor): [x_ctr,y_ctr,h,w,angle]
 
     Returns:
         hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
@@ -694,7 +694,7 @@ def obb2xyxy_le90(obboxes):
     # N = obboxes.shape[0]
     # if N == 0:
     #     return obboxes.new_zeros((obboxes.size(0), 4))
-    center, w, h, theta = torch.split(obboxes, [2, 1, 1, 1], dim=-1)
+    center, h, w, theta = torch.split(obboxes, [2, 1, 1, 1], dim=-1)
     Cos, Sin = torch.cos(theta), torch.sin(theta)
     x_bias = torch.abs(w / 2 * Cos) + torch.abs(h / 2 * Sin)
     y_bias = torch.abs(w / 2 * Sin) + torch.abs(h / 2 * Cos)
@@ -706,25 +706,25 @@ def obb2poly_np_oc(rbboxes):
     """Convert oriented bounding boxes to polygons.
 
     Args:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle,score]
+        obbs (ndarray): [x_ctr,y_ctr,h,w,angle,score]
 
     Returns:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3,score]
     """
     x = rbboxes[:, 0]
     y = rbboxes[:, 1]
-    w = rbboxes[:, 2]
-    h = rbboxes[:, 3]
+    h = rbboxes[:, 2]
+    w = rbboxes[:, 3]
     a = rbboxes[:, 4]
     score = rbboxes[:, 5]
     cosa = np.cos(a)
     sina = np.sin(a)
-    wx, wy = w / 2 * cosa, w / 2 * sina
-    hx, hy = -h / 2 * sina, h / 2 * cosa
-    p1x, p1y = x - wx - hx, y - wy - hy
-    p2x, p2y = x + wx - hx, y + wy - hy
-    p3x, p3y = x + wx + hx, y + wy + hy
-    p4x, p4y = x - wx + hx, y - wy + hy
+    hx, hy = h / 2 * cosa, h / 2 * sina
+    wx, wy = -w / 2 * sina, w / 2 * cosa
+    p1x, p1y = x - hx - wx, y - hy - wy
+    p2x, p2y = x + hx - wx, y + hy - wy
+    p3x, p3y = x + hx + wx, y + hy + wy
+    p4x, p4y = x - hx + wx, y - hy + wy
     polys = np.stack([p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y, score], axis=-1)
     polys = get_best_begin_point(polys)
     return polys
@@ -734,7 +734,7 @@ def obb2poly_np_le135(rrects):
     """Convert oriented bounding boxes to polygons.
 
     Args:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle,score]
+        obbs (ndarray): [x_ctr,y_ctr,h,w,angle,score]
 
     Returns:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3,score]
@@ -761,19 +761,19 @@ def obb2poly_np_le90(obboxes):
     """Convert oriented bounding boxes to polygons.
 
     Args:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle,score]
+        obbs (ndarray): [x_ctr,y_ctr,h,w,angle,score]
 
     Returns:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3,score]
     """
     try:
-        center, w, h, theta, score = np.split(obboxes, (2, 3, 4, 5), axis=-1)
+        center, h, w, theta, score = np.split(obboxes, (2, 3, 4, 5), axis=-1)
     except:  # noqa: E722
         results = np.stack([0., 0., 0., 0., 0., 0., 0., 0., 0.], axis=-1)
         return results.reshape(1, -1)
     Cos, Sin = np.cos(theta), np.sin(theta)
-    vector1 = np.concatenate([w / 2 * Cos, w / 2 * Sin], axis=-1)
-    vector2 = np.concatenate([-h / 2 * Sin, h / 2 * Cos], axis=-1)
+    vector1 = np.concatenate([h / 2 * Cos, h / 2 * Sin], axis=-1)
+    vector2 = np.concatenate([-w / 2 * Sin, w / 2 * Cos], axis=-1)
     point1 = center - vector1 - vector2
     point2 = center + vector1 - vector2
     point3 = center + vector1 + vector2
@@ -926,10 +926,10 @@ def gt2gaussian(target):
     center = torch.mean(target, dim=1)
     edge_1 = target[:, 1, :] - target[:, 0, :]
     edge_2 = target[:, 2, :] - target[:, 1, :]
-    w = (edge_1 * edge_1).sum(dim=-1, keepdim=True)
-    w_ = w.sqrt()
-    h = (edge_2 * edge_2).sum(dim=-1, keepdim=True)
-    diag = torch.cat([w, h], dim=-1).diag_embed() / (4 * L * L)
+    h = (edge_1 * edge_1).sum(dim=-1, keepdim=True)
+    h_ = h.sqrt()
+    w = (edge_2 * edge_2).sum(dim=-1, keepdim=True)
+    diag = torch.cat([h, w], dim=-1).diag_embed() / (4 * L * L)
     cos_sin = edge_1 / w_
     neg = torch.tensor([[1, -1]], dtype=torch.float32).to(cos_sin.device)
     R = torch.stack([cos_sin * neg, cos_sin[..., [1, 0]]], dim=-2)
