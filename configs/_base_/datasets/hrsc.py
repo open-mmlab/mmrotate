@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'HRSCDataset'
-data_root = '/data2/wjb/dataset/HRSC2016/'
+data_root = 'data/hrsc/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
