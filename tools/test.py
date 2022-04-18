@@ -17,6 +17,7 @@ from mmdet.datasets import build_dataloader, replace_ImageToTensor
 
 from mmrotate.datasets import build_dataset
 from mmrotate.models import build_detector
+from mmrotate.utils import cfg_compatibility, setup_multi_processes
 
 
 def parse_args():
@@ -115,6 +116,12 @@ def main():
     cfg = Config.fromfile(args.config)
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
+
+    cfg = cfg_compatibility(cfg)
+
+    # set multi-process settings
+    setup_multi_processes(cfg)
+
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
@@ -150,14 +157,6 @@ def main():
 
     test_dataloader_default_args = dict(
         samples_per_gpu=1, workers_per_gpu=2, dist=distributed, shuffle=False)
-    # update overall dataloader(for train, val and test) setting
-    test_dataloader_default_args.update({
-        k: v
-        for k, v in cfg.data.items() if k not in [
-            'train', 'val', 'test', 'train_dataloader', 'val_dataloader',
-            'test_dataloader', 'samples_per_gpu'
-        ]
-    })
 
     # in case the test dataset is concatenated
     if isinstance(cfg.data.test, dict):
@@ -186,9 +185,9 @@ def main():
             for ds_cfg in cfg.data.test:
                 ds_cfg.pipeline = replace_ImageToTensor(ds_cfg.pipeline)
 
-    train_loader_cfg = {
+    test_loader_cfg = {
         **test_dataloader_default_args,
-        **cfg.data.get('train_dataloader', {})
+        **cfg.data.get('test_dataloader', {})
     }
 
     rank, _ = get_dist_info()
@@ -200,7 +199,7 @@ def main():
 
     # build the dataloader
     dataset = build_dataset(cfg.data.test)
-    data_loader = build_dataloader(dataset, **train_loader_cfg)
+    data_loader = build_dataloader(dataset, **test_loader_cfg)
 
     # build the model and load checkpoint
     cfg.model.train_cfg = None

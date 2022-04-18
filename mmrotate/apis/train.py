@@ -1,7 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 # Copied from mmdet, only modified `get_root_logger`.
-import warnings
-
 import torch
 from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
 from mmcv.runner import (DistSamplerSeedHook, EpochBasedRunner,
@@ -11,7 +9,8 @@ from mmdet.core import DistEvalHook, EvalHook
 from mmdet.datasets import (build_dataloader, build_dataset,
                             replace_ImageToTensor)
 
-from mmrotate.utils import find_latest_checkpoint, get_root_logger
+from mmrotate.utils import (cfg_compatibility, find_latest_checkpoint,
+                            get_root_logger)
 
 
 def train_detector(model,
@@ -21,24 +20,12 @@ def train_detector(model,
                    validate=False,
                    timestamp=None,
                    meta=None):
-    """Main function of train."""
+
+    cfg = cfg_compatibility(cfg)
     logger = get_root_logger(log_level=cfg.log_level)
 
     # prepare data loaders
     dataset = dataset if isinstance(dataset, (list, tuple)) else [dataset]
-    if 'imgs_per_gpu' in cfg.data:
-        logger.warning('"imgs_per_gpu" is deprecated in MMDet V2.0. '
-                       'Please use "samples_per_gpu" instead')
-        if 'samples_per_gpu' in cfg.data:
-            logger.warning(
-                f'Got "imgs_per_gpu"={cfg.data.imgs_per_gpu} and '
-                f'"samples_per_gpu"={cfg.data.samples_per_gpu}, "imgs_per_gpu"'
-                f'={cfg.data.imgs_per_gpu} is used in this experiments')
-        else:
-            logger.warning(
-                'Automatically set "samples_per_gpu"="imgs_per_gpu"='
-                f'{cfg.data.imgs_per_gpu} in this experiments')
-        cfg.data.samples_per_gpu = cfg.data.imgs_per_gpu
 
     runner_type = 'EpochBasedRunner' if 'runner' not in cfg else cfg.runner[
         'type']
@@ -52,14 +39,7 @@ def train_detector(model,
         seed=cfg.seed,
         runner_type=runner_type,
         persistent_workers=False)
-    # update overall dataloader(for train, val and test) setting
-    train_dataloader_default_args.update({
-        k: v
-        for k, v in cfg.data.items() if k not in [
-            'train', 'val', 'test', 'train_dataloader', 'val_dataloader',
-            'test_dataloader'
-        ]
-    })
+
     train_loader_cfg = {
         **train_dataloader_default_args,
         **cfg.data.get('train_dataloader', {})
@@ -83,18 +63,6 @@ def train_detector(model,
 
     # build runner
     optimizer = build_optimizer(model, cfg.optimizer)
-
-    if 'runner' not in cfg:
-        cfg.runner = {
-            'type': 'EpochBasedRunner',
-            'max_epochs': cfg.total_epochs
-        }
-        warnings.warn(
-            'config is now expected to have a `runner` section, '
-            'please set `runner` in your config.', UserWarning)
-    else:
-        if 'total_epochs' in cfg:
-            assert cfg.total_epochs == cfg.runner.max_epochs
 
     runner = build_runner(
         cfg.runner,
@@ -140,35 +108,19 @@ def train_detector(model,
             shuffle=False,
             persistent_workers=False)
 
-        # update overall dataloader(for train, val and test) setting
-        val_dataloader_default_args.update({
-            k: v
-            for k, v in cfg.data.items() if k not in [
-                'train', 'val', 'test', 'train_dataloader', 'val_dataloader',
-                'test_dataloader', 'samples_per_gpu'
-            ]
-        })
-        if 'samples_per_gpu' in cfg.data.val:
-            logger.warning('`samples_per_gpu` in `val` field of '
-                           'data will be deprecated, you should'
-                           ' move it to `val_dataloader` field')
-            # keep default value of `sample_per_gpu` is 1
-            val_dataloader_default_args['samples_per_gpu'] = \
-                cfg.data.val.pop('samples_per_gpu')
-
         val_dataloader_args = {
             **val_dataloader_default_args,
             **cfg.data.get('val_dataloader', {})
         }
-        # Support batch_size > 1 in validation
 
+        # Support batch_size > 1 in validation
         if val_dataloader_args['samples_per_gpu'] > 1:
             # Replace 'ImageToTensor' to 'DefaultFormatBundle'
             cfg.data.val.pipeline = replace_ImageToTensor(
                 cfg.data.val.pipeline)
         val_dataset = build_dataset(cfg.data.val, dict(test_mode=True))
-
         val_dataloader = build_dataloader(val_dataset, **val_dataloader_args)
+
         eval_cfg = cfg.get('evaluation', {})
         eval_cfg['by_epoch'] = cfg.runner['type'] != 'IterBasedRunner'
         eval_hook = DistEvalHook if distributed else EvalHook
