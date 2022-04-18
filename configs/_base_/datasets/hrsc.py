@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'HRSCDataset'
-data_root = 'data/hrsc/'
+data_root = '/data2/wjb/dataset/HRSC2016/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -50,11 +50,4 @@ data = dict(
         ann_file=data_root + 'ImageSets/test.txt',
         ann_subdir=data_root + 'FullDataSet/Annotations/',
         img_subdir=data_root + 'FullDataSet/AllImages/',
-        pipeline=test_pipeline),
-    # parameters for specific dataloader,
-    # have priority to default value.
-    train_dataloader=dict(persistent_workers=False),
-    val_dataloader=dict(
-        persistent_workers=False, samples_per_gpu=1, workers_per_gpu=2),
-    test_dataloader=dict(
-        persistent_workers=False, samples_per_gpu=1, workers_per_gpu=2))
+        pipeline=test_pipeline))
