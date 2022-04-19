@@ -5,7 +5,8 @@ import platform
 
 import cv2
 from mmcv import Config
-from mmdet.utils import setup_multi_processes
+
+from mmrotate.utils import setup_multi_processes
 
 
 def test_setup_multi_processes():
