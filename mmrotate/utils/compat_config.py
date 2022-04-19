@@ -2,8 +2,10 @@
 import copy
 import warnings
 
+from mmcv import ConfigDict
 
-def cfg_compatibility(cfg):
+
+def compat_cfg(cfg):
     """This function would modify some filed to keep the compatibility of
     config.
 
@@ -11,18 +13,18 @@ def cfg_compatibility(cfg):
     fields.
     """
     cfg = copy.deepcopy(cfg)
-    cfg = imgs_per_gpu_rename_compatibility(cfg)
-    cfg = loader_args_compatibility(cfg)
-    cfg = runner_args_compatibility(cfg)
+    cfg = compat_imgs_per_gpu(cfg)
+    cfg = compat_loader_args(cfg)
+    cfg = compat_runner_args(cfg)
     return cfg
 
 
-def runner_args_compatibility(cfg):
+def compat_runner_args(cfg):
     if 'runner' not in cfg:
-        cfg.runner = {
+        cfg.runner = ConfigDict({
             'type': 'EpochBasedRunner',
             'max_epochs': cfg.total_epochs
-        }
+        })
         warnings.warn(
             'config is now expected to have a `runner` section, '
             'please set `runner` in your config.', UserWarning)
@@ -32,7 +34,7 @@ def runner_args_compatibility(cfg):
     return cfg
 
 
-def imgs_per_gpu_rename_compatibility(cfg):
+def compat_imgs_per_gpu(cfg):
     cfg = copy.deepcopy(cfg)
     if 'imgs_per_gpu' in cfg.data:
         warnings.warn('"imgs_per_gpu" is deprecated in MMDet V2.0. '
@@ -49,38 +51,44 @@ def imgs_per_gpu_rename_compatibility(cfg):
     return cfg
 
 
-def loader_args_compatibility(cfg):
+def compat_loader_args(cfg):
     """Deprecated sample_per_gpu in cfg.data."""
 
     cfg = copy.deepcopy(cfg)
     if 'train_dataloader' not in cfg.data:
-        cfg.data['train_dataloader'] = dict()
+        cfg.data['train_dataloader'] = ConfigDict()
     if 'val_dataloader' not in cfg.data:
-        cfg.data['val_dataloader'] = dict()
+        cfg.data['val_dataloader'] = ConfigDict()
     if 'test_dataloader' not in cfg.data:
-        cfg.data['test_dataloader'] = dict()
+        cfg.data['test_dataloader'] = ConfigDict()
 
     # special process for train_dataloader
     if 'samples_per_gpu' in cfg.data:
-        warnings.warn('`samples_per_gpu` in '
-                      'data will be deprecated, you should'
-                      ' move it to corresponding '
-                      '`*_dataloader` field')
+
         samples_per_gpu = cfg.data.pop('samples_per_gpu')
         assert 'samples_per_gpu' not in \
-               cfg.data.train_dataloader, 'You set ' \
-                                          '`samples_per_gpu` in data field' \
-                                          'and `train_dataloader` field at ' \
-                                          'the same time. ' \
-                                          'please only set it in ' \
-                                          '`train_dataloader`'
+               cfg.data.train_dataloader, ('`samples_per_gpu` are set '
+                                           'in `data` field and ` '
+                                           'data.train_dataloader` '
+                                           'at the same time. '
+                                           'Please only set it in '
+                                           '`data.train_dataloader`. ')
         cfg.data.train_dataloader['samples_per_gpu'] = samples_per_gpu
 
+    if 'persistent_workers' in cfg.data:
+
+        persistent_workers = cfg.data.pop('persistent_workers')
+        assert 'persistent_workers' not in \
+               cfg.data.train_dataloader, ('`persistent_workers` are set '
+                                           'in `data` field and ` '
+                                           'data.train_dataloader` '
+                                           'at the same time. '
+                                           'Please only set it in '
+                                           '`data.train_dataloader`. ')
+        cfg.data.train_dataloader['persistent_workers'] = persistent_workers
+
     if 'workers_per_gpu' in cfg.data:
-        warnings.warn('`workers_per_gpu` in '
-                      'data will be deprecated, you should'
-                      ' move it to corresponding '
-                      '`*_dataloader` field')
+
         workers_per_gpu = cfg.data.pop('workers_per_gpu')
         cfg.data.train_dataloader['workers_per_gpu'] = workers_per_gpu
         cfg.data.val_dataloader['workers_per_gpu'] = workers_per_gpu
@@ -88,17 +96,14 @@ def loader_args_compatibility(cfg):
 
     # special process for val_dataloader
     if 'samples_per_gpu' in cfg.data.val:
-        warnings.warn('`samples_per_gpu` in `val` field of '
-                      'data will be deprecated, you should'
-                      ' move it to `val_dataloader` field')
         # keep default value of `sample_per_gpu` is 1
         assert 'samples_per_gpu' not in \
-               cfg.data.val_dataloader, 'You set ' \
-               '`samples_per_gpu` in data field' \
-               'and `val_dataloader` field at the' \
-               'same time  ' \
-               'please only set it in ' \
-               '`val_dataloader`'
+               cfg.data.val_dataloader, ('`samples_per_gpu` are set '
+                                         'in `data.val` field and ` '
+                                         'data.val_dataloader` at '
+                                         'the same time. '
+                                         'Please only set it in '
+                                         '`data.val_dataloader`. ')
         cfg.data.val_dataloader['samples_per_gpu'] = \
             cfg.data.val.pop('samples_per_gpu')
     # special process for val_dataloader
@@ -106,18 +111,27 @@ def loader_args_compatibility(cfg):
     # in case the test dataset is concatenated
     if isinstance(cfg.data.test, dict):
         if 'samples_per_gpu' in cfg.data.test:
-            warnings.warn('`samples_per_gpu` in `test` field of '
-                          'data will be deprecated, you should'
-                          ' move it to `test_dataloader` field')
+            assert 'samples_per_gpu' not in \
+                   cfg.data.test_dataloader, ('`samples_per_gpu` are set '
+                                              'in `data.test` field and ` '
+                                              'data.test_dataloader` '
+                                              'at the same time. '
+                                              'Please only set it in '
+                                              '`data.test_dataloader`. ')
+
             cfg.data.test_dataloader['samples_per_gpu'] = \
                 cfg.data.test.pop('samples_per_gpu')
 
     elif isinstance(cfg.data.test, list):
         for ds_cfg in cfg.data.test:
             if 'samples_per_gpu' in ds_cfg:
-                warnings.warn('`samples_per_gpu` in `test` field of '
-                              'data will be deprecated, you should'
-                              ' move it to `test_dataloader` field')
+                assert 'samples_per_gpu' not in \
+                       cfg.data.test_dataloader, ('`samples_per_gpu` are set '
+                                                  'in `data.test` field and ` '
+                                                  'data.test_dataloader` at'
+                                                  ' the same time. '
+                                                  'Please only set it in '
+                                                  '`data.test_dataloader`. ')
         samples_per_gpu = max(
             [ds_cfg.pop('samples_per_gpu', 1) for ds_cfg in cfg.data.test])
         cfg.data.test_dataloader['samples_per_gpu'] = samples_per_gpu

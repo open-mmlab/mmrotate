@@ -17,7 +17,7 @@ from mmdet.datasets import build_dataloader, replace_ImageToTensor
 
 from mmrotate.datasets import build_dataset
 from mmrotate.models import build_detector
-from mmrotate.utils import cfg_compatibility, setup_multi_processes
+from mmrotate.utils import compat_cfg, setup_multi_processes
 
 
 def parse_args():
@@ -117,7 +117,7 @@ def main():
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
 
-    cfg = cfg_compatibility(cfg)
+    cfg = compat_cfg(cfg)
 
     # set multi-process settings
     setup_multi_processes(cfg)

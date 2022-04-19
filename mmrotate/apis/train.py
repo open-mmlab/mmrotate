@@ -9,8 +9,7 @@ from mmdet.core import DistEvalHook, EvalHook
 from mmdet.datasets import (build_dataloader, build_dataset,
                             replace_ImageToTensor)
 
-from mmrotate.utils import (cfg_compatibility, find_latest_checkpoint,
-                            get_root_logger)
+from mmrotate.utils import compat_cfg, find_latest_checkpoint, get_root_logger
 
 
 def train_detector(model,
@@ -21,7 +20,7 @@ def train_detector(model,
                    timestamp=None,
                    meta=None):
 
-    cfg = cfg_compatibility(cfg)
+    cfg = compat_cfg(cfg)
     logger = get_root_logger(log_level=cfg.log_level)
 
     # prepare data loaders
