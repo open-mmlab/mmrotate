@@ -35,6 +35,7 @@ DOTA1.0
 
 - `MS` means multiple scale image split.
 - `RR` means random rotation.
+- `Rotated IoU Loss` need mmcv version 1.5.0 or above.
 - `Separate Angle` means angle loss is calculated separately.
   At this time bbox loss uses horizontal bbox loss such as `IoULoss`, `GIoULoss`.
 - Tricks means setting `norm_on_bbox`, `centerness_on_reg`, `center_sampling` as `True`.
