@@ -1,0 +1,51 @@
+Collections:
+- Name: rotated_atss
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/abs/1912.02424
+    Title: 'Bridging the gap between anchor-based and anchor-free detection via adaptive training sample selection'
+  README: configs/rotated_atss/README.md
+
+Models:
+  - Name: rotated_atss_hbb_r50_fpn_1x_dota_oc
+    In Collection: rotated_atss
+    Config: configs/rotated_atss/rotated_atss_hbb_r50_fpn_1x_dota_oc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 65.59
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_atss/rotated_atss_hbb_r50_fpn_1x_dota_oc/rotated_atss_hbb_r50_fpn_1x_dota_oc-eaa94033.pth
+
+  - Name: rotated_atss_obb_r50_fpn_1x_dota_le90
+    In Collection: rotated_atss
+    Config: configs/rotated_atss/rotated_atss_obb_r50_fpn_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 70.64
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_atss/rotated_atss_obb_r50_fpn_1x_dota_le90/rotated_atss_obb_r50_fpn_1x_dota_le90-e029ca06.pth
+
+  - Name: rotated_atss_obb_r50_fpn_1x_dota_le135
+    In Collection: rotated_atss
+    Config: configs/rotated_atss/rotated_atss_obb_r50_fpn_1x_dota_le135.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 72.29
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_atss/rotated_atss_obb_r50_fpn_1x_dota_le135/rotated_atss_obb_r50_fpn_1x_dota_le135-eab7bc12.pth
