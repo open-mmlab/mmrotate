@@ -36,7 +36,7 @@ DOTA1.0
 - `MS` means multiple scale image split.
 - `RR` means random rotation.
 - `Separate Angle` means angle loss is calculated separately.
-  At this time bbox loss uses horizontal bbox loss such as `GIoULoss`.
+  At this time bbox loss uses horizontal bbox loss such as `IoULoss`, `GIoULoss`.
 - Tricks means setting `norm_on_bbox`, `centerness_on_reg`, `center_sampling` as `True`.
 - Inf time was tested on a single RTX3090.
 
