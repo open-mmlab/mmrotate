@@ -1,7 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import mmcv
 import pytest
 import torch
 
+from mmrotate import digit_version
 from mmrotate.models.losses import (BCConvexGIoULoss, ConvexGIoULoss, GDLoss,
                                     GDLoss_v1, KFLoss, KLDRepPointsLoss,
                                     RotatedIoULoss)
@@ -134,6 +136,9 @@ def test_kfiou_regression_losses():
 
 @pytest.mark.skipif(
     not torch.cuda.is_available(), reason='requires CUDA support')
+@pytest.mark.skipif(
+    digit_version(mmcv.__version__) <= digit_version('1.5.0'),
+    reason='requires mmcv>=1.5.0')
 def test_rotated_iou_losses():
     """Tests convex regression losses."""
     pred = torch.rand((10, 5)).cuda()
