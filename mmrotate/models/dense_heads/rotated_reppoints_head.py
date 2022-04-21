@@ -429,7 +429,7 @@ class RotatedRepPointsHead(BaseDenseHead):
             gt_bboxes_ignore_list = [None for _ in range(num_imgs)]
         if gt_labels_list is None:
             gt_labels_list = [None for _ in range(num_imgs)]
-        all_overlaps_rotate_list = [None] * 4
+        all_overlaps_rotate_list = [None] * len(proposals_list)
         (all_labels, all_label_weights, all_bbox_gt, all_proposals,
          all_proposal_weights, pos_inds_list, neg_inds_list,
          sampling_result) = multi_apply(
@@ -518,7 +518,7 @@ class RotatedRepPointsHead(BaseDenseHead):
             gt_bboxes_ignore_list = [None for _ in range(num_imgs)]
         if gt_labels_list is None:
             gt_labels_list = [None for _ in range(num_imgs)]
-        all_overlaps_rotate_list = [None] * 4
+        all_overlaps_rotate_list = [None] * len(proposals_list)
         (all_labels, all_label_weights, all_bbox_gt, all_proposals,
          all_proposal_weights, pos_inds_list, neg_inds_list,
          sampling_result) = multi_apply(
