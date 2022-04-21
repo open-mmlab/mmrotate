@@ -1,9 +1,9 @@
 _base_ = [
-    '../_base_/datasets/hrsc.py', '../_base_/schedules/schedule_3x.py',
+    '../_base_/datasets/hrsc.py', '../_base_/schedules/schedule_6x.py',
     '../_base_/default_runtime.py'
 ]
 
-angle_version = 'le90'
+angle_version = 'oc'
 model = dict(
     type='RotatedRetinaNet',
     backbone=dict(
@@ -30,7 +30,7 @@ model = dict(
         in_channels=256,
         stacked_convs=4,
         feat_channels=256,
-        assign_by_circumhbbox=None,
+        assign_by_circumhbbox=angle_version,
         anchor_generator=dict(
             type='RotatedAnchorGenerator',
             octave_base_scale=4,
@@ -41,8 +41,8 @@ model = dict(
             type='DeltaXYWHAOBBoxCoder',
             angle_range=angle_version,
             norm_factor=None,
-            edge_swap=True,
-            proj_xy=True,
+            edge_swap=False,
+            proj_xy=False,
             target_means=(.0, .0, .0, .0, .0),
             target_stds=(1.0, 1.0, 1.0, 1.0, 1.0)),
         loss_cls=dict(
@@ -75,18 +75,41 @@ img_norm_cfg = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='RResize', img_scale=(800, 800)),
+    dict(type='RResize', img_scale=(800, 512)),
     dict(
         type='RRandomFlip',
         flip_ratio=[0.25, 0.25, 0.25],
         direction=['horizontal', 'vertical', 'diagonal'],
+        version=angle_version),
+    dict(
+        type='PolyRandomRotate',
+        rotate_ratio=0.5,
+        angles_range=180,
+        auto_bound=False,
+        rect_classes=[9, 11],
         version=angle_version),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
 ]
+
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(800, 512),
+        flip=False,
+        transforms=[
+            dict(type='RResize'),
+            dict(type='Normalize', **img_norm_cfg),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+
 data = dict(
     train=dict(pipeline=train_pipeline, version=angle_version),
-    val=dict(version=angle_version),
-    test=dict(version=angle_version))
+    val=dict(pipeline=test_pipeline, version=angle_version),
+    test=dict(pipeline=test_pipeline, version=angle_version))
