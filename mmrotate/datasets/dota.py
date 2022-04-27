@@ -12,6 +12,7 @@ from functools import partial
 import mmcv
 import numpy as np
 import torch
+from mmcv.ops import nms_rotated
 from mmdet.datasets.custom import CustomDataset
 
 from mmrotate.core import obb2poly_np, poly2obb_np
@@ -335,8 +336,6 @@ def _merge_func(info, CLASSES, iou_thr):
         CLASSES (list): Label category.
         iou_thr (float): Threshold of IoU.
     """
-    from mmcv.ops import nms_rotated
-
     img_id, label_dets = info
     label_dets = np.concatenate(label_dets, axis=0)
 
