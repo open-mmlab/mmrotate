@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import numpy as np
+import pytest
 from mmdet.datasets import build_dataset
 
 from mmrotate.datasets.sar import SARDataset
@@ -16,6 +17,7 @@ def _create_dummy_results():
     return [boxes]
 
 
+@pytest.mark.parametrize('angle_version', ['oc'])
 def test_dota_dataset(angle_version):
     """Test DOTA dataset.
 
