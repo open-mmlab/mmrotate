@@ -12,13 +12,13 @@ on:
       - 'docs/**'
 
 jobs:
-  build_windows_cu111:
+  build_windows_cu102:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-2022]
-        python: [3.8]
-        platform: [cu111]
+        python: [3.7]
+        platform: [cu102]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python }}
