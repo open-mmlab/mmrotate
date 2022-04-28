@@ -64,10 +64,10 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## Changelog
 
-**0.2.0** was released in 30/3/2022:
+**0.3.0** was released in 29/4/2022:
 
-- Support Circular Smooth Label (CSL, ECCV'20) (#153)
-- Add [browse_dataset](tools/misc/browse_dataset.py) tool (#98)
+- Support Rotated ATSS-OBB (CVPR'20) (#179)
+
 
 Please refer to [changelog.md](docs/en/changelog.md) for details and release history.
 

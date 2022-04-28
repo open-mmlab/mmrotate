@@ -61,10 +61,10 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## 更新日志
 
-最新的 **0.2.0** 版本已经在 2022.03.14 发布:
+最新的 **0.3.0** 版本已经在 2022.04.29 发布:
 
-- 支持了 Circular Sommth Label (CSL, ECCV'20) 模型 (#153)
-- 增加了[数据集浏览工具](tools/misc/browse_dataset.py) (#98)
+- 支持了 Rotated ATSS-OBB (CVPR'20) 模型 (#179)
+
 
 如果想了解更多版本更新细节和历史信息，请阅读[更新日志](docs/en/changelog.md)。
 
