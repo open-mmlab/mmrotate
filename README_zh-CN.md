@@ -63,6 +63,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 最新的 **0.3.0** 版本已经在 2022.04.29 发布:
 
+- 支持了 TorchServe (#160)
 - 支持了 Rotated ATSS-OBB (CVPR'20) 模型 (#179)
 
 

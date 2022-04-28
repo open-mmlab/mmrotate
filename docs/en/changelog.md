@@ -4,7 +4,7 @@
 
 #### Highlight
 
-- Support TorchServe (#179)
+- Support TorchServe (#160)
 - Support Rotated ATSS (CVPR'20) (#179)
 
 #### New Features

@@ -66,8 +66,8 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 **0.3.0** was released in 29/4/2022:
 
-- Support Rotated ATSS-OBB (CVPR'20) (#179)
-
+- Support TorchServe (#160)
+- Support Rotated ATSS (CVPR'20) (#179)
 
 Please refer to [changelog.md](docs/en/changelog.md) for details and release history.
 
