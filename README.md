@@ -85,6 +85,7 @@ There are also tutorials:
 * [learn the config](docs/en/tutorials/customize_config.md)
 * [customize dataset](docs/en/tutorials/customize_dataset.md)
 * [customize model](docs/en/tutorials/customize_models.md)
+* [useful tools](docs/en/tutorials/useful_toos.md)
 
 
 ## Model Zoo
