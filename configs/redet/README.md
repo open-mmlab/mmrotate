@@ -22,6 +22,12 @@ DOTA1.0
 | ReResNet50 (1024,1024,200) | 76.68 | le90 | 1x | 9.32 | 10.9 | - | 2 | [redet_re50_refpn_1x_dota_le90](./redet_re50_refpn_1x_dota_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_le90/redet_re50_fpn_1x_dota_le90-724ab2da.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_le90/redet_re50_fpn_1x_dota_le90_20220130_132751.log.json)
 | ReResNet50 (1024,1024,200) | 79.87 | le90 | 1x |  | 10.9 | MS+RR | 2 | [redet_re50_refpn_1x_dota_ms_rr_le90](./redet_re50_refpn_1x_dota_ms_rr_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90-fc9217b5.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90_20220206_105343.log.json)
 
+HRSC
+
+|       Backbone        |  mAP | AP50 | AP75  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                            Configs                                            | Download |
+|:---------------------:|:-----:|:-----:|:-----:|:-----------:|:-------:|:---------:|:---------:|:---------:|:---------:|:---------------------------------------------------------------------------------------------:|:-------------:|
+|  ReResNet50 (800,512)   | 72.31 | 90.40 | 89.50 |   le90   | 3x | 2.30 | 17.5 | - | 2 | [redet_re50_refpn_3x_hrsc_le90](./redet_re50_refpn_3x_hrsc_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_refpn_3x_hrsc_le90/redet_re50_refpn_3x_hrsc_le90-241e217b.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_refpn_3x_hrsc_le90/redet_re50_refpn_3x_hrsc_le90_20220411_113223.log.json)
+
 Notes:
 - `MS` means multiple scale image split.
 - `RR` means random rotation.
