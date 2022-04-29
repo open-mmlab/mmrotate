@@ -6,7 +6,7 @@
 - CUDA 9.2+
 - GCC 5+
 - [mmcv](https://mmcv.readthedocs.io/en/latest/#installation) 1.4.5+
-- [mmdet](https://mmdetection.readthedocs.io/en/latest/#installation) 2.19.0+
+- [mmdet](https://mmdetection.readthedocs.io/en/latest/#installation) 2.22.0+
 
 
 MMRotate 和 MMCV, MMDet 版本兼容性如下所示，需要安装正确的版本以避免安装出现问题。
