@@ -77,6 +77,7 @@
 
 #### Improvements
 
+- Update citation of mmrotate in README.md (#263)
 - Update the introduction of SASM (AAAI'22) (#184)
 - Fix doc typo in Config File and Model Zoo. (#199)
 - Unified RBox definition in doc. (#234)
