@@ -141,11 +141,11 @@ MMRotate is an open source project that is contributed by researchers and engine
 If you find this project useful in your research, please consider cite:
 
 ```bibtex
-@misc{mmrotate2022,
+@article{mmrotate2022,
   title={MMRotate: A Rotated Object Detection Benchmark using PyTorch},
-  author =       {Zhou, Yue and Yang, Xue and Zhang, Gefan and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and Zhang, Wenwei, and Chen, Kai},
-  howpublished = {\url{https://github.com/open-mmlab/mmrotate}},
-  year =         {2022}
+  author={Zhou, Yue and Yang, Xue and Zhang, Gefan and Wang, Jiabao and Liu, Yanyi and Hou, Liping and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and Zhang, Wenwei and Chen, Kai},
+  journal={arXiv preprint arXiv:2204.13317},
+  year={2022}
 }
 ```
 
