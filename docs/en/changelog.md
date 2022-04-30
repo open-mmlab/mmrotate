@@ -10,7 +10,7 @@
 #### New Features
 
 - Update performance of ReDet on HRSC2016. (#203)
-- Upgrage visualization to custom colors of different classes and bump min mmdet to 2.22.0 (#187, #267, #270)
+- Upgrage visualization to custom colors of different classes. This requires mmdet>=2.22.0. (#187, #267, #270)
 - Update Stable KLD, which solve the Nan issue of KLD training. (#183)
 - Support setting dataloader arguments in config and add functions to handle config compatibility. (#215)
   The comparison between the old and new usages is as below.
