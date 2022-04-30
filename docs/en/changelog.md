@@ -1,5 +1,93 @@
 ## Changelog
 
+### v0.3.0 (29/4/2022)
+
+#### Highlight
+
+- Support TorchServe (#160)
+- Support Rotated ATSS (CVPR'20) (#179)
+
+#### New Features
+
+- Update performance of ReDet on HRSC2016. (#203)
+- Upgrage visualization to custom colors of different classes. This requires mmdet>=2.22.0. (#187, #267, #270)
+- Update Stable KLD, which solve the Nan issue of KLD training. (#183)
+- Support setting dataloader arguments in config and add functions to handle config compatibility. (#215)
+  The comparison between the old and new usages is as below.
+
+  <table align="center">
+    <thead>
+        <tr align='center'>
+            <td>Before v0.2.0</td>
+            <td>Since v0.3.0 </td>
+        </tr>
+    </thead>
+    <tbody><tr valign='top'>
+    <th>
+
+    ```python
+    data = dict(
+        samples_per_gpu=2, workers_per_gpu=2,
+        train=dict(type='xxx', ...),
+        val=dict(type='xxx', samples_per_gpu=4, ...),
+        test=dict(type='xxx', ...),
+    )
+    ```
+
+    </th>
+    <th>
+
+    ```python
+    # A recommended config that is clear
+    data = dict(
+        train=dict(type='xxx', ...),
+        val=dict(type='xxx', ...),
+        test=dict(type='xxx', ...),
+        # Use different batch size during inference.
+        train_dataloader=dict(samples_per_gpu=2, workers_per_gpu=2),
+        val_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
+        test_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
+    )
+
+    # Old style still works but allows to set more arguments about data loaders
+    data = dict(
+        samples_per_gpu=2,  # only works for train_dataloader
+        workers_per_gpu=2,  # only works for train_dataloader
+        train=dict(type='xxx', ...),
+        val=dict(type='xxx', ...),
+        test=dict(type='xxx', ...),
+        # Use different batch size during inference.
+        val_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
+        test_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
+    )
+    ```
+
+    </th></tr>
+  </tbody></table>
+- Add [get_flops](tools/analysis_tools/get_flops.py) tool (#176)
+
+#### Bug Fixes
+
+- Fix bug about rotated anchor inside flags. (#197)
+- Fix Nan issue of GWD. (#206)
+- Fix bug in eval_rbbox_map when labels_ignore is None. (#209)
+- Fix bug of 'RoIAlignRotated' object has no attribute 'output_size' (#213)
+- Fix bug in unit test for datasets. (#222)
+- Fix bug in rotated_reppoints_head. (#246)
+- Fix GPG key error in CI and docker. (#269)
+
+#### Improvements
+
+- Update citation of mmrotate in README.md (#263)
+- Update the introduction of SASM (AAAI'22) (#184)
+- Fix doc typo in Config File and Model Zoo. (#199)
+- Unified RBox definition in doc. (#234)
+
+#### Contributors
+
+A total of 7 developers contributed to this release.
+Thanks @nijkah @GamblerZSY @liuyanyi @yangxue0827 @jbwang1997 @zytx121 @ZwwWayne
+
 ### v0.2.0 (30/3/2022)
 
 #### New Features

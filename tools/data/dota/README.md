@@ -33,19 +33,19 @@ mmrotate
 Please crop the original images into 1024×1024 patches with an overlap of 200 by run
 
 ```shell
-python tools/data/dota/split/img_split.py --base_json \
+python tools/data/dota/split/img_split.py --base-json \
   tools/data/dota/split/split_configs/ss_trainval.json
 
-python tools/data/dota/split/img_split.py --base_json \
+python tools/data/dota/split/img_split.py --base-json \
   tools/data/dota/split/split_configs/ss_test.json
 ```
 
 If you want to get a multiple scale dataset, you can run the following command.
 ```shell
-python tools/data/dota/split/img_split.py --base_json \
+python tools/data/dota/split/img_split.py --base-json \
   tools/data/dota/split/split_configs/ms_trainval.json
 
-python tools/data/dota/split/img_split.py --base_json \
+python tools/data/dota/split/img_split.py --base-json \
   tools/data/dota/split/split_configs/ms_test.json
 ```
 

@@ -24,13 +24,13 @@ robotic grasping, etc.
 The most notable difference between rotated object detection and generic detection is
 the replacement of horizontal box annotations with rotated box annotations.
 They are defined as follows:
-- Horizontal box: A rectangle with the width along the x-axis and height along
-the y-axis. Usually, it can be represented by the coordinates of 2 diagonal
+- Horizontal box: A rectangle with the `width` along the `x-axis` and `height` along
+the `y-axis`. Usually, it can be represented by the coordinates of 2 diagonal
 vertices `(x_i, y_i)`  (i = 1, 2), or it can be represented by the coordinates
-of the center point and the height and width `(x_center, y_center, height, width)`.
+of the center point and the `width` and `height`, `(x_center, y_center, width, height)`.
 - Rotated box: It is obtained by rotating the horizontal box around the center
 point by an `angle`, and the definition method of its rotated box is
-obtained by adding a radian parameter `(x_center, y_center, height, width, theta)`,
+obtained by adding a radian parameter `(x_center, y_center, width, height, theta)`,
 where `theta = angle * pi / 180`. The unit of `theta` is `rad`. When the rotation
 angle is a multiple of 90°, the rotated box degenerates into a horizontal box.
 The rotated box annotations exported by the annotation software are usually polygons,
@@ -138,13 +138,13 @@ In MMRotate, the rotation direction of the rotated boxes is `CW`.
 Due to the difference in the definition range of `theta`, the following three
 definitions of the rotated box gradually emerge in rotated object detection:
 - {math}`D_{oc^{\prime}}`: OpenCV Definition, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`,
-The angle between the height of the rectangle and the positive semi-axis of x is
+The angle between the `width` of the rectangle and the positive semi-axis of x is
 a positive acute angle. This definition comes from the `cv2.minAreaRect` function
 in OpenCV, which returns an angle in the range `(0, 90°]`.
 - {math}`D_{le135}`: Long Edge Definition (135°)，`angle∈[-45°, 135°)`,
-`theta∈[-pi / 4, 3 * pi / 4)` and `height > width`.
+`theta∈[-pi / 4, 3 * pi / 4)` and `width > height`.
 - {math}`D_{le90}`: Long Edge Definition (90°)，`angle∈[-90°, 90°)`,
-`theta∈[-pi / 2, pi / 2)` and `height > width`.
+`theta∈[-pi / 2, pi / 2)` and `width > height`.
 
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/angle_def.png" width=100%/>
@@ -171,14 +171,14 @@ is denoted as {math}`D_{oc}`.
 
 The conversion relationship between the two OpenCV definitions is as follows:
 ```{math}
-D_{oc^{\prime}}\left( h_{oc^{\prime}},w_{oc^{\prime}},\theta _{oc^{\prime}} \right) =\begin{cases}
-	D_{oc}\left( w_{oc},h_{oc},\theta _{oc}+\pi /2 \right) , otherwise\\
-	D_{oc}\left( h_{oc},w_{oc},\theta _{oc}+\pi \right) ,\theta _{oc}=-\pi /2\\
+D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta _{oc^{\prime}} \right) =\begin{cases}
+	D_{oc}\left( h_{oc},w_{oc},\theta _{oc}+\pi /2 \right) , otherwise\\
+	D_{oc}\left( w_{oc},h_{oc},\theta _{oc}+\pi \right) ,\theta _{oc}=-\pi /2\\
 \end{cases}
 \\
-D_{oc}\left( h_{oc},w_{oc},\theta _{oc} \right) =\begin{cases}
-	D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta _{oc^{\prime}}-\pi /2 \right) , otherwise\\
-	D_{oc^{\prime}}\left( h_{oc^{\prime}},w_{oc^{\prime}},\theta _{oc^{\prime}}-\pi \right) , \theta _{oc^{\prime}}=\pi /2\\
+D_{oc}\left( w_{oc},h_{oc},\theta _{oc} \right) =\begin{cases}
+	D_{oc^{\prime}}\left( h_{oc^{\prime}},w_{oc^{\prime}},\theta _{oc^{\prime}}-\pi /2 \right) , otherwise\\
+	D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta _{oc^{\prime}}-\pi \right) , \theta _{oc^{\prime}}=\pi /2\\
 \end{cases}
 ```
 

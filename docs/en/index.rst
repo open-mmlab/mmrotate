@@ -23,6 +23,11 @@ Welcome to MMRotate's documentation!
 
    tutorials/index.rst
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Useful Tools and Scripts
+
+   useful_tools.md
 
 .. toctree::
    :maxdepth: 2

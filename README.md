@@ -64,10 +64,10 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## Changelog
 
-**0.2.0** was released in 30/3/2022:
+**0.3.0** was released in 29/4/2022:
 
-- Support Circular Smooth Label (CSL, ECCV'20) (#153)
-- Add [browse_dataset](tools/misc/browse_dataset.py) tool (#98)
+- Support TorchServe (#160)
+- Support Rotated ATSS (CVPR'20) (#179)
 
 Please refer to [changelog.md](docs/en/changelog.md) for details and release history.
 
@@ -85,6 +85,7 @@ There are also tutorials:
 * [learn the config](docs/en/tutorials/customize_config.md)
 * [customize dataset](docs/en/tutorials/customize_dataset.md)
 * [customize model](docs/en/tutorials/customize_models.md)
+* [useful tools](docs/en/tutorials/useful_toos.md)
 
 
 ## Model Zoo
@@ -100,6 +101,7 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 * [x] [Rotated RepPoints-OBB](configs/rotated_reppoints/README.md) (ICCV'2019)
 * [x] [RoI Transformer](configs/roi_trans/README.md) (CVPR'2019)
 * [x] [Gliding Vertex](configs/gliding_vertex/README.md) (TPAMI'2020)
+* [x] [Rotated ATSS-OBB](configs/rotated_atss/README.md) (CVPR'2020)
 * [x] [CSL](configs/csl/README.md) (ECCV'2020)
 * [x] [R<sup>3</sup>Det](configs/r3det/README.md) (AAAI'2021)
 * [x] [S<sup>2</sup>A-Net](configs/s2anet/README.md) (TGRS'2021)
@@ -139,11 +141,11 @@ MMRotate is an open source project that is contributed by researchers and engine
 If you find this project useful in your research, please consider cite:
 
 ```bibtex
-@misc{mmrotate2022,
+@article{mmrotate2022,
   title={MMRotate: A Rotated Object Detection Benchmark using PyTorch},
-  author =       {Zhou, Yue and Yang, Xue and Zhang, Gefan and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and Zhang, Wenwei, and Chen, Kai},
-  howpublished = {\url{https://github.com/open-mmlab/mmrotate}},
-  year =         {2022}
+  author={Zhou, Yue and Yang, Xue and Zhang, Gefan and Wang, Jiabao and Liu, Yanyi and Hou, Liping and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and Zhang, Wenwei and Chen, Kai},
+  journal={arXiv preprint arXiv:2204.13317},
+  year={2022}
 }
 ```
 
