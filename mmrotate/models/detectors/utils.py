@@ -10,9 +10,8 @@ class AlignConv(nn.Module):
 
     Args:
         in_channels (int): Number of input channels.
-        featmap_strides (list): The strides of featmap.
+        out_channels (int): Number of output channels.
         kernel_size (int, optional): The size of kernel.
-        stride (int, optional): Stride of the convolution. Default: None
         deform_groups (int, optional): Number of deformable group partitions.
     """
 
@@ -20,11 +19,9 @@ class AlignConv(nn.Module):
                  in_channels,
                  out_channels,
                  kernel_size=3,
-                 stride=None,
                  deform_groups=1):
         super(AlignConv, self).__init__()
         self.kernel_size = kernel_size
-        self.stride = stride
         self.deform_conv = DeformConv2d(
             in_channels,
             out_channels,
@@ -78,12 +75,12 @@ class AlignConv(nn.Module):
                                 -1).permute(1, 0).reshape(-1, feat_h, feat_w)
         return offset
 
-    def forward(self, x, anchors):
+    def forward(self, x, anchors, stride):
         """Forward function of AlignConv."""
         anchors = anchors.reshape(x.shape[0], x.shape[2], x.shape[3], 5)
         num_imgs, H, W = anchors.shape[:3]
         offset_list = [
-            self.get_offset(anchors[i].reshape(-1, 5), (H, W), self.stride)
+            self.get_offset(anchors[i].reshape(-1, 5), (H, W), stride)
             for i in range(num_imgs)
         ]
         offset_tensor = torch.stack(offset_list, dim=0)
@@ -96,39 +93,36 @@ class AlignConvModule(nn.Module):
 
     Args:
         in_channels (int): Number of input channels.
-        featmap_strides (list): The strides of featmap.
         align_conv_size (int): The size of align convolution.
     """
 
-    def __init__(self, in_channels, featmap_strides, align_conv_size):
+    def __init__(self, in_channels, align_conv_size):
         super(AlignConvModule, self).__init__()
         self.in_channels = in_channels
-        self.featmap_strides = featmap_strides
         self.align_conv_size = align_conv_size
         self._init_layers()
 
     def _init_layers(self):
-        """Initialize layers of the head."""
-        self.ac = nn.ModuleList([
-            AlignConv(
-                self.in_channels,
-                self.in_channels,
-                kernel_size=self.align_conv_size,
-                stride=s) for s in self.featmap_strides
-        ])
 
-    def forward(self, x, rbboxes):
+        self.ac = AlignConv(
+                    self.in_channels,
+                    self.in_channels,
+                    kernel_size=self.align_conv_size)
+
+
+    def forward(self, x, rbboxes, strides):
         """
         Args:
             x (list[Tensor]):
                 feature maps of multiple scales
             best_rbboxes (list[list[Tensor]]):
                 best rbboxes of multiple scales of multiple images
+            featmap_strides (list): The strides of featmap.
         """
         mlvl_rbboxes = [torch.cat(rbbox) for rbbox in zip(*rbboxes)]
         out = []
-        for x_scale, rbboxes_scale, ac_scale in zip(x, mlvl_rbboxes, self.ac):
-            feat_refined_scale = ac_scale(x_scale, rbboxes_scale)
+        for x_scale, rbboxes_scale, stride in zip(x, mlvl_rbboxes, strides):
+            feat_refined_scale = self.ac(x_scale, rbboxes_scale, stride)
             out.append(feat_refined_scale)
         return out
 
