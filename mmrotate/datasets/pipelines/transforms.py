@@ -1,4 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import List, Optional
+
 import cv2
 import numpy as np
 from mmdet.datasets.pipelines.transforms import RandomFlip, Resize
@@ -97,7 +99,7 @@ class PolyRandomRotate(object):
     Reference: https://github.com/hukaixuan19970627/OrientedRepPoints_DOTA
 
     Args:
-        rate (bool): (float, optional): The rotating probability.
+        rotate_ratio (float, optional): The rotating probability.
             Default: 0.5.
         angles_range(int, optional): The rotate angle defined by random
             (-angles_range, +angles_range).
@@ -105,7 +107,7 @@ class PolyRandomRotate(object):
             bounds.
         rect_classes (None|list, optional): Specifies classes that needs to
             be rotated by a multiple of 90 degrees.
-        version  (str, optional): Angle representations. Defaults to 'oc'.
+        version  (str, optional): Angle representations. Defaults to 'le90'.
     """
 
     def __init__(self,
@@ -238,5 +240,106 @@ class PolyRandomRotate(object):
         repr_str = self.__class__.__name__
         repr_str += f'(rotate_ratio={self.rotate_ratio}, ' \
                     f'angles_range={self.angles_range}, ' \
+                    f'auto_bound={self.auto_bound})'
+        return repr_str
+
+
+@ROTATED_PIPELINES.register_module()
+class PolyDiscreteRotate(PolyRandomRotate):
+    """Rotate img & bbox with a random angle among the given angles.
+
+    Args:
+        rotate_ratio (float, optional): The probability of rotation.
+            Default: 0.5.
+        angles (list[int]): The possible rotation angles in degrees.
+            Defaults to None to keep coherent with arguments' order,
+            but passing None will raise an AssertionError.
+        auto_bound (bool, optional): whether to find the new width and height
+            bounds. Default: False
+        ignore_classes (None|list, optional): Specifies classes that shouldn't
+            be rotated. Default: None.
+        version (str, optional): Angle representations. Default: 'oc'.
+    """
+
+    def __init__(self,
+                 rotate_ratio: float = 0.5,
+                 angles: Optional[List[int]] = None,
+                 auto_bound: bool = False,
+                 ignore_classes: Optional[List[int]] = None,
+                 version: str = 'oc') -> None:
+        self.rotate_ratio = rotate_ratio
+        assert isinstance(angles, list) and isinstance(angles[0], int), \
+            f'angles must be a list of int, not {angles}'
+        self.angles = angles
+        self.auto_bound = auto_bound
+        self.ignore_classes = [] if ignore_classes is None else ignore_classes
+        self.version = version
+
+    def __call__(self, results):
+        """Call function of PolyDiscreteRotate."""
+        if not self.is_rotate:
+            results['rotate'] = False
+            angle = 0
+        else:
+            angle = self.angles[np.random.randint(len(self.angles))]
+            results['rotate'] = True
+
+            class_labels = results['gt_labels']
+            for classid in class_labels:
+                if self.ignore_classes:
+                    if classid in self.ignore_classes:
+                        results['rotate'] = False
+                        angle = 0
+                        break
+
+        h, w, c = results['img_shape']
+        img = results['img']
+        results['rotate_angle'] = angle
+
+        image_center = np.array((w / 2, h / 2))
+        abs_cos, abs_sin = abs(np.cos(angle)), abs(np.sin(angle))
+        if self.auto_bound:
+            bound_w, bound_h = np.rint(
+                [h * abs_sin + w * abs_cos,
+                 h * abs_cos + w * abs_sin]).astype(int)
+        else:
+            bound_w, bound_h = w, h
+
+        self.rm_coords = self.create_rotation_matrix(image_center, angle,
+                                                     bound_h, bound_w)
+        self.rm_image = self.create_rotation_matrix(
+            image_center, angle, bound_h, bound_w, offset=-0.5)
+
+        img = self.apply_image(img, bound_h, bound_w)
+        results['img'] = img
+        results['img_shape'] = (bound_h, bound_w, c)
+        gt_bboxes = results.get('gt_bboxes', [])
+        labels = results.get('gt_labels', [])
+        gt_bboxes = np.concatenate(
+            [gt_bboxes, np.zeros((gt_bboxes.shape[0], 1))], axis=-1)
+        polys = obb2poly_np(gt_bboxes, self.version)[:, :-1].reshape(-1, 2)
+        polys = self.apply_coords(polys).reshape(-1, 8)
+        gt_bboxes = []
+        for pt in polys:
+            pt = np.array(pt, dtype=np.float32)
+            obb = poly2obb_np(pt, self.version) \
+                if poly2obb_np(pt, self.version) is not None\
+                else [0, 0, 0, 0, 0]
+            gt_bboxes.append(obb)
+        gt_bboxes = np.array(gt_bboxes, dtype=np.float32)
+        keep_inds = self.filter_border(gt_bboxes, bound_h, bound_w)
+        gt_bboxes = gt_bboxes[keep_inds, :]
+        labels = labels[keep_inds]
+        if len(gt_bboxes) == 0:
+            return None
+        results['gt_bboxes'] = gt_bboxes
+        results['gt_labels'] = labels
+
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(rotate_ratio={self.rotate_ratio}, ' \
+                    f'angles={self.angles}, ' \
                     f'auto_bound={self.auto_bound})'
         return repr_str
