@@ -24,7 +24,8 @@ def translate_bboxes(bboxes, offset):
     elif bboxes.shape[1] == 6:
         bboxes[:, :2] = bboxes[:, :2] + offset
     else:
-        raise TypeError('Only support ')
+        raise TypeError('Require the shape of `bboxes` to be (n, 5) or (n, 6),'
+                        f' but get `bboxes` with shape being {bboxes.shape}.')
     return bboxes
 
 
