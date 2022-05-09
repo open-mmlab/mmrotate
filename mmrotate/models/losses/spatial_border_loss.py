@@ -6,7 +6,18 @@ from mmcv.ops import points_in_polygons
 
 @ROTATED_LOSSES.register_module()
 class SpatialBorderLoss(nn.Module):
-    """Spatial Border loss for learning reppoints"""
+    """Spatial Border loss for learning points in Oriented RepPoints -<https://arxiv.org/pdf/2105.11111v4.pdf>.
+    The loss is used to penalize the learning points out of the assigned
+    ground truth boxes.
+
+    Args:
+        pts (torch.Tensor): point sets with shape (N, 9).
+        Default point number in each point set is 9.
+        gt_bboxes (torch.Tensor): gt_bboxes of polygon with shape(N, 8)
+
+    Returns:
+        loss (torch.Tensor)
+    """
     def __init__(self, loss_weight=1.0):
         super(SpatialBorderLoss, self).__init__()
         self.loss_weight = loss_weight

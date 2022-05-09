@@ -33,7 +33,11 @@ def ChamferDistance2D(point_set_1, point_set_2, distance_weight = 0.05, eps = 1e
 
 @ROTATED_HEADS.register_module()
 class OrientedRepPointsHead(BaseDenseHead):
-    """Oriented RepPoints head.
+    """Oriented RepPoints head -<https://arxiv.org/pdf/2105.11111v4.pdf>.
+    The head contains initial and refined stages based on RepPoints.
+    The initial stage regresses coarse point sets, and the refine stage further
+    regresses the fine point sets. The APAA scheme based on the quality of point set samples
+    in the paper is employed in refined stage.
 
     Args:
         num_classes (int): Number of classes.
