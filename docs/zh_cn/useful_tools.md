@@ -55,6 +55,132 @@ python tools/analysis_tools/analyze_logs.py plot_curve [--keys ${KEYS}] [--title
 python tools/misc/browse_dataset.py ${CONFIG} [-h] [--skip-type ${SKIP_TYPE[SKIP_TYPE...]}] [--output-dir ${OUTPUT_DIR}] [--not-show] [--show-interval ${SHOW_INTERVAL}]
 ```
 
+## 模型部署
+
+为了使用 [`TorchServe`](https://pytorch.org/serve/) 部署一个 `MMRotate` 模型，需要进行以下几步：
+
+### 1. 转换 MMRotate 模型至 TorchServe
+
+```shell
+python tools/deployment/mmrotate2torchserve.py ${CONFIG_FILE} ${CHECKPOINT_FILE} \
+--output-folder ${MODEL_STORE} \
+--model-name ${MODEL_NAME}
+```
+
+示例:
+
+```shell
+wget -P checkpoint  \
+https://download.openmmlab.com/mmrotate/v0.1.0/rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90/rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth
+
+python tools/deployment/mmrotate2torchserve.py configs/rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py checkpoint/rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth \
+--output-folder ${MODEL_STORE} \
+--model-name rotated_faster_rcnn
+```
+
+**Note**: ${MODEL_STORE} 需要是一个文件夹的绝对路径。
+
+
+### 2. 构建 `mmrotate-serve` docker 镜像
+
+```shell
+docker build -t mmrotate-serve:latest docker/serve/
+```
+
+### 3. 运行 `mmrotate-serve` 镜像
+
+请参考官方文档 [基于 docker 运行 TorchServe](https://github.com/pytorch/serve/blob/master/docker/README.md#running-torchserve-in-a-production-docker-environment).
+
+为了使镜像能够使用 GPU 资源，需要安装 [nvidia-docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)。之后可以传递 `--gpus` 参数以在 GPU 上运行。
+
+示例：
+
+```shell
+docker run --rm \
+--cpus 8 \
+--gpus device=0 \
+-p8080:8080 -p8081:8081 -p8082:8082 \
+--mount type=bind,source=$MODEL_STORE,target=/home/model-server/model-store \
+mmrotate-serve:latest
+```
+
+参考 [该文档](https://github.com/pytorch/serve/blob/master/docs/rest_api.md) 了解关于推理 (8080)，管理 (8081) 和指标 (8082) 等 API 的信息。
+
+### 4. 测试部署
+
+```shell
+curl -O https://raw.githubusercontent.com/open-mmlab/mmrotate/main/demo/demo.jpg
+curl http://127.0.0.1:8080/predictions/${MODEL_NAME} -T demo.jpg
+```
+
+您应该获得类似于以下内容的响应：
+
+```json
+[
+  {
+    "class_name": "small-vehicle",
+    "bbox": [
+      584.9473266601562,
+      327.2749938964844,
+      38.45665740966797,
+      16.898427963256836,
+      -0.7229751944541931
+    ],
+    "score": 0.9766026139259338
+  },
+  {
+    "class_name": "small-vehicle",
+    "bbox": [
+      152.0239715576172,
+      305.92572021484375,
+      43.144744873046875,
+      18.85024642944336,
+      0.014928221702575684
+    ],
+    "score": 0.972826361656189
+  },
+  {
+    "class_name": "large-vehicle",
+    "bbox": [
+      160.58056640625,
+      437.3690185546875,
+      55.6795654296875,
+      19.31710433959961,
+      0.007036328315734863
+    ],
+    "score": 0.888836681842804
+  },
+  {
+    "class_name": "large-vehicle",
+    "bbox": [
+      666.2868041992188,
+      1011.3961181640625,
+      60.396209716796875,
+      21.821645736694336,
+      0.8549195528030396
+    ],
+    "score": 0.8240180015563965
+  }
+]
+```
+
+另外，你也可以使用 `test_torchserver.py` 来比较 TorchServe 和 PyTorch 的结果，并进行可视化。
+
+```shell
+python tools/deployment/test_torchserver.py ${IMAGE_FILE} ${CONFIG_FILE} ${CHECKPOINT_FILE} ${MODEL_NAME}
+[--inference-addr ${INFERENCE_ADDR}] [--device ${DEVICE}] [--score-thr ${SCORE_THR}]
+```
+
+示例：
+
+```shell
+python tools/deployment/test_torchserver.py \
+demo/demo.jpg \
+configs/rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py \
+rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth \
+rotated_fater_rcnn
+```
+
 ## 模型复杂度
 
 `tools/analysis_tools/get_flops.py` 是改编自 [flops-counter.pytorch](https://github.com/sovrasov/flops-counter.pytorch) 的脚本，用于计算给定模型的 FLOPs 和参数量。
