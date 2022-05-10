@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from .base import RotatedBaseDetector
+from .cascade_s2anet import CascadeS2ANet
 from .gliding_vertex import GlidingVertex
 from .oriented_rcnn import OrientedRCNN
 from .r3det import R3Det
@@ -16,5 +17,5 @@ __all__ = [
     'RotatedRetinaNet', 'RotatedFasterRCNN', 'OrientedRCNN', 'RoITransformer',
     'GlidingVertex', 'ReDet', 'R3Det', 'S2ANet', 'RotatedRepPoints',
     'RotatedBaseDetector', 'RotatedTwoStageDetector',
-    'RotatedSingleStageDetector'
+    'RotatedSingleStageDetector', 'CascadeS2ANet'
 ]
