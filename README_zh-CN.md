@@ -61,10 +61,11 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## 更新日志
 
-最新的 **0.2.0** 版本已经在 2022.03.14 发布:
+最新的 **0.3.0** 版本已经在 2022.04.29 发布:
 
-- 支持了 Circular Sommth Label (CSL, ECCV'20) 模型 (#153)
-- 增加了[数据集浏览工具](tools/misc/browse_dataset.py) (#98)
+- 支持了 TorchServe (#160)
+- 支持了 Rotated ATSS-OBB (CVPR'20) 模型 (#179)
+
 
 如果想了解更多版本更新细节和历史信息，请阅读[更新日志](docs/en/changelog.md)。
 
@@ -138,11 +139,11 @@ MMRotate 是一款由不同学校和公司共同贡献的开源项目。我们�
 如果您觉得 MMRotate 对您的研究有所帮助，请考虑引用它：
 
 ```bibtex
-@misc{mmrotate2022,
+@article{mmrotate2022,
   title={MMRotate: A Rotated Object Detection Benchmark using PyTorch},
-  author =       {Zhou, Yue and Yang, Xue and Zhang, Gefan and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and Zhang, Wenwei, and Chen, Kai},
-  howpublished = {\url{https://github.com/open-mmlab/mmrotate}},
-  year =         {2022}
+  author={Zhou, Yue and Yang, Xue and Zhang, Gefan and Wang, Jiabao and Liu, Yanyi and Hou, Liping and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and Zhang, Wenwei and Chen, Kai},
+  journal={arXiv preprint arXiv:2204.13317},
+  year={2022}
 }
 ```
 
