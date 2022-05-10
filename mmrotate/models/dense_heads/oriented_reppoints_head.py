@@ -17,17 +17,25 @@ from .utils import  levels_to_images
 import math
 
 def ChamferDistance2D(point_set_1, point_set_2, distance_weight = 0.05, eps = 1e-12):
-    """Compute the Chamfer distance between two point sets."""
+    """Compute the Chamfer distance between two point sets.
+
+    Args:
+        point_set_1 (torch.tensor): point set 1 with shape (N_pointsets, N_points, 2)
+        point_set_2 (torch.tensor): point set 2 with shape (N_pointsets, N_points, 2)
+
+    Returns:
+        dist (torch.tensor): chamfer distance between two point sets with shape (N_pointsets,)
+        """
     chamfer = ChamferDistance()
     assert point_set_1.dim() == point_set_2.dim()
     assert point_set_1.shape[-1] == point_set_2.shape[-1]
-    if point_set_1.dim() <= 3:
-        dist1, dist2, _, _ = chamfer(point_set_1, point_set_2)
-        dist1 = torch.sqrt(torch.clamp(dist1, eps))
-        dist2 = torch.sqrt(torch.clamp(dist2, eps))
-        dist = (dist1.mean(-1) + dist2.mean(-1)) / 2.0
+    assert point_set_1.dim() <= 3
+    dist1, dist2, _, _ = chamfer(point_set_1, point_set_2)
+    dist1 = torch.sqrt(torch.clamp(dist1, eps))
+    dist2 = torch.sqrt(torch.clamp(dist2, eps))
+    dist = distance_weight * (dist1.mean(-1) + dist2.mean(-1)) / 2.0
 
-    return dist * distance_weight
+    return dist
 
 
 
@@ -226,7 +234,16 @@ class OrientedRepPointsHead(BaseDenseHead):
         return multi_apply(self.forward_single, feats)
 
     def forward_single(self, x):
-        """Forward feature map of a single FPN level."""
+        """Forward feature map of a single FPN level.
+        Args:
+            x (torch.tensor): single-level feature map sizes.
+
+        Returns:
+            cls_out (torch.tensor): classification score prediction
+            pts_out_init (torch.tensor): initial point sets prediction
+            pts_out_refine (torch.tensor): refined point sets prediction
+            base_feat: single-level feature as the basic feature map
+        """
         dcn_base_offset = self.dcn_base_offset.type_as(x)
         points_init = 0
         cls_feat = x
@@ -299,7 +316,15 @@ class OrientedRepPointsHead(BaseDenseHead):
         return pts_list
 
     def sampling_points(self, polygons, points_num, device):
-        """Sample edge points for polygon."""
+        """Sample edge points for polygon.
+
+        Args:
+            polygons (torch.tensor): polygons with shape (N, 8)
+            points_num (int): number of sampling points for each polygon edge. 10 by default.
+
+        Returns:
+            sampling_points (torch.tensor): sampling points with shape (N, points_num*4, 2)
+        """
         polygons_xs, polygons_ys = polygons[:, 0::2], polygons[:, 1::2]
         ratio = torch.linspace(0, 1, points_num).to(device).repeat(polygons.shape[0], 1)
 
@@ -328,14 +353,13 @@ class OrientedRepPointsHead(BaseDenseHead):
 
 
     def get_adaptive_points_feature(self, features, pt_locations, stride):
-
         """Get the points features from the locations of predicted points.
         Args:
-            features (tensor): base feature (B,C,W,H)
-            pt_locations: locations of points in each point set
+            features (torch.tensor): base feature with shape (B,C,W,H)
+            pt_locations (torch.tensor): locations of points in each point set with shape
                          (B, N_points_set(number of point set), N_points(number of points in each point set) *2)
         Returns:
-            tensor: sampling points features (B, C, N_points_set, N_points)
+            tensor: sampling points features with (B, C, N_points_set, N_points)
         """
 
         h = features.shape[2] * stride
@@ -359,7 +383,12 @@ class OrientedRepPointsHead(BaseDenseHead):
         return sampled_features,
 
     def feature_cosine_similarity(self, points_features):
-        """Compute the points features similarity for points-wise correlation."""
+        """Compute the points features similarity for points-wise correlation.
+        Args:
+            points_features (torch.tensor): sampling point feature with shape (N_pointsets, N_points, C)
+        Returns:
+            max_correlation: max feature similarity in each point set with shape (N_points_set, N_points, C)
+        """
 
         mean_points_feats = torch.mean(points_features, dim=1, keepdim=True)
         norm_pts_feats = torch.norm(points_features, p=2, dim=2).unsqueeze(
@@ -388,8 +417,22 @@ class OrientedRepPointsHead(BaseDenseHead):
                                      label_weight,
                                      bbox_weight,
                                      pos_inds):
-        """Calculate the quality of each point set from the classification, localization, orientation,
-        and point-wise correlation."""
+        """Assess the quality of each point set from the classification, localization,
+        orientation, and point-wise correlation based on the assigned point sets samples.
+        Args:
+            pts_features (torch.tensor): points features with shape (N, 9, C)
+            cls_score (torch.tensor): classification scores with shape (N, class_num)
+            pts_pred_init (torch.tensor): initial point sets prediction with shape (N, 9*2)
+            pts_pred_refine (torch.tensor): refined point sets prediction with shape (N, 9*2)
+            label (torch.tensor): gt label with shape (N)
+            bbox_gt(torch.tensor): gt bbox of polygon with shape (N, 8)
+            label_weight (torch.tensor): label weight with shape (N)
+            bbox_weight (torch.tensor): box weight with shape (N)
+            pos_inds (torch.tensor): the  inds of  positive point set samples
+
+        Returns:
+            qua (torch.tensor) : weighted quality values for positive point set samples.
+        """
         device = cls_score.device
         pos_scores = cls_score[pos_inds]
         pos_pts_pred_init = pts_pred_init[pos_inds]
@@ -447,7 +490,24 @@ class OrientedRepPointsHead(BaseDenseHead):
     def dynamic_pointset_samples_selection(self, quality, label, label_weight, bbox_weight,
                      pos_inds, pos_gt_inds, num_proposals_each_level=None, num_level=None):
 
-        """The dynamic top k selection of point set samples based on the quality assessment values."""
+        """The dynamic top k selection of point set samples based on the quality assessment values.
+        Args:
+            quality (torch.tensor): the quality values of positive point set samples
+            label (torch.tensor): gt label with shape (N)
+            bbox_gt(torch.tensor): gt bbox of polygon with shape (N, 8)
+            label_weight (torch.tensor): label weight with shape (N)
+            bbox_weight (torch.tensor): box weight with shape (N)
+            pos_inds (torch.tensor): the inds of  positive point set samples
+            num_proposals_each_level (list[int]): proposals number of each level
+            num_level (int): the level number
+        Returns:
+            label: gt label with shape (N)
+            label_weight: label weight with shape (N)
+            bbox_weight: box weight with shape (N)
+            num_pos (int): the number of selected positive point samples with high-qualty
+            pos_normalize_term (torch.tensor): the corresponding positive normalize term
+
+        """
 
         if len(pos_inds) == 0:
             return label, label_weight, bbox_weight, 0, torch.tensor([]).type_as(bbox_weight)

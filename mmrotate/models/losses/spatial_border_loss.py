@@ -6,14 +6,12 @@ from mmcv.ops import points_in_polygons
 
 @ROTATED_LOSSES.register_module()
 class SpatialBorderLoss(nn.Module):
-    """Spatial Border loss for learning points in Oriented RepPoints -<https://arxiv.org/pdf/2105.11111v4.pdf>.
-    The loss is used to penalize the learning points out of the assigned
-    ground truth boxes.
+    """Spatial Border loss for learning points in Oriented RepPoints.
 
     Args:
-        pts (torch.Tensor): point sets with shape (N, 9).
-        Default point number in each point set is 9.
-        gt_bboxes (torch.Tensor): gt_bboxes of polygon with shape(N, 8)
+        pts (torch.Tensor): point sets with shape (N, 9*2).
+        Default points number in each point set is 9.
+        gt_bboxes (torch.Tensor): gt_bboxes with polygon form with shape(N, 8)
 
     Returns:
         loss (torch.Tensor)
@@ -28,6 +26,16 @@ class SpatialBorderLoss(nn.Module):
         return loss
 
 def spatial_border_loss(pts, gt_bboxes):
+    """The loss is used to penalize the learning points out of the assigned
+    ground truth boxes (polygon by default).
+
+    Args:
+        pts (torch.Tensor): point sets with shape (N, 9*2).
+        gt_bboxes (torch.Tensor): gt_bboxes with polygon form with shape(N, 8)
+
+    Returns:
+        loss (torch.Tensor)
+    """
     num_gts, num_pointsets = gt_bboxes.size(0), pts.size(0)
     num_point = int(pts.size(1) / 2.0)
     loss = pts.new_zeros([0])
@@ -55,6 +63,16 @@ def spatial_border_loss(pts, gt_bboxes):
     return loss
 
 def weighted_spatial_border_loss(pts, gt_bboxes, weight, avg_factor=None):
+    """Weghted spatial border loss.
+
+    Args:
+        pts (torch.Tensor): point sets with shape (N, 9*2).
+        gt_bboxes (torch.Tensor): gt_bboxes with polygon form with shape(N, 8)
+        weight (torch.Tensor): weights for point sets with shape (N)
+
+    Returns:
+        loss (torch.Tensor)
+    """
 
     weight = weight.unsqueeze(dim=1).repeat(1, 4)
     assert weight.dim() == 2
