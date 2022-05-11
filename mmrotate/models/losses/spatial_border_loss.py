@@ -1,8 +1,10 @@
+# Copyright (c) OpenMMLab. All rights reserved.
 import torch
 import torch.nn as nn
+from mmcv.ops import points_in_polygons
 
 from ..builder import ROTATED_LOSSES
-from mmcv.ops import points_in_polygons
+
 
 @ROTATED_LOSSES.register_module()
 class SpatialBorderLoss(nn.Module):
@@ -16,6 +18,7 @@ class SpatialBorderLoss(nn.Module):
     Returns:
         loss (torch.Tensor)
     """
+
     def __init__(self, loss_weight=1.0):
         super(SpatialBorderLoss, self).__init__()
         self.loss_weight = loss_weight
@@ -24,6 +27,7 @@ class SpatialBorderLoss(nn.Module):
         loss = self.loss_weight * weighted_spatial_border_loss(
             pts, gt_bboxes, weight, *args, **kwargs)
         return loss
+
 
 def spatial_border_loss(pts, gt_bboxes):
     """The loss is used to penalize the learning points out of the assigned
@@ -43,7 +47,8 @@ def spatial_border_loss(pts, gt_bboxes):
     if num_gts > 0:
         inside_flag_list = []
         for i in range(num_point):
-            pt = pts[:, (2*i): (2*i+2)].reshape(num_pointsets, 2).contiguous()
+            pt = pts[:, (2 * i):(2 * i + 2)].reshape(num_pointsets,
+                                                     2).contiguous()
             inside_pt_flag = points_in_polygons(pt, gt_bboxes)
             inside_pt_flag = torch.diag(inside_pt_flag)
             inside_flag_list.append(inside_pt_flag)
@@ -54,13 +59,18 @@ def spatial_border_loss(pts, gt_bboxes):
 
         if out_border_pts.size(0) > 0:
             corr_gt_boxes = gt_bboxes[torch.where(inside_flag == 0)[0]]
-            corr_gt_boxes_center_x = (corr_gt_boxes[:, 0] + corr_gt_boxes[:, 4]) / 2.0
-            corr_gt_boxes_center_y = (corr_gt_boxes[:, 1] + corr_gt_boxes[:, 5]) / 2.0
-            corr_gt_boxes_center = torch.stack([corr_gt_boxes_center_x, corr_gt_boxes_center_y], dim=1)
-            distance_out_pts = 0.2*(((out_border_pts - corr_gt_boxes_center)**2).sum(dim=1).sqrt())
+            corr_gt_boxes_center_x = (corr_gt_boxes[:, 0] +
+                                      corr_gt_boxes[:, 4]) / 2.0
+            corr_gt_boxes_center_y = (corr_gt_boxes[:, 1] +
+                                      corr_gt_boxes[:, 5]) / 2.0
+            corr_gt_boxes_center = torch.stack(
+                [corr_gt_boxes_center_x, corr_gt_boxes_center_y], dim=1)
+            distance_out_pts = 0.2 * ((
+                (out_border_pts - corr_gt_boxes_center)**2).sum(dim=1).sqrt())
             loss = distance_out_pts.sum() / out_border_pts.size(0)
 
     return loss
+
 
 def weighted_spatial_border_loss(pts, gt_bboxes, weight, avg_factor=None):
     """Weghted spatial border loss.
@@ -81,4 +91,3 @@ def weighted_spatial_border_loss(pts, gt_bboxes, weight, avg_factor=None):
     loss = spatial_border_loss(pts, gt_bboxes)
 
     return torch.sum(loss)[None] / avg_factor
-

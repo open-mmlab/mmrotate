@@ -5,14 +5,14 @@
 ## Abstract
 
 In contrast to the generic object, aerial targets are often non-axis aligned with arbitrary orientations having
-the cluttered surroundings. Unlike the mainstreamed approaches regressing the bounding box orientations, this paper 
-proposes an effective adaptive points learning approach to aerial object detection by taking advantage of the adaptive 
-points representation, which is able to capture the geometric information of the arbitrary-oriented instances. 
-To this end, three oriented conversion functions are presented to facilitate the classification and localization 
-with accurate orientation. Moreover, we propose an effective quality assessment and sample assignment scheme for 
-adaptive points learning toward choosing the representative oriented reppoints samples during training, which is 
-able to capture the non-axis aligned features from adjacent objects or background noises. A spatial constraint is 
-introduced to penalize the outlier points for roust adaptive learning. Experimental results on four challenging 
+the cluttered surroundings. Unlike the mainstreamed approaches regressing the bounding box orientations, this paper
+proposes an effective adaptive points learning approach to aerial object detection by taking advantage of the adaptive
+points representation, which is able to capture the geometric information of the arbitrary-oriented instances.
+To this end, three oriented conversion functions are presented to facilitate the classification and localization
+with accurate orientation. Moreover, we propose an effective quality assessment and sample assignment scheme for
+adaptive points learning toward choosing the representative oriented reppoints samples during training, which is
+able to capture the non-axis aligned features from adjacent objects or background noises. A spatial constraint is
+introduced to penalize the outlier points for roust adaptive learning. Experimental results on four challenging
 aerial datasets including DOTA, HRSC2016, UCAS-AOD and DIOR-R, demonstrate the efficacy of our proposed approach.
 
 ## Results and models
