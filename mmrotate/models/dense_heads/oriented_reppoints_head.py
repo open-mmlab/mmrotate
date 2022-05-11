@@ -25,11 +25,14 @@ def ChamferDistance2D(point_set_1,
     """Compute the Chamfer distance between two point sets.
 
     Args:
-        point_set_1 (torch.tensor): point set 1 with shape (N_pointsets, N_points, 2)
-        point_set_2 (torch.tensor): point set 2 with shape (N_pointsets, N_points, 2)
+        point_set_1 (torch.tensor): point set 1 with shape (N_pointsets,
+                                    N_points, 2)
+        point_set_2 (torch.tensor): point set 2 with shape (N_pointsets,
+                                    N_points, 2)
 
     Returns:
-        dist (torch.tensor): chamfer distance between two point sets with shape (N_pointsets,)
+        dist (torch.tensor): chamfer distance between two point sets
+                             with shape (N_pointsets,)
     """
     chamfer = ChamferDistance()
     assert point_set_1.dim() == point_set_2.dim()
@@ -72,10 +75,13 @@ class OrientedRepPointsHead(BaseDenseHead):
         train_cfg (dict, optional): The config of train.
         test_cfg (dict, optional): The config of test.
         center_init (bool, optional): Whether to use center point assignment.
-        top_ratio (float, optional): Ratio of top high-quality point sets. Defaults to 0.4.
-        init_qua_weight (float, optional): Quality weight of initial stage.  Defaults to 0.2.
-        ori_qua_weight (float, optional): Orientation quality weight. Defaults to 0.3.
-        poc_qua_weight (float, optional): Point-wise correlation quality weight. Defaults to 0.1.
+        top_ratio (float, optional): Ratio of top high-quality point sets.
+                  Defaults to 0.4.
+        init_qua_weight (float, optional): Quality weight of initial
+                    stage.
+        ori_qua_weight (float, optional): Orientation quality weight.
+        poc_qua_weight (float, optional): Point-wise correlation
+                    quality weight.
         version (str, optional): Angle representations. Defaults to 'oc'.
         init_cfg (dict or list[dict], optional): Initialization config dict.
     """
@@ -326,10 +332,12 @@ class OrientedRepPointsHead(BaseDenseHead):
 
         Args:
             polygons (torch.tensor): polygons with shape (N, 8)
-            points_num (int): number of sampling points for each polygon edge. 10 by default.
+            points_num (int): number of sampling points for each polygon edge.
+                              10 by default.
 
         Returns:
-            sampling_points (torch.tensor): sampling points with shape (N, points_num*4, 2)
+            sampling_points (torch.tensor): sampling points with shape (N,
+                             points_num*4, 2)
         """
         polygons_xs, polygons_ys = polygons[:, 0::2], polygons[:, 1::2]
         ratio = torch.linspace(0, 1, points_num).to(device).repeat(
@@ -339,15 +347,15 @@ class OrientedRepPointsHead(BaseDenseHead):
         edge_pts_y = []
         for i in range(4):
             if i < 3:
-                points_x = ratio * polygons_xs[:, i+1:i+2] + \
-                                  (1 - ratio) * polygons_xs[:, i:i+1]
-                points_y = ratio * polygons_ys[:, i + 1:i + 2] + \
-                           (1 - ratio) * polygons_ys[:, i:i + 1]
+                points_x = ratio * polygons_xs[:, i + 1:i + 2] + (
+                    1 - ratio) * polygons_xs[:, i:i + 1]
+                points_y = ratio * polygons_ys[:, i + 1:i + 2] + (
+                    1 - ratio) * polygons_ys[:, i:i + 1]
             else:
-                points_x = ratio * polygons_xs[:, 0].unsqueeze(1) + \
-                           (1 - ratio) * polygons_xs[:, i].unsqueeze(1)
-                points_y = ratio * polygons_ys[:, 0].unsqueeze(1) + \
-                           (1 - ratio) * polygons_ys[:, i].unsqueeze(1)
+                points_x = ratio * polygons_xs[:, 0].unsqueeze(1) + (
+                    1 - ratio) * polygons_xs[:, i].unsqueeze(1)
+                points_y = ratio * polygons_ys[:, 0].unsqueeze(1) + (
+                    1 - ratio) * polygons_ys[:, i].unsqueeze(1)
 
             edge_pts_x.append(points_x)
             edge_pts_y.append(points_y)
@@ -364,10 +372,11 @@ class OrientedRepPointsHead(BaseDenseHead):
 
         Args:
             features (torch.tensor): base feature with shape (B,C,W,H)
-            pt_locations (torch.tensor): locations of points in each point set with shape
-                         (B, N_points_set(number of point set), N_points(number of points in each point set) *2)
+            pt_locations (torch.tensor): locations of points in each point set
+                     with shape (B, N_points_set(number of point set),
+                     N_points(number of points in each point set) *2)
         Returns:
-            tensor: sampling points features with (B, C, N_points_set, N_points)
+            tensor: sampling features with (B, C, N_points_set, N_points)
         """
 
         h = features.shape[2] * stride
@@ -397,9 +406,11 @@ class OrientedRepPointsHead(BaseDenseHead):
         """Compute the points features similarity for points-wise correlation.
 
         Args:
-            points_features (torch.tensor): sampling point feature with shape (N_pointsets, N_points, C)
+            points_features (torch.tensor): sampling point feature with
+                     shape (N_pointsets, N_points, C)
         Returns:
-            max_correlation: max feature similarity in each point set with shape (N_points_set, N_points, C)
+            max_correlation: max feature similarity in each point set with
+                     shape (N_points_set, N_points, C)
         """
 
         mean_points_feats = torch.mean(points_features, dim=1, keepdim=True)
@@ -423,13 +434,17 @@ class OrientedRepPointsHead(BaseDenseHead):
                                      pts_pred_init, pts_pred_refine, label,
                                      bbox_gt, label_weight, bbox_weight,
                                      pos_inds):
-        """Assess the quality of each point set from the classification, localization,
-        orientation, and point-wise correlation based on the assigned point sets samples.
+        """Assess the quality of each point set from the classification,
+        localization, orientation, and point-wise correlation based on
+        the assigned point sets samples.
         Args:
             pts_features (torch.tensor): points features with shape (N, 9, C)
-            cls_score (torch.tensor): classification scores with shape (N, class_num)
-            pts_pred_init (torch.tensor): initial point sets prediction with shape (N, 9*2)
-            pts_pred_refine (torch.tensor): refined point sets prediction with shape (N, 9*2)
+            cls_score (torch.tensor): classification scores with
+                        shape (N, class_num)
+            pts_pred_init (torch.tensor): initial point sets prediction with
+                        shape (N, 9*2)
+            pts_pred_refine (torch.tensor): refined point sets prediction with
+                        shape (N, 9*2)
             label (torch.tensor): gt label with shape (N)
             bbox_gt(torch.tensor): gt bbox of polygon with shape (N, 8)
             label_weight (torch.tensor): label weight with shape (N)
@@ -437,7 +452,8 @@ class OrientedRepPointsHead(BaseDenseHead):
             pos_inds (torch.tensor): the  inds of  positive point set samples
 
         Returns:
-            qua (torch.tensor) : weighted quality values for positive point set samples.
+            qua (torch.tensor) : weighted quality values for positive
+                                 point set samples.
         """
         device = cls_score.device
         pos_scores = cls_score[pos_inds]
@@ -468,13 +484,13 @@ class OrientedRepPointsHead(BaseDenseHead):
             polygons_pred_refine, 10, device=device)
         sampling_pts_gt = self.sampling_points(pos_bbox_gt, 10, device=device)
 
-        #quality of orientation
+        # quality of orientation
         qua_ori_init = self.ori_qua_weight * ChamferDistance2D(
             sampling_pts_gt, sampling_pts_pred_init)
         qua_ori_refine = self.ori_qua_weight * ChamferDistance2D(
             sampling_pts_gt, sampling_pts_pred_refine)
 
-        #quality of localization
+        # quality of localization
         qua_loc_init = self.loss_bbox_refine(
             pos_pts_pred_init,
             pos_bbox_gt,
@@ -511,20 +527,24 @@ class OrientedRepPointsHead(BaseDenseHead):
         quality assessment values.
 
         Args:
-            quality (torch.tensor): the quality values of positive point set samples
+            quality (torch.tensor): the quality values of positive
+                                    point set samples
             label (torch.tensor): gt label with shape (N)
             bbox_gt(torch.tensor): gt bbox of polygon with shape (N, 8)
             label_weight (torch.tensor): label weight with shape (N)
             bbox_weight (torch.tensor): box weight with shape (N)
             pos_inds (torch.tensor): the inds of  positive point set samples
-            num_proposals_each_level (list[int]): proposals number of each level
+            num_proposals_each_level (list[int]): proposals number of
+                                    each level
             num_level (int): the level number
         Returns:
             label: gt label with shape (N)
             label_weight: label weight with shape (N)
             bbox_weight: box weight with shape (N)
-            num_pos (int): the number of selected positive point samples with high-qualty
-            pos_normalize_term (torch.tensor): the corresponding positive normalize term
+            num_pos (int): the number of selected positive point samples
+                           with high-qualty
+            pos_normalize_term (torch.tensor): the corresponding positive
+                             normalize term
         """
 
         if len(pos_inds) == 0:
@@ -566,7 +586,7 @@ class OrientedRepPointsHead(BaseDenseHead):
                 pos_loss_select, sort_inds = pos_loss_select.sort(
                 )  # small to large
                 pos_inds_select = pos_inds_select[sort_inds]
-                #dynamic top k
+                # dynamic top k
                 topk = math.ceil(pos_loss_select.shape[0] * self.top_ratio)
                 pos_inds_select_topk = pos_inds_select[:topk]
                 pos_inds_after_select.append(pos_inds_select_topk)
@@ -623,8 +643,7 @@ class OrientedRepPointsHead(BaseDenseHead):
             normalize_term,
             bbox_gt_init_norm / normalize_term,
             bbox_weights_pos_init,
-            avg_factor=None
-        ) if self.loss_spatial_init is not None else loss_pts_init.new_zeros(1)
+            avg_factor=None)
 
         return loss_pts_init, loss_border_init
 
@@ -983,9 +1002,7 @@ class OrientedRepPointsHead(BaseDenseHead):
                 pos_normalize_term.reshape(-1, 1),
                 pos_bbox_gt_refine / pos_normalize_term.reshape(-1, 1),
                 pos_bbox_weights_refine,
-                avg_factor=None
-            ) if self.loss_spatial_refine is not None else losses_pts_refine.new_zeros(
-                1)
+                avg_factor=None)
 
         else:
             losses_cls = cls_scores.sum() * 0
