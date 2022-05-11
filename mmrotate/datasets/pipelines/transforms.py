@@ -93,18 +93,21 @@ class RRandomFlip(RandomFlip):
 
 @ROTATED_PIPELINES.register_module()
 class PolyRandomRotate(object):
-    """Rotate img & bbox with angle theta = base_angle + random_angle where:
-        - base angle is chosen uniformly in the list of base_angles
-        - random_angle is a random float in (-angles_range, +angles_range)
+    """Rotate img & bbox.
     Reference: https://github.com/hukaixuan19970627/OrientedRepPoints_DOTA
 
     Args:
         rotate_ratio (float, optional): The rotating probability.
             Default: 0.5.
-        base_angles (None|list[int], optional) : The list of base angles to
-            choose from. Defaults to None, which is replaced with [0].
-        angles_range(int, optional): The range of the random angle added to
-            the base angle.
+        mode (str, optional) : Indicates whether the angle is chosen in a
+            random range (mode='range') or in a preset list of angles
+            (mode='value'). Defaults to 'range'.
+        angles_range(int|list[int], optional): The range of angles.
+            If mode='range', angle_ranges is an int and the angle is chosen
+            in (-angles_range, +angles_ranges).
+            If mode='value', angles_range is a non-empty list of int and the
+            angle is chosen in angles_range.
+            Defaults to 180 as default mode is 'range'.
         auto_bound(bool, optional): whether to find the new width and height
             bounds.
         rect_classes (None|list, optional): Specifies classes that needs to
@@ -114,14 +117,26 @@ class PolyRandomRotate(object):
 
     def __init__(self,
                  rotate_ratio=0.5,
-                 base_angles=None,
+                 mode='range',
                  angles_range=180,
                  auto_bound=False,
                  rect_classes=None,
                  version='le90'):
         self.rotate_ratio = rotate_ratio
-        self.base_angles = [0] if (base_angles is None) else base_angles
         self.auto_bound = auto_bound
+        if mode == 'range':
+            if not isinstance(angles_range, int):
+                raise TypeError("PolyRandomRotate with mode 'range' \
+                                  expects angle_range to be an int.")
+        elif mode == 'value':
+            if not (isinstance(angles_range, list)
+                    and isinstance(angles_range[0], int)):
+                raise TypeError("PolyRandomRotate with mode 'value' expects \
+                                  angle_range to be a non-empty list of int.")
+        else:
+            raise ValueError(f"Unknown mode for PolyRandomRange: {mode}. \
+                               Mode is supposed to be 'range' or 'value'.")
+        self.mode = mode
         self.angles_range = angles_range
         self.discrete_range = [90, 180, -90, -180]
         self.rect_classes = rect_classes
@@ -183,11 +198,14 @@ class PolyRandomRotate(object):
             results['rotate'] = False
             angle = 0
         else:
-            i_angle = np.random.randint(len(self.base_angles))
-            base_angle = self.base_angles[i_angle]
-            random_angle = self.angles_range * (2 * np.random.rand() - 1)
-            angle = base_angle + random_angle
             results['rotate'] = True
+            if self.mode == 'range':
+                angle = self.angles_range * (2 * np.random.rand() - 1)
+            elif self.mode == 'value':
+                i = np.random.randint(len(self.angles_range))
+                angle = self.angles_range[i]
+            else:
+                raise ValueError(f'Unknown mode: {self.mode}')
 
             class_labels = results['gt_labels']
             for classid in class_labels:
