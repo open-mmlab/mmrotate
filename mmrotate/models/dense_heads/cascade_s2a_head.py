@@ -30,7 +30,7 @@ class CascadeS2AHead(BaseDenseHead):
             self.pre_align = False
 
         # TODO 支持非数组
-        assert len(train_cfg) == len(heads)
+        assert train_cfg is None or len(train_cfg) == len(heads)
 
         self.num_stages = len(heads)
 
@@ -41,7 +41,8 @@ class CascadeS2AHead(BaseDenseHead):
 
         self.heads = nn.ModuleList()
         for i, head in enumerate(heads):
-            head.update(train_cfg=train_cfg[i])
+            if train_cfg is not None:
+                head.update(train_cfg=train_cfg[i])
             head.update(test_cfg=deepcopy(test_cfg))
             self.heads.append(build_head(head))
 
@@ -54,9 +55,9 @@ class CascadeS2AHead(BaseDenseHead):
         for i in range(self.num_stages):
             outs = self.heads[i](feats)
             if i != (self.num_stages - 1):
-                rois = self.get_pred_anchors(outs, i, rois)
+                rois = self.heads[i].refine_bboxes(*outs)
                 feats = self.align_modules[i](feats, rois)
-        return outs + (rois, )
+        return outs, rois
 
     def _bbox_forward_train(self,
                             stage,
@@ -128,6 +129,7 @@ class CascadeS2AHead(BaseDenseHead):
                 rois=rois)
 
             if i != self.num_stages - 1:
+                # TODO add rois
                 rois = self.heads[i].refine_bboxes(*outs)
 
                 # TODO ERROR i
