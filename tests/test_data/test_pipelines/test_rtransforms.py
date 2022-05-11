@@ -111,13 +111,3 @@ def test_rotate():
         version='oc')
     rotate_module = build_from_cfg(transform, PIPELINES)
     rotate_module(copy.deepcopy(results))
-
-    # test PolyDiscreteRotate
-    transform = dict(
-        type='PolyDiscreteRotate',
-        rotate_ratio=1.0,
-        angles=[30],
-        auto_bound=False,
-        version='oc')
-    rotate_module = build_from_cfg(transform, PIPELINES)
-    rotate_module(copy.deepcopy(results))
