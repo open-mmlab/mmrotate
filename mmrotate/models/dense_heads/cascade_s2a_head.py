@@ -13,6 +13,8 @@ from ..utils.align_module import build_align_module
 class CascadeS2AHead(BaseDenseHead):
 
     def __init__(self,
+                 pre_align=True,
+                 num_stages=2,
                  prior_generator=None,
                  align_modules=None,
                  heads=None,
@@ -20,18 +22,19 @@ class CascadeS2AHead(BaseDenseHead):
                  test_cfg=None,
                  init_cfg=None):
         super(CascadeS2AHead, self).__init__(init_cfg)
-        if prior_generator is not None:
+        self.pre_align = pre_align
+        self.num_stages = num_stages
+        assert num_stages >= 1, 'num_stages should be >=1'
+        assert len(heads) == self.num_stages,\
+            'heads should be list of length num_stages'
+        if self.pre_align:
             self.prior_generator = build_prior_generator(prior_generator)
-            assert len(align_modules) == len(heads)
-            self.pre_align = True
         else:
             self.prior_generator = None
-            assert len(align_modules) == len(heads) - 1
             align_modules.insert(0, dict(type='PseudoAlignModule'))
-            self.pre_align = False
 
-        # Get Stage Number
-        self.num_stages = len(heads)
+        assert len(align_modules) == self.num_stages
+
         # Build align_modules
         align_modules = [
             build_align_module(align_module) for align_module in align_modules
