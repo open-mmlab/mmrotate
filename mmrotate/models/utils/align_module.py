@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 from mmcv.cnn import normal_init
-from mmcv.ops import DeformConv2d
+from mmcv.ops import DeformConv2d, DeformConv2dPack
 from mmcv.runner import BaseModule
 from mmcv.utils import Registry, build_from_cfg
 from torch import nn
@@ -98,3 +98,25 @@ class AlignConv(BaseModule):
         for x, anchor, stride in zip(x, mlvl_anchors, self.strides):
             out.append(self.forward_single(x, anchor, stride))
         return out
+
+
+@ALIGN_MODULE.register_module()
+class PseudoAlignModule(BaseModule):
+    """Pseudo Align Module."""
+
+    def forward(self, x, anchors):
+        """Forward function."""
+        return x
+
+
+@ALIGN_MODULE.register_module()
+class DCNAlignModule(DeformConv2dPack):
+    """DCN Align Module.
+
+    All args are from DeformConv2dPack.
+    TODO: maybe use build_conv_layer is more flexible.
+    """
+
+    def forward(self, x, anchors):
+        """Forward function."""
+        return super(DCNAlignModule, self).forward(x)

@@ -21,42 +21,91 @@ class CascadeS2AHead(BaseDenseHead):
                  init_cfg=None):
         super(CascadeS2AHead, self).__init__(init_cfg)
         if prior_generator is not None:
-            self.anchor_generator = build_prior_generator(prior_generator)
+            self.prior_generator = build_prior_generator(prior_generator)
             assert len(align_modules) == len(heads)
             self.pre_align = True
         else:
-            self.anchor_generator = None
+            self.prior_generator = None
             assert len(align_modules) == len(heads) - 1
+            align_modules.insert(0, dict(type='PseudoAlignModule'))
             self.pre_align = False
 
-        # TODO 支持非数组
-        assert train_cfg is None or len(train_cfg) == len(heads)
-
+        # Get Stage Number
         self.num_stages = len(heads)
-
+        # Build align_modules
         align_modules = [
             build_align_module(align_module) for align_module in align_modules
         ]
         self.align_modules = nn.ModuleList(align_modules)
 
+        # Process train_cfg
+        if train_cfg:
+            if isinstance(train_cfg, dict):
+                self.train_cfg = [
+                    deepcopy(train_cfg) for _ in range(self.num_stages)
+                ]
+            else:
+                assert len(train_cfg) == self.num_stages
+                self.train_cfg = train_cfg
+        else:
+            self.train_cfg = [None for _ in range(self.num_stages)]
+
+        # Process test_cfg
+        if isinstance(test_cfg, dict):
+            self.test_cfg = [
+                deepcopy(test_cfg) for _ in range(self.num_stages)
+            ]
+        else:
+            assert len(test_cfg) == self.num_stages
+            self.test_cfg = test_cfg
+
+        # Build heads
         self.heads = nn.ModuleList()
         for i, head in enumerate(heads):
-            if train_cfg is not None:
-                head.update(train_cfg=train_cfg[i])
-            head.update(test_cfg=deepcopy(test_cfg))
+            head.update(train_cfg=self.train_cfg[i])
+            head.update(test_cfg=self.test_cfg[i])
             self.heads.append(build_head(head))
 
     def loss(self, **kwargs):
         raise NotImplementedError
 
+    def get_init_anchors(self, featmap_sizes, num_imgs, device='cuda'):
+        """Get init anchors according to feature map sizes.
+
+        Args:
+            featmap_sizes (list[tuple]): Multi-level feature map sizes.
+            num_imgs (int): Numbers of image.
+            device (torch.device | str): Device for returned tensors
+
+        Returns:
+            tuple (list[Tensor]):
+
+                - anchor_list (list[Tensor]): Anchors of each image.
+        """
+
+        # since feature map sizes of all images are the same, we only compute
+        # anchors for one time
+        multi_level_anchors = self.prior_generator.grid_priors(
+            featmap_sizes, device)
+        anchor_list = [multi_level_anchors for _ in range(num_imgs)]
+
+        return anchor_list
+
     def forward(self, feats):
-        rois = None
+        if self.pre_align:
+            featmap_sizes = [featmap.size()[-2:] for featmap in feats]
+            num_imgs = feats[0].size(0)
+            rois = self.get_init_anchors(featmap_sizes, num_imgs)
+        else:
+            rois = None
         outs = None
         for i in range(self.num_stages):
+            feats = self.align_modules[i](feats, rois)
             outs = self.heads[i](feats)
-            if i != (self.num_stages - 1):
+            if i == 0 and not self.pre_align:
                 rois = self.heads[i].refine_bboxes(*outs)
-                feats = self.align_modules[i](feats, rois)
+            elif i != self.num_stages - 1:
+                rois = self.heads[i].refine_bboxes(*outs, rois=rois)
         return outs, rois
 
     def _bbox_forward_train(self,
@@ -109,16 +158,15 @@ class CascadeS2AHead(BaseDenseHead):
         """
         losses = dict()
 
-        rois = None
-        align_feat = x
+        if self.pre_align:
+            featmap_sizes = [featmap.size()[-2:] for featmap in x]
+            num_imgs = x[0].size(0)
+            rois = self.get_init_anchors(featmap_sizes, num_imgs)
+        else:
+            rois = None
 
         for i in range(self.num_stages):
-
-            if i == 0 and self.pre_align:
-                # TODO
-                rois = None
-                align_feat = self.align_modules[0](x, rois)
-
+            align_feat = self.align_modules[i](x, rois)
             outs, loss = self._bbox_forward_train(
                 i,
                 align_feat,
@@ -128,12 +176,11 @@ class CascadeS2AHead(BaseDenseHead):
                 gt_bboxes_ignore,
                 rois=rois)
 
-            if i != self.num_stages - 1:
-                # TODO add rois
+            if i == 0 and not self.pre_align:
                 rois = self.heads[i].refine_bboxes(*outs)
+            elif i != self.num_stages - 1:
+                rois = self.heads[i].refine_bboxes(*outs, rois=rois)
 
-                # TODO ERROR i
-                align_feat = self.align_modules[i](x, rois)
             # update loss
             for name, value in loss.items():
                 losses[f's{i}.{name}'] = value
