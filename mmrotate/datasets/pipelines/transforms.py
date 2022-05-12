@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import cv2
+import mmcv
 import numpy as np
 from mmdet.datasets.pipelines.transforms import RandomFlip, Resize
 
@@ -124,18 +125,14 @@ class PolyRandomRotate(object):
                  version='le90'):
         self.rotate_ratio = rotate_ratio
         self.auto_bound = auto_bound
+        assert mode in ['range', 'value'], \
+            f"mode is supposed to be 'range' or 'value', but got {mode}."
         if mode == 'range':
-            if not isinstance(angles_range, int):
-                raise TypeError("PolyRandomRotate with mode 'range' \
-                                  expects angle_range to be an int.")
-        elif mode == 'value':
-            if not (isinstance(angles_range, list)
-                    and isinstance(angles_range[0], int)):
-                raise TypeError("PolyRandomRotate with mode 'value' expects \
-                                  angle_range to be a non-empty list of int.")
+            assert isinstance(angles_range, int), \
+                "mode 'range' expects angle_range to be an int."
         else:
-            raise ValueError(f"Unknown mode for PolyRandomRange: {mode}. \
-                               Mode is supposed to be 'range' or 'value'.")
+            assert mmcv.is_seq_of(angles_range, int) and len(angles_range), \
+                "mode 'value' expects angle_range as a non-empty list of int."
         self.mode = mode
         self.angles_range = angles_range
         self.discrete_range = [90, 180, -90, -180]
@@ -201,11 +198,9 @@ class PolyRandomRotate(object):
             results['rotate'] = True
             if self.mode == 'range':
                 angle = self.angles_range * (2 * np.random.rand() - 1)
-            elif self.mode == 'value':
+            else:
                 i = np.random.randint(len(self.angles_range))
                 angle = self.angles_range[i]
-            else:
-                raise ValueError(f'Unknown mode: {self.mode}')
 
             class_labels = results['gt_labels']
             for classid in class_labels:
