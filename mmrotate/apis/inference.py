@@ -85,5 +85,9 @@ def inference_detector_by_patches(model,
         start += bs
 
     results = merge_results(
-        results, windows[:, :2], iou_thr=merge_iou_thr, device=device)
+        results,
+        windows[:, :2],
+        img_shape=(width, height),
+        iou_thr=merge_iou_thr,
+        device=device)
     return results
