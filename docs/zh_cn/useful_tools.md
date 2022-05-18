@@ -4,9 +4,9 @@
 
 `tools/analysis_tools/analyze_logs.py` 通过给定的日志文件绘制 loss/mAP 曲线。 需首先执行 `pip install seaborn` 安装依赖。
 
- ```shell
+```shell
 python tools/analysis_tools/analyze_logs.py plot_curve [--keys ${KEYS}] [--title ${TITLE}] [--legend ${LEGEND}] [--backend ${BACKEND}] [--style ${STYLE}] [--out ${OUT_FILE}]
- ```
+```
 
 ![loss curve image](https://raw.githubusercontent.com/open-mmlab/mmdetection/master/resources/loss_curve.png)
 
@@ -14,36 +14,37 @@ python tools/analysis_tools/analyze_logs.py plot_curve [--keys ${KEYS}] [--title
 
 - 绘制某次执行的分类损失
 
-    ```shell
-    python tools/analysis_tools/analyze_logs.py plot_curve log.json --keys loss_cls --legend loss_cls
-    ```
+  ```shell
+  python tools/analysis_tools/analyze_logs.py plot_curve log.json --keys loss_cls --legend loss_cls
+  ```
+
 - 绘制某次执行的分类和回归损失，同时将图像保存到 pdf 文件
 
-    ```shell
-    python tools/analysis_tools/analyze_logs.py plot_curve log.json --keys loss_cls loss_bbox --out losses.pdf
-    ```
+  ```shell
+  python tools/analysis_tools/analyze_logs.py plot_curve log.json --keys loss_cls loss_bbox --out losses.pdf
+  ```
 
 - 在同一张图像中比较两次执行的 mAP
 
-    ```shell
-    python tools/analysis_tools/analyze_logs.py plot_curve log1.json log2.json --keys bbox_mAP --legend run1 run2
-    ```
+  ```shell
+  python tools/analysis_tools/analyze_logs.py plot_curve log1.json log2.json --keys bbox_mAP --legend run1 run2
+  ```
 
 - 计算平均训练速度
 
-    ```shell
-    python tools/analysis_tools/analyze_logs.py cal_train_time log.json [--include-outliers]
-    ```
+  ```shell
+  python tools/analysis_tools/analyze_logs.py cal_train_time log.json [--include-outliers]
+  ```
 
-    预计输出如下
+  预计输出如下
 
-    ```text
-    -----Analyze train time of work_dirs/some_exp/20190611_192040.log.json-----
-    slowest epoch 11, average time is 1.2024
-    fastest epoch 1, average time is 1.1909
-    time std over epochs is 0.0028
-    average iter time: 1.1959 s/iter
-    ```
+  ```text
+  -----Analyze train time of work_dirs/some_exp/20190611_192040.log.json-----
+  slowest epoch 11, average time is 1.2024
+  fastest epoch 1, average time is 1.1909
+  time std over epochs is 0.0028
+  average iter time: 1.1959 s/iter
+  ```
 
 ## 可视化
 
@@ -79,7 +80,6 @@ python tools/deployment/mmrotate2torchserve.py configs/rotated_faster_rcnn/rotat
 ```
 
 **Note**: ${MODEL_STORE} 需要是一个文件夹的绝对路径。
-
 
 ### 2. 构建 `mmrotate-serve` docker 镜像
 
@@ -204,7 +204,7 @@ Params: 36.42 M
 
 1. FLOPs 与输入大小相关，但参数量与其无关。默认输入大小是(1, 3, 1024, 1024)。
 2. 一些算子例如 DCN 或自定义算子并未包含在 FLOPs 计算中，所以 S<sup>2</sup>A-Net 和基于 RepPoints 的模型的 FLOPs 计算是错误的。
-详细信息请查看 [`mmcv.cnn.get_model_complexity_info()`](https://github.com/open-mmlab/mmcv/blob/master/mmcv/cnn/utils/flops_counter.py)。
+   详细信息请查看 [`mmcv.cnn.get_model_complexity_info()`](https://github.com/open-mmlab/mmcv/blob/master/mmcv/cnn/utils/flops_counter.py)。
 3. 两阶段检测器的 FLOPs 取决于候选的数量。
 
 ### 准备发布模型

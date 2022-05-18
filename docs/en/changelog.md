@@ -10,8 +10,11 @@
 #### New Features
 
 - Update performance of ReDet on HRSC2016. (#203)
+
 - Upgrage visualization to custom colors of different classes. This requires mmdet>=2.22.0. (#187, #267, #270)
+
 - Update Stable KLD, which solve the Nan issue of KLD training. (#183)
+
 - Support setting dataloader arguments in config and add functions to handle config compatibility. (#215)
   The comparison between the old and new usages is as below.
 
@@ -25,45 +28,46 @@
     <tbody><tr valign='top'>
     <th>
 
-    ```python
-    data = dict(
-        samples_per_gpu=2, workers_per_gpu=2,
-        train=dict(type='xxx', ...),
-        val=dict(type='xxx', samples_per_gpu=4, ...),
-        test=dict(type='xxx', ...),
-    )
-    ```
+  ```python
+  data = dict(
+      samples_per_gpu=2, workers_per_gpu=2,
+      train=dict(type='xxx', ...),
+      val=dict(type='xxx', samples_per_gpu=4, ...),
+      test=dict(type='xxx', ...),
+  )
+  ```
 
-    </th>
+  </th>
     <th>
 
-    ```python
-    # A recommended config that is clear
-    data = dict(
-        train=dict(type='xxx', ...),
-        val=dict(type='xxx', ...),
-        test=dict(type='xxx', ...),
-        # Use different batch size during inference.
-        train_dataloader=dict(samples_per_gpu=2, workers_per_gpu=2),
-        val_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
-        test_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
-    )
+  ```python
+  # A recommended config that is clear
+  data = dict(
+      train=dict(type='xxx', ...),
+      val=dict(type='xxx', ...),
+      test=dict(type='xxx', ...),
+      # Use different batch size during inference.
+      train_dataloader=dict(samples_per_gpu=2, workers_per_gpu=2),
+      val_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
+      test_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
+  )
 
-    # Old style still works but allows to set more arguments about data loaders
-    data = dict(
-        samples_per_gpu=2,  # only works for train_dataloader
-        workers_per_gpu=2,  # only works for train_dataloader
-        train=dict(type='xxx', ...),
-        val=dict(type='xxx', ...),
-        test=dict(type='xxx', ...),
-        # Use different batch size during inference.
-        val_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
-        test_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
-    )
-    ```
+  # Old style still works but allows to set more arguments about data loaders
+  data = dict(
+      samples_per_gpu=2,  # only works for train_dataloader
+      workers_per_gpu=2,  # only works for train_dataloader
+      train=dict(type='xxx', ...),
+      val=dict(type='xxx', ...),
+      test=dict(type='xxx', ...),
+      # Use different batch size during inference.
+      val_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
+      test_dataloader=dict(samples_per_gpu=4, workers_per_gpu=4),
+  )
+  ```
 
-    </th></tr>
+  </th></tr>
   </tbody></table>
+
 - Add [get_flops](tools/analysis_tools/get_flops.py) tool (#176)
 
 #### Bug Fixes

@@ -17,17 +17,19 @@ python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments]
 python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments] --launcher slurm
 ```
 
-
 例子:
 
 在 DOTA-1.0 数据集推理 RotatedRetinaNet 并生成压缩文件用于在线[提交](https://captain-whu.github.io/DOTA/evaluation.html) (首先请修改 [data_root](https://github.com/open-mmlab/mmrotate/tree/main/configs/_base_/datasets/dotav1.py))。
+
 ```shell
 python ./tools/test.py  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth --format-only \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
+
 或者
+
 ```shell
 ./tools/dist_test.sh  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -36,12 +38,15 @@ python ./tools/test.py  \
 ```
 
 您可以修改 [data_root](https://github.com/open-mmlab/mmrotate/tree/main/configs/_base_/datasets/dotav1.py) 中测试集的路径为验证集或训练集路径用于离线的验证。
+
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth --eval mAP
 ```
+
 或者
+
 ```shell
 ./tools/dist_test.sh  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -49,14 +54,13 @@ python ./tools/test.py \
 ```
 
 您也可以可视化结果。
+
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth \
   --show-dir work_dirs/vis
 ```
-
-
 
 ## 训练一个模型
 
@@ -106,7 +110,6 @@ NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_tr
 ### 使用 Slurm 来管理任务
 
 如果您在 [slurm](https://slurm.schedmd.com/) 管理的集群上运行 MMRotate，您可以使用脚本 `slurm_train.sh` (此脚本还支持单机训练)。
-
 
 ```shell
 [GPUS=${GPUS}] ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${WORK_DIR}

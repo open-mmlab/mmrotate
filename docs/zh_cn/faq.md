@@ -4,11 +4,11 @@
 
 ## MMCV 安装相关
 
-- MMCV 与 MMDetection 的兼容问题: "ConvWS is already registered in conv layer"; "AssertionError: MMCV==xxx is used but incompatible. Please install mmcv>=xxx, <=xxx."
+- MMCV 与 MMDetection 的兼容问题: "ConvWS is already registered in conv layer"; "AssertionError: MMCV==xxx is used but incompatible. Please install mmcv>=xxx, \<=xxx."
 
   请按 [安装说明](https://mmrotate.readthedocs.io/zh_CN/latest/install.html) 为你的 MMRotate 安装正确版本的 MMCV。
 
-- "No module named 'mmcv.ops'"; "No module named 'mmcv._ext'".
+- "No module named 'mmcv.ops'"; "No module named 'mmcv.\_ext'".
 
   原因是安装了 `mmcv` 而不是 `mmcv-full`。
 
@@ -42,7 +42,8 @@
 
 - "Segmentation fault".
 
-  1. 检查 GCC 的版本并使用 GCC 5.4，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如，对于 Pytorch GCC < 4.9)，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
+  1. 检查 GCC 的版本并使用 GCC 5.4，通常是因为 PyTorch 版本与 GCC 版本不匹配 （例如，对于 Pytorch GCC \< 4.9)，我们推荐用户使用 GCC 5.4，我们也不推荐使用 GCC 5.5， 因为有反馈 GCC 5.5 会导致 "segmentation fault" 并且切换到 GCC 5.4 就可以解决问题。
+
   2. 检查是是否 PyTorch 被正确的安装并可以使用 CUDA 算子，例如在终端中键入如下的指令。
 
      ```shell
@@ -63,42 +64,46 @@
 
 ## E2CNN
 
-- "ImportError: cannot import name 'container_bacs' from 'torch._six'"
+- "ImportError: cannot import name 'container_bacs' from 'torch.\_six'"
 
-    1. 这是因为 `container_abcs` 在 PyTorch 1.9 之后被移除.
-    2. 将文件 `python3.7/site-packages/e2cnn/nn/modules/module_list.py` 中的
+  1. 这是因为 `container_abcs` 在 PyTorch 1.9 之后被移除.
 
-        ```shell
-        from torch.six import container_abcs
-        ```
+  2. 将文件 `python3.7/site-packages/e2cnn/nn/modules/module_list.py` 中的
 
-       替换成
+     ```shell
+     from torch.six import container_abcs
+     ```
 
-        ```shell
-        TORCH_MAJOR = int(torch.__version__.split('.')[0])
-        TORCH_MINOR = int(torch.__version__.split('.')[1])
-        if TORCH_MAJOR ==1 and TORCH_MINOR < 8:
-            from torch.six import container_abcs
-        else:
-            import collections.abs as container_abcs
-        ```
+     替换成
 
-     3. 或者降低 Pytorch 的版本。
+     ```shell
+     TORCH_MAJOR = int(torch.__version__.split('.')[0])
+     TORCH_MINOR = int(torch.__version__.split('.')[1])
+     if TORCH_MAJOR ==1 and TORCH_MINOR < 8:
+         from torch.six import container_abcs
+     else:
+         import collections.abs as container_abcs
+     ```
+
+  3. 或者降低 Pytorch 的版本。
 
 ## Training 相关
 
 - "Loss goes Nan"
+
   1. 检查数据的标注是否正常，长或宽为 0 的框可能会导致回归 loss 变为 nan，一些小尺寸（宽度或高度小于 1）的框在数据增强（例如，instaboost）后也会导致此问题。因此，可以检查标注并过滤掉那些特别小甚至面积为 0 的框，并关闭一些可能会导致 0 面积框出现数据增强。
   2. 降低学习率：由于某些原因，例如 batch size 大小的变化，导致当前学习率可能太大。您可以降低为可以稳定训练模型的值。
   3. 延长 warm up 的时间：一些模型在训练初始时对学习率很敏感，您可以把 `warmup_iters` 从 500 更改为 1000 或 2000。
   4. 添加 gradient clipping: 一些模型需要梯度裁剪来稳定训练过程。默认的 `grad_clip` 是 `None`，你可以在 config 设置 `optimizer_config=dict(_delete_=True, grad_clip=dict(max_norm=35, norm_type=2))`。 如果你的 config 没有继承任何包含 `optimizer_config=dict(grad_clip=None)`，你可以直接设置 `optimizer_config=dict(grad_clip=dict(max_norm=35, norm_type=2))`。
 
 - "GPU out of memory"
+
   1. 存在大量 ground truth boxes 或者大量 anchor 的场景，可能在 assigner 会 OOM。您可以在 assigner 的配置中设置 `gpu_assign_thr=N`，这样当超过 N 个 GT boxes 时，assigner 会通过 CPU 计算 IoU。
   2. 在 backbone 中设置 `with_cp=True`。这使用 PyTorch 中的 `sublinear strategy` 来降低 backbone 占用的 GPU 显存。
   3. 通过在配置文件中设置 `fp16 = dict(loss_scale='dynamic')` 来尝试混合精度训练。
 
 - "RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one"
+
   1. 错误表明，您的模块有没用于产生损失的参数，这种现象可能是由于在 DDP 模式下运行代码中的不同分支造成的。
   2. 您可以在配置中设置 `find_unused_parameters = True` 来解决上述问题，或者手动查找那些未使用的参数。
 

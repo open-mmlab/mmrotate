@@ -256,7 +256,6 @@ custom_imports=dict(
 
 to the config file and achieve the same goal.
 
-
 ### Add new loss
 
 Assume you want to add a new loss as `MyLoss`, for bounding box regression.
