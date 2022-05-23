@@ -32,7 +32,6 @@ repos:
     rev: v2.1.0
     hooks:
       - id: codespell
-        args: [ '--ignore-words-list', 'DOTA' ]
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.14
     hooks:
