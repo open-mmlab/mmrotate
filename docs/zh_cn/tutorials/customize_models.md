@@ -205,7 +205,7 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
 
 ```
 
-Double Head 的修改主要在 _bbox_forward 的逻辑中，且它从 `StandardRoIHead` 中继承了其他逻辑。
+Double Head 的修改主要在 \_bbox_forward 的逻辑中，且它从 `StandardRoIHead` 中继承了其他逻辑。
 在 `mmrotate/models/roi_heads/double_roi_head.py` 中, 我们实现如下的新的 RoI Head:
 
 ```python
@@ -253,7 +253,6 @@ custom_imports=dict(
 ```
 
 到配置文件中来实现同样的目的。
-
 
 ### 添加新的损失
 

@@ -4,9 +4,9 @@ import copy
 import torch
 import torch.nn as nn
 from mmcv.ops import batched_nms
-from mmdet.core import unmap
+from mmdet.core import anchor_inside_flags, unmap
 
-from mmrotate.core import obb2xyxy, rotated_anchor_inside_flags
+from mmrotate.core import obb2xyxy
 from ..builder import ROTATED_HEADS
 from .rotated_rpn_head import RotatedRPNHead
 
@@ -64,9 +64,9 @@ class OrientedRPNHead(RotatedRPNHead):
                 - num_total_pos (int): Number of positive samples in all images
                 - num_total_neg (int): Number of negative samples in all images
         """
-        inside_flags = rotated_anchor_inside_flags(
-            flat_anchors, valid_flags, img_meta['img_shape'][:2],
-            self.train_cfg.allowed_border)
+        inside_flags = anchor_inside_flags(flat_anchors, valid_flags,
+                                           img_meta['img_shape'][:2],
+                                           self.train_cfg.allowed_border)
         if not inside_flags.any():
             return (None, ) * 7
         # assign gt and sample anchors

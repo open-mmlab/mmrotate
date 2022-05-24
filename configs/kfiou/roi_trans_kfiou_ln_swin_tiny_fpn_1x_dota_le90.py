@@ -26,7 +26,6 @@ model = dict(
         type='FPN',
         in_channels=[96, 192, 384, 768],
         out_channels=256,
-        start_level=1,
         add_extra_convs='on_input',
         num_outs=5))
 

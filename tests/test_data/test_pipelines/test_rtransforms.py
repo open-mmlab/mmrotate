@@ -103,9 +103,10 @@ def test_rotate():
     """Test rotation for rbboxes."""
     results = construct_toy_data()
 
-    # test PolyRandomRotate
+    # test PolyRandomRotate with 'range' mode
     transform = dict(
         type='PolyRandomRotate',
+        mode='range',
         rotate_ratio=1.0,
         angles_range=180,
         auto_bound=False,
@@ -113,7 +114,18 @@ def test_rotate():
     rotate_module = build_from_cfg(transform, PIPELINES)
     rotate_module(copy.deepcopy(results))
 
+    # test PolyRandomRotate with 'value' mode
+    transform = dict(
+        type='PolyRandomRotate',
+        mode='value',
+        rotate_ratio=1.0,
+        angles_range=[30],
+        auto_bound=False,
+        version='oc')
+    rotate_module = build_from_cfg(transform, PIPELINES)
+    rotate_module(copy.deepcopy(results))
 
+  
 def test_rrandom_crop():
     """Test random crop for rbboxes."""
     # test assertion for invalid random crop
