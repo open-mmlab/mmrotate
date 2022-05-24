@@ -282,8 +282,7 @@ class RRandomCrop(RandomCrop):
                                           allow_negative_crop)
 
     def _crop_data(self, results, crop_size, allow_negative_crop):
-        """Function to randomly crop images, bounding boxes, masks, semantic
-        segmentation maps.
+        """Function to randomly crop images, bounding boxes.
 
         Args:
             results (dict): Result dict from loading pipeline.
