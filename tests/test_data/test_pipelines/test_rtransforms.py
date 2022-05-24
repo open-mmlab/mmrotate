@@ -2,6 +2,7 @@
 import copy
 
 import numpy as np
+import pytest
 from mmcv.utils import build_from_cfg
 from mmdet.datasets.builder import PIPELINES
 
@@ -111,3 +112,36 @@ def test_rotate():
         version='oc')
     rotate_module = build_from_cfg(transform, PIPELINES)
     rotate_module(copy.deepcopy(results))
+
+
+def test_rrandom_crop():
+    """Test random crop for rbboxes."""
+    # test assertion for invalid random crop
+    with pytest.raises(AssertionError):
+        transform = dict(type='RRandomCrop', crop_size=(-1, 0))
+        build_from_cfg(transform, PIPELINES)
+
+    results = construct_toy_data()
+    h, w, c = results['img_shape']
+    gt_bboxes = results['gt_bboxes'].copy()
+    gt_bboxes_ignore = results['gt_bboxes_ignore'].copy()
+
+    transform = dict(type='RRandomCrop', crop_size=(h - 1, w - 3))
+    crop_module = build_from_cfg(transform, PIPELINES)
+    results = crop_module(results)
+    assert results['img'].shape[:2] == (h - 1, w - 3)
+    # All bboxes should be reserved after crop
+    assert results['img_shape'][:2] == (h - 1, w - 3)
+    assert results['gt_labels'].shape[0] == results['gt_bboxes'].shape[0]
+    assert results['gt_labels'].dtype == np.int64
+    assert results['gt_bboxes'].dtype == np.float32
+    assert results['gt_bboxes'].shape[0] == 1
+    assert results['gt_bboxes_ignore'].shape[0] == 1
+
+    def area(bboxes):
+        return np.prod(bboxes[:, 2:4], axis=1)
+
+    assert (area(results['gt_bboxes']) <= area(gt_bboxes)).all()
+    assert (area(results['gt_bboxes_ignore']) <= area(gt_bboxes_ignore)).all()
+    assert results['gt_bboxes'].dtype == np.float32
+    assert results['gt_bboxes_ignore'].dtype == np.float32
