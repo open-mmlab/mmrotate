@@ -17,17 +17,19 @@ python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments]
 python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments] --launcher slurm
 ```
 
-
 Examples:
 
 Inference RotatedRetinaNet on DOTA-1.0 dataset, which can generate compressed files for online [submission](https://captain-whu.github.io/DOTA/evaluation.html). (Please change the [data_root](https://github.com/open-mmlab/mmrotate/tree/main/configs/_base_/datasets/dotav1.py) firstly.)
+
 ```shell
 python ./tools/test.py  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth --format-only \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
+
 or
+
 ```shell
 ./tools/dist_test.sh  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -36,12 +38,15 @@ or
 ```
 
 You can change the test set path in the [data_root](https://github.com/open-mmlab/mmrotate/tree/main/configs/_base_/datasets/dotav1.py) to the val set or trainval set for the offline evaluation.
+
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth --eval mAP
 ```
+
 or
+
 ```shell
 ./tools/dist_test.sh  \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
@@ -49,14 +54,13 @@ or
 ```
 
 You can also visualize the results.
+
 ```shell
 python ./tools/test.py \
   configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
   checkpoints/SOME_CHECKPOINT.pth \
   --show-dir work_dirs/vis
 ```
-
-
 
 ## Train a model
 

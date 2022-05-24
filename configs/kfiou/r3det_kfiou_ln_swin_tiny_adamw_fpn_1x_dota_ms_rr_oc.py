@@ -3,7 +3,7 @@ _base_ = ['./r3det_kfiou_ln_r50_fpn_1x_dota_oc.py']
 pretrained = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth'  # noqa
 
 data_root = '../datasets/split_ms_dota1_0/'
-angle_version = 'le90'
+angle_version = 'oc'
 model = dict(
     backbone=dict(
         _delete_=True,

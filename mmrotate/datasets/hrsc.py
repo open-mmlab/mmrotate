@@ -40,6 +40,19 @@ class HRSCDataset(CustomDataset):
                        '10', '11', '12', '13', '14', '15', '16', '17', '18',
                        '19', '20', '22', '24', '25', '26', '27', '28', '29',
                        '30', '31', '32', '33')
+    PALETTE = [
+        (0, 255, 0),
+    ]
+    CLASSWISE_PALETTE = [(220, 20, 60), (119, 11, 32),
+                         (0, 0, 142), (0, 0, 230), (106, 0, 228), (0, 60, 100),
+                         (0, 80, 100), (0, 0, 70), (0, 0, 192), (250, 170, 30),
+                         (100, 170, 30), (220, 220, 0), (175, 116, 175),
+                         (250, 0, 30), (165, 42, 42), (255, 77, 255),
+                         (0, 226, 252), (182, 182, 255), (0, 82, 0),
+                         (120, 166, 157), (110, 76, 0), (174, 57, 255),
+                         (199, 100, 0), (72, 0, 118), (255, 179, 240),
+                         (0, 125, 92), (209, 0, 151), (188, 208, 182),
+                         (0, 220, 176), (255, 99, 164), (92, 0, 73)]
 
     def __init__(self,
                  ann_file,
@@ -54,6 +67,7 @@ class HRSCDataset(CustomDataset):
         self.classwise = classwise
         self.version = version
         if self.classwise:
+            HRSCDataset.PALETTE = HRSCDataset.CLASSWISE_PALETTE
             HRSCDataset.CLASSES = self.HRSC_CLASSES
             self.catid2label = {
                 ('1' + '0' * 6 + cls_id): i
@@ -188,15 +202,16 @@ class HRSCDataset(CustomDataset):
                 valid_inds.append(i)
         return valid_inds
 
-    def evaluate(self,
-                 results,
-                 metric='mAP',
-                 logger=None,
-                 proposal_nums=(100, 300, 1000),
-                 iou_thr=0.5,
-                 scale_ranges=None,
-                 use_07_metric=True,
-                 nproc=4):
+    def evaluate(
+            self,
+            results,
+            metric='mAP',
+            logger=None,
+            proposal_nums=(100, 300, 1000),
+            iou_thr=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
+            scale_ranges=None,
+            use_07_metric=True,
+            nproc=4):
         """Evaluate the dataset.
 
         Args:

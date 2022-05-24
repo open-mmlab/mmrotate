@@ -91,6 +91,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Fetch GPG keys
+        run: |
+          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
       - name: Install system dependencies
         run: apt-get update && apt-get install -y libgl1-mesa-glx libglib2.0-0 libsm6 libxrender-dev libxext6
       - name: Install python-dev
@@ -140,6 +144,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Fetch GPG keys
+        run: |
+          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
       - name: Install system dependencies
         run: apt-get update && apt-get install -y libgl1-mesa-glx libglib2.0-0 libsm6 libxrender-dev libxext6 git
       - name: Install python-dev
@@ -178,8 +186,9 @@ jobs:
     strategy:
       matrix:
         os: [windows-2022]
-        python: [3.8]
-        platform: [cpu, cu111]
+        # Currently, mmdet has some bugs in win-py3.8-cu111
+        python: [3.7]
+        platform: [cpu, cu102]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python }}

@@ -31,6 +31,11 @@ post_processing
 .. automodule:: mmrotate.core.post_processing
     :members:
 
+visualization
+^^^^^^^^^^^^^
+.. automodule:: mmrotate.core.visualization
+    :members:
+
 mmrotate.datasets
 --------------
 
