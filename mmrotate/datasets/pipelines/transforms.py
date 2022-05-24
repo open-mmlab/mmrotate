@@ -312,7 +312,7 @@ class RRandomCrop(RandomCrop):
             results[key] = img
         results['img_shape'] = img_shape
 
-        height, width = img_shape
+        height, width, _ = img_shape
 
         # crop bboxes accordingly and clip to the image boundary
         for key in results.get('bbox_fields', []):
