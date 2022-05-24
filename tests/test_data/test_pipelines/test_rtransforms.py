@@ -125,7 +125,7 @@ def test_rotate():
     rotate_module = build_from_cfg(transform, PIPELINES)
     rotate_module(copy.deepcopy(results))
 
-  
+
 def test_rrandom_crop():
     """Test random crop for rbboxes."""
     # test assertion for invalid random crop
@@ -134,12 +134,17 @@ def test_rrandom_crop():
         build_from_cfg(transform, PIPELINES)
 
     results = construct_toy_data()
+    img = np.zeros([256, 256, 3], dtype=np.uint8)
+    results['img'] = img
+    results['img_shape'] = img.shape
+
     h, w, c = results['img_shape']
     gt_bboxes = results['gt_bboxes'].copy()
     gt_bboxes_ignore = results['gt_bboxes_ignore'].copy()
 
     transform = dict(type='RRandomCrop', crop_size=(h - 1, w - 3))
     crop_module = build_from_cfg(transform, PIPELINES)
+    print(results['img'].shape)
     results = crop_module(results)
     assert results['img'].shape[:2] == (h - 1, w - 3)
     # All bboxes should be reserved after crop

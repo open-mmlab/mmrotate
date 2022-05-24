@@ -344,7 +344,7 @@ class RRandomCrop(RandomCrop):
             bboxes = results[key] - bbox_offset
 
             valid_inds = (bboxes[:, 0] >=
-                          0) & (bboxes[:, 0 < width]) & (bboxes[:, 1] >= 0) & (
+                          0) & (bboxes[:, 0] < width) & (bboxes[:, 1] >= 0) & (
                               bboxes[:, 1] < height)
             # If the crop does not contain any gt-bbox area and
             # allow_negative_crop is False, skip this image.
