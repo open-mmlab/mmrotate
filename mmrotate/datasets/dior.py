@@ -25,6 +25,7 @@ class DIORDataset(CustomDataset):
         ann_subdir (str): Subdir where annotations are.
             Defaults to ``Annotations/Oriented Bounding Boxes/``.
         version (str, optional): Angle representations. Defaults to ``oc``.
+        xmltype : Choose obb or hbb as ground truth. Defaults to ``obb``.
     """
 
     CLASSES = ('airplane', 'airport', 'baseballfield', 'basketballcourt',
@@ -46,7 +47,10 @@ class DIORDataset(CustomDataset):
                  img_subdir='JPEGImages-trainval',
                  ann_subdir='Annotations/Oriented Bounding Boxes/',
                  version='oc',
+                 xmltype='obb',
                  **kwargs):
+        assert xmltype in ['hbb', 'obb']
+        self.xmltype = xmltype
         self.img_subdir = img_subdir
         self.ann_subdir = ann_subdir
         self.version = version
@@ -100,21 +104,34 @@ class DIORDataset(CustomDataset):
                 if label is None:
                     continue
 
-                # Add an extra score to use obb2poly_np
-                bnd_box = obj.find('robndbox')
-                polygon = np.array([
-                    float(bnd_box.find('x_left_top').text),
-                    float(bnd_box.find('y_left_top').text),
-                    float(bnd_box.find('x_right_top').text),
-                    float(bnd_box.find('y_right_top').text),
-                    float(bnd_box.find('x_right_bottom').text),
-                    float(bnd_box.find('y_right_bottom').text),
-                    float(bnd_box.find('x_left_bottom').text),
-                    float(bnd_box.find('y_left_bottom').text),
-                ]).astype(np.float32)
+                if self.xmltype == 'obb':
+                    bnd_box = obj.find('robndbox')
+                    polygon = np.array([
+                        float(bnd_box.find('x_left_top').text),
+                        float(bnd_box.find('y_left_top').text),
+                        float(bnd_box.find('x_right_top').text),
+                        float(bnd_box.find('y_right_top').text),
+                        float(bnd_box.find('x_right_bottom').text),
+                        float(bnd_box.find('y_right_bottom').text),
+                        float(bnd_box.find('x_left_bottom').text),
+                        float(bnd_box.find('y_left_bottom').text),
+                    ]).astype(np.float32)
+                else:
+                    bnd_box = obj.find('bndbox')
+                    if bnd_box is None:
+                        continue
+                    polygon = np.array([
+                        float(bnd_box.find('xmin').text),
+                        float(bnd_box.find('ymin').text),
+                        float(bnd_box.find('xmax').text),
+                        float(bnd_box.find('ymin').text),
+                        float(bnd_box.find('xmax').text),
+                        float(bnd_box.find('ymax').text),
+                        float(bnd_box.find('xmin').text),
+                        float(bnd_box.find('ymax').text)
+                    ]).astype(np.float32)
 
                 bbox = poly2obb_np(polygon, self.version)
-
                 if bbox is not None:
                     gt_bboxes.append(np.array(bbox, dtype=np.float32))
                     gt_labels.append(label)
