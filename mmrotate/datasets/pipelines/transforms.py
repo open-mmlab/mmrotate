@@ -270,6 +270,7 @@ class RRandomCrop(RandomCrop):
 
     The absolute `crop_size` is sampled based on `crop_type` and `image_size`,
     then the cropped results are generated.
+
     Args:
         crop_size (tuple): The relative ratio or absolute pixels of
             height and width.
@@ -284,6 +285,7 @@ class RRandomCrop(RandomCrop):
             in range [crop_size[0], min(w, crop_size[1])]. Default "absolute".
         allow_negative_crop (bool, optional): Whether to allow a crop that does
             not contain any bbox area. Default False.
+
     Note:
         - If the image is smaller than the absolute crop size, return the
             original image.
@@ -311,6 +313,7 @@ class RRandomCrop(RandomCrop):
             crop_size (tuple): Expected absolute size after cropping, (h, w).
             allow_negative_crop (bool): Whether to allow a crop that does not
                 contain any bbox area. Default to False.
+
         Returns:
             dict: Randomly cropped results, 'img_shape' key in result dict is
                 updated according to crop size.
