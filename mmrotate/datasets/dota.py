@@ -89,7 +89,7 @@ class DOTADataset(CustomDataset):
                 gt_labels_ignore = []
                 gt_polygons_ignore = []
 
-                if os.path.getsize(ann_file) == 0:
+                if os.path.getsize(ann_file) == 0 and self.filter_empty_gt:
                     continue
 
                 with open(ann_file) as f:
