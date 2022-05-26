@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
 from mmcv.runner import force_fp32
@@ -221,3 +222,45 @@ class ODMRefineHead(RotatedRetinaHead):
                                                 scale_factor, cfg, rescale)
             result_list.append(proposals)
         return result_list
+
+    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
+    def refine_bboxes(self, cls_scores, bbox_preds, rois):
+        """Refine predicted bounding boxes at each position of the feature
+        maps. This method will be used in R3Det in refinement stages.
+
+        Args:
+            cls_scores (list[Tensor]): Box scores for each scale level
+                Has shape (N, num_classes, H, W)
+            bbox_preds (list[Tensor]): Box energies / deltas for each scale
+                level with shape (N, 5, H, W)
+            rois (list[list[Tensor]]): input rbboxes of each level of each
+                image. rois output by former stages and are to be refined
+
+        Returns:
+            list[list[Tensor]]: best or refined rbboxes of each level of each \
+                image.
+        """
+        num_levels = len(cls_scores)
+        assert num_levels == len(bbox_preds)
+
+        num_imgs = cls_scores[0].size(0)
+
+        for i in range(num_levels):
+            assert num_imgs == cls_scores[i].size(0) == bbox_preds[i].size(0)
+
+        bboxes_list = [[] for _ in range(num_imgs)]
+
+        assert rois is not None
+        mlvl_rois = [torch.cat(r) for r in zip(*rois)]
+
+        for lvl in range(num_levels):
+            bbox_pred = bbox_preds[lvl]
+            rois = mlvl_rois[lvl]
+            assert bbox_pred.size(1) == 5
+            bbox_pred = bbox_pred.permute(0, 2, 3, 1)
+            bbox_pred = bbox_pred.reshape(-1, 5)
+            refined_bbox = self.bbox_coder.decode(rois, bbox_pred)
+            refined_bbox = refined_bbox.reshape(num_imgs, -1, 5)
+            for img_id in range(num_imgs):
+                bboxes_list[img_id].append(refined_bbox[img_id].detach())
+        return bboxes_list

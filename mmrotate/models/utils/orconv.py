@@ -115,7 +115,7 @@ class ORConv2d(Conv2d):
     def __repr__(self):
         arf_config = f'[{self.nOrientation}]' \
             if self.nOrientation == self.nRotation \
-            else '[{self.nOrientation}-{self.nRotation}]'
+            else f'[{self.nOrientation}-{self.nRotation}]'
         s = ('{name}({arf_config} {in_channels}, '
              '{out_channels}, kernel_size={kernel_size}'
              ', stride={stride}')
