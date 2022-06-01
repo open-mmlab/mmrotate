@@ -73,7 +73,7 @@ class DIORDataset(CustomDataset):
             data_info = {}
 
             filename = osp.join(self.img_subdir, f'{img_id}.jpg')
-            data_info['filename'] = filename
+            data_info['filename'] = f'{img_id}.jpg'
             xml_path = osp.join(self.img_prefix, self.ann_subdir,
                                 f'{img_id}.xml')
             tree = ET.parse(xml_path)
