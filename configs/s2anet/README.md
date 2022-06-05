@@ -1,7 +1,9 @@
 # S2ANet
+
 > [Align Deep Features for Oriented Object Detection](https://ieeexplore.ieee.org/document/9377550)
 
 <!-- [ALGORITHM] -->
+
 ## Abstract
 
 <div align=center>
@@ -14,19 +16,20 @@ The past decade has witnessed significant progress on detecting objects in aeria
 
 DOTA1.0
 
-|    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
-|:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
-| ResNet50 (1024,1024,200) | 69.79 | le135 | 1x | 3.38 | 17.2 | - | 2 | [rotated_retinanet_obb_r50_fpn_1x_dota_le135](../rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135-e4131166.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135_20220128_130755.log.json)
-| ResNet50 (1024,1024,200) | 73.91 | le135 | 1x | 3.14 | 15.5 | - | 2 | [s2anet_r50_fpn_1x_dota_le135](./s2anet_r50_fpn_1x_dota_le135.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_1x_dota_le135/s2anet_r50_fpn_1x_dota_le135-5dfcf396.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_1x_dota_le135/s2anet_r50_fpn_1x_dota_le135_20220124_163529.log.json)
-| ResNet50 (1024,1024,200) | 74.19 | le135 | 1x | 2.17 | 17.4 | - | 2 | [s2anet_r50_fpn_fp16_1x_dota_le135](./s2anet_r50_fpn_fp16_1x_dota_le135.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_fp16_1x_dota_le135/s2anet_r50_fpn_fp16_1x_dota_le135-5cac515c.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_fp16_1x_dota_le135/s2anet_r50_fpn_fp16_1x_dota_le135_20220303_194910.log.json)
+|         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                                      Configs                                                       |                                                                                                                                                                                  Download                                                                                                                                                                                  |
+| :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :----------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ResNet50 (1024,1024,200) | 69.79 | le135 |   1x    |   3.38   |      17.2      |  -  |     2      | [rotated_retinanet_obb_r50_fpn_1x_dota_le135](../rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135-e4131166.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135_20220128_130755.log.json) |
+| ResNet50 (1024,1024,200) | 73.91 | le135 |   1x    |   3.14   |      15.5      |  -  |     2      |                         [s2anet_r50_fpn_1x_dota_le135](./s2anet_r50_fpn_1x_dota_le135.py)                          |                                          [model](https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_1x_dota_le135/s2anet_r50_fpn_1x_dota_le135-5dfcf396.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_1x_dota_le135/s2anet_r50_fpn_1x_dota_le135_20220124_163529.log.json)                                          |
+| ResNet50 (1024,1024,200) | 74.19 | le135 |   1x    |   2.17   |      17.4      |  -  |     2      |                    [s2anet_r50_fpn_fp16_1x_dota_le135](./s2anet_r50_fpn_fp16_1x_dota_le135.py)                     |                                [model](https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_fp16_1x_dota_le135/s2anet_r50_fpn_fp16_1x_dota_le135-5cac515c.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_fp16_1x_dota_le135/s2anet_r50_fpn_fp16_1x_dota_le135_20220303_194910.log.json)                                |
 
 HRSC
 
-|       Backbone        |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                            Configs                                            | Download |
-|:---------------------:|:-----:|:-----------:|:-------:|:---------:|:---------:|:---------:|:---------:|:---------------------------------------------------------------------------------------------:|:-------------:|
-|  ResNet50 (800,800)   | 89.75 | le90 |   3x    |  |  | - | 2 | [s2anet_r50_fpn_3x_hrsc_le135](./s2anet_r50_fpn_3x_hrsc_le135.py) |
+|      Backbone      |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                              Configs                              | Download |
+| :----------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :---------------------------------------------------------------: | :------: |
+| ResNet50 (800,800) | 89.75 | le90  |   3x    |          |                |  -  |     2      | [s2anet_r50_fpn_3x_hrsc_le135](./s2anet_r50_fpn_3x_hrsc_le135.py) |          |
 
 ## Citation
+
 ```
 @article{han2021align,
   title={Align deep features for oriented object detection},
