@@ -1,5 +1,38 @@
 ## Changelog
 
+### v0.3.1 (6/6/2022)
+
+#### Highlight
+
+- Support Rotated FCOS (#223)
+
+#### New Features
+
+- Update PolyRandomRotate to support discrete angle value. (#281)
+- Support RRandomCrop. (#322)
+- Support mask in merge_results and huge_image_demo.py. (#280)
+- Support don't filter images without ground truths. (#323)
+- Add MultiImageMixDataset in build_dataset. (#331)
+
+#### Bug Fixes
+
+- Fix error in Windows CI. (#324)
+- Fix data path error in config files. (#328)
+- Fix bug when visualize the HRSC2016 detect results. (#329)
+
+#### Improvements
+
+- Add torchserve doc in zh_cn. (#287)
+- Fix doc typo in README. (#284)
+- Configure Myst-parser to parse anchor tag (#305 #308)
+- Replace markdownlint with mdformat for avoiding installing ruby. (#306)
+- Fix typo about split gap of multi scale. (#272)
+
+#### Contributors
+
+A total of 7 developers contributed to this release.
+Thanks @liuyanyi @nijkah @remi-or @yangxue0827 @jbwang1997 @zytx121 @ZwwWayne
+
 ### v0.3.0 (29/4/2022)
 
 #### Highlight
