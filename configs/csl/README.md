@@ -1,7 +1,9 @@
 # CSL
+
 > [Arbitrary-Oriented Object Detection with Circular Smooth Label](https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40)
 
 <!-- [ALGORITHM] -->
+
 ## Abstract
 
 <div align=center>
@@ -24,14 +26,14 @@ as well as scene text dataset ICDAR2015 and MLT, show the effectiveness of our a
 
 DOTA1.0
 
-|    Backbone   |    mAP   | Angle | Window func. | Omega | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
-|:------------:|:----------:|:-----------:|:-----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
-| ResNet50 (1024,1024,200) | 68.42 | le90 | - | - | 1x | 3.38 | 17.8 | - | 2 | [rotated_retinanet_obb_r50_fpn_1x_dota_le90](../rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90/rotated_retinanet_obb_r50_fpn_1x_dota_le90-c0097bc4.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90/rotated_retinanet_obb_r50_fpn_1x_dota_le90_20220128_130740.log.json)
-| ResNet50 (1024,1024,200) | 68.79 | le90 | - | - | 1x | 2.36 | 25.9 | - | 2 | [rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90](../rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90-01de71b5.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90_20220303_183714.log.json)
-| ResNet50 (1024,1024,200) | 69.51 | le90 | Gaussian | 4 | 1x | 2.60 | 24.0 | - | 2 | [rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90](./rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90.py) |  [model](https://download.openmmlab.com/mmrotate/v0.1.0/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90-b4271aed.pth) &#124; [log](https://download.openmmlab.com/mmrotate/v0.1.0/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90_20220321_010033.log.json)
-
+|         Backbone         |  mAP  | Angle | Window func. | Omega | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                                              Configs                                                              |                                                                                                                                                                                                      Download                                                                                                                                                                                                      |
+| :----------------------: | :---: | :---: | :----------: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :-------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ResNet50 (1024,1024,200) | 68.42 | le90  |      -       |   -   |   1x    |   3.38   |      17.8      |  -  |     2      |         [rotated_retinanet_obb_r50_fpn_1x_dota_le90](../rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py)          |                       [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90/rotated_retinanet_obb_r50_fpn_1x_dota_le90-c0097bc4.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90/rotated_retinanet_obb_r50_fpn_1x_dota_le90_20220128_130740.log.json)                       |
+| ResNet50 (1024,1024,200) | 68.79 | le90  |      -       |   -   |   1x    |   2.36   |      25.9      |  -  |     2      |    [rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90](../rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90.py)     |             [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90-01de71b5.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90_20220303_183714.log.json)             |
+| ResNet50 (1024,1024,200) | 69.51 | le90  |   Gaussian   |   4   |   1x    |   2.60   |      24.0      |  -  |     2      | [rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90](./rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90-b4271aed.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90_20220321_010033.log.json) |
 
 ## Citation
+
 ```
 @inproceedings{yang2020arbitrary,
     title={Arbitrary-Oriented Object Detection with Circular Smooth Label},

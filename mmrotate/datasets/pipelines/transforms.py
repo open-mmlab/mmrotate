@@ -1,7 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import cv2
+import mmcv
 import numpy as np
-from mmdet.datasets.pipelines.transforms import RandomFlip, Resize
+from mmdet.datasets.pipelines.transforms import RandomCrop, RandomFlip, Resize
 
 from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
 from ..builder import ROTATED_PIPELINES
@@ -97,25 +98,42 @@ class PolyRandomRotate(object):
     Reference: https://github.com/hukaixuan19970627/OrientedRepPoints_DOTA
 
     Args:
-        rate (bool): (float, optional): The rotating probability.
+        rotate_ratio (float, optional): The rotating probability.
             Default: 0.5.
-        angles_range(int, optional): The rotate angle defined by random
-            (-angles_range, +angles_range).
+        mode (str, optional) : Indicates whether the angle is chosen in a
+            random range (mode='range') or in a preset list of angles
+            (mode='value'). Defaults to 'range'.
+        angles_range(int|list[int], optional): The range of angles.
+            If mode='range', angle_ranges is an int and the angle is chosen
+            in (-angles_range, +angles_ranges).
+            If mode='value', angles_range is a non-empty list of int and the
+            angle is chosen in angles_range.
+            Defaults to 180 as default mode is 'range'.
         auto_bound(bool, optional): whether to find the new width and height
             bounds.
         rect_classes (None|list, optional): Specifies classes that needs to
             be rotated by a multiple of 90 degrees.
-        version  (str, optional): Angle representations. Defaults to 'oc'.
+        version  (str, optional): Angle representations. Defaults to 'le90'.
     """
 
     def __init__(self,
                  rotate_ratio=0.5,
+                 mode='range',
                  angles_range=180,
                  auto_bound=False,
                  rect_classes=None,
                  version='le90'):
         self.rotate_ratio = rotate_ratio
         self.auto_bound = auto_bound
+        assert mode in ['range', 'value'], \
+            f"mode is supposed to be 'range' or 'value', but got {mode}."
+        if mode == 'range':
+            assert isinstance(angles_range, int), \
+                "mode 'range' expects angle_range to be an int."
+        else:
+            assert mmcv.is_seq_of(angles_range, int) and len(angles_range), \
+                "mode 'value' expects angle_range as a non-empty list of int."
+        self.mode = mode
         self.angles_range = angles_range
         self.discrete_range = [90, 180, -90, -180]
         self.rect_classes = rect_classes
@@ -177,9 +195,12 @@ class PolyRandomRotate(object):
             results['rotate'] = False
             angle = 0
         else:
-            angle = 2 * self.angles_range * np.random.rand() - \
-                    self.angles_range
             results['rotate'] = True
+            if self.mode == 'range':
+                angle = self.angles_range * (2 * np.random.rand() - 1)
+            else:
+                i = np.random.randint(len(self.angles_range))
+                angle = self.angles_range[i]
 
             class_labels = results['gt_labels']
             for classid in class_labels:
@@ -237,6 +258,106 @@ class PolyRandomRotate(object):
     def __repr__(self):
         repr_str = self.__class__.__name__
         repr_str += f'(rotate_ratio={self.rotate_ratio}, ' \
+                    f'base_angles={self.base_angles}, ' \
                     f'angles_range={self.angles_range}, ' \
                     f'auto_bound={self.auto_bound})'
         return repr_str
+
+
+@ROTATED_PIPELINES.register_module()
+class RRandomCrop(RandomCrop):
+    """Random crop the image & bboxes.
+
+    The absolute `crop_size` is sampled based on `crop_type` and `image_size`,
+    then the cropped results are generated.
+
+    Args:
+        crop_size (tuple): The relative ratio or absolute pixels of
+            height and width.
+        crop_type (str, optional): one of "relative_range", "relative",
+            "absolute", "absolute_range". "relative" randomly crops
+            (h * crop_size[0], w * crop_size[1]) part from an input of size
+            (h, w). "relative_range" uniformly samples relative crop size from
+            range [crop_size[0], 1] and [crop_size[1], 1] for height and width
+            respectively. "absolute" crops from an input with absolute size
+            (crop_size[0], crop_size[1]). "absolute_range" uniformly samples
+            crop_h in range [crop_size[0], min(h, crop_size[1])] and crop_w
+            in range [crop_size[0], min(w, crop_size[1])]. Default "absolute".
+        allow_negative_crop (bool, optional): Whether to allow a crop that does
+            not contain any bbox area. Default False.
+
+    Note:
+        - If the image is smaller than the absolute crop size, return the
+            original image.
+        - The keys for bboxes, labels must be aligned. That is, `gt_bboxes`
+          corresponds to `gt_labels`, and `gt_bboxes_ignore` corresponds to
+          `gt_labels_ignore`.
+        - If the crop does not contain any gt-bbox region and
+          `allow_negative_crop` is set to False, skip this image.
+    """
+
+    def __init__(self,
+                 crop_size,
+                 crop_type='absolute',
+                 allow_negative_crop=False,
+                 version='oc'):
+        self.version = version
+        super(RRandomCrop, self).__init__(crop_size, crop_type,
+                                          allow_negative_crop)
+
+    def _crop_data(self, results, crop_size, allow_negative_crop):
+        """Function to randomly crop images, bounding boxes.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+            crop_size (tuple): Expected absolute size after cropping, (h, w).
+            allow_negative_crop (bool): Whether to allow a crop that does not
+                contain any bbox area. Default to False.
+
+        Returns:
+            dict: Randomly cropped results, 'img_shape' key in result dict is
+                updated according to crop size.
+        """
+        assert crop_size[0] > 0 and crop_size[1] > 0
+        for key in results.get('bbox_fields', []):
+            assert results[key].shape[-1] % 5 == 0
+
+        for key in results.get('img_fields', ['img']):
+            img = results[key]
+            margin_h = max(img.shape[0] - crop_size[0], 0)
+            margin_w = max(img.shape[1] - crop_size[1], 0)
+            offset_h = np.random.randint(0, margin_h + 1)
+            offset_w = np.random.randint(0, margin_w + 1)
+            crop_y1, crop_y2 = offset_h, offset_h + crop_size[0]
+            crop_x1, crop_x2 = offset_w, offset_w + crop_size[1]
+
+            # crop the image
+            img = img[crop_y1:crop_y2, crop_x1:crop_x2, ...]
+            img_shape = img.shape
+            results[key] = img
+        results['img_shape'] = img_shape
+
+        height, width, _ = img_shape
+
+        # crop bboxes accordingly and clip to the image boundary
+        for key in results.get('bbox_fields', []):
+            # e.g. gt_bboxes and gt_bboxes_ignore
+            bbox_offset = np.array([offset_w, offset_h, 0, 0, 0],
+                                   dtype=np.float32)
+            bboxes = results[key] - bbox_offset
+
+            valid_inds = (bboxes[:, 0] >=
+                          0) & (bboxes[:, 0] < width) & (bboxes[:, 1] >= 0) & (
+                              bboxes[:, 1] < height)
+            # If the crop does not contain any gt-bbox area and
+            # allow_negative_crop is False, skip this image.
+            if (key == 'gt_bboxes' and not valid_inds.any()
+                    and not allow_negative_crop):
+                return None
+            results[key] = bboxes[valid_inds, :]
+            # label fields. e.g. gt_labels and gt_labels_ignore
+            label_key = self.bbox2label.get(key)
+            if label_key in results:
+                results[label_key] = results[label_key][valid_inds]
+
+        return results
