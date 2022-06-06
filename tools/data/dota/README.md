@@ -13,9 +13,11 @@ year = {2018}
 ```
 
 ## download dota dataset
+
 The dota dataset can be downloaded from [here](https://captain-whu.github.io/DOTA/dataset.html).
 
 The data structure is as follows:
+
 ```none
 mmrotate
 ├── mmrotate
@@ -41,6 +43,7 @@ python tools/data/dota/split/img_split.py --base-json \
 ```
 
 If you want to get a multiple scale dataset, you can run the following command.
+
 ```shell
 python tools/data/dota/split/img_split.py --base-json \
   tools/data/dota/split/split_configs/ms_trainval.json
@@ -50,7 +53,6 @@ python tools/data/dota/split/img_split.py --base-json \
 ```
 
 Please change the `img_dirs` and `ann_dirs` in json. (Forked from [BboxToolkit](https://github.com/jbwang1997/BboxToolkit), which is faster then DOTA_Devkit.)
-
 
 ## change root path in base config
 
