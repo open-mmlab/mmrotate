@@ -1,142 +1,174 @@
 ## Prerequisites
 
-- Linux & Windows
-- Python 3.7+
-- PyTorch 1.6+
-- CUDA 9.2+
-- GCC 5+
-- [mmcv](https://mmcv.readthedocs.io/en/latest/get_started/installation.html) 1.4.5+
-- [mmdet](https://mmdetection.readthedocs.io/en/latest/get_started.html#installation) 2.22.0+
+In this section we demonstrate how to prepare an environment with PyTorch.
 
-Compatible MMCV, MMClassification and MMDetection versions are shown as below. Please install the correct version of them to avoid installation issues.
+MMRotate works on Linux, Windows. It requires Python 3.7+, CUDA 9.2+ and PyTorch 1.6+.
 
-| MMRotate version |       MMCV version        | MMDetection version |
-| :--------------: | :-----------------------: | :-----------------: |
-|       main       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
-|      0.3.1       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
-|      0.3.0       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
-|      0.2.0       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
-|      0.1.1       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
-|      0.1.0       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
+```{note}
+If you are experienced with PyTorch and have already installed it, just skip this part and jump to the [next section](#installation). Otherwise, you can follow these steps for the preparation.
+```
 
-**Note:** You need to run `pip uninstall mmcv` first if you have mmcv installed.
-If mmcv and mmcv-full are both installed, there will be `ModuleNotFoundError`.
+**Step 0.** Download and install Miniconda from the [official website](https://docs.conda.io/en/latest/miniconda.html).
+
+**Step 1.** Create a conda environment and activate it.
+
+```shell
+conda create --name openmmlab python=3.8 -y
+conda activate openmmlab
+```
+
+**Step 2.** Install PyTorch following [official instructions](https://pytorch.org/get-started/locally/), e.g.
+
+On GPU platforms:
+
+```shell
+conda install pytorch torchvision -c pytorch
+```
+
+On CPU platforms:
+
+```shell
+conda install pytorch torchvision cpuonly -c pytorch
+```
 
 ## Installation
 
-### A from-scratch setup script
+We recommend that users follow our best practices to install MMRotate. However, the whole process is highly customizable. See [Customize Installation](#customize-installation) section for more information.
 
-Assuming that you already have CUDA 10.1 installed, here is a full script for setting up MMRotate with conda.
-You can refer to the step-by-step installation instructions in the next section.
+### Best Practices
+
+**Step 0.** Install [MMCV](https://github.com/open-mmlab/mmcv) and [MMDetection](https://github.com/open-mmlab/mmdetection) using [MIM](https://github.com/open-mmlab/mim).
 
 ```shell
-conda create -n open-mmlab python=3.7 pytorch==1.7.0 cudatoolkit=10.1 torchvision -c pytorch -y
-conda activate open-mmlab
-pip install openmim
+pip install -U openmim
 mim install mmcv-full
 mim install mmdet
+```
+
+**Step 1.** Install MMRotate.
+
+Case a: If you develop and run mmrotate directly, install it from source:
+
+```shell
 git clone https://github.com/open-mmlab/mmrotate.git
 cd mmrotate
 pip install -r requirements/build.txt
 pip install -v -e .
+# "-v" means verbose, or more output
+# "-e" means installing a project in editable mode,
+# thus any local modifications made to the code will take effect without reinstallation.
 ```
 
-### Prepare environment
-
-1. Create a conda virtual environment and activate it.
-
-   ```shell
-   conda create -n openmmlab python=3.7 -y
-   conda activate openmmlab
-   ```
-
-2. Install PyTorch and torchvision following the [official instructions](https://pytorch.org/), e.g.,
-
-   ```shell
-   conda install pytorch torchvision -c pytorch
-   ```
-
-   Note: Make sure that your compilation CUDA version and runtime CUDA version match.
-   You can check the supported CUDA version for precompiled packages on the [PyTorch website](https://pytorch.org/).
-
-   `E.g` If you have CUDA 10.1 installed under `/usr/local/cuda` and would like to install
-   PyTorch 1.7, you need to install the prebuilt PyTorch with CUDA 10.1.
-
-   ```shell
-   conda install pytorch==1.7.0 torchvision==0.8.0 cudatoolkit=10.1 -c pytorch
-   ```
-
-### Install MMRotate
-
-It is recommended to install MMRotate with [MIM](https://github.com/open-mmlab/mim),
-which automatically handle the dependencies of OpenMMLab projects, including mmcv and other python packages.
+Case b: If you use mmrotate as a dependency or third-party package, install it with pip:
 
 ```shell
-pip install openmim
-mim install mmrotate
+pip install mmrotate
 ```
 
-Or you can still install MMRotate manually:
+## Verify the installation
 
-1. Install mmcv-full.
+To verify whether MMRotate is installed correctly, we provide some sample codes to run an inference demo.
 
-   ```shell
-   pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/{cu_version}/{torch_version}/index.html
-   ```
+**Step 1.** We need to download config and checkpoint files.
 
-   Please replace `{cu_version}` and `{torch_version}` in the url to your desired one. For example, to install the latest `mmcv-full` with `CUDA 11.0` and `PyTorch 1.7.0`, use the following command:
+```shell
+mim download mmrotate --config oriented_rcnn_r50_fpn_1x_dota_le90 --dest .
+```
 
-   ```shell
-   pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html
-   ```
+The downloading will take several seconds or more, depending on your network environment. When it is done, you will find two files `yolov3_mobilenetv2_320_300e_coco.py` and `yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth` in your current folder.
 
-   See [here](https://github.com/open-mmlab/mmcv#installation) for different versions of MMCV compatible to different PyTorch and CUDA versions.
+**Step 2.** Verify the inference demo.
 
-   Optionally you can compile mmcv from source if you need to develop both mmcv and mmrotate. Refer to the [guide](https://github.com/open-mmlab/mmcv#installation) for details.
+Option (a). If you install mmrotate from source, just run the following command.
 
-2. Install MMDetection.
+```shell
+python demo/image_demo.py demo/demo.jpg oriented_rcnn_r50_fpn_1x_dota_le90.py oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth --out-file result.jpg
+```
 
-   You can simply install mmdetection with the following command:
+You will see a new image `result.jpg` on your current folder, where bounding boxes are plotted on cars, buses, etc.
 
-   ```shell
-   pip install mmdet
-   ```
+Option (b). If you install mmrotate with pip, open you python interpreter and copy&paste the following codes.
 
-3. Install MMRotate.
+```python
+from mmdet.apis import init_detector, inference_detector
+import mmrotate
 
-   You can simply install MMRotate with the following command:
+config_file = 'oriented_rcnn_r50_fpn_1x_dota_le90.py'
+checkpoint_file = 'oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth'
+model = init_detector(config_file, checkpoint_file, device='cuda:0')
+inference_detector(model, 'demo/demo.jpg')
+```
 
-   ```shell
-   pip install mmrotate
-   ```
+You will see a list of arrays printed, indicating the detected bounding boxes.
 
-   or clone the repository and then install it:
+### Customize Installation
 
-   ```shell
-   git clone https://github.com/open-mmlab/mmrotate.git
-   cd mmrotate
-   pip install -r requirements/build.txt
-   pip install -v -e .  # or "python setup.py develop"
+#### CUDA versions
 
-   ```
+When installing PyTorch, you need to specify the version of CUDA. If you are not clear on which to choose, follow our recommendations:
 
-**Note:**
+- For Ampere-based NVIDIA GPUs, such as GeForce 30 series and NVIDIA A100, CUDA 11 is a must.
+- For older NVIDIA GPUs, CUDA 11 is backward compatible, but CUDA 10.2 offers better compatibility and is more lightweight.
 
-a. When specifying `-e` or `develop`, MMRotate is installed on dev mode
-, any local modifications made to the code will take effect without reinstallation.
+Please make sure the GPU driver satisfies the minimum version requirements. See [this table](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html#cuda-major-component-versions__table-cuda-toolkit-driver-versions) for more information.
 
-b. If you would like to use `opencv-python-headless` instead of `opencv-python`,
-you can install it before installing MMCV.
+```{note}
+Installing CUDA runtime libraries is enough if you follow our best practices, because no CUDA code will be compiled locally. However if you hope to compile MMCV from source or develop other CUDA operators, you need to install the complete CUDA toolkit from NVIDIA's [website](https://developer.nvidia.com/cuda-downloads), and its version should match the CUDA version of PyTorch. i.e., the specified version of cudatoolkit in `conda install` command.
+```
 
-c. Some dependencies are optional. Simply running `pip install -v -e .` will
-only install the minimum runtime requirements. To use optional dependencies like `albumentations` and `imagecorruptions` either install them manually with `pip install -r requirements/optional.txt` or specify desired extras when calling `pip` (e.g. `pip install -v -e .[optional]`). Valid keys for the extras field are: `all`, `tests`, `build`, and `optional`.
+#### Install MMCV without MIM
 
-### Another option: Docker Image
+MMCV contains C++ and CUDA extensions, thus depending on PyTorch in a complex way. MIM solves such dependencies automatically and makes the installation easier. However, it is not a must.
 
-We provide a [Dockerfile](https://github.com/open-mmlab/mmrotate/tree/main/docker/Dockerfile) to build an image. Ensure that you are using [docker version](https://docs.docker.com/engine/install/) >=19.03.
+To install MMCV with pip instead of MIM, please follow [MMCV installation guides](https://mmcv.readthedocs.io/en/latest/get_started/installation.html). This requires manually specifying a find-url based on PyTorch version and its CUDA version.
+
+For example, the following command install mmcv-full built for PyTorch 1.10.x and CUDA 11.3.
+
+```shell
+pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.10/index.html
+```
+
+### Install on Google Colab
+
+[Google Colab](https://research.google.com/) usually has PyTorch installed,
+thus we only need to install MMCV and MMDetection with the following commands.
+
+**Step 1.** Install [MMCV](https://github.com/open-mmlab/mmcv) and [MMDetection](https://github.com/open-mmlab/mmdetection) using [MIM](https://github.com/open-mmlab/mim).
+
+```shell
+!pip3 install -U openmim
+!mim install mmcv-full
+!mim install mmdet
+```
+
+**Step 2.** Install MMRotate from the source.
+
+```shell
+!git clone https://github.com/open-mmlab/mmrotate.git
+%cd mmrotate
+!pip install -r requirements/build.txt
+!pip install -e .
+```
+
+**Step 3.** Verification.
+
+```python
+import mmrotate
+print(mmrotate.__version__)
+# Example output: 0.3.1
+```
+
+```{note}
+Within Jupyter, the exclamation mark `!` is used to call external executables and `%cd` is a [magic command](https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-cd) to change the current working directory of Python.
+```
+
+### Using MMRotate with Docker
+
+We provide a [Dockerfile](https://github.com/open-mmlab/mmrotate/tree/main/docker/Dockerfile) to build an image. Ensure that your [docker version](https://docs.docker.com/engine/install/) >=19.03.
 
 ```shell
 # build an image with PyTorch 1.6, CUDA 10.1
+# If you prefer other versions, just modified the Dockerfile
 docker build -t mmrotate docker/
 ```
 
@@ -146,13 +178,7 @@ Run it with
 docker run --gpus all --shm-size=8g -it -v {DATA_DIR}:/mmrotate/data mmrotate
 ```
 
-## Verification
+## Trouble shooting
 
-To verify whether MMRotate is installed correctly, we can run the demo code and inference a demo image.
-
-Please refer to [demo](https://github.com/open-mmlab/mmrotate/tree/main/demo)
-for more details. The demo code is supposed to run successfully upon you finish the installation.
-
-## Dataset Preparation
-
-Please refer to [data preparation](https://github.com/open-mmlab/mmrotate/tree/main/tools/data) for dataset preparation.
+If you have some issues during the installation, please first view the [FAQ](faq.md) page.
+You may [open an issue](https://github.com/open-mmlab/mmrotate/issues/new/choose) on GitHub if no solution is found.
