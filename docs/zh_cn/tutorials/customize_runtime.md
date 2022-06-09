@@ -41,7 +41,7 @@ class MyOptimizer(Optimizer):
 
 - 修改 `mmrotate/core/optimizer/__init__.py` 文件来导入该模块。
 
-    新的被定义的模块应该被导入到 `mmrotate/core/optimizer/__init__.py` 中，这样注册表才会发现新的模块并添加它：
+  新的被定义的模块应该被导入到 `mmrotate/core/optimizer/__init__.py` 中，这样注册表才会发现新的模块并添加它：
 
 ```python
 from .my_optimizer import MyOptimizer
@@ -53,7 +53,7 @@ from .my_optimizer import MyOptimizer
 custom_imports = dict(imports=['mmrotate.core.optimizer.my_optimizer'], allow_failed_imports=False)
 ```
 
- `mmrotate.core.optimizer.my_optimizer` 模块将会在程序开始被导入，并且 `MyOptimizer` 类将会自动注册。
+`mmrotate.core.optimizer.my_optimizer` 模块将会在程序开始被导入，并且 `MyOptimizer` 类将会自动注册。
 需要注意只有包含 `MyOptimizer` 类的包 (package) 应当被导入。
 而 `mmrotate.core.optimizer.my_optimizer.MyOptimizer` **不能** 被直接导入。
 
@@ -98,7 +98,7 @@ class MyOptimizerConstructor(object):
 
 ```
 
- `mmcv` 默认的优化器构造函数实现可以参考 [这里](https://github.com/open-mmlab/mmcv/blob/9ecd6b0d5ff9d2172c49a182eaa669e9f27bb8e7/mmcv/runner/optimizer/default_constructor.py#L11) ，这也可以作为新的优化器构造函数的模板。
+`mmcv` 默认的优化器构造函数实现可以参考 [这里](https://github.com/open-mmlab/mmcv/blob/9ecd6b0d5ff9d2172c49a182eaa669e9f27bb8e7/mmcv/runner/optimizer/default_constructor.py#L11) ，这也可以作为新的优化器构造函数的模板。
 
 ### 其他配置
 
@@ -106,33 +106,33 @@ class MyOptimizerConstructor(object):
 如果您有更多的设置，欢迎在 PR 和 issue 里面提出。
 
 - __使用梯度裁剪 (gradient clip) 来稳定训练__:
-    一些模型需要梯度裁剪来稳定训练过程。使用方式如下：
+  一些模型需要梯度裁剪来稳定训练过程。使用方式如下：
 
-    ```python
-    optimizer_config = dict(
-        _delete_=True, grad_clip=dict(max_norm=35, norm_type=2))
-    ```
+  ```python
+  optimizer_config = dict(
+      _delete_=True, grad_clip=dict(max_norm=35, norm_type=2))
+  ```
 
-    如果您的配置继承了已经设置了 `optimizer_config` 的基础配置（base config），你可能需要设置 `_delete_=True` 来覆盖不必要的配置参数。请参考 [配置文档](https://mmdetection.readthedocs.io/en/latest/tutorials/config.html) 了解更多细节。
+  如果您的配置继承了已经设置了 `optimizer_config` 的基础配置（base config），你可能需要设置 `_delete_=True` 来覆盖不必要的配置参数。请参考 [配置文档](https://mmdetection.readthedocs.io/en/latest/tutorials/config.html) 了解更多细节。
 
 - __使用动量调度加速模型收敛__:
-    我们支持动量规划器（Momentum scheduler），以实现根据学习率调节模型优化过程中的动量设置，这可以使模型以更快速度收敛。
-    动量规划器经常与学习率规划器（LR scheduler）一起使用，例如下面的配置经常被用于 3D 检测模型训练中以加速收敛。更多细节请参考 [CyclicLrUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L327) 和 [CyclicMomentumUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/momentum_updater.py#L130)。
+  我们支持动量规划器（Momentum scheduler），以实现根据学习率调节模型优化过程中的动量设置，这可以使模型以更快速度收敛。
+  动量规划器经常与学习率规划器（LR scheduler）一起使用，例如下面的配置经常被用于 3D 检测模型训练中以加速收敛。更多细节请参考 [CyclicLrUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/lr_updater.py#L327) 和 [CyclicMomentumUpdater](https://github.com/open-mmlab/mmcv/blob/f48241a65aebfe07db122e9db320c31b685dc674/mmcv/runner/hooks/momentum_updater.py#L130)。
 
-    ```python
-    lr_config = dict(
-        policy='cyclic',
-        target_ratio=(10, 1e-4),
-        cyclic_times=1,
-        step_ratio_up=0.4,
-    )
-    momentum_config = dict(
-        policy='cyclic',
-        target_ratio=(0.85 / 0.95, 1),
-        cyclic_times=1,
-        step_ratio_up=0.4,
-    )
-    ```
+  ```python
+  lr_config = dict(
+      policy='cyclic',
+      target_ratio=(10, 1e-4),
+      cyclic_times=1,
+      step_ratio_up=0.4,
+  )
+  momentum_config = dict(
+      policy='cyclic',
+      target_ratio=(0.85 / 0.95, 1),
+      cyclic_times=1,
+      step_ratio_up=0.4,
+  )
+  ```
 
 ## 自定义训练计划
 
@@ -141,20 +141,20 @@ class MyOptimizerConstructor(object):
 
 - `Poly` :
 
-    ```python
-    lr_config = dict(policy='poly', power=0.9, min_lr=1e-4, by_epoch=False)
-    ```
+  ```python
+  lr_config = dict(policy='poly', power=0.9, min_lr=1e-4, by_epoch=False)
+  ```
 
 - `ConsineAnnealing` :
 
-    ```python
-    lr_config = dict(
-        policy='CosineAnnealing',
-        warmup='linear',
-        warmup_iters=1000,
-        warmup_ratio=1.0 / 10,
-        min_lr_ratio=1e-5)
-    ```
+  ```python
+  lr_config = dict(
+      policy='CosineAnnealing',
+      warmup='linear',
+      warmup_iters=1000,
+      warmup_ratio=1.0 / 10,
+      min_lr_ratio=1e-5)
+  ```
 
 ## 自定义工作流 (workflow)
 
@@ -181,7 +181,7 @@ workflow = [('train', 1)]
 2. 配置文件里的键值 `total_epochs` 仅控制训练的 epochs 数目，而不会影响验证工作流。
 3. 工作流 `[('train', 1), ('val', 1)]` 和 `[('train', 1)]` 将不会改变 `EvalHook` 的行为，因为 `EvalHook` 被 `after_train_epoch`
    调用而且验证的工作流仅仅影响通过调用 `after_val_epoch` 的钩子 (hooks)。因此， `[('train', 1), ('val', 1)]` 和 `[('train', 1)]`
-    的区别仅在于 runner 将在每次训练阶段（training epoch）结束后计算在验证集上的损失。
+   的区别仅在于 runner 将在每次训练阶段（training epoch）结束后计算在验证集上的损失。
 
 ## 自定义钩 (hooks)
 
@@ -229,7 +229,7 @@ class MyHook(Hook):
 
 - 修改 `mmrotate/core/utils/__init__.py` 文件来导入
 
-    新定义的模块需要在 `mmrotate/core/utils/__init__.py` 导入，注册表才会发现并添加该模块：
+  新定义的模块需要在 `mmrotate/core/utils/__init__.py` 导入，注册表才会发现并添加该模块：
 
 ```python
 from .my_hook import MyHook
@@ -300,7 +300,7 @@ checkpoint_config = dict(interval=1)
 
 #### Log config
 
- `log_config` 包裹了许多日志钩 (logger hooks) 而且能去设置间隔 (intervals)。现在 MMCV 支持 `WandbLoggerHook` ， `MlflowLoggerHook` 和 `TensorboardLoggerHook`。
+`log_config` 包裹了许多日志钩 (logger hooks) 而且能去设置间隔 (intervals)。现在 MMCV 支持 `WandbLoggerHook` ， `MlflowLoggerHook` 和 `TensorboardLoggerHook`。
 详细的使用请参照 [文档](https://mmcv.readthedocs.io/en/latest/api.html#mmcv.runner.LoggerHook)。
 
 ```python
@@ -314,7 +314,7 @@ log_config = dict(
 
 #### Evaluation config
 
- `evaluation` 的配置文件将被用来初始化 [`EvalHook`](https://github.com/open-mmlab/mmdetection/blob/7a404a2c000620d52156774a5025070d9e00d918/mmdet/core/evaluation/eval_hooks.py#L8)。
+`evaluation` 的配置文件将被用来初始化 [`EvalHook`](https://github.com/open-mmlab/mmdetection/blob/7a404a2c000620d52156774a5025070d9e00d918/mmdet/core/evaluation/eval_hooks.py#L8)。
 除了 `interval` 键，其他的像 `metric` 这样的参数将被传递给 `dataset.evaluate()`。
 
 ```python

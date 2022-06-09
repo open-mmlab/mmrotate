@@ -22,8 +22,11 @@ DOTA1.0
 |    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
 |:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
 | ResNet50 (1024,1024,200) | 71.94 | le135 | 1x | 3.45 | 16.1 | - | 2 | [oriented_reppoints_r50_fpn_1x_dota_le135](./oriented_reppoints_r50_fpn_1x_dota_le135.py) |  [model]() &#124; [log]()
+| ResNet50 (1024,1024,200) | 75.21 | le135 | 40e | 3.45 | 16.1 | ms | 2 | [oriented_reppoints_r50_fpn_40e_dota_ms_le135](./oriented_reppoints_r50_fpn_40e_dota_ms_le135.py) |  [model]() &#124; [log]()
 
+**Notes:**
 
+- `ms` means multiple scale image split online (768, 1280).
 ## Citation
 ```
 @inproceedings{li2022ori,

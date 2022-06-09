@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-from mmcv.ops import ChamferDistance, DeformConv2d, min_area_polygons
+from mmcv.ops import chamfer_distance, DeformConv2d, min_area_polygons
 from mmcv.runner import force_fp32
 from mmdet.core import images_to_levels, multi_apply, unmap
 from mmdet.core.anchor.point_generator import MlvlPointGenerator
@@ -34,11 +34,10 @@ def ChamferDistance2D(point_set_1,
         dist (torch.tensor): chamfer distance between two point sets
                              with shape (N_pointsets,)
     """
-    chamfer = ChamferDistance()
     assert point_set_1.dim() == point_set_2.dim()
     assert point_set_1.shape[-1] == point_set_2.shape[-1]
     assert point_set_1.dim() <= 3
-    dist1, dist2, _, _ = chamfer(point_set_1, point_set_2)
+    dist1, dist2, _, _ = chamfer_distance(point_set_1, point_set_2)
     dist1 = torch.sqrt(torch.clamp(dist1, eps))
     dist2 = torch.sqrt(torch.clamp(dist2, eps))
     dist = distance_weight * (dist1.mean(-1) + dist2.mean(-1)) / 2.0
@@ -551,7 +550,7 @@ class OrientedRepPointsHead(BaseDenseHead):
             return label, label_weight, bbox_weight, 0, torch.tensor(
                 []).type_as(bbox_weight)
 
-        num_gt = pos_gt_inds.max() + 1
+        num_gt = pos_gt_inds.max()
         num_proposals_each_level_ = num_proposals_each_level.copy()
         num_proposals_each_level_.insert(0, 0)
         inds_level_interval = np.cumsum(num_proposals_each_level_)
@@ -567,7 +566,7 @@ class OrientedRepPointsHead(BaseDenseHead):
         for gt_ind in range(num_gt):
             pos_inds_select = []
             pos_loss_select = []
-            gt_mask = pos_gt_inds == gt_ind
+            gt_mask = pos_gt_inds == (gt_ind + 1)
             for level in range(num_level):
                 level_mask = pos_level_mask[level]
                 level_gt_mask = level_mask & gt_mask
@@ -679,6 +678,7 @@ class OrientedRepPointsHead(BaseDenseHead):
         sampling_result = self.sampler.sample(assign_result, proposals,
                                               gt_bboxes)
 
+        gt_inds = assign_result.gt_inds
         num_valid_proposals = proposals.shape[0]
         bbox_gt = proposals.new_zeros([num_valid_proposals, 8])
         pos_proposals = torch.zeros_like(proposals)
@@ -723,9 +723,11 @@ class OrientedRepPointsHead(BaseDenseHead):
                                   inside_flags)
             proposals_weights = unmap(proposals_weights, num_total_proposals,
                                       inside_flags)
+            gt_inds = unmap(gt_inds, num_total_proposals,
+                                      inside_flags)
 
         return (labels, label_weights, bbox_gt, pos_proposals,
-                proposals_weights, pos_inds, neg_inds, sampling_result)
+                proposals_weights, pos_inds, neg_inds, gt_inds, sampling_result)
 
     def get_targets(self,
                     proposals_list,
@@ -792,7 +794,7 @@ class OrientedRepPointsHead(BaseDenseHead):
             gt_labels_list = [None for _ in range(num_imgs)]
         all_overlaps_rotate_list = [None] * 4
         (all_labels, all_label_weights, all_bbox_gt, all_proposals,
-         all_proposal_weights, pos_inds_list, neg_inds_list,
+         all_proposal_weights, pos_inds_list, neg_inds_list, all_gt_inds,
          sampling_result) = multi_apply(
              self._point_target_single,
              proposals_list,
@@ -828,16 +830,16 @@ class OrientedRepPointsHead(BaseDenseHead):
 
         else:
             pos_inds = []
-            # pos_gt_index = []
+            pos_gt_index = []
             for i, single_labels in enumerate(all_labels):
                 pos_mask = (0 <= single_labels) & (
                     single_labels < self.num_classes)
                 pos_inds.append(pos_mask.nonzero(as_tuple=False).view(-1))
-
-            gt_inds = [item.pos_assigned_gt_inds for item in sampling_result]
+                pos_gt_index.append(all_gt_inds[i][pos_mask.nonzero(
+                    as_tuple=False).view(-1)])
 
             return (all_labels, all_label_weights, all_bbox_gt, all_proposals,
-                    all_proposal_weights, pos_inds, gt_inds)
+                    all_proposal_weights, pos_inds, pos_gt_index)
 
     def loss(self,
              cls_scores,
