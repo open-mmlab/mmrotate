@@ -2,7 +2,7 @@
 
 In this section we demonstrate how to prepare an environment with PyTorch.
 
-MMRotate works on Linux, Windows. It requires Python 3.7+, CUDA 9.2+ and PyTorch 1.6+.
+MMRotate works on Linux and Windows. It requires Python 3.7+, CUDA 9.2+ and PyTorch 1.6+.
 
 ```{note}
 If you are experienced with PyTorch and have already installed it, just skip this part and jump to the [next section](#installation). Otherwise, you can follow these steps for the preparation.
@@ -19,16 +19,8 @@ conda activate openmmlab
 
 **Step 2.** Install PyTorch following [official instructions](https://pytorch.org/get-started/locally/), e.g.
 
-On GPU platforms:
-
 ```shell
-conda install pytorch torchvision -c pytorch
-```
-
-On CPU platforms:
-
-```shell
-conda install pytorch torchvision cpuonly -c pytorch
+conda install pytorch==1.8.0 torchvision==0.9.0 cudatoolkit=10.2 -c pytorch
 ```
 
 ## Installation
@@ -52,7 +44,6 @@ Case a: If you develop and run mmrotate directly, install it from source:
 ```shell
 git clone https://github.com/open-mmlab/mmrotate.git
 cd mmrotate
-pip install -r requirements/build.txt
 pip install -v -e .
 # "-v" means verbose, or more output
 # "-e" means installing a project in editable mode,
@@ -65,7 +56,7 @@ Case b: If you use mmrotate as a dependency or third-party package, install it w
 pip install mmrotate
 ```
 
-## Verify the installation
+### Verify the installation
 
 To verify whether MMRotate is installed correctly, we provide some sample codes to run an inference demo.
 
@@ -75,7 +66,7 @@ To verify whether MMRotate is installed correctly, we provide some sample codes 
 mim download mmrotate --config oriented_rcnn_r50_fpn_1x_dota_le90 --dest .
 ```
 
-The downloading will take several seconds or more, depending on your network environment. When it is done, you will find two files `yolov3_mobilenetv2_320_300e_coco.py` and `yolov3_mobilenetv2_320_300e_coco_20210719_215349-d18dff72.pth` in your current folder.
+The downloading will take several seconds or more, depending on your network environment. When it is done, you will find two files `oriented_rcnn_r50_fpn_1x_dota_le90.py` and `oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth` in your current folder.
 
 **Step 2.** Verify the inference demo.
 
@@ -85,7 +76,7 @@ Option (a). If you install mmrotate from source, just run the following command.
 python demo/image_demo.py demo/demo.jpg oriented_rcnn_r50_fpn_1x_dota_le90.py oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth --out-file result.jpg
 ```
 
-You will see a new image `result.jpg` on your current folder, where bounding boxes are plotted on cars, buses, etc.
+You will see a new image `result.jpg` on your current folder, where rotated bounding boxes are plotted on cars, buses, etc.
 
 Option (b). If you install mmrotate with pip, open you python interpreter and copy&paste the following codes.
 
@@ -99,7 +90,7 @@ model = init_detector(config_file, checkpoint_file, device='cuda:0')
 inference_detector(model, 'demo/demo.jpg')
 ```
 
-You will see a list of arrays printed, indicating the detected bounding boxes.
+You will see a list of arrays printed, indicating the detected rotated bounding boxes.
 
 ### Customize Installation
 
@@ -122,13 +113,13 @@ MMCV contains C++ and CUDA extensions, thus depending on PyTorch in a complex wa
 
 To install MMCV with pip instead of MIM, please follow [MMCV installation guides](https://mmcv.readthedocs.io/en/latest/get_started/installation.html). This requires manually specifying a find-url based on PyTorch version and its CUDA version.
 
-For example, the following command install mmcv-full built for PyTorch 1.10.x and CUDA 11.3.
+For example, the following command install mmcv-full built for PyTorch 1.9.x and CUDA 10.2.
 
 ```shell
-pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.10/index.html
+pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.8/index.html
 ```
 
-### Install on Google Colab
+#### Install on Google Colab
 
 [Google Colab](https://research.google.com/) usually has PyTorch installed,
 thus we only need to install MMCV and MMDetection with the following commands.
@@ -162,7 +153,7 @@ print(mmrotate.__version__)
 Within Jupyter, the exclamation mark `!` is used to call external executables and `%cd` is a [magic command](https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-cd) to change the current working directory of Python.
 ```
 
-### Using MMRotate with Docker
+#### Using MMRotate with Docker
 
 We provide a [Dockerfile](https://github.com/open-mmlab/mmrotate/tree/main/docker/Dockerfile) to build an image. Ensure that your [docker version](https://docs.docker.com/engine/install/) >=19.03.
 
@@ -178,7 +169,7 @@ Run it with
 docker run --gpus all --shm-size=8g -it -v {DATA_DIR}:/mmrotate/data mmrotate
 ```
 
-## Trouble shooting
+### Trouble shooting
 
 If you have some issues during the installation, please first view the [FAQ](faq.md) page.
 You may [open an issue](https://github.com/open-mmlab/mmrotate/issues/new/choose) on GitHub if no solution is found.
