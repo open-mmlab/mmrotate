@@ -5,7 +5,7 @@
 MMRotate 能够在 Linux 和 Windows 上运行。它依赖于 Python 3.7+, CUDA 9.2+ 和 PyTorch 1.6+。
 
 ```{note}
-如果您对PyTorch有经验并且已经安装了它，只需跳过此部分并跳到[下一节](#installation)。否则，您可以按照以下步骤进行准备。
+如果您对 PyTorch 有经验并且已经安装了它，只需跳过此部分并跳到 [下一节](#安装) 。否则，您可以按照以下步骤进行准备。
 ```
 
 **第0步：** 从 [官网](https://docs.conda.io/en/latest/miniconda.html) 下载并安装 Miniconda。
@@ -150,7 +150,7 @@ print(mmrotate.__version__)
 ```
 
 ```{note}
-在Jupyter中，感叹号 `!` 用于调用外部可执行文件，`%cd` 是一个[魔术命令](https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-cd）用于更改 Python 的当前工作目录。
+在Jupyter中，感叹号 `!` 用于调用外部可执行文件，`%cd` 是一个 [魔术命令](https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-cd) 用于更改 Python 的当前工作目录。
 ```
 
 #### 在 Docker 镜像中使用 MMRotate
