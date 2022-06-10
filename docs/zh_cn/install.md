@@ -137,7 +137,6 @@ pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.8
 ```shell
 !git clone https://github.com/open-mmlab/mmrotate.git
 %cd mmrotate
-!pip install -r requirements/build.txt
 !pip install -e .
 ```
 
