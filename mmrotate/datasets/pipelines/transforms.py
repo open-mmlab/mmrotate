@@ -3,9 +3,9 @@ import copy
 import cv2
 import mmcv
 import numpy as np
+from mmdet.datasets.pipelines.transforms import (Mosaic, RandomCrop,
+                                                 RandomFlip, Resize)
 from numpy import random
-from mmdet.datasets.pipelines.transforms import (RandomCrop, RandomFlip,
-                                                 Resize, Mosaic)
 
 from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
 from ..builder import ROTATED_PIPELINES
