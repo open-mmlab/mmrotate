@@ -52,28 +52,29 @@ y (pi/2 rad)
 
 `CW` 的旋转矩阵
 
-```{math}
+$$
 \begin{pmatrix}
 \cos\alpha & -\sin\alpha \\
 \sin\alpha & \cos\alpha
 \end{pmatrix}
-```
+$$
 
 `CW` 的旋转变换
 
-```{math}
-P_A=
-\begin{pmatrix} x_A \\ y_A\end{pmatrix}
-=
-\begin{pmatrix} x_{center} \\ y_{center}\end{pmatrix} +
+$$
+P_A =
+\begin{pmatrix} x_A \\ 
+y_A\end{pmatrix} =
+\begin{pmatrix} x_{center} \\ 
+y_{center}\end{pmatrix} +
 \begin{pmatrix}\cos\alpha & -\sin\alpha \\
 \sin\alpha & \cos\alpha\end{pmatrix}
-\begin{pmatrix} -0.5w \\ -0.5h\end{pmatrix} \\
-=
+\begin{pmatrix} -0.5w \\ 
+-0.5h\end{pmatrix} \\ =
 \begin{pmatrix} x_{center}-0.5w\cos\alpha+0.5h\sin\alpha
 \\
 y_{center}-0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
-```
+$$
 
 - 逆时针 (`CCW`)
 
@@ -93,28 +94,29 @@ y (-pi/2 rad)
 
 `CCW` 的旋转矩阵
 
-```{math}
+$$
 \begin{pmatrix}
 \cos\alpha & \sin\alpha \\
 -\sin\alpha & \cos\alpha
 \end{pmatrix}
-```
+$$
 
 `CCW` 的旋转变换
 
-```{math}
+$$
 P_A=
-\begin{pmatrix} x_A \\ y_A\end{pmatrix}
-=
-\begin{pmatrix} x_{center} \\ y_{center}\end{pmatrix} +
+\begin{pmatrix} x_A \\ 
+y_A\end{pmatrix} =
+\begin{pmatrix} x_{center} \\ 
+y_{center}\end{pmatrix} +
 \begin{pmatrix}\cos\alpha & \sin\alpha \\
 -\sin\alpha & \cos\alpha\end{pmatrix}
-\begin{pmatrix} -0.5w \\ -0.5h\end{pmatrix} \\
-=
+\begin{pmatrix} -0.5w \\ 
+-0.5h\end{pmatrix} \\ =
 \begin{pmatrix} x_{center}-0.5w\cos\alpha-0.5h\sin\alpha
 \\
 y_{center}+0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
-```
+$$
 
 在MMCV中可以设置旋转方向的算子有：
 
@@ -131,10 +133,10 @@ y_{center}+0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
 
 由于 `theta` 定义范围的不同，在旋转目标检测中逐渐派生出如下3种旋转框定义法：
 
-- {math}`D_{oc^{\prime}}` : OpenCV 定义法，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`， `width` 与 `x` 正半轴之间的夹角为正的锐角。该定义法源于 OpenCV 中的 `cv2.minAreaRect` 函数，
+- {math} $D_{oc^{\prime}}$ : OpenCV 定义法，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`， `width` 与 `x` 正半轴之间的夹角为正的锐角。该定义法源于 OpenCV 中的 `cv2.minAreaRect` 函数，
   其返回值为 `(0, 90°]`。
-- {math}`D_{le135}` : 长边 135° 定义法，`angle∈[-45°, 135°)`，`theta∈[-pi / 4, 3 * pi / 4)` 并且 `width > height`。
-- {math}`D_{le90}` : 长边 90° 定义法，`angle∈[-90°, 90°)`，`theta∈[-pi / 2, pi / 2)` 并且 `width > height`。
+- {math} $D_{le135}$ : 长边 135° 定义法，`angle∈[-45°, 135°)`，`theta∈[-pi / 4, 3 * pi / 4)` 并且 `width > height`。
+- {math} $D_{le90}$ : 长边 90° 定义法，`angle∈[-90°, 90°)`，`theta∈[-pi / 2, pi / 2)` 并且 `width > height`。
 
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/angle_def.png" width=100%/>
@@ -150,8 +152,8 @@ MMRotate 同时支持上述三种旋转框定义法，可以通过配置文件�
 （[参考资料](https://github.com/opencv/opencv/issues/19749)）。为了便于区分，
 将老版本的 OpenCV 定义法记作 {math}`D_{oc}`。
 
-- {math}`D_{oc^{\prime}}`: OpenCV 定义法，`opencv>=4.5.1`，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`。
-- {math}`D_{oc}`: 老版的 OpenCV 定义法，`opencv<4.5.1`，`angle∈[-90°, 0°)`，`theta∈[-pi / 2, 0)`。
+- {math} $D_{oc^{\prime}}$ : OpenCV 定义法，`opencv>=4.5.1`，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`。
+- {math} $D_{oc}$ : 老版的 OpenCV 定义法，`opencv<4.5.1`，`angle∈[-90°, 0°)`，`theta∈[-pi / 2, 0)`。
 
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/opencv.png" width=50%/>
@@ -159,17 +161,19 @@ MMRotate 同时支持上述三种旋转框定义法，可以通过配置文件�
 
 两种 OpenCV 定义法的转换关系如下：
 
-```{math}
-D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta _{oc^{\prime}} \right) =\begin{cases}
-	D_{oc}\left( h_{oc},w_{oc},\theta _{oc}+\pi /2 \right) , otherwise\\
-	D_{oc}\left( w_{oc},h_{oc},\theta _{oc}+\pi \right) ,\theta _{oc}=-\pi /2\\
+$$
+D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta_{oc^{\prime}} \right) =\begin{cases}
+	D_{oc}\left( h_{oc},w_{oc},\theta_{oc}+\pi /2 \right) , otherwise\\
+	D_{oc}\left( w_{oc},h_{oc},\theta_{oc}+\pi \right) ,\theta_{oc}=-\pi /2\\
 \end{cases}
-\\
-D_{oc}\left( w_{oc},h_{oc},\theta _{oc} \right) =\begin{cases}
-	D_{oc^{\prime}}\left( h_{oc^{\prime}},w_{oc^{\prime}},\theta _{oc^{\prime}}-\pi /2 \right) , otherwise\\
-	D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta _{oc^{\prime}}-\pi \right) , \theta _{oc^{\prime}}=\pi /2\\
+$$
+
+$$
+D_{oc}\left( w_{oc},h_{oc},\theta_{oc} \right) =\begin{cases}
+	D_{oc^{\prime}}\left( h_{oc^{\prime}},w_{oc^{\prime}},\theta_{oc^{\prime}}-\pi /2 \right) , otherwise\\
+	D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta_{oc^{\prime}}-\pi \right) , \theta_{oc^{\prime}}=\pi /2\\
 \end{cases}
-```
+$$
 
 ```{note}
 不管您使用的 OpenCV 版本是多少, MMRotate 都会将 OpenCV 定义法的 theta 转换为 (0, pi / 2]。
