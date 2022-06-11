@@ -374,6 +374,7 @@ class RMosaic(Mosaic):
     Given 4 images, mosaic transform combines them into
     one output image. The output image is composed of the parts from each sub-
     image.
+
     .. code:: text
                         mosaic transform
                            center_x
@@ -391,11 +392,13 @@ class RMosaic(Mosaic):
                 +----|-------------+-----------+
                      |             |
                      +-------------+
+
      The mosaic transform steps are as follows:
          1. Choose the mosaic center as the intersections of 4 images
          2. Get the left top image according to the index, and randomly
             sample another 3 images from the custom dataset.
          3. Sub image will be cropped if image is larger than mosaic patch
+
     Args:
         img_scale (Sequence[int]): Image size after mosaic pipeline of single
             image. The shape order should be (height, width).
@@ -436,8 +439,10 @@ class RMosaic(Mosaic):
 
     def _mosaic_transform(self, results):
         """Mosaic transform function.
+
         Args:
             results (dict): Result dict.
+
         Returns:
             dict: Updated result dict.
         """
