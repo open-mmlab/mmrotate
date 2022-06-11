@@ -149,13 +149,13 @@ In MMRotate, the rotation direction of the rotated boxes is `CW`.
 Due to the difference in the definition range of `theta`, the following three
 definitions of the rotated box gradually emerge in rotated object detection:
 
-- {math} $D_{oc^{\prime}}$: OpenCV Definition, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`,
+- {math} $D_{oc^{\prime}}$ : OpenCV Definition, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`,
   The angle between the `width` of the rectangle and the positive semi-axis of x is
   a positive acute angle. This definition comes from the `cv2.minAreaRect` function
   in OpenCV, which returns an angle in the range `(0, 90°]`.
-- {math} $D_{le135}$: Long Edge Definition (135°)，`angle∈[-45°, 135°)`,
+- {math} $D_{le135}$ : Long Edge Definition (135°)，`angle∈[-45°, 135°)`,
   `theta∈[-pi / 4, 3 * pi / 4)` and `width > height`.
-- {math} $D_{le90}$: Long Edge Definition (90°)，`angle∈[-90°, 90°)`,
+- {math} $D_{le90}$ : Long Edge Definition (90°)，`angle∈[-90°, 90°)`,
   `theta∈[-pi / 2, pi / 2)` and `width > height`.
 
 <div align=center>
