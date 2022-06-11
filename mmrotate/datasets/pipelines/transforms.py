@@ -4,7 +4,7 @@ import cv2
 import mmcv
 import numpy as np
 from numpy import random
-from mmdet.datasets.pipelines.transforms import (RandomCrop, RandomFlip, 
+from mmdet.datasets.pipelines.transforms import (RandomCrop, RandomFlip,
                                                  Resize, Mosaic)
 
 from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
@@ -368,7 +368,7 @@ class RRandomCrop(RandomCrop):
 
 @ROTATED_PIPELINES.register_module()
 class RMosaic(Mosaic):
-    """Rotate Mosaic augmentation. 
+    """Rotate Mosaic augmentation.
     Inherit from 'mmdet.datasets.pipelines.transforms.Mosaic'
 
     Given 4 images, mosaic transform combines them into
@@ -428,12 +428,12 @@ class RMosaic(Mosaic):
         super(RMosaic, self).__init__(
             img_scale=img_scale,
             center_ratio_range=center_ratio_range,
-            min_bbox_size=min_bbox_size, 
+            min_bbox_size=min_bbox_size,
             bbox_clip_border=bbox_clip_border,
-            skip_filter=skip_filter, 
+            skip_filter=skip_filter,
             pad_val=pad_val,
             prob=1.0)
-        
+
     def _mosaic_transform(self, results):
         """Mosaic transform function.
         Args:
@@ -510,11 +510,11 @@ class RMosaic(Mosaic):
 
             mosaic_bboxes, mosaic_labels = \
                 self._filter_box_candidates(
-                    mosaic_bboxes, mosaic_labels, 
+                    mosaic_bboxes, mosaic_labels,
                     2 * self.img_scale[1], 2 * self.img_scale[0]
                 )
-        # If results after rmosaic does not contain any valid gt-bbox, 
-        # return None. And transform flows in MultiImageMixDataset will 
+        # If results after rmosaic does not contain any valid gt-bbox,
+        # return None. And transform flows in MultiImageMixDataset will
         # repeat until existing valid gt-bbox.
         if len(mosaic_bboxes) == 0:
             return None
