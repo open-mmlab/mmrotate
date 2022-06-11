@@ -3,6 +3,6 @@ from .loading import LoadPatchFromImage
 from .transforms import PolyRandomRotate, RRandomFlip, RResize, RMosaic
 
 __all__ = [
-    'LoadPatchFromImage', 'RResize', 'RRandomFlip', 
+    'LoadPatchFromImage', 'RResize', 'RRandomFlip',
     'PolyRandomRotate', 'RMosaic'
 ]
