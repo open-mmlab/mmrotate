@@ -4,7 +4,8 @@ import cv2
 import mmcv
 import numpy as np
 from numpy import random
-from mmdet.datasets.pipelines.transforms import RandomCrop, RandomFlip, Resize, Mosaic
+from mmdet.datasets.pipelines.transforms import (RandomCrop, RandomFlip, 
+                                                 Resize, Mosaic)
 
 from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
 from ..builder import ROTATED_PIPELINES
@@ -367,6 +368,54 @@ class RRandomCrop(RandomCrop):
 
 @ROTATED_PIPELINES.register_module()
 class RMosaic(Mosaic):
+    """Rotate Mosaic augmentation. 
+    Inherit from 'mmdet.datasets.pipelines.transforms.Mosaic'
+
+    Given 4 images, mosaic transform combines them into
+    one output image. The output image is composed of the parts from each sub-
+    image.
+    .. code:: text
+                        mosaic transform
+                           center_x
+                +------------------------------+
+                |       pad        |  pad      |
+                |      +-----------+           |
+                |      |           |           |
+                |      |  image1   |--------+  |
+                |      |           |        |  |
+                |      |           | image2 |  |
+     center_y   |----+-------------+-----------|
+                |    |   cropped   |           |
+                |pad |   image3    |  image4   |
+                |    |             |           |
+                +----|-------------+-----------+
+                     |             |
+                     +-------------+
+     The mosaic transform steps are as follows:
+         1. Choose the mosaic center as the intersections of 4 images
+         2. Get the left top image according to the index, and randomly
+            sample another 3 images from the custom dataset.
+         3. Sub image will be cropped if image is larger than mosaic patch
+    Args:
+        img_scale (Sequence[int]): Image size after mosaic pipeline of single
+            image. The shape order should be (height, width).
+            Default to (640, 640).
+        center_ratio_range (Sequence[float]): Center ratio range of mosaic
+            output. Default to (0.5, 1.5).
+        min_bbox_size (int | float): The minimum pixel for filtering
+            invalid bboxes after the mosaic pipeline. Default to 0.
+        bbox_clip_border (bool, optional): Whether to clip the objects outside
+            the border of the image. In some dataset like MOT17, the gt bboxes
+            are allowed to cross the border of images. Therefore, we don't
+            need to clip the gt bboxes in these cases. Defaults to True.
+        skip_filter (bool): Whether to skip filtering rules. If it
+            is True, the filter rule will not be applied, and the
+            `min_bbox_size` is invalid. Default to True.
+        pad_val (int): Pad value. Default to 114.
+        prob (float): Probability of applying this transformation.
+            Default to 1.0.
+    """
+
     def __init__(self,
                  img_scale=(640, 640),
                  center_ratio_range=(0.5, 1.5),
@@ -464,6 +513,11 @@ class RMosaic(Mosaic):
                     mosaic_bboxes, mosaic_labels, 
                     2 * self.img_scale[1], 2 * self.img_scale[0]
                 )
+        # If results after rmosaic does not contain any valid gt-bbox, 
+        # return None. And transform flows in MultiImageMixDataset will 
+        # repeat until existing valid gt-bbox.
+        if len(mosaic_bboxes) == 0:
+            return None
 
         results['img'] = mosaic_img
         results['img_shape'] = mosaic_img.shape
@@ -473,7 +527,7 @@ class RMosaic(Mosaic):
         return results
 
     def _filter_box_candidates(self, bboxes, labels, w, h):
-        """Filter out bboxes too small after Mosaic."""
+        """Filter out small bboxes and outside bboxes after Mosaic."""
         bbox_x, bbox_y, bbox_w, bbox_h = \
             bboxes[:, 0], bboxes[:, 1], bboxes[:, 2], bboxes[:, 3]
         valid_inds = (bbox_x > 0) & (bbox_x < w) & \
