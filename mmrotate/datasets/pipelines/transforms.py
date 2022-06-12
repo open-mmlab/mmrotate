@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
+
 import cv2
 import mmcv
 import numpy as np
@@ -368,8 +369,8 @@ class RRandomCrop(RandomCrop):
 
 @ROTATED_PIPELINES.register_module()
 class RMosaic(Mosaic):
-    """Rotate Mosaic augmentation.
-    Inherit from 'mmdet.datasets.pipelines.transforms.Mosaic'
+    """Rotate Mosaic augmentation. Inherit from
+    'mmdet.datasets.pipelines.transforms.Mosaic'.
 
     Given 4 images, mosaic transform combines them into
     one output image. The output image is composed of the parts from each sub-
@@ -422,7 +423,7 @@ class RMosaic(Mosaic):
     def __init__(self,
                  img_scale=(640, 640),
                  center_ratio_range=(0.5, 1.5),
-                 min_bbox_size=5,
+                 min_bbox_size=10,
                  bbox_clip_border=True,
                  skip_filter=True,
                  pad_val=114,
