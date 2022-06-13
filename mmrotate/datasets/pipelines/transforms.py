@@ -418,7 +418,7 @@ class RMosaic(Mosaic):
         pad_val (int): Pad value. Defaults to 114.
         prob (float): Probability of applying this transformation.
             Defaults to 1.0.
-        version  (str, optional): Angle representations. Defaults to 'oc'.
+        version  (str, optional): Angle representations. Defaults to `oc`.
     """
 
     def __init__(self,
