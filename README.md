@@ -18,24 +18,32 @@
   </div>
   <div>&nbsp;</div>
 
-[![Documentation](https://readthedocs.org/projects/mmrotate/badge/?version=latest)](https://mmrotate.readthedocs.io/en/latest/?badge=latest)
-[![actions](https://github.com/open-mmlab/mmrotate/workflows/build/badge.svg)](https://github.com/open-mmlab/mmrotate/actions)
-[![codecov](https://codecov.io/gh/open-mmlab/mmrotate/branch/master/graph/badge.svg)](https://codecov.io/gh/open-mmlab/mmrotate)
-[![PyPI](https://img.shields.io/pypi/v/mmrotate)](https://pypi.org/project/mmrotate/)
-[![LICENSE](https://img.shields.io/github/license/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/blob/master/LICENSE)
-[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
-[![Percentage of issues still open](https://isitmaintained.com/badge/open/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
+[![PyPI](https://img.shields.io/pypi/v/mmrotate)](https://pypi.org/project/mmrotate)
+[![docs](https://img.shields.io/badge/docs-latest-blue)](https://mmrotate.readthedocs.io/en/latest/)
+[![badge](https://github.com/open-mmlab/mmrotate/workflows/build/badge.svg)](https://github.com/open-mmlab/mmrotate/actions)
+[![codecov](https://codecov.io/gh/open-mmlab/mmrotate/branch/main/graph/badge.svg)](https://codecov.io/gh/open-mmlab/mmrotate)
+[![license](https://img.shields.io/github/license/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/blob/main/LICENSE)
+[![open issues](https://isitmaintained.com/badge/open/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
+[![issue resolution](https://isitmaintained.com/badge/resolution/open-mmlab/mmrotate.svg)](https://github.com/open-mmlab/mmrotate/issues)
 
 [📘Documentation](https://mmrotate.readthedocs.io/en/latest/) |
 [🛠️Installation](https://mmrotate.readthedocs.io/en/latest/install.html) |
-[👀Model Zoo](docs/en/model_zoo.md) |
+[👀Model Zoo](https://mmrotate.readthedocs.io/en/latest/model_zoo.html) |
+[🆕Update News](https://mmrotate.readthedocs.io/en/latest/changelog.html) |
+[🚀Ongoing Projects](https://github.com/open-mmlab/mmrotate/projects) |
 [🤔Reporting Issues](https://github.com/open-mmlab/mmrotate/issues/new/choose)
 
 </div>
 
-## Introduction
+<!--中/英 文档切换-->
+
+<div align="center">
 
 English | [简体中文](README_zh-CN.md)
+
+</div>
+
+## Introduction
 
 MMRotate is an open-source toolbox for rotated object detection based on PyTorch.
 It is a part of the [OpenMMLab project](https://github.com/open-mmlab).
@@ -62,24 +70,36 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 </details>
 
-## Changelog
+## What's New
 
-**0.3.0** was released in 29/4/2022:
+**0.3.1** was released in 6/6/2022:
 
-- Support TorchServe (#160)
-- Support Rotated ATSS (CVPR'20) (#179)
+- Support Rotated FCOS (#223)
 
 Please refer to [changelog.md](docs/en/changelog.md) for details and release history.
 
 ## Installation
 
-Please refer to [install.md](docs/en/install.md) for installation guide.
+MMRotate depends on [PyTorch](https://pytorch.org/), [MMCV](https://github.com/open-mmlab/mmcv) and [MMDetection](https://github.com/open-mmlab/mmdetection).
+Below are quick steps for installation.
+Please refer to [Install Guide](https://mmrotate.readthedocs.io/en/latest/install.html) for more detailed instruction.
+
+```shell
+conda create -n open-mmlab python=3.7 pytorch==1.7.0 cudatoolkit=10.1 torchvision -c pytorch -y
+conda activate open-mmlab
+pip install openmim
+mim install mmcv-full
+mim install mmdet
+git clone https://github.com/open-mmlab/mmrotate.git
+cd mmrotate
+pip install -r requirements/build.txt
+pip install -v -e .
+```
 
 ## Get Started
 
 Please see [get_started.md](docs/en/get_started.md) for the basic usage of MMRotate.
-We provide [colab tutorial](demo/MMRotate_Tutorial.ipynb) for beginners.
-There are also tutorials:
+We provide [colab tutorial](demo/MMRotate_Tutorial.ipynb), and other tutorials for:
 
 - [learn the basics](docs/en/intro.md)
 - [learn the config](docs/en/tutorials/customize_config.md)
@@ -98,6 +118,7 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 - [x] [Rotated RetinaNet-OBB/HBB](configs/rotated_retinanet/README.md) (ICCV'2017)
 - [x] [Rotated FasterRCNN-OBB](configs/rotated_faster_rcnn/README.md) (TPAMI'2017)
 - [x] [Rotated RepPoints-OBB](configs/rotated_reppoints/README.md) (ICCV'2019)
+- [x] [Rotated FCOS](configs/rotated_fcos/README.md) (ICCV'2019)
 - [x] [RoI Transformer](configs/roi_trans/README.md) (CVPR'2019)
 - [x] [Gliding Vertex](configs/gliding_vertex/README.md) (TPAMI'2020)
 - [x] [Rotated ATSS-OBB](configs/rotated_atss/README.md) (CVPR'2020)
@@ -114,10 +135,6 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 - [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
 
 </details>
-
-### Model Request
-
-We will keep up with the latest progress of the community, and support more popular algorithms and frameworks. If you have any feature requests, please feel free to leave a comment in [MMRotate Roadmap](https://github.com/open-mmlab/mmrotate/issues/1).
 
 ## Data Preparation
 
@@ -137,13 +154,15 @@ MMRotate is an open source project that is contributed by researchers and engine
 
 ## Citation
 
-If you find this project useful in your research, please consider cite:
+If you use this toolbox or benchmark in your research, please cite this project.
 
 ```bibtex
 @article{mmrotate2022,
-  title={MMRotate: A Rotated Object Detection Benchmark using PyTorch},
-  author={Zhou, Yue and Yang, Xue and Zhang, Gefan and Wang, Jiabao and Liu, Yanyi and Hou, Liping and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and Zhang, Wenwei and Chen, Kai},
-  journal={arXiv preprint arXiv:2204.13317},
+  title   = {MMRotate: A Rotated Object Detection Benchmark using PyTorch},
+  author  = {Zhou, Yue and Yang, Xue and Zhang, Gefan and Wang, Jiabao and Liu, Yanyi and
+             Hou, Liping and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and
+             Zhang, Wenwei and Chen, Kai},
+  journal= {arXiv preprint arXiv:2204.13317},
   year={2022}
 }
 ```

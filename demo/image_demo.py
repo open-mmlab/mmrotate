@@ -1,18 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-"""Inference on single image.
-
-Example:
-
-
-```
-wget -P checkpoint https://download.openmmlab.com/mmrotate/v0.1.0/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90/oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth  # noqa: E501, E261.
-python demo/image_demo.py \
-    demo/demo.jpg \
-    configs/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py \
-    work_dirs/oriented_rcnn_r50_fpn_1x_dota_v3/epoch_12.pth
-```
-"""  # nowq
-
 from argparse import ArgumentParser
 
 from mmdet.apis import inference_detector, init_detector, show_result_pyplot
@@ -25,6 +11,7 @@ def parse_args():
     parser.add_argument('img', help='Image file')
     parser.add_argument('config', help='Config file')
     parser.add_argument('checkpoint', help='Checkpoint file')
+    parser.add_argument('--out-file', default=None, help='Path to output file')
     parser.add_argument(
         '--device', default='cuda:0', help='Device used for inference')
     parser.add_argument(
@@ -49,7 +36,8 @@ def main(args):
         args.img,
         result,
         palette=args.palette,
-        score_thr=args.score_thr)
+        score_thr=args.score_thr,
+        out_file=args.out_file)
 
 
 if __name__ == '__main__':

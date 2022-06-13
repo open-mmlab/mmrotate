@@ -1,6 +1,6 @@
 _base_ = ['./roi_trans_r50_fpn_1x_dota_le90.py']
 
-data_root = '../datasets/split_ms_dotav1/'
+data_root = 'data/split_ms_dotav1/'
 data = dict(
     train=dict(
         ann_file=data_root + 'trainval/annfiles/',

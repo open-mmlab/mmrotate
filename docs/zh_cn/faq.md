@@ -6,14 +6,23 @@
 
 - MMCV 与 MMDetection 的兼容问题: "ConvWS is already registered in conv layer"; "AssertionError: MMCV==xxx is used but incompatible. Please install mmcv>=xxx, \<=xxx."
 
-  请按 [安装说明](https://mmrotate.readthedocs.io/zh_CN/latest/install.html) 为你的 MMRotate 安装正确版本的 MMCV。
+MMRotate 和 MMCV, MMDet 版本兼容性如下所示，需要安装正确的版本以避免安装出现问题。
+
+| MMRotate 版本 |          MMCV 版本          | MMDetection 版本  |
+| :---------: | :-----------------------: | :-------------: |
+|    main     | mmcv-full>=1.5.0, \<1.6.0 | mmdet >= 2.22.0 |
+|    0.3.1    | mmcv-full>=1.5.0, \<1.6.0 | mmdet >= 2.22.0 |
+|    0.3.0    | mmcv-full>=1.4.5, \<1.6.0 | mmdet >= 2.22.0 |
+|    0.2.0    | mmcv-full>=1.4.5, \<1.5.0 | mmdet >= 2.19.0 |
+|    0.1.1    | mmcv-full>=1.4.5, \<1.5.0 | mmdet >= 2.19.0 |
+|    0.1.0    | mmcv-full>=1.4.5, \<1.5.0 | mmdet >= 2.19.0 |
 
 - "No module named 'mmcv.ops'"; "No module named 'mmcv.\_ext'".
 
   原因是安装了 `mmcv` 而不是 `mmcv-full`。
 
   1. 使用 `pip uninstall mmcv` 卸载。
-  2. 根据 [安装说明](https://mmcv.readthedocs.io/zh_CN/latest/get_started/installation.html) 安装 `mmcv-full`。
+  2. 根据 [安装说明](install#best-practices) 安装 `mmcv-full`。
 
 ## PyTorch/CUDA 环境相关
 
