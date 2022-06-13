@@ -370,7 +370,7 @@ class RRandomCrop(RandomCrop):
 @ROTATED_PIPELINES.register_module()
 class RMosaic(Mosaic):
     """Rotate Mosaic augmentation. Inherit from
-    'mmdet.datasets.pipelines.transforms.Mosaic'.
+    `mmdet.datasets.pipelines.transforms.Mosaic`.
 
     Given 4 images, mosaic transform combines them into
     one output image. The output image is composed of the parts from each sub-
@@ -403,21 +403,22 @@ class RMosaic(Mosaic):
     Args:
         img_scale (Sequence[int]): Image size after mosaic pipeline of single
             image. The shape order should be (height, width).
-            Default to (640, 640).
+            Defaults to (640, 640).
         center_ratio_range (Sequence[float]): Center ratio range of mosaic
-            output. Default to (0.5, 1.5).
+            output. Defaults to (0.5, 1.5).
         min_bbox_size (int | float): The minimum pixel for filtering
-            invalid bboxes after the mosaic pipeline. Default to 0.
+            invalid bboxes after the mosaic pipeline. Defaults to 0.
         bbox_clip_border (bool, optional): Whether to clip the objects outside
             the border of the image. In some dataset like MOT17, the gt bboxes
             are allowed to cross the border of images. Therefore, we don't
             need to clip the gt bboxes in these cases. Defaults to True.
         skip_filter (bool): Whether to skip filtering rules. If it
             is True, the filter rule will not be applied, and the
-            `min_bbox_size` is invalid. Default to True.
-        pad_val (int): Pad value. Default to 114.
+            `min_bbox_size` is invalid. Defaults to True.
+        pad_val (int): Pad value. Defaults to 114.
         prob (float): Probability of applying this transformation.
-            Default to 1.0.
+            Defaults to 1.0.
+        version  (str, optional): Angle representations. Defaults to 'oc'.
     """
 
     def __init__(self,
