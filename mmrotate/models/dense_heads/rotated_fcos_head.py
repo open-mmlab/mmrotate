@@ -41,13 +41,13 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
         separate_angle (bool): If true, angle prediction is separated from
             bbox regression loss. Default: False.
         scale_angle (bool): If true, add scale to angle pred branch. Default: True.
-        h_bbox_coder (dict): Config of horzional bbox coder, only used when seprate_angle is True.
+        h_bbox_coder (dict): Config of horzional bbox coder, only used when separate_angle is True.
         conv_bias (bool | str): If specified as `auto`, it will be decided by the
             norm_cfg. Bias of conv will be set as True if `norm_cfg` is None, otherwise
             False. Default: "auto".
         loss_cls (dict): Config of classification loss.
         loss_bbox (dict): Config of localization loss.
-        loss_angle (dict): Config of angle loss, only used when seprate_angle is True.
+        loss_angle (dict): Config of angle loss, only used when separate_angle is True.
         loss_centerness (dict): Config of centerness loss.
         norm_cfg (dict): dictionary to construct and config norm layer.
             Default: norm_cfg=dict(type='GN', num_groups=32, requires_grad=True).
@@ -99,7 +99,7 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
         self.center_sample_radius = center_sample_radius
         self.norm_on_bbox = norm_on_bbox
         self.centerness_on_reg = centerness_on_reg
-        self.seprate_angle = separate_angle
+        self.separate_angle = separate_angle
         self.is_scale_angle = scale_angle
         super().__init__(
             num_classes,
@@ -110,7 +110,7 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
             init_cfg=init_cfg,
             **kwargs)
         self.loss_centerness = build_loss(loss_centerness)
-        if self.seprate_angle:
+        if self.separate_angle:
             self.loss_angle = build_loss(loss_angle)
             self.h_bbox_coder = build_bbox_coder(h_bbox_coder)
         # Angle predict length
@@ -275,7 +275,7 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
 
         if len(pos_inds) > 0:
             pos_points = flatten_points[pos_inds]
-            if self.seprate_angle:
+            if self.separate_angle:
                 bbox_coder = self.h_bbox_coder
             else:
                 bbox_coder = self.bbox_coder
@@ -292,7 +292,7 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
                 pos_decoded_target_preds,
                 weight=pos_centerness_targets,
                 avg_factor=centerness_denorm)
-            if self.seprate_angle:
+            if self.separate_angle:
                 loss_angle = self.loss_angle(
                     pos_angle_preds, pos_angle_targets, avg_factor=num_pos)
             loss_centerness = self.loss_centerness(
@@ -300,10 +300,10 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
         else:
             loss_bbox = pos_bbox_preds.sum()
             loss_centerness = pos_centerness.sum()
-            if self.seprate_angle:
+            if self.separate_angle:
                 loss_angle = pos_angle_preds.sum()
 
-        if self.seprate_angle:
+        if self.separate_angle:
             return dict(
                 loss_cls=loss_cls,
                 loss_bbox=loss_bbox,
