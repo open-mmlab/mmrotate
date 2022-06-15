@@ -64,7 +64,13 @@ def multiclass_nms_rotated(multi_bboxes,
         else:
             return dets, labels
 
-    max_coordinate = bboxes.max()
+    # Strictly, the maximum coordinates of the rotating box (x,y,w,h,a)
+    # should be calculated by polygon coordinates.
+    # But the conversion from rbbox to polygon will slow down the speed.
+    # So we use max(x,y) + max(w,h) as max coordinate
+    # which is larger than polygon max coordinate
+    # max(x1, y1, x2, y2,x3, y3, x4, y4)
+    max_coordinate = bboxes[:, :2].max() + bboxes[:, 2:4].max()
     offsets = labels.to(bboxes) * (max_coordinate + 1)
     if bboxes.size(-1) == 5:
         bboxes_for_nms = bboxes.clone()
