@@ -1,7 +1,9 @@
 # Oriented RepPoints
+
 > [Oriented RepPoints for Aerial Object Detection](https://arxiv.org/pdf/2105.11111v4.pdf)
 
 <!-- [ALGORITHM] -->
+
 ## Abstract
 
 In contrast to the generic object, aerial targets are often non-axis aligned with arbitrary orientations having
@@ -19,15 +21,17 @@ aerial datasets including DOTA, HRSC2016, UCAS-AOD and DIOR-R, demonstrate the e
 
 DOTA1.0
 
-|    Backbone   |    mAP   | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size | Configs | Download |
-|:------------:|:----------:|:-----------:|:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------------:|
-| ResNet50 (1024,1024,200) | 71.94 | le135 | 1x | 3.45 | 16.1 | - | 2 | [oriented_reppoints_r50_fpn_1x_dota_le135](./oriented_reppoints_r50_fpn_1x_dota_le135.py) |  [model]() &#124; [log]()
-| ResNet50 (1024,1024,200) | 75.21 | le135 | 40e | 3.45 | 16.1 | ms | 2 | [oriented_reppoints_r50_fpn_40e_dota_ms_le135](./oriented_reppoints_r50_fpn_40e_dota_ms_le135.py) |  [model]() &#124; [log]()
+|         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                              Configs                                              |         Download         |
+| :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :-----------------------------------------------------------------------------------------------: | :----------------------: |
+| ResNet50 (1024,1024,200) | 71.94 | le135 |   1x    |   3.45   |      16.1      |  -  |     2      |     [oriented_reppoints_r50_fpn_1x_dota_le135](./oriented_reppoints_r50_fpn_1x_dota_le135.py)     | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 75.21 | le135 |   40e   |   3.45   |      16.1      | ms  |     2      | [oriented_reppoints_r50_fpn_40e_dota_ms_le135](./oriented_reppoints_r50_fpn_40e_dota_ms_le135.py) | [model](<>) \| [log](<>) |
 
 **Notes:**
 
 - `ms` means multiple scale image split online (768, 1280).
+
 ## Citation
+
 ```
 @inproceedings{li2022ori,
     title={Oriented RepPoints for Aerial Object Detection},

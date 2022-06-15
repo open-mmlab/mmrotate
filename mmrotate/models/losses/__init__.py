@@ -10,5 +10,6 @@ from .spatial_border_loss import SpatialBorderLoss
 
 __all__ = [
     'GDLoss', 'GDLoss_v1', 'KFLoss', 'ConvexGIoULoss', 'BCConvexGIoULoss',
-    'KLDRepPointsLoss', 'SmoothFocalLoss', 'RotatedIoULoss', 'SpatialBorderLoss'
+    'KLDRepPointsLoss', 'SmoothFocalLoss', 'RotatedIoULoss',
+    'SpatialBorderLoss'
 ]

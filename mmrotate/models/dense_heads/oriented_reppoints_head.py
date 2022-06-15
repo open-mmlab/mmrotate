@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-from mmcv.ops import chamfer_distance, DeformConv2d, min_area_polygons
+from mmcv.ops import DeformConv2d, chamfer_distance, min_area_polygons
 from mmcv.runner import force_fp32
 from mmdet.core import images_to_levels, multi_apply, unmap
 from mmdet.core.anchor.point_generator import MlvlPointGenerator
@@ -723,11 +723,11 @@ class OrientedRepPointsHead(BaseDenseHead):
                                   inside_flags)
             proposals_weights = unmap(proposals_weights, num_total_proposals,
                                       inside_flags)
-            gt_inds = unmap(gt_inds, num_total_proposals,
-                                      inside_flags)
+            gt_inds = unmap(gt_inds, num_total_proposals, inside_flags)
 
         return (labels, label_weights, bbox_gt, pos_proposals,
-                proposals_weights, pos_inds, neg_inds, gt_inds, sampling_result)
+                proposals_weights, pos_inds, neg_inds, gt_inds,
+                sampling_result)
 
     def get_targets(self,
                     proposals_list,
@@ -835,8 +835,8 @@ class OrientedRepPointsHead(BaseDenseHead):
                 pos_mask = (0 <= single_labels) & (
                     single_labels < self.num_classes)
                 pos_inds.append(pos_mask.nonzero(as_tuple=False).view(-1))
-                pos_gt_index.append(all_gt_inds[i][pos_mask.nonzero(
-                    as_tuple=False).view(-1)])
+                pos_gt_index.append(
+                    all_gt_inds[i][pos_mask.nonzero(as_tuple=False).view(-1)])
 
             return (all_labels, all_label_weights, all_bbox_gt, all_proposals,
                     all_proposal_weights, pos_inds, pos_gt_index)
