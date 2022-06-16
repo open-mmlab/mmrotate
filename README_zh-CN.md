@@ -62,9 +62,9 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## 更新日志
 
-最新的 **0.3.2** 版本已经在 2022.xx.xx 发布:
+最新的 **0.3.1** 版本已经在 2022.06.06 发布:
 
-- 支持了 Oriented RepPoints 模型 (#127)
+- 支持了 Rotated FCOS 模型 (#223)
 
 如果想了解更多版本更新细节和历史信息，请阅读[更新日志](docs/en/changelog.md)。
 
