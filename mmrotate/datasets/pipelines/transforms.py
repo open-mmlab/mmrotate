@@ -170,7 +170,7 @@ class PolyRandomRotate(object):
                                bound_w,
                                offset=0):
         """Create rotation matrix."""
-        center = (center[0] + offset, center[1] + offset)
+        center += offset
         rm = cv2.getRotationMatrix2D(tuple(center), angle, 1)
         if self.auto_bound:
             rot_im_center = cv2.transform(center[None, None, :] + offset,
@@ -215,7 +215,8 @@ class PolyRandomRotate(object):
         results['rotate_angle'] = angle
 
         image_center = np.array((w / 2, h / 2))
-        abs_cos, abs_sin = abs(np.cos(angle)), abs(np.sin(angle))
+        abs_cos, abs_sin = \
+            abs(np.cos(angle / 180 * np.pi)), abs(np.sin(angle / 180 * np.pi))
         if self.auto_bound:
             bound_w, bound_h = np.rint(
                 [h * abs_sin + w * abs_cos,
