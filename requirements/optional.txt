@@ -1,3 +1,4 @@
 imagecorruptions
 scipy
 sklearn
+torch-model-archiver
