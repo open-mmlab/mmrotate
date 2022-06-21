@@ -16,7 +16,7 @@ Collections:
 Models:
   - Name: oriented_rcnn_r50_fpn_fp16_1x_dota_le90
     In Collection: oriented_rcnn
-    Config: configs/cfa/oriented_rcnn_r50_fpn_fp16_1x_dota_le90.py
+    Config: configs/oriented_rcnn/oriented_rcnn_r50_fpn_fp16_1x_dota_le90.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -28,7 +28,7 @@ Models:
 
   - Name: oriented_rcnn_r50_fpn_1x_dota_le90
     In Collection: oriented_rcnn
-    Config: configs/cfa/oriented_rcnn_r50_fpn_1x_dota_le90.py
+    Config: configs/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
