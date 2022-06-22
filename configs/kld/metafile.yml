@@ -3,7 +3,7 @@ Collections:
   Metadata:
     Training Data: DOTAv1.0
     Training Techniques:
-      - SGD with Momentum
+      - SGD with Momentum and AdamW
       - Weight Decay
     Training Resources: 1x GeForce GTX 1080 Ti
     Architecture:
@@ -109,3 +109,15 @@ Models:
         Metrics:
           mAP: 54.15/86.20/60.60
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90/rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90-58665364.pth
+
+  - Name: rotated_retinanet_obb_kld_stable_r50_adamw_fpn_1x_dota_le90
+    In Collection: kld
+    Config: configs/kld/rotated_retinanet_obb_kld_stable_r50_adamw_fpn_1x_dota_le90.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.30
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_obb_kld_stable_r50_adamw_fpn_1x_dota_le90/rotated_retinanet_obb_kld_stable_r50_adamw_fpn_1x_dota_le90-474d9955.pth
