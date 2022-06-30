@@ -246,7 +246,7 @@ class PolyRandomRotate(object):
         for pt in polys:
             pt = np.array(pt, dtype=np.float32)
             obb = poly2obb_np(pt, self.version) \
-                if poly2obb_np(pt, self.version) is not None\
+                if poly2obb_np(pt, self.version) is not None \
                 else [0, 0, 0, 0, 0]
             gt_bboxes.append(obb)
         gt_bboxes = np.array(gt_bboxes, dtype=np.float32)
@@ -369,8 +369,8 @@ class RRandomCrop(RandomCrop):
 
 
 @ROTATED_PIPELINES.register_module()
-class RRandomAffine(RandomAffine):
-    """Rotated Random affine transform data augmentation.
+class PolyRandomAffine(RandomAffine):
+    """Poly Random affine transform data augmentation.
 
     This operation randomly generates affine transform matrix which including
     rotation, translation, shear and scaling transforms.
@@ -410,7 +410,7 @@ class RRandomAffine(RandomAffine):
     """
 
     def __init__(self, version='oc', **kwargs):
-        super(RRandomAffine, self).__init__(**kwargs)
+        super(PolyRandomAffine, self).__init__(**kwargs)
         self.angle_version = version
 
     def __call__(self, results):
