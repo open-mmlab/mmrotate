@@ -1,5 +1,36 @@
 ## Changelog
 
+### v0.3.2 (5/7/2022)
+
+#### Highlight
+
+- Support Oriented Reppoints (CVPR'22) (#286)
+- Support ConvNeXt backbone (CVPR'22) (#343)
+
+#### New Features
+
+- Support RMosaic. (#344)
+
+#### Bug Fixes
+
+- Fix max_coordinate in multiclass_nms_rotated. (#346)
+- Fix bug in PolyRandomRotate. (#366)
+- Fix memory shortage when using huge_image_demo.py (#368)
+
+#### Improvements
+
+- Update README.md and INSTALL.md. (#342)
+- Fix typo in rotated_fcos_head. (#354)
+- Fix typo in csl_rotated_fcos_head. (#362)
+- Update checkpoint and eval interval of base config. (#347)
+- Fix mdformat version to support python3.6 & Add mim to extras_require in setup.py (#359)
+- Add mim test in CI (#374)
+
+#### Contributors
+
+A total of 9 developers contributed to this release.
+Thanks @LiWentomng @JinYuannn @sltlls @heiyuxiaokai @liuyanyi  @yangxue0827 @jbwang1997 @zytx121 @ZwwWayne
+
 ### v0.3.1 (6/6/2022)
 
 #### Highlight
