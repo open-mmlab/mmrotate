@@ -107,6 +107,7 @@ MMRotate 也提供了其他更详细的教程:
 - [x] [GWD](configs/gwd/README.md) (ICML'2021)
 - [x] [KLD](configs/kld/README.md) (NeurIPS'2021)
 - [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
+- [x] [Oriented RepPoints](configs/oriented_reppoints/README.md) (CVPR'2022)
 - [x] [KFIoU](configs/kfiou/README.md) (arXiv)
 - [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
 
