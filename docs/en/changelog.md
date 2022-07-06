@@ -21,7 +21,6 @@
 
 - Update README.md and INSTALL.md. (#342)
 - Fix typo in rotated_fcos_head. (#354)
-- Fix typo in csl_rotated_fcos_head. (#362)
 - Update checkpoint and eval interval of base config. (#347)
 - Fix mdformat version to support python3.6 & Add mim to extras_require in setup.py. (#359)
 - Add mim test in CI. (#374)
