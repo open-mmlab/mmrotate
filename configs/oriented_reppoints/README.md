@@ -32,6 +32,7 @@ DOTA1.0
 
 **Notes:**
 
+- Oriented RepPoints needs to install [MMCV](https://github.com/open-mmlab/mmcv) >= 1.5.3.
 - `ms` means multi-scale image split online (768, 1280).
 
 ## Citation

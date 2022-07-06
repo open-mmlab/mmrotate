@@ -72,9 +72,10 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## What's New
 
-**0.3.1** was released in 6/6/2022:
+**0.3.2** was released in 6/7/2022:
 
-- Support Rotated FCOS (#223)
+- Support Oriented Reppoints (CVPR'22) (#286)
+- Support ConvNeXt backbone (CVPR'22) (#343)
 
 Please refer to [changelog.md](docs/en/changelog.md) for details and release history.
 
