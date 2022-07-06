@@ -148,7 +148,7 @@ class CSLRFCOSHead(RotatedFCOSHead):
 
         if len(pos_inds) > 0:
             pos_points = flatten_points[pos_inds]
-            if self.seprate_angle:
+            if self.separate_angle:
                 bbox_coder = self.h_bbox_coder
             else:
                 bbox_coder = self.bbox_coder
@@ -165,7 +165,7 @@ class CSLRFCOSHead(RotatedFCOSHead):
                 pos_decoded_target_preds,
                 weight=pos_centerness_targets,
                 avg_factor=centerness_denorm)
-            if self.seprate_angle:
+            if self.separate_angle:
                 loss_angle = self.loss_angle(
                     pos_angle_preds, pos_angle_targets, avg_factor=num_pos)
             loss_centerness = self.loss_centerness(
@@ -173,10 +173,10 @@ class CSLRFCOSHead(RotatedFCOSHead):
         else:
             loss_bbox = pos_bbox_preds.sum()
             loss_centerness = pos_centerness.sum()
-            if self.seprate_angle:
+            if self.separate_angle:
                 loss_angle = pos_angle_preds.sum()
 
-        if self.seprate_angle:
+        if self.separate_angle:
             return dict(
                 loss_cls=loss_cls,
                 loss_bbox=loss_bbox,
