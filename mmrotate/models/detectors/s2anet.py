@@ -39,7 +39,6 @@ class S2ANet(RotatedBaseDetector):
 
         if self.align_conv_type == 'AlignConv':
             self.align_conv = AlignConvModule(self.feat_channels,
-                                              self.featmap_strides,
                                               self.align_conv_size)
 
         if train_cfg is not None:
@@ -66,7 +65,7 @@ class S2ANet(RotatedBaseDetector):
         outs = self.fam_head(x)
         rois = self.fam_head.refine_bboxes(*outs)
         # rois: list(indexed by images) of list(indexed by levels)
-        align_feat = self.align_conv(x, rois)
+        align_feat = self.align_conv(x, rois, self.featmap_strides)
         outs = self.odm_head(align_feat)
 
         return outs
@@ -91,7 +90,7 @@ class S2ANet(RotatedBaseDetector):
 
         rois = self.fam_head.refine_bboxes(*outs)
         # rois: list(indexed by images) of list(indexed by levels)
-        align_feat = self.align_conv(x, rois)
+        align_feat = self.align_conv(x, rois, self.featmap_strides)
         outs = self.odm_head(align_feat)
         loss_inputs = outs + (gt_bboxes, gt_labels, img_metas)
         loss_refine = self.odm_head.loss(
@@ -119,7 +118,7 @@ class S2ANet(RotatedBaseDetector):
         outs = self.fam_head(x)
         rois = self.fam_head.refine_bboxes(*outs)
         # rois: list(indexed by images) of list(indexed by levels)
-        align_feat = self.align_conv(x, rois)
+        align_feat = self.align_conv(x, rois, self.featmap_strides)
         outs = self.odm_head(align_feat)
 
         bbox_inputs = outs + (img_meta, self.test_cfg, rescale)
