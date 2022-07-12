@@ -6,6 +6,7 @@ from .r3det import R3Det
 from .redet import ReDet
 from .roi_transformer import RoITransformer
 from .rotate_faster_rcnn import RotatedFasterRCNN
+from .rotated_dal_retinanet import RotatedDalRetinaNet
 from .rotated_fcos import RotatedFCOS
 from .rotated_reppoints import RotatedRepPoints
 from .rotated_retinanet import RotatedRetinaNet
@@ -17,5 +18,5 @@ __all__ = [
     'RotatedRetinaNet', 'RotatedFasterRCNN', 'OrientedRCNN', 'RoITransformer',
     'GlidingVertex', 'ReDet', 'R3Det', 'S2ANet', 'RotatedRepPoints',
     'RotatedBaseDetector', 'RotatedTwoStageDetector',
-    'RotatedSingleStageDetector', 'RotatedFCOS'
+    'RotatedSingleStageDetector', 'RotatedFCOS', 'RotatedDalRetinaNet'
 ]
