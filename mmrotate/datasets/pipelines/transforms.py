@@ -1,12 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import copy
 import random
 
 import cv2
 import mmcv
 import numpy as np
 import torch
-from mmdet.datasets.pipelines.transforms import (RandomAffine, RandomCrop,
-                                                 RandomFlip, Resize)
+from mmdet.datasets.pipelines import (Mosaic, RandomAffine, RandomCrop,
+                                      RandomFlip, Resize)
 
 from mmrotate.core import (find_inside_polygons, norm_angle, obb2poly_np,
                            poly2obb, poly2obb_np)
@@ -175,7 +176,7 @@ class PolyRandomRotate(object):
                                bound_w,
                                offset=0):
         """Create rotation matrix."""
-        center = (center[0] + offset, center[1] + offset)
+        center += offset
         rm = cv2.getRotationMatrix2D(tuple(center), angle, 1)
         if self.auto_bound:
             rot_im_center = cv2.transform(center[None, None, :] + offset,
@@ -220,7 +221,8 @@ class PolyRandomRotate(object):
         results['rotate_angle'] = angle
 
         image_center = np.array((w / 2, h / 2))
-        abs_cos, abs_sin = abs(np.cos(angle)), abs(np.sin(angle))
+        abs_cos, abs_sin = \
+            abs(np.cos(angle / 180 * np.pi)), abs(np.sin(angle / 180 * np.pi))
         if self.auto_bound:
             bound_w, bound_h = np.rint(
                 [h * abs_sin + w * abs_cos,
@@ -366,6 +368,184 @@ class RRandomCrop(RandomCrop):
                 results[label_key] = results[label_key][valid_inds]
 
         return results
+
+
+@ROTATED_PIPELINES.register_module()
+class RMosaic(Mosaic):
+    """Rotate Mosaic augmentation. Inherit from
+    `mmdet.datasets.pipelines.transforms.Mosaic`.
+
+    Given 4 images, mosaic transform combines them into
+    one output image. The output image is composed of the parts from each sub-
+    image.
+
+    .. code:: text
+                        mosaic transform
+                           center_x
+                +------------------------------+
+                |       pad        |  pad      |
+                |      +-----------+           |
+                |      |           |           |
+                |      |  image1   |--------+  |
+                |      |           |        |  |
+                |      |           | image2 |  |
+     center_y   |----+-------------+-----------|
+                |    |   cropped   |           |
+                |pad |   image3    |  image4   |
+                |    |             |           |
+                +----|-------------+-----------+
+                     |             |
+                     +-------------+
+
+     The mosaic transform steps are as follows:
+         1. Choose the mosaic center as the intersections of 4 images
+         2. Get the left top image according to the index, and randomly
+            sample another 3 images from the custom dataset.
+         3. Sub image will be cropped if image is larger than mosaic patch
+
+    Args:
+        img_scale (Sequence[int]): Image size after mosaic pipeline of single
+            image. The shape order should be (height, width).
+            Defaults to (640, 640).
+        center_ratio_range (Sequence[float]): Center ratio range of mosaic
+            output. Defaults to (0.5, 1.5).
+        min_bbox_size (int | float): The minimum pixel for filtering
+            invalid bboxes after the mosaic pipeline. Defaults to 0.
+        bbox_clip_border (bool, optional): Whether to clip the objects outside
+            the border of the image. In some dataset like MOT17, the gt bboxes
+            are allowed to cross the border of images. Therefore, we don't
+            need to clip the gt bboxes in these cases. Defaults to True.
+        skip_filter (bool): Whether to skip filtering rules. If it
+            is True, the filter rule will not be applied, and the
+            `min_bbox_size` is invalid. Defaults to True.
+        pad_val (int): Pad value. Defaults to 114.
+        prob (float): Probability of applying this transformation.
+            Defaults to 1.0.
+        version  (str, optional): Angle representations. Defaults to `oc`.
+    """
+
+    def __init__(self,
+                 img_scale=(640, 640),
+                 center_ratio_range=(0.5, 1.5),
+                 min_bbox_size=10,
+                 bbox_clip_border=True,
+                 skip_filter=True,
+                 pad_val=114,
+                 prob=1.0,
+                 version='oc'):
+        super(RMosaic, self).__init__(
+            img_scale=img_scale,
+            center_ratio_range=center_ratio_range,
+            min_bbox_size=min_bbox_size,
+            bbox_clip_border=bbox_clip_border,
+            skip_filter=skip_filter,
+            pad_val=pad_val,
+            prob=1.0)
+
+    def _mosaic_transform(self, results):
+        """Mosaic transform function.
+
+        Args:
+            results (dict): Result dict.
+
+        Returns:
+            dict: Updated result dict.
+        """
+
+        assert 'mix_results' in results
+        mosaic_labels = []
+        mosaic_bboxes = []
+        if len(results['img'].shape) == 3:
+            mosaic_img = np.full(
+                (int(self.img_scale[0] * 2), int(self.img_scale[1] * 2), 3),
+                self.pad_val,
+                dtype=results['img'].dtype)
+        else:
+            mosaic_img = np.full(
+                (int(self.img_scale[0] * 2), int(self.img_scale[1] * 2)),
+                self.pad_val,
+                dtype=results['img'].dtype)
+
+        # mosaic center x, y
+        center_x = int(
+            random.uniform(*self.center_ratio_range) * self.img_scale[1])
+        center_y = int(
+            random.uniform(*self.center_ratio_range) * self.img_scale[0])
+        center_position = (center_x, center_y)
+
+        loc_strs = ('top_left', 'top_right', 'bottom_left', 'bottom_right')
+        for i, loc in enumerate(loc_strs):
+            if loc == 'top_left':
+                results_patch = copy.deepcopy(results)
+            else:
+                results_patch = copy.deepcopy(results['mix_results'][i - 1])
+
+            img_i = results_patch['img']
+            h_i, w_i = img_i.shape[:2]
+            # keep_ratio resize
+            scale_ratio_i = min(self.img_scale[0] / h_i,
+                                self.img_scale[1] / w_i)
+            img_i = mmcv.imresize(
+                img_i, (int(w_i * scale_ratio_i), int(h_i * scale_ratio_i)))
+
+            # compute the combine parameters
+            paste_coord, crop_coord = self._mosaic_combine(
+                loc, center_position, img_i.shape[:2][::-1])
+            x1_p, y1_p, x2_p, y2_p = paste_coord
+            x1_c, y1_c, x2_c, y2_c = crop_coord
+
+            # crop and paste image
+            mosaic_img[y1_p:y2_p, x1_p:x2_p] = img_i[y1_c:y2_c, x1_c:x2_c]
+
+            # adjust coordinate
+            gt_bboxes_i = results_patch['gt_bboxes']
+            gt_labels_i = results_patch['gt_labels']
+
+            if gt_bboxes_i.shape[0] > 0:
+                padw = x1_p - x1_c
+                padh = y1_p - y1_c
+                gt_bboxes_i[:, 0] = \
+                    scale_ratio_i * gt_bboxes_i[:, 0] + padw
+                gt_bboxes_i[:, 1] = \
+                    scale_ratio_i * gt_bboxes_i[:, 1] + padh
+                gt_bboxes_i[:, 2:4] = \
+                    scale_ratio_i * gt_bboxes_i[:, 2:4]
+
+            mosaic_bboxes.append(gt_bboxes_i)
+            mosaic_labels.append(gt_labels_i)
+
+        if len(mosaic_labels) > 0:
+            mosaic_bboxes = np.concatenate(mosaic_bboxes, 0)
+            mosaic_labels = np.concatenate(mosaic_labels, 0)
+
+            mosaic_bboxes, mosaic_labels = \
+                self._filter_box_candidates(
+                    mosaic_bboxes, mosaic_labels,
+                    2 * self.img_scale[1], 2 * self.img_scale[0]
+                )
+        # If results after rmosaic does not contain any valid gt-bbox,
+        # return None. And transform flows in MultiImageMixDataset will
+        # repeat until existing valid gt-bbox.
+        if len(mosaic_bboxes) == 0:
+            return None
+
+        results['img'] = mosaic_img
+        results['img_shape'] = mosaic_img.shape
+        results['gt_bboxes'] = mosaic_bboxes
+        results['gt_labels'] = mosaic_labels
+
+        return results
+
+    def _filter_box_candidates(self, bboxes, labels, w, h):
+        """Filter out small bboxes and outside bboxes after Mosaic."""
+        bbox_x, bbox_y, bbox_w, bbox_h = \
+            bboxes[:, 0], bboxes[:, 1], bboxes[:, 2], bboxes[:, 3]
+        valid_inds = (bbox_x > 0) & (bbox_x < w) & \
+                     (bbox_y > 0) & (bbox_y < h) & \
+                     (bbox_w > self.min_bbox_size) & \
+                     (bbox_h > self.min_bbox_size)
+        valid_inds = np.nonzero(valid_inds)[0]
+        return bboxes[valid_inds], labels[valid_inds]
 
 
 @ROTATED_PIPELINES.register_module()

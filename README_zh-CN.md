@@ -68,9 +68,10 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## 最新进展
 
-最新的 **0.3.1** 版本已经在 2022.06.06 发布:
+最新的 **0.3.2** 版本已经在 2022.07.06 发布:
 
-- 支持了 Rotated FCOS 模型 (#223)
+- 支持了 Oriented Reppoints 模型 (CVPR'22) (#286)
+- 支持了 ConvNeXt 骨干网络 (CVPR'22) (#343)
 
 如果想了解更多版本更新细节和历史信息，请阅读[更新日志](docs/en/changelog.md)。
 
@@ -125,6 +126,7 @@ pip install -v -e .
 - [x] [GWD](configs/gwd/README.md) (ICML'2021)
 - [x] [KLD](configs/kld/README.md) (NeurIPS'2021)
 - [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
+- [x] [Oriented RepPoints](configs/oriented_reppoints/README.md) (CVPR'2022)
 - [x] [KFIoU](configs/kfiou/README.md) (arXiv)
 - [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
 
