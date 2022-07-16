@@ -1,12 +1,12 @@
 {
   "nproc": 10,
   "img_dirs": [
-    "/datasets/Dota/dota/train/images/",
-    "/datasets/Dota/dota/val/images/"
+    "data/DOTA/train/images/",
+    "data/DOTA/val/images/"
   ],
   "ann_dirs": [
-    "/datasets/Dota/dota/train/labelTxt/",
-    "/datasets/Dota/dota/val/labelTxt/"
+    "data/DOTA/train/labelTxt/",
+    "data/DOTA/val/labelTxt/"
   ],
   "sizes": [
     1024
@@ -27,6 +27,6 @@
     116,
     124
   ],
-  "save_dir": "/datasets/dota_mmrotate/dota1.0/ms/trainval/",
+  "save_dir": "data/split_ms_dota/trainval/",
   "save_ext": ".png"
 }
