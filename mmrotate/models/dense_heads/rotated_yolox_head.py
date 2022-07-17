@@ -313,12 +313,12 @@ class RotatedYOLOXHead(YOLOXHead):
 
         flatten_hbboxes = self._bbox_decode(flatten_priors, flatten_bbox_preds)
         flatten_cxcywh_hbboxes = bbox_xyxy_to_cxcywh(flatten_hbboxes)
-        faltten_decoded_angle_preds = self.angle_coder.decode(
+        flatten_decoded_angle_preds = self.angle_coder.decode(
             flatten_angle_preds)
 
         flatten_rbboxes = torch.cat([
             flatten_cxcywh_hbboxes,
-            faltten_decoded_angle_preds.unsqueeze(-1)
+            flatten_decoded_angle_preds.unsqueeze(-1)
         ],
                                     dim=-1)
 
@@ -382,7 +382,7 @@ class RotatedYOLOXHead(YOLOXHead):
                 angle_targets = bbox_targets[..., 4:5]
                 flatten_rbbox_preds = torch.cat([
                     flatten_bbox_preds,
-                    faltten_decoded_angle_preds.unsqueeze(-1)
+                    flatten_decoded_angle_preds.unsqueeze(-1)
                 ],
                                                 dim=-1)
                 l1_targets = torch.cat([l1_targets, angle_targets], dim=-1)
