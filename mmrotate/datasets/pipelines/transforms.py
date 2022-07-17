@@ -529,8 +529,8 @@ class RMosaic(Mosaic):
         # If results after rmosaic does not contain any valid gt-bbox,
         # return None. And transform flows in MultiImageMixDataset will
         # repeat until existing valid gt-bbox.
-        if len(mosaic_bboxes) == 0:
-            return None
+        # if len(mosaic_bboxes) == 0:
+        #     return None
 
         results['img'] = mosaic_img
         results['img_shape'] = mosaic_img.shape
@@ -926,7 +926,6 @@ class PolyMixUp(MixUp):
         results['img_shape'] = mixup_img.shape
         results['gt_bboxes'] = mixup_gt_bboxes
         results['gt_labels'] = mixup_gt_labels
-        show_img(mixup_img.astype(np.uint8), mixup_gt_bboxes)
         return results
 
     def _filter_polygon_candidates(self, poly1, poly2):

@@ -64,18 +64,25 @@ train_pipeline = [
         ratio_range=(0.8, 1.6),
         pad_val=114.0),
     dict(type='YOLOXHSVRandomAug'),
-    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='RRandomFlip',
+        flip_ratio=[0.25, 0.25, 0.25],
+        direction=['horizontal', 'vertical', 'diagonal'],
+        version=angle_version),
     # According to the official implementation, multi-scale
     # training is not considered here but in the
     # 'mmdet/models/detectors/yolox.py'.
-    dict(type='Resize', img_scale=img_scale, keep_ratio=True),
+    dict(type='RResize', img_scale=img_scale),
     dict(
         type='Pad',
         pad_to_square=True,
         # If the image is three-channel, the pad value needs
         # to be set separately for each channel.
         pad_val=dict(img=(114.0, 114.0, 114.0))),
-    dict(type='FilterAnnotations', min_gt_bbox_wh=(1, 1), keep_empty=False),
+    dict(
+        type='FilterRotatedAnnotations',
+        min_gt_bbox_wh=(1, 1),
+        keep_empty=False),
     dict(type='DefaultFormatBundle'),
     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
 ]
@@ -88,9 +95,8 @@ train_dataset = dict(
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True),
-            dict(type='OBB2Poly', angle_version=angle_version),
         ],
-        filter_empty_gt=True,
+        filter_empty_gt=False,
     ),
     pipeline=train_pipeline)
 
