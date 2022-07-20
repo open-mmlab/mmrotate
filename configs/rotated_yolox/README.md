@@ -23,11 +23,11 @@ scenes, and we also provide deploy versions with ONNX, TensorRT, NCNN, and Openv
 
 ## Results and Models
 
-|    Backbone     |    Bbox Loss Type    |    Size     | mAP | FPS | Config | Download |
-| :-------------: | :------------------: | :---------: | :-: | :-: | :----: | :------: |
-| Rotated YOLOX-s |     Rotated IoU      | (1024,1024) |  -  |  -  |   -    |    -     |
-| Rotated YOLOX-s | Horizontal IoU + CSL | (1024,1024) |  -  |  -  |   -    |    -     |
-| Rotated YOLOX-s |         KLD          | (1024,1024) |  -  |  -  |   -    |    -     |
+|    Backbone     |    Bbox Loss Type    |    Size     | mAP | FPS  | Config | Download |
+| :-------------: | :------------------: | :---------: | :-: | :--: | :----: | :------: |
+| Rotated YOLOX-s |     Rotated IoU      | (1024,1024) |  -  | 52.6 |   -    |    -     |
+| Rotated YOLOX-s | Horizontal IoU + CSL | (1024,1024) |  -  |  -   |   -    |    -     |
+| Rotated YOLOX-s |         KLD          | (1024,1024) |  -  |  -   |   -    |    -     |
 
 **Note**:
 
