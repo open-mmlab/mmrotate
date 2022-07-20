@@ -455,8 +455,7 @@ def batched_nms(
     enough so that boxes from different classes do not overlap.
 
     Note:
-        In v1.4.1 and later, ``batched_nms`` supports skipping the NMS and
-        returns sorted raw results when `nms_cfg` is None.
+        Same with mmcv.ops.batched_nms in mmcv 1.5.3.
     Args:
         boxes (torch.Tensor): boxes in shape (N, 4) or (N, 5).
         scores (torch.Tensor): scores in shape (N, ).
