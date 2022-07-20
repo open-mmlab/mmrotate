@@ -10,4 +10,5 @@ model = dict(
             fun='log1p',
             tau=1,
             sqrt=False,
+            reduction='sum',
             loss_weight=27.5)))
