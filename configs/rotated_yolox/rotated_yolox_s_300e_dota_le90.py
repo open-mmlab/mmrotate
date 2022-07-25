@@ -2,7 +2,6 @@ _base_ = ['../_base_/schedules/schedule_1x.py', '../_base_/default_runtime.py']
 
 angle_version = 'le90'
 img_scale = (1024, 1024)  # height, width
-fp16 = dict(loss_scale='dynamic')
 
 # model settings
 model = dict(
@@ -71,7 +70,7 @@ train_pipeline = [
         version=angle_version),
     # According to the official implementation, multi-scale
     # training is not considered here but in the
-    # 'mmdet/models/detectors/yolox.py'.
+    # 'mmrotate/models/detectors/rotated_yolox.py.'
     dict(type='RResize', img_scale=img_scale),
     dict(
         type='Pad',
@@ -97,7 +96,10 @@ train_dataset = dict(
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True),
         ],
-        filter_empty_gt=False,
+        # Unlike the original implementation,
+        # filter_empty_gt=False will lead to instability
+        # at the end of the training and performance degradation
+        filter_empty_gt=True,
     ),
     pipeline=train_pipeline)
 
@@ -137,7 +139,6 @@ data = dict(
         pipeline=test_pipeline))
 
 # optimizer
-# default 8 gpu
 optimizer = dict(
     type='SGD',
     lr=0.01 / 8,
@@ -145,7 +146,7 @@ optimizer = dict(
     weight_decay=5e-4,
     nesterov=True,
     paramwise_cfg=dict(norm_decay_mult=0., bias_decay_mult=0.))
-optimizer_config = dict(grad_clip=None)
+optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 
 max_epochs = 300
 num_last_epochs = 15

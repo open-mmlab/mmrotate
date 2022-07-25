@@ -23,16 +23,19 @@ scenes, and we also provide deploy versions with ONNX, TensorRT, NCNN, and Openv
 
 ## Results and Models
 
-|    Backbone     |    Bbox Loss Type    |    Size     | mAP | FPS  | Config | Download |
-| :-------------: | :------------------: | :---------: | :-: | :--: | :----: | :------: |
-| Rotated YOLOX-s |     Rotated IoU      | (1024,1024) |  -  | 52.6 |   -    |    -     |
-| Rotated YOLOX-s | Horizontal IoU + CSL | (1024,1024) |  -  |  -   |   -    |    -     |
-| Rotated YOLOX-s |         KLD          | (1024,1024) |  -  |  -   |   -    |    -     |
+|        Backbone        |    Bbox Loss Type    |    Size     | mAP | FPS |                       Config                       |                                                                                                                                                      Download                                                                                                                                                      |
+| :--------------------: | :------------------: | :---------: | :-: | :-: | :------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| Rotated YOLOX-s (FP16) |     Rotated IoU      | (1024,1024) |  -  |  -  | [config](./rotated_yolox_s_fp16_300e_dota_le90.py) | [model](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_yolox/rotated_yolox_s_fp16_300e_dota/rotated_yolox_s_fp16_300e_dota_le90-********.pth) \\  [log](https://download.openmmlab.com/mmrotate/v0.1.0/rotated_yolox/rotated_yolox_s_fp16_300e_dota_le90/rotated_yolox_s_fp16_300e_dota_le90_*_*.log.json) |
+|    Rotated YOLOX-s     |     Rotated IoU      | (1024,1024) |  -  |  -  |   [config](./rotated_yolox_s_300e_dota_le90.py)    |                                                                                                                                                         -                                                                                                                                                          |
+|    Rotated YOLOX-s     | Horizontal IoU + CSL | (1024,1024) |  -  |  -  | [config](./rotated_yolox_s_csl_300e_dota_le90.py)  |                                                                                                                                                         -                                                                                                                                                          |
+|    Rotated YOLOX-s     |         KLD          | (1024,1024) |  -  |  -  | [config](./rotated_yolox_s_kld_300e_dota_le90.py)  |                                                                                                                                                         -                                                                                                                                                          |
 
 **Note**:
 
+- Compared with original YOLOX in mmdet, Rotated YOLOX set `filter_empty_gt=True` and enable `grad_clip` for better
+  performance and prevent nan at training process.
 - All models are trained with batch size 8 on one GPU.
-- FPS and speed are tested on a single -.
+- FPS and speed are tested on a single RTX3090.
 
 ## Citation
 

@@ -9,7 +9,7 @@ from mmcv.ops import nms_rotated  # noqa
 from mmcv.runner import force_fp32
 from mmdet.core import (bbox_cxcywh_to_xyxy, bbox_xyxy_to_cxcywh, multi_apply,
                         reduce_mean)
-from mmdet.models import YOLOXHead
+from mmdet.models.dense_heads import YOLOXHead
 
 from mmrotate.core import build_bbox_coder
 from ..builder import ROTATED_HEADS, build_loss
@@ -17,7 +17,7 @@ from ..builder import ROTATED_HEADS, build_loss
 
 @ROTATED_HEADS.register_module()
 class RotatedYOLOXHead(YOLOXHead):
-    """RotatedYOLOXHead head used in `YOLOX.
+    """Rotated YOLOXHead head used in `YOLOX.
 
     <https://arxiv.org/abs/2107.08430>`_.
 
@@ -345,6 +345,7 @@ class RotatedYOLOXHead(YOLOXHead):
         if self.use_l1:
             l1_targets = torch.cat(l1_targets, 0)
 
+        # Loss Bbox
         if self.seprate_angle:
             hbbox_xyxy_targets = bbox_cxcywh_to_xyxy(bbox_targets[..., :4])
             angle_targets = bbox_targets[..., 4:5]
@@ -361,6 +362,7 @@ class RotatedYOLOXHead(YOLOXHead):
                 flatten_rbboxes.view(-1, 5)[pos_masks],
                 bbox_targets) / num_total_samples
 
+        # Loss Objectness and Loss Cls
         loss_obj = self.loss_obj(flatten_objectness.view(-1, 1),
                                  obj_targets) / num_total_samples
         loss_cls = self.loss_cls(
@@ -373,19 +375,18 @@ class RotatedYOLOXHead(YOLOXHead):
         if self.seprate_angle:
             loss_dict.update(loss_angle=loss_angle)
 
+        # Loss L1
         if self.use_l1:
             if self.seprate_angle:
                 loss_l1 = self.loss_l1(
                     flatten_bbox_preds.view(-1, 4)[pos_masks],
                     l1_targets) / num_total_samples
             else:
-                angle_targets = bbox_targets[..., 4:5]
                 flatten_rbbox_preds = torch.cat([
                     flatten_bbox_preds,
                     flatten_decoded_angle_preds.unsqueeze(-1)
                 ],
                                                 dim=-1)
-                l1_targets = torch.cat([l1_targets, angle_targets], dim=-1)
                 loss_l1 = self.loss_l1(
                     flatten_rbbox_preds.view(-1, 5)[pos_masks],
                     l1_targets) / num_total_samples
@@ -421,7 +422,10 @@ class RotatedYOLOXHead(YOLOXHead):
         if num_gts == 0:
             cls_target = cls_preds.new_zeros((0, self.num_classes))
             bbox_target = cls_preds.new_zeros((0, 5))
-            l1_target = cls_preds.new_zeros((0, 4))
+            if self.seprate_angle:
+                l1_target = cls_preds.new_zeros((0, 4))
+            else:
+                l1_target = cls_preds.new_zeros((0, 5))
             obj_target = cls_preds.new_zeros((num_priors, 1))
             foreground_mask = cls_preds.new_zeros(num_priors).bool()
             return (foreground_mask, cls_target, obj_target, bbox_target,
@@ -437,7 +441,11 @@ class RotatedYOLOXHead(YOLOXHead):
         gt_cxcywh = gt_bboxes[..., :4]
         l1_target[:, :2] = (gt_cxcywh[:, :2] - priors[:, :2]) / priors[:, 2:]
         l1_target[:, 2:] = torch.log(gt_cxcywh[:, 2:] / priors[:, 2:] + eps)
-        return l1_target
+        if self.seprate_angle:
+            return l1_target
+        else:
+            angle_target = gt_bboxes[..., 4:5]
+            return torch.cat([l1_target, angle_target], dim=-1)
 
 
 def batched_nms(
