@@ -82,7 +82,7 @@ class RotatedYOLOX(RotatedSingleStageDetector):
                 For details on the values of these keys see
                 :class:`mmdet.datasets.pipelines.Collect`.
             gt_bboxes (list[Tensor]): Each item are the truth boxes for each
-                image in [tl_x, tl_y, br_x, br_y] format.
+                image in [cx, cy, w, h, a] format.
             gt_labels (list[Tensor]): Class indices corresponding to each box
             gt_bboxes_ignore (None | list[Tensor]): Specify which bounding
                 boxes can be ignored when computing the loss.

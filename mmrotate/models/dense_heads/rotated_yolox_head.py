@@ -47,6 +47,11 @@ class RotatedYOLOXHead(YOLOXHead):
         train_cfg (dict): Training config of anchor head.
         test_cfg (dict): Testing config of anchor head.
         init_cfg (dict or list[dict], optional): Initialization config dict.
+        separate_angle (bool): If true, angle prediction is separated from
+            bbox regression loss. Default: False.
+        angle_coder (dict): Config of angle coder.
+        loss_angle (dict): Config of angle loss, only used when
+            separate_angle is True.
     """
 
     def __init__(self,
@@ -63,7 +68,7 @@ class RotatedYOLOXHead(YOLOXHead):
         self.seprate_angle = seprate_angle
         if self.seprate_angle:
             assert loss_angle is not None, \
-                'loss_angle must be specified when seprate_angle is True'
+                'loss_angle must be specified when separate_angle is True'
             self.loss_angle = build_loss(loss_angle)
 
     def _init_layers(self):
@@ -146,6 +151,9 @@ class RotatedYOLOXHead(YOLOXHead):
             bbox_preds (list[Tensor]): Box energies / deltas for all
                 scale levels, each is a 4D-tensor, has shape
                 (batch_size, num_priors * 4, H, W).
+            angle_preds (list[Tensor]): Box angles for all
+                scale levels, each is a 4D-tensor, has shape
+                (batch_size, num_priors, H, W).
             objectnesses (list[Tensor], Optional): Score factor for
                 all scale level, each is a 4D-tensor, has shape
                 (batch_size, 1, H, W).
@@ -158,11 +166,11 @@ class RotatedYOLOXHead(YOLOXHead):
                 Default True.
         Returns:
             list[list[Tensor, Tensor]]: Each item in result_list is 2-tuple.
-                The first item is an (n, 5) tensor, where the first 4 columns
-                are bounding box positions (tl_x, tl_y, br_x, br_y) and the
-                5-th column is a score between 0 and 1. The second item is a
-                (n,) tensor where each item is the predicted class label of
-                the corresponding box.
+                The first item is an (n, 6) tensor, where the first 5 columns
+                are bounding box positions (x, y, w, h, a) and the 5-th column
+                is a score between 0 and 1. The second item is a (n,) tensor
+                 where each item is the predicted class label of the
+                corresponding box.
         """
         assert len(cls_scores) == len(bbox_preds) == len(objectnesses)
         cfg = self.test_cfg if cfg is None else cfg
@@ -267,11 +275,14 @@ class RotatedYOLOXHead(YOLOXHead):
             bbox_preds (list[Tensor]): Box energies / deltas for each scale
                 level, each is a 4D-tensor, the channel number is
                 num_priors * 4.
+            angle_preds (list[Tensor]): Box angles for all
+                scale levels, each is a 4D-tensor, has shape
+                (batch_size, num_priors, H, W).
             objectnesses (list[Tensor], Optional): Score factor for
                 all scale level, each is a 4D-tensor, has shape
                 (batch_size, 1, H, W).
             gt_bboxes (list[Tensor]): Ground truth bboxes for each image with
-                shape (num_gts, 4) in [tl_x, tl_y, br_x, br_y] format.
+                shape (num_gts, 5) in [x, y, w, h, a] format.
             gt_labels (list[Tensor]): class indices corresponding to each box
             img_metas (list[dict]): Meta information of each image, e.g.,
                 image size, scaling factor, etc.
@@ -408,10 +419,10 @@ class RotatedYOLOXHead(YOLOXHead):
             priors (Tensor): All priors of one image, a 2D-Tensor with shape
                 [num_priors, 4] in [cx, xy, stride_w, stride_y] format.
             decoded_bboxes (Tensor): Decoded bboxes predictions of one image,
-                a 2D-Tensor with shape [num_priors, 4] in [tl_x, tl_y,
-                br_x, br_y] format.
+                a 2D-Tensor with shape [num_priors, 5] in [x, y, w, h, a]
+                format.
             gt_bboxes (Tensor): Ground truth bboxes of one image, a 2D-Tensor
-                with shape [num_gts, 4] in [tl_x, tl_y, br_x, br_y] format.
+                with shape [num_gts, 5] in [x, y, w, h, a] format.
             gt_labels (Tensor): Ground truth labels of one image, a Tensor
                 with shape [num_gts].
         """
