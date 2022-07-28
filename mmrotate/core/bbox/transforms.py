@@ -935,3 +935,22 @@ def gt2gaussian(target):
     R = torch.stack([cos_sin * neg, cos_sin[..., [1, 0]]], dim=-2)
 
     return (center, R.matmul(diag).matmul(R.transpose(-1, -2)))
+
+
+def find_inside_polygons(polygons, img_shape_x, img_shape_y):
+    """Find inside polygons.
+
+    Args:
+        polygons (ndarray): Input polygons with shape (N,8).
+        img_shape_x (int): Image shape x.
+        img_shape_y (int): Image shape y.
+
+    Returns:
+        inside_ind (ndarray): Keep indices.
+    """
+    polygons_ctr_x = polygons[:, ::2].sum(axis=1) / 4
+    polygons_ctr_y = polygons[:, 1::2].sum(axis=1) / 4
+    polygons_inside_x = (polygons_ctr_x > 0) & (polygons_ctr_x < img_shape_x)
+    polygons_inside_y = (polygons_ctr_y > 0) & (polygons_ctr_y < img_shape_y)
+    # inside_ind = np.nonzero(polygons_inside_x & polygons_inside_y)[0]
+    return polygons_inside_x & polygons_inside_y

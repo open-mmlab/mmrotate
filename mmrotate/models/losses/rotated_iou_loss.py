@@ -41,6 +41,13 @@ def rotated_iou_loss(pred, target, linear=False, mode='log', eps=1e-6):
             'poly_iou_loss is deprecated, please use "mode=`linear`" '
             'instead.')
 
+    batch_shape = pred.shape[:-2]
+    rows = pred.size(-2)
+    cols = target.size(-2)
+
+    if rows * cols == 0:
+        return pred.new(batch_shape + (rows, ))
+
     if diff_iou_rotated_2d is None:
         raise ImportError('Please install mmcv-full >= 1.5.0.')
 

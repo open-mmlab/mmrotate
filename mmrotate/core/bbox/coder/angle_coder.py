@@ -108,7 +108,21 @@ class CSLCoder(BaseBBoxCoder):
             list[Tensor]: Angle offset for each scale level.
                 Has shape (num_anchors * H * W, 1)
         """
-        angle_cls_inds = torch.argmax(angle_preds, dim=1)
+        angle_cls_inds = torch.argmax(angle_preds, dim=-1)
         angle_pred = ((angle_cls_inds + 0.5) *
                       self.omega) % self.angle_range - self.angle_offset
         return angle_pred * (math.pi / 180)
+
+
+@ROTATED_BBOX_CODERS.register_module()
+class PseudoAngleCoder(BaseBBoxCoder):
+
+    def __init__(self):
+        super().__init__()
+        self.coding_len = 1
+
+    def encode(self, angle_targets):
+        return angle_targets
+
+    def decode(self, angle_preds):
+        return angle_preds.squeeze(-1)

@@ -1,14 +1,19 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
+import random
 
 import cv2
 import mmcv
 import numpy as np
-from mmdet.datasets.pipelines.transforms import (Mosaic, RandomCrop,
-                                                 RandomFlip, Resize)
-from numpy import random
+import torch
+from mmdet.core.visualization import get_palette, palette_val
+from mmdet.datasets.pipelines import (MixUp, Mosaic, RandomAffine, RandomCrop,
+                                      RandomFlip, Resize)
 
-from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
+from mmrotate.core import (find_inside_polygons, norm_angle, obb2poly_np,
+                           poly2obb, poly2obb_np)
+from ...core.bbox.transforms import get_best_begin_point
+from ...core.visualization.image import draw_rbboxes
 from ..builder import ROTATED_PIPELINES
 
 
@@ -246,7 +251,7 @@ class PolyRandomRotate(object):
         for pt in polys:
             pt = np.array(pt, dtype=np.float32)
             obb = poly2obb_np(pt, self.version) \
-                if poly2obb_np(pt, self.version) is not None\
+                if poly2obb_np(pt, self.version) is not None \
                 else [0, 0, 0, 0, 0]
             gt_bboxes.append(obb)
         gt_bboxes = np.array(gt_bboxes, dtype=np.float32)
@@ -524,8 +529,8 @@ class RMosaic(Mosaic):
         # If results after rmosaic does not contain any valid gt-bbox,
         # return None. And transform flows in MultiImageMixDataset will
         # repeat until existing valid gt-bbox.
-        if len(mosaic_bboxes) == 0:
-            return None
+        # if len(mosaic_bboxes) == 0:
+        #     return None
 
         results['img'] = mosaic_img
         results['img_shape'] = mosaic_img.shape
@@ -544,3 +549,416 @@ class RMosaic(Mosaic):
                      (bbox_h > self.min_bbox_size)
         valid_inds = np.nonzero(valid_inds)[0]
         return bboxes[valid_inds], labels[valid_inds]
+
+
+@ROTATED_PIPELINES.register_module()
+class PolyRandomAffine(RandomAffine):
+    """Poly Random affine transform data augmentation.
+
+    This operation randomly generates affine transform matrix which including
+    rotation, translation, shear and scaling transforms.
+
+    Args:
+        version (str, optional): Angle representations. Defaults to 'oc'.
+        max_rotate_degree (float): Maximum degrees of rotation transform.
+            Default: 10.
+        max_translate_ratio (float): Maximum ratio of translation.
+            Default: 0.1.
+        scaling_ratio_range (tuple[float]): Min and max ratio of
+            scaling transform. Default: (0.5, 1.5).
+        max_shear_degree (float): Maximum degrees of shear
+            transform. Default: 2.
+        border (tuple[int]): Distance from height and width sides of input
+            image to adjust output shape. Only used in mosaic dataset.
+            Default: (0, 0).
+        border_val (tuple[int]): Border padding values of 3 channels.
+            Default: (114, 114, 114).
+        min_bbox_size (float): Width and height threshold to filter bboxes.
+            If the height or width of a box is smaller than this value, it
+            will be removed. Default: 2.
+        min_area_ratio (float): Threshold of area ratio between
+            original bboxes and wrapped bboxes. If smaller than this value,
+            the box will be removed. Default: 0.2.
+        max_aspect_ratio (float): Aspect ratio of width and height
+            threshold to filter bboxes. If max(h/w, w/h) larger than this
+            value, the box will be removed.
+        bbox_clip_border (bool, optional): Whether to clip the objects outside
+            the border of the image. In some dataset like MOT17, the gt bboxes
+            are allowed to cross the border of images. Therefore, we don't
+            need to clip the gt bboxes in these cases. Defaults to True.
+        skip_filter (bool): Whether to skip filtering rules. If it
+            is True, the filter rule will not be applied, and the
+            `min_bbox_size` and `min_area_ratio` and `max_aspect_ratio`
+            is invalid. Default to True.
+    """
+
+    def __init__(self, version='oc', **kwargs):
+        super(PolyRandomAffine, self).__init__(**kwargs)
+        self.angle_version = version
+
+    def __call__(self, results):
+        img = results['img']
+        height = img.shape[0] + self.border[0] * 2
+        width = img.shape[1] + self.border[1] * 2
+
+        # Rotation
+        rotation_degree = random.uniform(-self.max_rotate_degree,
+                                         self.max_rotate_degree)
+        rotation_matrix = self._get_rotation_matrix(rotation_degree)
+
+        # Scaling
+        scaling_ratio = random.uniform(self.scaling_ratio_range[0],
+                                       self.scaling_ratio_range[1])
+        scaling_matrix = self._get_scaling_matrix(scaling_ratio)
+
+        # Shear
+        x_degree = random.uniform(-self.max_shear_degree,
+                                  self.max_shear_degree)
+        y_degree = random.uniform(-self.max_shear_degree,
+                                  self.max_shear_degree)
+        shear_matrix = self._get_shear_matrix(x_degree, y_degree)
+
+        # Translation
+        trans_x = random.uniform(-self.max_translate_ratio,
+                                 self.max_translate_ratio) * width
+        trans_y = random.uniform(-self.max_translate_ratio,
+                                 self.max_translate_ratio) * height
+        translate_matrix = self._get_translation_matrix(trans_x, trans_y)
+
+        warp_matrix = (
+            translate_matrix @ shear_matrix @ rotation_matrix @ scaling_matrix)
+
+        img = cv2.warpPerspective(
+            img,
+            warp_matrix,
+            dsize=(width, height),
+            borderValue=self.border_val)
+        results['img'] = img
+        results['img_shape'] = img.shape
+
+        for key in results.get('bbox_fields', []):
+            bboxes = results[key]
+            num_bboxes = len(bboxes)
+            assert bboxes.shape[1] == 5, 'bbox dim should be 5'
+            if num_bboxes:
+                # obb to polygon
+                scores = np.zeros([num_bboxes, 1])
+                bboxes_ws = np.concatenate([bboxes, scores], axis=1)
+                polygons = obb2poly_np(bboxes_ws, self.angle_version)
+                polygons = polygons[:, :8]
+
+                # homogeneous coordinates
+                xs = polygons[:, ::2].reshape(num_bboxes * 4)
+                ys = polygons[:, 1::2].reshape(num_bboxes * 4)
+                ones = np.ones_like(xs)
+                points = np.vstack([xs, ys, ones])
+
+                warp_points = warp_matrix @ points
+                warp_points = warp_points[:2] / warp_points[2]
+                xs = warp_points[0].reshape(num_bboxes, 4)
+                ys = warp_points[1].reshape(num_bboxes, 4)
+
+                warp_polygons = np.zeros_like(polygons)
+                warp_polygons[:, ::2] = xs
+                warp_polygons[:, 1::2] = ys
+
+                # remove outside bbox
+                valid_index = find_inside_polygons(warp_polygons, height,
+                                                   width)
+
+                if self.bbox_clip_border:
+                    warp_polygons[:, ::2] = \
+                        warp_polygons[:, ::2].clip(0, width)
+                    warp_polygons[:, 1::2] = \
+                        warp_polygons[:, 1::2].clip(0, height)
+
+                wrap_bboxes = poly2obb(
+                    torch.Tensor(warp_polygons),
+                    version=self.angle_version).numpy()
+
+                if not self.skip_filter:
+                    # filter rbboxes
+                    resize_bbox = bboxes.copy()
+                    resize_bbox[:, 0:4] = resize_bbox[:, 0:4] * scaling_ratio
+                    filter_index = self.filter_gt_bboxes(
+                        resize_bbox, wrap_bboxes)
+                    valid_index = valid_index & filter_index
+
+                results[key] = wrap_bboxes[valid_index]
+                if key in ['gt_bboxes']:
+                    if 'gt_labels' in results:
+                        results['gt_labels'] = results['gt_labels'][
+                            valid_index]
+
+                if 'gt_masks' in results:
+                    raise NotImplementedError(
+                        'RRandomAffine only supports bbox.')
+
+        return results
+
+    def filter_gt_bboxes(self, origin_bboxes, wrapped_bboxes):
+        origin_w = origin_bboxes[:, 2]
+        origin_h = origin_bboxes[:, 3]
+        wrapped_w = wrapped_bboxes[:, 2]
+        wrapped_h = wrapped_bboxes[:, 3]
+        aspect_ratio = np.maximum(wrapped_w / (wrapped_h + 1e-16),
+                                  wrapped_h / (wrapped_w + 1e-16))
+
+        wh_valid_idx = (wrapped_w > self.min_bbox_size) & \
+                       (wrapped_h > self.min_bbox_size)
+        area_valid_idx = wrapped_w * wrapped_h / (origin_w * origin_h +
+                                                  1e-16) > self.min_area_ratio
+        aspect_ratio_valid_idx = aspect_ratio < self.max_aspect_ratio
+        return wh_valid_idx & area_valid_idx & aspect_ratio_valid_idx
+
+
+@ROTATED_PIPELINES.register_module()
+class PolyMixUp(MixUp):
+    """Polygon MixUp data augmentation.
+
+    .. code:: text
+
+                         mixup transform
+                +------------------------------+
+                | mixup image   |              |
+                |      +--------|--------+     |
+                |      |        |        |     |
+                |---------------+        |     |
+                |      |                 |     |
+                |      |      image      |     |
+                |      |                 |     |
+                |      |                 |     |
+                |      |-----------------+     |
+                |             pad              |
+                +------------------------------+
+
+     The mixup transform steps are as follows:
+
+        1. Another random image is picked by dataset and embedded in
+           the top left patch(after padding and resizing)
+        2. The target of mixup transform is the weighted average of mixup
+           image and origin image.
+
+    Args:
+        version (str, optional): Angle representations. Defaults to 'oc'.
+        img_scale (Sequence[int]): Image output size after mixup pipeline.
+            The shape order should be (height, width). Default: (640, 640).
+        ratio_range (Sequence[float]): Scale ratio of mixup image.
+            Default: (0.5, 1.5).
+        flip_ratio (float): Horizontal flip ratio of mixup image.
+            Default: 0.5.
+        pad_val (int): Pad value. Default: 114.
+        max_iters (int): The maximum number of iterations. If the number of
+            iterations is greater than `max_iters`, but gt_bbox is still
+            empty, then the iteration is terminated. Default: 15.
+        min_bbox_size (float): Width and height threshold to filter bboxes.
+            If the height or width of a box is smaller than this value, it
+            will be removed. Default: 5.
+        min_area_ratio (float): Threshold of area ratio between
+            original bboxes and wrapped bboxes. If smaller than this value,
+            the box will be removed. Default: 0.2.
+        max_aspect_ratio (float): Aspect ratio of width and height
+            threshold to filter bboxes. If max(h/w, w/h) larger than this
+            value, the box will be removed. Default: 20.
+        bbox_clip_border (bool, optional): Whether to clip the objects outside
+            the border of the image. In some dataset like MOT17, the gt bboxes
+            are allowed to cross the border of images. Therefore, we don't
+            need to clip the gt bboxes in these cases. Defaults to True.
+        skip_filter (bool): Whether to skip filtering rules. If it
+            is True, the filter rule will not be applied, and the
+            `min_bbox_size` and `min_area_ratio` and `max_aspect_ratio`
+            is invalid. Default to True.
+    """
+
+    def __init__(self, version='oc', **kwargs):
+        super(PolyMixUp, self).__init__(**kwargs)
+        self.angle_version = version
+
+    def _mixup_transform(self, results):
+        """MixUp transform function.
+
+        Args:
+            results (dict): Result dict.
+        Returns:
+            dict: Updated result dict.
+        """
+
+        assert 'mix_results' in results
+        assert len(
+            results['mix_results']) == 1, 'MixUp only support 2 images now !'
+
+        if results['mix_results'][0]['gt_bboxes'].shape[0] == 0:
+            # empty bbox
+            return results
+
+        if len(results['gt_bboxes']) == 0:
+            gt_polygons = np.zeros((0, 8))
+        else:
+            scores = np.zeros([len(results['gt_bboxes']), 1])
+            bboxes_ws = np.concatenate([results['gt_bboxes'], scores], axis=1)
+            gt_polygons = obb2poly_np(bboxes_ws, self.angle_version)
+            gt_polygons = gt_polygons[:, :8]
+
+        retrieve_results = results['mix_results'][0].copy()
+        retrieve_img = retrieve_results['img'].copy()
+        # show_img(retrieve_img, retrieve_results['gt_polygons'])
+
+        jit_factor = random.uniform(*self.ratio_range)
+        is_filp = random.uniform(0, 1) > self.flip_ratio
+
+        if len(retrieve_img.shape) == 3:
+            out_img = np.ones(
+                (self.dynamic_scale[0], self.dynamic_scale[1], 3),
+                dtype=retrieve_img.dtype) * self.pad_val
+        else:
+            out_img = np.ones(
+                self.dynamic_scale, dtype=retrieve_img.dtype) * self.pad_val
+
+        # 1. keep_ratio resize
+        scale_ratio = min(self.dynamic_scale[0] / retrieve_img.shape[0],
+                          self.dynamic_scale[1] / retrieve_img.shape[1])
+        retrieve_img = mmcv.imresize(
+            retrieve_img, (int(retrieve_img.shape[1] * scale_ratio),
+                           int(retrieve_img.shape[0] * scale_ratio)))
+
+        # 2. paste
+        out_img[:retrieve_img.shape[0], :retrieve_img.shape[1]] = retrieve_img
+
+        # 3. scale jit
+        scale_ratio *= jit_factor
+        out_img = mmcv.imresize(out_img, (int(out_img.shape[1] * jit_factor),
+                                          int(out_img.shape[0] * jit_factor)))
+
+        # 4. flip
+        if is_filp:
+            out_img = out_img[:, ::-1, :]
+
+        # 5. random crop
+        ori_img = results['img']
+        origin_h, origin_w = out_img.shape[:2]
+        target_h, target_w = ori_img.shape[:2]
+        padded_img = np.zeros(
+            (max(origin_h, target_h), max(origin_w,
+                                          target_w), 3)).astype(np.uint8)
+        padded_img[:origin_h, :origin_w] = out_img
+
+        x_offset, y_offset = 0, 0
+        if padded_img.shape[0] > target_h:
+            y_offset = random.randint(0, padded_img.shape[0] - target_h)
+        if padded_img.shape[1] > target_w:
+            x_offset = random.randint(0, padded_img.shape[1] - target_w)
+        padded_cropped_img = padded_img[y_offset:y_offset + target_h,
+                                        x_offset:x_offset + target_w]
+
+        # 6. adjust polygon
+        retrieve_gt_bboxes = retrieve_results['gt_bboxes']
+        # obb to polygon
+        scores = np.zeros([len(retrieve_gt_bboxes), 1])
+        bboxes_ws = np.concatenate([retrieve_gt_bboxes, scores], axis=1)
+        polygons = obb2poly_np(bboxes_ws, self.angle_version)
+        retrieve_gt_polygons = polygons[:, :8]
+
+        retrieve_gt_polygons[:,
+                             0::2] = retrieve_gt_polygons[:,
+                                                          0::2] * scale_ratio
+        retrieve_gt_polygons[:,
+                             1::2] = retrieve_gt_polygons[:,
+                                                          1::2] * scale_ratio
+        if self.bbox_clip_border:
+            retrieve_gt_polygons[:,
+                                 0::2] = np.clip(retrieve_gt_polygons[:, 0::2],
+                                                 0, origin_w)
+            retrieve_gt_polygons[:,
+                                 1::2] = np.clip(retrieve_gt_polygons[:, 1::2],
+                                                 0, origin_h)
+
+        if is_filp:
+            retrieve_gt_polygons[:, 0::2] = (
+                origin_w - retrieve_gt_polygons[:, 0::2])
+            score = np.zeros((retrieve_gt_polygons.shape[0], 1))
+            retrieve_gt_polygons = np.concatenate(
+                [retrieve_gt_polygons, score], axis=1)
+            retrieve_gt_polygons = get_best_begin_point(retrieve_gt_polygons)
+            retrieve_gt_polygons = retrieve_gt_polygons[:, :8]
+
+        # 7. filter
+        cp_retrieve_gt_polygons = retrieve_gt_polygons.copy()
+        cp_retrieve_gt_polygons[:, 0::2] = \
+            cp_retrieve_gt_polygons[:, 0::2] - x_offset
+        cp_retrieve_gt_polygons[:, 1::2] = \
+            cp_retrieve_gt_polygons[:, 1::2] - y_offset
+
+        # 8. mix up
+        ori_img = ori_img.astype(np.float32)
+        mixup_img = 0.5 * ori_img + 0.5 * padded_cropped_img.astype(np.float32)
+
+        retrieve_gt_labels = retrieve_results['gt_labels']
+        if not self.skip_filter:
+            keep_list = self._filter_polygon_candidates(
+                retrieve_gt_polygons.T, cp_retrieve_gt_polygons.T)
+
+            retrieve_gt_labels = retrieve_gt_labels[keep_list]
+            cp_retrieve_gt_polygons = cp_retrieve_gt_polygons[keep_list]
+
+        mixup_gt_polygons = np.concatenate(
+            (gt_polygons, cp_retrieve_gt_polygons), axis=0)
+        mixup_gt_labels = np.concatenate(
+            (results['gt_labels'], retrieve_gt_labels), axis=0)
+
+        # remove outside bbox
+        inside_inds = find_inside_polygons(mixup_gt_polygons, target_h,
+                                           target_w)
+        mixup_gt_polygons = mixup_gt_polygons[inside_inds]
+        mixup_gt_labels = mixup_gt_labels[inside_inds]
+
+        if self.bbox_clip_border:
+            mixup_gt_polygons[:, 0::2] = np.clip(mixup_gt_polygons[:, 0::2], 0,
+                                                 target_w)
+            mixup_gt_polygons[:, 1::2] = np.clip(mixup_gt_polygons[:, 1::2], 0,
+                                                 target_h)
+
+        # polygon to obb
+        mixup_gt_bboxes = poly2obb(
+            torch.Tensor(mixup_gt_polygons),
+            version=self.angle_version).numpy()
+
+        results['img'] = mixup_img.astype(np.uint8)
+        results['img_shape'] = mixup_img.shape
+        results['gt_bboxes'] = mixup_gt_bboxes
+        results['gt_labels'] = mixup_gt_labels
+        return results
+
+    def _filter_polygon_candidates(self, poly1, poly2):
+        """Compute candidate boxes which include following 5 things:
+
+        bbox1 before augment, bbox2 after augment, min_bbox_size (pixels),
+        min_area_ratio, max_aspect_ratio.
+        """
+        bbox1 = poly2obb(
+            torch.Tensor(poly1), version=self.angle_version).numpy()
+        bbox2 = poly2obb(
+            torch.Tensor(poly2), version=self.angle_version).numpy()
+
+        w1, h1 = bbox1[2], bbox1[3]
+        w2, h2 = bbox2[2], bbox2[3]
+        ar = np.maximum(w2 / (h2 + 1e-16), h2 / (w2 + 1e-16))
+        return ((w2 > self.min_bbox_size)
+                & (h2 > self.min_bbox_size)
+                & (w2 * h2 / (w1 * h1 + 1e-16) > self.min_area_ratio)
+                & (ar < self.max_aspect_ratio))
+
+
+def show_img(img, bbox):
+    import matplotlib.pyplot as plt
+    plt.subplots_adjust(left=0, right=1, bottom=0, top=1)
+    ax = plt.gca()
+    ax.axis('off')
+    plt.imshow(img)
+    num_bboxes = bbox.shape[0]
+
+    boxes = np.array(bbox)
+
+    bbox_palette = palette_val(get_palette('green', 2))
+    colors = [bbox_palette[0] for _ in range(num_bboxes)]
+    draw_rbboxes(ax, boxes, colors, alpha=0.8, thickness=2)
+    plt.show()
