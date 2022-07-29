@@ -1,8 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
-from mmdet.core import images_to_levels, multi_apply, unmap
+from mmdet.models.utils import images_to_levels, multi_apply, unmap
 
-from mmrotate.core import obb2hbb, rotated_anchor_inside_flags
+from mmrotate.models.task_modules.prior_generators import \
+    rotated_anchor_inside_flags
+from mmrotate.structures.bbox import obb2hbb
 from ..builder import ROTATED_HEADS
 from .rotated_retina_head import RotatedRetinaHead
 from .utils import get_num_level_anchors_inside

@@ -4,17 +4,17 @@ import torch
 import torch.nn as nn
 from mmcv.cnn import Scale
 from mmcv.runner import force_fp32
-from mmdet.core import reduce_mean
+from mmdet.utils import reduce_mean
 
-from mmrotate.core import build_bbox_coder, multiclass_nms_rotated
-from ..builder import ROTATED_HEADS
+from mmrotate.core import multiclass_nms_rotated
+from mmrotate.registry import MODELS, TASK_UTILS
 from .rotated_anchor_free_head import RotatedAnchorFreeHead
 from .rotated_fcos_head import RotatedFCOSHead
 
 INF = 1e8
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class CSLRFCOSHead(RotatedFCOSHead):
     """Use `Circular Smooth Label (CSL)
 
@@ -39,7 +39,7 @@ class CSLRFCOSHead(RotatedFCOSHead):
                      window='gaussian',
                      radius=6),
                  **kwargs):
-        self.angle_coder = build_bbox_coder(angle_coder)
+        self.angle_coder = TASK_UTILS.build(angle_coder)
         assert separate_angle, 'Only support separate angle in CSL'
         assert scale_angle is False, 'Only support no scale angle in CSL'
         self.coding_len = self.angle_coder.coding_len

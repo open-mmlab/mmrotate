@@ -1,8 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from .loading import LoadPatchFromImage
-from .transforms import PolyRandomRotate, RMosaic, RRandomFlip, RResize
+from .loading import LoadPatchFromImage, LoadPolyAnnotation
+from .transforms import (Polygon2OBB, PolyRandomRotate, RMosaic, RRandomFlip,
+                         RResize)
 
 __all__ = [
     'LoadPatchFromImage', 'RResize', 'RRandomFlip', 'PolyRandomRotate',
-    'RMosaic'
+    'RMosaic', 'Polygon2OBB', 'LoadPolyAnnotation'
 ]

@@ -1,10 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from mmcv.ops import box_iou_rotated
 
-from .builder import ROTATED_IOU_CALCULATORS
+from mmrotate.registry import TASK_UTILS
 
 
-@ROTATED_IOU_CALCULATORS.register_module()
+@TASK_UTILS.register_module()
 class RBboxOverlaps2D(object):
     """2D Overlaps (e.g. IoUs, GIoUs) Calculator."""
 

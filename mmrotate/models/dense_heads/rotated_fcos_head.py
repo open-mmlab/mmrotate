@@ -4,7 +4,8 @@ import torch
 import torch.nn as nn
 from mmcv.cnn import Scale
 from mmcv.runner import force_fp32
-from mmdet.core import multi_apply, reduce_mean
+from mmdet.models.utils import multi_apply
+from mmdet.utils import reduce_mean
 
 from mmrotate.core import build_bbox_coder, multiclass_nms_rotated
 from ..builder import ROTATED_HEADS, build_loss

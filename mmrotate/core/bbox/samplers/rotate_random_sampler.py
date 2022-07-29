@@ -1,12 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
-from mmdet.core.bbox.samplers.base_sampler import BaseSampler
-from mmdet.core.bbox.samplers.sampling_result import SamplingResult
+from mmdet.models.task_modules.samplers.base_sampler import BaseSampler
+from mmdet.models.task_modules.samplers.sampling_result import SamplingResult
 
-from ..builder import ROTATED_BBOX_SAMPLERS
+from mmrotate.registry import TASK_UTILS
 
 
-@ROTATED_BBOX_SAMPLERS.register_module()
+@TASK_UTILS.register_module()
 class RRandomSampler(BaseSampler):
     """Random sampler.
 
@@ -25,10 +25,10 @@ class RRandomSampler(BaseSampler):
                  neg_pos_ub=-1,
                  add_gt_as_proposals=True,
                  **kwargs):
-        from mmdet.core.bbox import demodata
+        from mmdet.utils.util_random import ensure_rng
         super(RRandomSampler, self).__init__(num, pos_fraction, neg_pos_ub,
                                              add_gt_as_proposals)
-        self.rng = demodata.ensure_rng(kwargs.get('rng', None))
+        self.rng = ensure_rng(kwargs.get('rng', None))
 
     def random_choice(self, gallery, num):
         """Random select some elements from the gallery.

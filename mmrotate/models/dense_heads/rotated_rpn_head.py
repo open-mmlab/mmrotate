@@ -6,11 +6,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from mmcv.ops import batched_nms
 from mmcv.runner import force_fp32
-from mmdet.core import (anchor_inside_flags, images_to_levels, multi_apply,
-                        unmap)
 from mmdet.models.dense_heads.anchor_head import AnchorHead
+from mmdet.models.task_modules.prior_generators import anchor_inside_flags
+from mmdet.models.utils import images_to_levels, multi_apply, unmap
 
-from mmrotate.core import obb2xyxy
+from mmrotate.structures.bbox import obb2xyxy
 from ..builder import ROTATED_HEADS
 
 

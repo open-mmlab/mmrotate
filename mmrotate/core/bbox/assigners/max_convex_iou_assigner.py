@@ -1,13 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 from mmcv.ops import convex_iou
-from mmdet.core.bbox.assigners.assign_result import AssignResult
-from mmdet.core.bbox.assigners.base_assigner import BaseAssigner
+from mmdet.models.task_modules.assigners.assign_result import AssignResult
+from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
 
-from ..builder import ROTATED_BBOX_ASSIGNERS
+from mmrotate.registry import TASK_UTILS
 
 
-@ROTATED_BBOX_ASSIGNERS.register_module()
+@TASK_UTILS.register_module()
 class MaxConvexIoUAssigner(BaseAssigner):
     """Assign a corresponding gt bbox or background to each bbox. Each
     proposals will be assigned with `-1`, or a semi-positive integer indicating

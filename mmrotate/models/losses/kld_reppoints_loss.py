@@ -3,7 +3,8 @@ import torch
 import torch.nn as nn
 from mmdet.models.losses.utils import weighted_loss
 
-from mmrotate.core import GaussianMixture, gt2gaussian
+from mmrotate.core import GaussianMixture
+from mmrotate.structures.bbox import gt2gaussian
 from ..builder import ROTATED_LOSSES
 
 

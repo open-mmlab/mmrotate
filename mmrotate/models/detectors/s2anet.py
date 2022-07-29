@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from mmrotate.core import rbbox2result
+from mmrotate.structures.bbox import rbbox2result
 from ..builder import ROTATED_DETECTORS, build_backbone, build_head, build_neck
 from .base import RotatedBaseDetector
 from .utils import AlignConvModule

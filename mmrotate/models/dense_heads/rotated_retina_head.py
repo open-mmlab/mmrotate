@@ -1,32 +1,18 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-from mmcv.runner import force_fp32
 
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 from .rotated_anchor_head import RotatedAnchorHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedRetinaHead(RotatedAnchorHead):
-    r"""An anchor-based head used in `RotatedRetinaNet
+    r"""An rotated anchor-based head modified by `RetinaNet
     <https://arxiv.org/pdf/1708.02002.pdf>`_.
-
     The head contains two subnetworks. The first classifies anchor boxes and
     the second regresses deltas for the anchors.
-
-    Args:
-        num_classes (int): Number of categories excluding the background
-            category.
-        in_channels (int): Number of channels in the input feature map.
-        stacked_convs (int, optional): Number of stacked convolutions.
-        conv_cfg (dict, optional): Config dict for convolution layer.
-            Default: None.
-        norm_cfg (dict, optional): Config dict for normalization layer.
-            Default: None.
-        anchor_generator (dict): Config dict for anchor generator
-        init_cfg (dict or list[dict], optional): Initialization config dict.
-    """  # noqa: W605
+    """
 
     def __init__(self,
                  num_classes,
@@ -50,11 +36,10 @@ class RotatedRetinaHead(RotatedAnchorHead):
                          std=0.01,
                          bias_prob=0.01)),
                  **kwargs):
-
         self.stacked_convs = stacked_convs
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
-        super(RotatedRetinaHead, self).__init__(
+        super().__init__(
             num_classes,
             in_channels,
             anchor_generator=anchor_generator,
@@ -88,25 +73,24 @@ class RotatedRetinaHead(RotatedAnchorHead):
                     norm_cfg=self.norm_cfg))
         self.retina_cls = nn.Conv2d(
             self.feat_channels,
-            self.num_anchors * self.cls_out_channels,
+            self.num_base_priors * self.cls_out_channels,
             3,
             padding=1)
         self.retina_reg = nn.Conv2d(
-            self.feat_channels, self.num_anchors * 5, 3, padding=1)
+            self.feat_channels, self.num_base_priors * 5, 3, padding=1)
 
     def forward_single(self, x):
         """Forward feature of a single scale level.
 
         Args:
-            x (torch.Tensor): Features of a single scale level.
+            x (Tensor): Features of a single scale level.
 
         Returns:
-            tuple (torch.Tensor):
-
-                - cls_score (torch.Tensor): Cls scores for a single scale \
-                    level the channels number is num_anchors * num_classes.
-                - bbox_pred (torch.Tensor): Box energies / deltas for a \
-                    single scale level, the channels number is num_anchors * 5.
+            tuple:
+                cls_score (Tensor): Cls scores for a single scale level
+                    the channels number is num_anchors * num_classes.
+                bbox_pred (Tensor): Box energies / deltas for a single scale
+                    level, the channels number is num_anchors * 4.
         """
         cls_feat = x
         reg_feat = x
@@ -118,71 +102,6 @@ class RotatedRetinaHead(RotatedAnchorHead):
         bbox_pred = self.retina_reg(reg_feat)
         return cls_score, bbox_pred
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
-    def filter_bboxes(self, cls_scores, bbox_preds):
-        """Filter predicted bounding boxes at each position of the feature
-        maps. Only one bounding boxes with highest score will be left at each
-        position. This filter will be used in R3Det prior to the first feature
-        refinement stage.
-
-        Args:
-            cls_scores (list[Tensor]): Box scores for each scale level
-                Has shape (N, num_anchors * num_classes, H, W)
-            bbox_preds (list[Tensor]): Box energies / deltas for each scale
-                level with shape (N, num_anchors * 5, H, W)
-
-        Returns:
-            list[list[Tensor]]: best or refined rbboxes of each level \
-                of each image.
-        """
-        num_levels = len(cls_scores)
-        assert num_levels == len(bbox_preds)
-
-        num_imgs = cls_scores[0].size(0)
-
-        for i in range(num_levels):
-            assert num_imgs == cls_scores[i].size(0) == bbox_preds[i].size(0)
-
-        device = cls_scores[0].device
-        featmap_sizes = [cls_scores[i].shape[-2:] for i in range(num_levels)]
-        mlvl_anchors = self.anchor_generator.grid_priors(
-            featmap_sizes, device=device)
-
-        bboxes_list = [[] for _ in range(num_imgs)]
-
-        for lvl in range(num_levels):
-            cls_score = cls_scores[lvl]
-            bbox_pred = bbox_preds[lvl]
-
-            anchors = mlvl_anchors[lvl]
-
-            cls_score = cls_score.permute(0, 2, 3, 1)
-            cls_score = cls_score.reshape(num_imgs, -1, self.num_anchors,
-                                          self.cls_out_channels)
-
-            cls_score, _ = cls_score.max(dim=-1, keepdim=True)
-            best_ind = cls_score.argmax(dim=-2, keepdim=True)
-            best_ind = best_ind.expand(-1, -1, -1, 5)
-
-            bbox_pred = bbox_pred.permute(0, 2, 3, 1)
-            bbox_pred = bbox_pred.reshape(num_imgs, -1, self.num_anchors, 5)
-            best_pred = bbox_pred.gather(
-                dim=-2, index=best_ind).squeeze(dim=-2)
-
-            anchors = anchors.reshape(-1, self.num_anchors, 5)
-
-            for img_id in range(num_imgs):
-                best_ind_i = best_ind[img_id]
-                best_pred_i = best_pred[img_id]
-                best_anchor_i = anchors.gather(
-                    dim=-2, index=best_ind_i).squeeze(dim=-2)
-                best_bbox_i = self.bbox_coder.decode(best_anchor_i,
-                                                     best_pred_i)
-                bboxes_list[img_id].append(best_bbox_i.detach())
-
-        return bboxes_list
-
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def refine_bboxes(self, cls_scores, bbox_preds):
         """This function will be used in S2ANet, whose num_anchors=1.
 

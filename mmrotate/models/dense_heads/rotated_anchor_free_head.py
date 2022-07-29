@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 
-from mmdet.core.anchor.point_generator import MlvlPointGenerator
 from mmdet.models.dense_heads import AnchorFreeHead
+from mmdet.models.task_modules.prior_generators import MlvlPointGenerator
 
 from mmrotate.core import build_bbox_coder
 from ..builder import ROTATED_HEADS, build_loss

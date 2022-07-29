@@ -1,15 +1,15 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 from mmcv.ops import points_in_polygons
-from mmdet.core.bbox.assigners.assign_result import AssignResult
-from mmdet.core.bbox.assigners.base_assigner import BaseAssigner
+from mmdet.models.task_modules.assigners.assign_result import AssignResult
+from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
 
 from mmrotate.core.bbox.utils import GaussianMixture
-from ..builder import ROTATED_BBOX_ASSIGNERS
-from ..transforms import gt2gaussian
+from mmrotate.registry import TASK_UTILS
+from mmrotate.structures.bbox import gt2gaussian
 
 
-@ROTATED_BBOX_ASSIGNERS.register_module()
+@TASK_UTILS.register_module()
 class ATSSKldAssigner(BaseAssigner):
     """Assign a corresponding gt bbox or background to each bbox.
 

@@ -1,102 +1,243 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
+from typing import Tuple
 
 import cv2
 import mmcv
 import numpy as np
-from mmdet.datasets.pipelines.transforms import (Mosaic, RandomCrop,
-                                                 RandomFlip, Resize)
+from mmcv.transforms import BaseTransform
+from mmdet.datasets.transforms import Mosaic, RandomCrop, RandomFlip, Resize
 from numpy import random
 
-from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
-from ..builder import ROTATED_PIPELINES
+from mmrotate.registry import TRANSFORMS
+from mmrotate.structures.bbox import obb2poly_np, poly2obb_np
 
 
-@ROTATED_PIPELINES.register_module()
-class RResize(Resize):
-    """Resize images & rotated bbox Inherit Resize pipeline class to handle
-    rotated bboxes.
+# TODO: remove in boxlist
+@TRANSFORMS.register_module()
+class Polygon2OBB(BaseTransform):
+    """Convert polygons to rotated bboxes.
 
-    Args:
-        img_scale (tuple or list[tuple]): Images scales for resizing.
-        multiscale_mode (str): Either "range" or "value".
-        ratio_range (tuple[float]): (min_ratio, max_ratio).
-    """
+    Required Keys:
 
-    def __init__(self,
-                 img_scale=None,
-                 multiscale_mode='range',
-                 ratio_range=None):
-        super(RResize, self).__init__(
-            img_scale=img_scale,
-            multiscale_mode=multiscale_mode,
-            ratio_range=ratio_range,
-            keep_ratio=True)
+    - gt_bboxes (np.float32) (optional)
 
-    def _resize_bboxes(self, results):
-        """Resize bounding boxes with ``results['scale_factor']``."""
-        for key in results.get('bbox_fields', []):
-            bboxes = results[key]
-            orig_shape = bboxes.shape
-            bboxes = bboxes.reshape((-1, 5))
-            w_scale, h_scale, _, _ = results['scale_factor']
-            bboxes[:, 0] *= w_scale
-            bboxes[:, 1] *= h_scale
-            bboxes[:, 2:4] *= np.sqrt(w_scale * h_scale)
-            results[key] = bboxes.reshape(orig_shape)
+    Modified Keys:
 
-
-@ROTATED_PIPELINES.register_module()
-class RRandomFlip(RandomFlip):
-    """
+    - gt_bboxes
 
     Args:
-        flip_ratio (float | list[float], optional): The flipping probability.
-            Default: None.
-        direction(str | list[str], optional): The flipping direction. Options
-            are 'horizontal', 'vertical', 'diagonal'.
-        version (str, optional): Angle representations. Defaults to 'oc'.
+        scale (int or tuple): Images scales for resizing. Defaults to None
+        scale_factor (float or tuple[float]): Scale factors for resizing.
+            Defaults to None.
+        keep_ratio (bool): Whether to keep the aspect ratio when resizing the
+            image. Defaults to False.
+        clip_object_border (bool): Whether to clip the objects
+            outside the border of the image. In some dataset like MOT17, the gt
+            bboxes are allowed to cross the border of images. Therefore, we
+            don't need to clip the gt bboxes in these cases. Defaults to True.
+        backend (str): Image resize backend, choices are 'cv2' and 'pillow'.
+            These two backends generates slightly different results. Defaults
+            to 'cv2'.
+        interpolation (str): Interpolation method, accepted values are
+            "nearest", "bilinear", "bicubic", "area", "lanczos" for 'cv2'
+            backend, "nearest", "bilinear" for 'pillow' backend. Defaults
+            to 'bilinear'.
     """
 
-    def __init__(self, flip_ratio=None, direction='horizontal', version='oc'):
-        self.version = version
-        super(RRandomFlip, self).__init__(flip_ratio, direction)
+    def __init__(self, angle_version: str) -> None:
+        self.angle_version = angle_version
 
-    def bbox_flip(self, bboxes, img_shape, direction):
-        """Flip bboxes horizontally or vertically.
+    def transform(self, results: dict) -> dict:
+        """Transform function to convert polygons to rotated bboxes.
 
         Args:
-            bboxes(ndarray): shape (..., 5*k)
-            img_shape(tuple): (height, width)
+            results (dict): Result dict from loading pipeline.
 
+        Returns:
+            dict: Result dict with rotated bboxes.
+        """
+        if results.get('gt_bboxes', None) is not None:
+            polys = results['gt_bboxes']
+            gt_bboxes = []
+            for pt in polys:
+                pt = np.array(pt, dtype=np.float32)
+                obb = poly2obb_np(pt, self.angle_version) \
+                    if poly2obb_np(pt, self.angle_version) is not None\
+                    else [0, 0, 0, 0, 0]
+                gt_bboxes.append(obb)
+            results['gt_bboxes'] = np.array(gt_bboxes, dtype=np.float32)
+
+        return results
+
+    def __repr__(self) -> str:
+        repr_str = self.__class__.__name__
+        return repr_str
+
+
+# TODO: remove in boxlist
+@TRANSFORMS.register_module()
+class RResize(Resize):
+    """Resize images & rotated bbox & seg.
+
+    This transform resizes the input image according to ``scale`` or
+    ``scale_factor``. Rotated bboxes, masks, and seg map are then resized
+    with the same scale factor.
+    if ``scale`` and ``scale_factor`` are both set, it will use ``scale`` to
+    resize.
+
+    Required Keys:
+
+    - img
+    - gt_bboxes (np.float32) (optional)
+    - gt_masks (BitmapMasks | PolygonMasks) (optional)
+    - gt_seg_map (np.uint8) (optional)
+
+    Modified Keys:
+
+    - img
+    - img_shape
+    - gt_bboxes
+    - gt_masks
+    - gt_seg_map
+
+
+    Added Keys:
+
+    - scale
+    - scale_factor
+    - keep_ratio
+    - homography_matrix
+
+    Args:
+        scale (int or tuple): Images scales for resizing. Defaults to None
+        scale_factor (float or tuple[float]): Scale factors for resizing.
+            Defaults to None.
+        keep_ratio (bool): Whether to keep the aspect ratio when resizing the
+            image. Defaults to False.
+        clip_object_border (bool): Whether to clip the objects
+            outside the border of the image. In some dataset like MOT17, the gt
+            bboxes are allowed to cross the border of images. Therefore, we
+            don't need to clip the gt bboxes in these cases. Defaults to True.
+        backend (str): Image resize backend, choices are 'cv2' and 'pillow'.
+            These two backends generates slightly different results. Defaults
+            to 'cv2'.
+        interpolation (str): Interpolation method, accepted values are
+            "nearest", "bilinear", "bicubic", "area", "lanczos" for 'cv2'
+            backend, "nearest", "bilinear" for 'pillow' backend. Defaults
+            to 'bilinear'.
+    """
+
+    def _resize_bboxes(self, results: dict) -> None:
+        """Resize bounding boxes with ``results['scale_factor']``."""
+        if results.get('gt_bboxes', None) is not None:
+            bboxes = results['gt_bboxes'] * np.tile(
+                np.array(results['scale_factor']), 4)
+            if self.clip_object_border:
+                bboxes[:, 0::2] = np.clip(bboxes[:, 0::2], 0,
+                                          results['img_shape'][1])
+                bboxes[:, 1::2] = np.clip(bboxes[:, 1::2], 0,
+                                          results['img_shape'][0])
+            results['gt_bboxes'] = bboxes.astype(np.float32)
+
+
+# TODO: remove in boxlist
+@TRANSFORMS.register_module()
+class RRandomFlip(RandomFlip):
+    """Flip the image & rotatedbbox & mask & segmentation map. Added or Updated
+    keys: flip, flip_direction, img, gt_bboxes, and gt_seg_map. There are 3
+    flip modes:
+
+     - ``prob`` is float, ``direction`` is string: the image will be
+         ``direction``ly flipped with probability of ``prob`` .
+         E.g., ``prob=0.5``, ``direction='horizontal'``,
+         then image will be horizontally flipped with probability of 0.5.
+     - ``prob`` is float, ``direction`` is list of string: the image will
+         be ``direction[i]``ly flipped with probability of
+         ``prob/len(direction)``.
+         E.g., ``prob=0.5``, ``direction=['horizontal', 'vertical']``,
+         then image will be horizontally flipped with probability of 0.25,
+         vertically with probability of 0.25.
+     - ``prob`` is list of float, ``direction`` is list of string:
+         given ``len(prob) == len(direction)``, the image will
+         be ``direction[i]``ly flipped with probability of ``prob[i]``.
+         E.g., ``prob=[0.3, 0.5]``, ``direction=['horizontal',
+         'vertical']``, then image will be horizontally flipped with
+         probability of 0.3, vertically with probability of 0.5.
+
+
+    Required Keys:
+
+    - img
+    - gt_bboxes (np.float32) (optional)
+    - gt_masks (BitmapMasks | PolygonMasks) (optional)
+    - gt_seg_map (np.uint8) (optional)
+
+    Modified Keys:
+
+    - img
+    - gt_bboxes
+    - gt_masks
+    - gt_seg_map
+
+    Added Keys:
+
+    - flip
+    - flip_direction
+    - homography_matrix
+
+
+    Args:
+         prob (float | list[float], optional): The flipping probability.
+             Defaults to None.
+         direction(str | list[str]): The flipping direction. Options
+             If input is a list, the length must equal ``prob``. Each
+             element in ``prob`` indicates the flip probability of
+             corresponding direction. Defaults to 'horizontal'.
+    """
+
+    def flip_bbox(self, bboxes: np.ndarray, img_shape: Tuple[int, int],
+                  direction: str) -> np.ndarray:
+        """Flip bboxes horizontally.
+
+        Args:
+            bboxes (numpy.ndarray): Bounding boxes, shape (..., 4*k)
+            img_shape (tuple[int]): Image shape (height, width)
+            direction (str): Flip direction. Options are 'horizontal',
+                'vertical'.
         Returns:
             numpy.ndarray: Flipped bounding boxes.
         """
-        assert bboxes.shape[-1] % 5 == 0
-        orig_shape = bboxes.shape
-        bboxes = bboxes.reshape((-1, 5))
+        assert bboxes.shape[-1] % 8 == 0
         flipped = bboxes.copy()
+        h, w = img_shape
         if direction == 'horizontal':
-            flipped[:, 0] = img_shape[1] - bboxes[:, 0] - 1
+            flipped[..., 0::8] = w - bboxes[..., 2::8]
+            flipped[..., 2::8] = w - bboxes[..., 0::8]
+            flipped[..., 4::8] = w - bboxes[..., 6::8]
+            flipped[..., 6::8] = w - bboxes[..., 4::8]
         elif direction == 'vertical':
-            flipped[:, 1] = img_shape[0] - bboxes[:, 1] - 1
+            flipped[..., 1::8] = h - bboxes[..., 3::8]
+            flipped[..., 3::8] = h - bboxes[..., 1::8]
+            flipped[..., 5::8] = h - bboxes[..., 7::8]
+            flipped[..., 7::8] = h - bboxes[..., 5::8]
         elif direction == 'diagonal':
-            flipped[:, 0] = img_shape[1] - bboxes[:, 0] - 1
-            flipped[:, 1] = img_shape[0] - bboxes[:, 1] - 1
-            return flipped.reshape(orig_shape)
+            flipped[..., 0::8] = w - bboxes[..., 2::8]
+            flipped[..., 1::8] = h - bboxes[..., 3::8]
+            flipped[..., 2::8] = w - bboxes[..., 0::8]
+            flipped[..., 3::8] = h - bboxes[..., 1::8]
+            flipped[..., 4::8] = w - bboxes[..., 6::8]
+            flipped[..., 5::8] = h - bboxes[..., 7::8]
+            flipped[..., 6::8] = w - bboxes[..., 4::8]
+            flipped[..., 7::8] = h - bboxes[..., 5::8]
         else:
-            raise ValueError(f'Invalid flipping direction "{direction}"')
-        if self.version == 'oc':
-            rotated_flag = (bboxes[:, 4] != np.pi / 2)
-            flipped[rotated_flag, 4] = np.pi / 2 - bboxes[rotated_flag, 4]
-            flipped[rotated_flag, 2] = bboxes[rotated_flag, 3]
-            flipped[rotated_flag, 3] = bboxes[rotated_flag, 2]
-        else:
-            flipped[:, 4] = norm_angle(np.pi - bboxes[:, 4], self.version)
-        return flipped.reshape(orig_shape)
+            raise ValueError(
+                f"Flipping direction must be 'horizontal', 'vertical', \
+                  or 'diagonal', but got '{direction}'")
+        return flipped
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PolyRandomRotate(object):
     """Rotate img & bbox.
     Reference: https://github.com/hukaixuan19970627/OrientedRepPoints_DOTA
@@ -269,7 +410,7 @@ class PolyRandomRotate(object):
         return repr_str
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RRandomCrop(RandomCrop):
     """Random crop the image & bboxes.
 
@@ -368,7 +509,7 @@ class RRandomCrop(RandomCrop):
         return results
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RMosaic(Mosaic):
     """Rotate Mosaic augmentation. Inherit from
     `mmdet.datasets.pipelines.transforms.Mosaic`.

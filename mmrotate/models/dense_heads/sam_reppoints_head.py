@@ -5,13 +5,13 @@ import torch.nn as nn
 from mmcv.cnn import ConvModule
 from mmcv.ops import DeformConv2d, min_area_polygons
 from mmcv.runner import force_fp32
-from mmdet.core import images_to_levels, multi_apply, unmap
-from mmdet.core.anchor.point_generator import MlvlPointGenerator
-from mmdet.core.utils import select_single_mlvl
 from mmdet.models.dense_heads.base_dense_head import BaseDenseHead
+from mmdet.models.task_modules.prior_generators import MlvlPointGenerator
+from mmdet.models.utils import (images_to_levels, multi_apply,
+                                select_single_mlvl, unmap)
 
-from mmrotate.core import (build_assigner, build_sampler,
-                           multiclass_nms_rotated, obb2poly, poly2obb)
+from mmrotate.core import build_assigner, build_sampler, multiclass_nms_rotated
+from mmrotate.structures.bbox import obb2poly, poly2obb
 from ..builder import ROTATED_HEADS, build_loss
 from .utils import get_num_level_anchors_inside, points_center_pts
 

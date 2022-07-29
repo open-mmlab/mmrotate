@@ -4,9 +4,10 @@ import copy
 import torch
 import torch.nn as nn
 from mmcv.ops import batched_nms
-from mmdet.core import anchor_inside_flags, unmap
+from mmdet.models.task_modules.prior_generators import anchor_inside_flags
+from mmdet.models.utils import unmap
 
-from mmrotate.core import obb2xyxy
+from mmrotate.structures.bbox import obb2xyxy
 from ..builder import ROTATED_HEADS
 from .rotated_rpn_head import RotatedRPNHead
 
