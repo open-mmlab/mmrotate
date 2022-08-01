@@ -822,6 +822,9 @@ class RotatedRepPointsHead(BaseDenseHead):
         Returns:
             Tensor: Losses of all positive samples in single image.
         """
+        if pos_inds.size(0) == 0:
+            pos_loss = bbox_gt.new_zeros(0)
+            return pos_loss,
         pos_scores = cls_score[pos_inds]
         pos_pts_pred = pts_pred[pos_inds]
         pos_bbox_gt = bbox_gt[pos_inds]
