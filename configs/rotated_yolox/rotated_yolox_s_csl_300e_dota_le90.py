@@ -3,7 +3,8 @@ _base_ = './rotated_yolox_s_300e_dota_le90.py'
 # model settings
 model = dict(
     bbox_head=dict(
-        seprate_angle=True,
+        separate_angle=True,
+        with_angle_l1=False,
         loss_bbox=dict(
             _delete_=True,
             type='IoULoss',

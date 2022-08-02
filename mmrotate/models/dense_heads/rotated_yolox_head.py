@@ -7,11 +7,10 @@ import torch.nn as nn
 from mmcv.cnn import bias_init_with_prob
 from mmcv.ops import nms_rotated  # noqa
 from mmcv.runner import force_fp32
-from mmdet.core import (bbox_cxcywh_to_xyxy, bbox_xyxy_to_cxcywh, multi_apply,
-                        reduce_mean)
+from mmdet.core import bbox_cxcywh_to_xyxy, multi_apply, reduce_mean
 from mmdet.models.dense_heads import YOLOXHead
 
-from mmrotate.core import build_bbox_coder
+from mmrotate.core import build_bbox_coder, norm_angle
 from ..builder import ROTATED_HEADS, build_loss
 
 
@@ -49,13 +48,20 @@ class RotatedYOLOXHead(YOLOXHead):
         init_cfg (dict or list[dict], optional): Initialization config dict.
         separate_angle (bool): If true, angle prediction is separated from
             bbox regression loss. Default: False.
+        with_angle_l1 (bool): If true, compute L1 loss with angle.
+            Default: True.
+        angle_norm_factor (float): Regularization factor of angle. Only
+            used when with_angle_l1 is True
         angle_coder (dict): Config of angle coder.
         loss_angle (dict): Config of angle loss, only used when
             separate_angle is True.
     """
 
     def __init__(self,
-                 seprate_angle=False,
+                 separate_angle=False,
+                 with_angle_l1=True,
+                 angle_norm_factor=3.14,
+                 edge_swap=None,
                  angle_coder=dict(type='PseudoAngleCoder'),
                  loss_angle=None,
                  **kwargs):
@@ -65,8 +71,13 @@ class RotatedYOLOXHead(YOLOXHead):
 
         super().__init__(**kwargs)
 
-        self.seprate_angle = seprate_angle
-        if self.seprate_angle:
+        self.separate_angle = separate_angle
+        self.with_angle_l1 = with_angle_l1
+        self.angle_norm_factor = angle_norm_factor
+        self.edge_swap = edge_swap
+        if self.edge_swap:
+            assert self.edge_swap in ['oc', 'le90', 'le135']
+        if self.separate_angle:
             assert loss_angle is not None, \
                 'loss_angle must be specified when separate_angle is True'
             self.loss_angle = build_loss(loss_angle)
@@ -211,14 +222,15 @@ class RotatedYOLOXHead(YOLOXHead):
         flatten_objectness = torch.cat(flatten_objectness, dim=1).sigmoid()
         flatten_priors = torch.cat(mlvl_priors)
 
-        flatten_hbboxes_cxcywh = self._bbox_decode_cxcywh(
-            flatten_priors, flatten_bbox_preds)
-        flatten_decoded_angle = self.angle_coder.decode(flatten_angle_preds)
+        flatten_decoded_angle = self.angle_coder.decode(
+            flatten_angle_preds).unsqueeze(-1)
+
+        flatten_hbboxes_cxcywh, flatten_decoded_angle = \
+            self._bbox_decode_cxcywha(
+                flatten_priors, flatten_bbox_preds, flatten_decoded_angle)
 
         flatten_rbboxes = torch.cat(
-            [flatten_hbboxes_cxcywh,
-             flatten_decoded_angle.unsqueeze(-1)],
-            dim=-1)
+            [flatten_hbboxes_cxcywh, flatten_decoded_angle], dim=-1)
 
         if rescale:
             flatten_rbboxes[..., :4] /= flatten_rbboxes.new_tensor(
@@ -249,12 +261,22 @@ class RotatedYOLOXHead(YOLOXHead):
             dets, keep = batched_nms(bboxes, scores, labels, cfg.nms)
             return dets, labels[keep]
 
-    def _bbox_decode_cxcywh(self, priors, bbox_preds):
+    def _bbox_decode_cxcywha(self, priors, bbox_preds, decoded_angle):
         xys = (bbox_preds[..., :2] * priors[:, 2:]) + priors[:, :2]
         whs = bbox_preds[..., 2:].exp() * priors[:, 2:]
 
-        decoded_bboxes = torch.cat([xys, whs], -1)
-        return decoded_bboxes
+        if self.edge_swap:
+            w = whs[..., 0:1]
+            h = whs[..., 1:2]
+            w_regular = torch.where(w > h, w, h)
+            h_regular = torch.where(w > h, h, w)
+            theta_regular = torch.where(w > h, decoded_angle,
+                                        decoded_angle + np.pi / 2)
+            theta_regular = norm_angle(theta_regular, self.edge_swap)
+            return torch.cat([xys, w_regular, h_regular],
+                             dim=-1), theta_regular
+        else:
+            return torch.cat([xys, whs], -1), decoded_angle
 
     @force_fp32(
         apply_to=('cls_scores', 'bbox_preds', 'angle_preds', 'objectnesses'))
@@ -322,16 +344,16 @@ class RotatedYOLOXHead(YOLOXHead):
         flatten_objectness = torch.cat(flatten_objectness, dim=1)
         flatten_priors = torch.cat(mlvl_priors)
 
-        flatten_hbboxes = self._bbox_decode(flatten_priors, flatten_bbox_preds)
-        flatten_cxcywh_hbboxes = bbox_xyxy_to_cxcywh(flatten_hbboxes)
-        flatten_decoded_angle_preds = self.angle_coder.decode(
-            flatten_angle_preds)
+        flatten_decoded_angle = self.angle_coder.decode(
+            flatten_angle_preds).unsqueeze(-1)
 
-        flatten_rbboxes = torch.cat([
-            flatten_cxcywh_hbboxes,
-            flatten_decoded_angle_preds.unsqueeze(-1)
-        ],
-                                    dim=-1)
+        flatten_hbboxes_cxcywh, flatten_decoded_angle = \
+            self._bbox_decode_cxcywha(
+                flatten_priors, flatten_bbox_preds, flatten_decoded_angle)
+
+        flatten_rbboxes = torch.cat(
+            [flatten_hbboxes_cxcywh, flatten_decoded_angle], dim=-1)
+        flatten_hbboxes = bbox_cxcywh_to_xyxy(flatten_hbboxes_cxcywh)
 
         (pos_masks, cls_targets, obj_targets, bbox_targets, l1_targets,
          num_fg_imgs) = multi_apply(
@@ -357,7 +379,7 @@ class RotatedYOLOXHead(YOLOXHead):
             l1_targets = torch.cat(l1_targets, 0)
 
         # Loss Bbox
-        if self.seprate_angle:
+        if self.separate_angle:
             hbbox_xyxy_targets = bbox_cxcywh_to_xyxy(bbox_targets[..., :4])
             angle_targets = bbox_targets[..., 4:5]
             angle_targets = self.angle_coder.encode(angle_targets)
@@ -383,23 +405,23 @@ class RotatedYOLOXHead(YOLOXHead):
         loss_dict = dict(
             loss_cls=loss_cls, loss_bbox=loss_bbox, loss_obj=loss_obj)
 
-        if self.seprate_angle:
+        if self.separate_angle:
             loss_dict.update(loss_angle=loss_angle)
 
         # Loss L1
         if self.use_l1:
-            if self.seprate_angle:
-                loss_l1 = self.loss_l1(
-                    flatten_bbox_preds.view(-1, 4)[pos_masks],
-                    l1_targets) / num_total_samples
-            else:
+            if self.with_angle_l1:
                 flatten_rbbox_preds = torch.cat([
                     flatten_bbox_preds,
-                    flatten_decoded_angle_preds.unsqueeze(-1)
+                    flatten_decoded_angle / self.angle_norm_factor
                 ],
                                                 dim=-1)
                 loss_l1 = self.loss_l1(
                     flatten_rbbox_preds.view(-1, 5)[pos_masks],
+                    l1_targets) / num_total_samples
+            else:
+                loss_l1 = self.loss_l1(
+                    flatten_bbox_preds.view(-1, 4)[pos_masks],
                     l1_targets) / num_total_samples
 
             loss_dict.update(loss_l1=loss_l1)
@@ -433,10 +455,10 @@ class RotatedYOLOXHead(YOLOXHead):
         if num_gts == 0:
             cls_target = cls_preds.new_zeros((0, self.num_classes))
             bbox_target = cls_preds.new_zeros((0, 5))
-            if self.seprate_angle:
-                l1_target = cls_preds.new_zeros((0, 4))
-            else:
+            if self.with_angle_l1:
                 l1_target = cls_preds.new_zeros((0, 5))
+            else:
+                l1_target = cls_preds.new_zeros((0, 4))
             obj_target = cls_preds.new_zeros((num_priors, 1))
             foreground_mask = cls_preds.new_zeros(num_priors).bool()
             return (foreground_mask, cls_target, obj_target, bbox_target,
@@ -452,11 +474,11 @@ class RotatedYOLOXHead(YOLOXHead):
         gt_cxcywh = gt_bboxes[..., :4]
         l1_target[:, :2] = (gt_cxcywh[:, :2] - priors[:, :2]) / priors[:, 2:]
         l1_target[:, 2:] = torch.log(gt_cxcywh[:, 2:] / priors[:, 2:] + eps)
-        if self.seprate_angle:
-            return l1_target
-        else:
-            angle_target = gt_bboxes[..., 4:5]
+        if self.with_angle_l1:
+            angle_target = gt_bboxes[..., 4:5] / self.angle_norm_factor
             return torch.cat([l1_target, angle_target], dim=-1)
+        else:
+            return l1_target
 
 
 def batched_nms(

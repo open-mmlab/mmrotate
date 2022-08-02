@@ -31,9 +31,9 @@ class RSimOTAAssigner(SimOTAAssigner):
             priors (Tensor): All priors of one image, a 2D-Tensor with shape
                 [num_priors, 4] in [cx, xy, stride_w, stride_y] format.
             decoded_bboxes (Tensor): Predicted bboxes, a 2D-Tensor with shape
-                [num_priors, 4] in [tl_x, tl_y, br_x, br_y] format.
+                [num_priors, 5] in [x, y, w, h ,a] format.
             gt_bboxes (Tensor): Ground truth bboxes of one image, a 2D-Tensor
-                with shape [num_gts, 4] in [tl_x, tl_y, br_x, br_y] format.
+                with shape [num_gts, 5] in [x, y, w, h ,a] format.
             gt_labels (Tensor): Ground truth labels of one image, a Tensor
                 with shape [num_gts].
             gt_bboxes_ignore (Tensor, optional): Ground truth bboxes that are
@@ -107,48 +107,6 @@ class RSimOTAAssigner(SimOTAAssigner):
         return AssignResult(
             num_gt, assigned_gt_inds, max_overlaps, labels=assigned_labels)
 
-    def get_in_gt_and_in_center_info2(self, priors, gt_bboxes):
-        num_gt = gt_bboxes.size(0)
-        num_prior = priors.size(0)
-
-        points = priors[:, None, :2].expand(num_prior, num_gt, 2)
-        gt_bboxes = gt_bboxes[None].expand(num_prior, num_gt, 5)
-        # is prior centers in gt
-        gt_ctr, gt_wh, gt_angle = torch.split(gt_bboxes, [2, 2, 1], dim=2)
-
-        cos_angle, sin_angle = torch.cos(gt_angle), torch.sin(gt_angle)
-        rot_matrix = torch.cat([cos_angle, sin_angle, -sin_angle, cos_angle],
-                               dim=-1).reshape(num_prior, num_gt, 2, 2)
-        offset = points - gt_ctr
-        offset = torch.matmul(rot_matrix, offset[..., None])
-        offset = offset.squeeze(-1)
-
-        w, h = gt_wh[..., 0], gt_wh[..., 1]
-        offset_x, offset_y = offset[..., 0], offset[..., 1]
-        left = w / 2 + offset_x
-        right = w / 2 - offset_x
-        top = h / 2 + offset_y
-        bottom = h / 2 - offset_y
-        deltas = torch.stack((left, top, right, bottom), dim=1)
-        is_in_gts = deltas.min(dim=1).values > 0
-        is_in_gts_all = is_in_gts.sum(dim=1) > 0
-
-        # is prior centers in gt centers
-        strides = priors[:, None, 2:4].expand(num_prior, num_gt,
-                                              2) * self.center_radius
-
-        is_in_cts = (torch.abs(offset) < strides).min(dim=-1).values
-        is_in_cts_all = is_in_cts.sum(dim=1) > 0
-
-        # in boxes or in centers, shape: [num_priors]
-        is_in_gts_or_centers = is_in_gts_all | is_in_cts_all
-
-        # both in boxes and centers, shape: [num_fg, num_gt]
-        is_in_boxes_and_centers = (
-            is_in_gts[is_in_gts_or_centers, :]
-            & is_in_cts[is_in_gts_or_centers, :])
-        return is_in_gts_or_centers, is_in_boxes_and_centers
-
     def get_in_gt_and_in_center_info(self, priors, gt_bboxes):
         num_gt = gt_bboxes.size(0)
 
@@ -187,7 +145,17 @@ class RSimOTAAssigner(SimOTAAssigner):
         return is_in_gts_or_centers, is_in_boxes_and_centers
 
     def points_in_rbboxes(self, points, rbboxes):
+        """Judging whether points are inside rotated bboxes.
 
+        Args:
+            points (torch.Tensor): It has shape (B, 2), indicating (x, y).
+                M means the number of predicted points.
+            rbboxes (torch.Tensor): It has shape (M, 5), indicating
+                (x, y, w, h, a). M means the number of rotated bboxes.
+
+        Returns:
+            torch.Tensor: Return the result with the shape of (B, M).
+        """
         num_gt = rbboxes.size(0)
         num_prior = points.size(0)
         points = points[:, None, :].expand(num_prior, num_gt, 2)

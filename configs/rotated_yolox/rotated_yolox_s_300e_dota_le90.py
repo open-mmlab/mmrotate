@@ -20,7 +20,10 @@ model = dict(
         num_classes=15,
         in_channels=128,
         feat_channels=128,
-        seprate_angle=False,
+        separate_angle=False,
+        with_angle_l1=True,
+        angle_norm_factor=5,
+        edge_swap=angle_version,
         loss_bbox=dict(
             type='RotatedIoULoss',
             mode='square',
@@ -96,10 +99,7 @@ train_dataset = dict(
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True),
         ],
-        # Unlike the original implementation,
-        # filter_empty_gt=False will lead to instability
-        # at the end of the training and performance degradation
-        filter_empty_gt=True,
+        filter_empty_gt=False,
     ),
     pipeline=train_pipeline)
 
