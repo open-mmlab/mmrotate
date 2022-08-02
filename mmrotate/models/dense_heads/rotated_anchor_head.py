@@ -1,11 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import copy
 from inspect import signature
-from typing import Optional
+from typing import List, Optional
 
 import torch
 from mmcv.ops import batched_nms
 from mmdet.models.dense_heads.anchor_head import AnchorHead
-from mmdet.models.utils import unmap
+from mmdet.models.utils import filter_scores_and_topk, unmap
 from mmengine.config import ConfigDict
 from mmengine.data import InstanceData
 from torch import Tensor
@@ -183,6 +184,138 @@ class RotatedAnchorHead(AnchorHead):
             bbox_pred, bbox_targets, bbox_weights, avg_factor=avg_factor)
         return loss_cls, loss_bbox
 
+    def _predict_by_feat_single(self,
+                                cls_score_list: List[Tensor],
+                                bbox_pred_list: List[Tensor],
+                                score_factor_list: List[Tensor],
+                                mlvl_priors: List[Tensor],
+                                img_meta: dict,
+                                cfg: ConfigDict,
+                                rescale: bool = False,
+                                with_nms: bool = True) -> InstanceData:
+        """Transform a single image's features extracted from the head into
+        bbox results.
+
+        Args:
+            cls_score_list (list[Tensor]): Box scores from all scale
+                levels of a single image, each item has shape
+                (num_priors * num_classes, H, W).
+            bbox_pred_list (list[Tensor]): Box energies / deltas from
+                all scale levels of a single image, each item has shape
+                (num_priors * 5, H, W).
+            score_factor_list (list[Tensor]): Score factor from all scale
+                levels of a single image, each item has shape
+                (num_priors * 1, H, W).
+            mlvl_priors (list[Tensor]): Each element in the list is
+                the priors of a single level in feature pyramid. In all
+                anchor-based methods, it has shape (num_priors, 5). In
+                all anchor-free methods, it has shape (num_priors, 2)
+                when `with_stride=True`, otherwise it still has shape
+                (num_priors, 5).
+            img_meta (dict): Image meta info.
+            cfg (mmengine.Config): Test / postprocessing configuration,
+                if None, test_cfg would be used.
+            rescale (bool): If True, return boxes in original image space.
+                Defaults to False.
+            with_nms (bool): If True, do nms before return boxes.
+                Defaults to True.
+
+        Returns:
+            :obj:`InstanceData`: Detection results of each image
+            after the post process.
+            Each item usually contains following keys.
+
+                - scores (Tensor): Classification scores, has a shape
+                  (num_instance, )
+                - labels (Tensor): Labels of bboxes, has a shape
+                  (num_instances, ).
+                - bboxes (Tensor): Has a shape (num_instances, 4),
+                  the last dimension 4 arrange as (x1, y1, x2, y2).
+        """
+        if score_factor_list[0] is None:
+            # e.g. Retina, FreeAnchor, etc.
+            with_score_factors = False
+        else:
+            # e.g. FCOS, PAA, ATSS, etc.
+            with_score_factors = True
+
+        cfg = self.test_cfg if cfg is None else cfg
+        cfg = copy.deepcopy(cfg)
+        img_shape = img_meta['img_shape']
+        nms_pre = cfg.get('nms_pre', -1)
+
+        mlvl_bbox_preds = []
+        mlvl_valid_priors = []
+        mlvl_scores = []
+        mlvl_labels = []
+        if with_score_factors:
+            mlvl_score_factors = []
+        else:
+            mlvl_score_factors = None
+        for level_idx, (cls_score, bbox_pred, score_factor, priors) in \
+                enumerate(zip(cls_score_list, bbox_pred_list,
+                              score_factor_list, mlvl_priors)):
+
+            assert cls_score.size()[-2:] == bbox_pred.size()[-2:]
+
+            bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, 5)
+            if with_score_factors:
+                score_factor = score_factor.permute(1, 2,
+                                                    0).reshape(-1).sigmoid()
+            cls_score = cls_score.permute(1, 2,
+                                          0).reshape(-1, self.cls_out_channels)
+            if self.use_sigmoid_cls:
+                scores = cls_score.sigmoid()
+            else:
+                # remind that we set FG labels to [0, num_class-1]
+                # since mmdet v2.0
+                # BG cat_id: num_class
+                scores = cls_score.softmax(-1)[:, :-1]
+
+            # After https://github.com/open-mmlab/mmdetection/pull/6268/,
+            # this operation keeps fewer bboxes under the same `nms_pre`.
+            # There is no difference in performance for most models. If you
+            # find a slight drop in performance, you can set a larger
+            # `nms_pre` than before.
+            score_thr = cfg.get('score_thr', 0)
+
+            results = filter_scores_and_topk(
+                scores, score_thr, nms_pre,
+                dict(bbox_pred=bbox_pred, priors=priors))
+            scores, labels, keep_idxs, filtered_results = results
+
+            bbox_pred = filtered_results['bbox_pred']
+            priors = filtered_results['priors']
+
+            if with_score_factors:
+                score_factor = score_factor[keep_idxs]
+
+            mlvl_bbox_preds.append(bbox_pred)
+            mlvl_valid_priors.append(priors)
+            mlvl_scores.append(scores)
+            mlvl_labels.append(labels)
+
+            if with_score_factors:
+                mlvl_score_factors.append(score_factor)
+
+        bbox_pred = torch.cat(mlvl_bbox_preds)
+        priors = torch.cat(mlvl_valid_priors)
+        bboxes = self.bbox_coder.decode(priors, bbox_pred, max_shape=img_shape)
+
+        results = InstanceData()
+        results.bboxes = bboxes
+        results.scores = torch.cat(mlvl_scores)
+        results.labels = torch.cat(mlvl_labels)
+        if with_score_factors:
+            results.score_factors = torch.cat(mlvl_score_factors)
+
+        return self._bbox_post_process(
+            results=results,
+            cfg=cfg,
+            rescale=rescale,
+            with_nms=with_nms,
+            img_meta=img_meta)
+
     def _bbox_post_process(self,
                            results: InstanceData,
                            cfg: ConfigDict,
@@ -218,7 +351,7 @@ class RotatedAnchorHead(AnchorHead):
             assert img_meta.get('scale_factor') is not None
             # angle should not be rescaled
             results.bboxes[:, :4] /= results.bboxes.new_tensor(
-                img_meta['scale_factor'])
+                img_meta['scale_factor']).repeat((1, 2))
 
         if hasattr(results, 'score_factors'):
             # TODO： Add sqrt operation in order to be consistent with
