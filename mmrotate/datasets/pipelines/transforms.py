@@ -4,15 +4,14 @@ import copy
 import cv2
 import mmcv
 import numpy as np
-from mmdet.datasets.pipelines.transforms import (Mosaic, RandomCrop,
-                                                 RandomFlip, Resize)
+from mmdet.datasets.transforms import Mosaic, RandomCrop, RandomFlip, Resize
 from numpy import random
 
 from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
-from ..builder import ROTATED_PIPELINES
+from mmrotate.registry import TRANSFORMS
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RResize(Resize):
     """Resize images & rotated bbox Inherit Resize pipeline class to handle
     rotated bboxes.
@@ -46,7 +45,7 @@ class RResize(Resize):
             results[key] = bboxes.reshape(orig_shape)
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RRandomFlip(RandomFlip):
     """
 
@@ -96,7 +95,7 @@ class RRandomFlip(RandomFlip):
         return flipped.reshape(orig_shape)
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class PolyRandomRotate(object):
     """Rotate img & bbox.
     Reference: https://github.com/hukaixuan19970627/OrientedRepPoints_DOTA
@@ -269,7 +268,7 @@ class PolyRandomRotate(object):
         return repr_str
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RRandomCrop(RandomCrop):
     """Random crop the image & bboxes.
 
@@ -368,7 +367,7 @@ class RRandomCrop(RandomCrop):
         return results
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class RMosaic(Mosaic):
     """Rotate Mosaic augmentation. Inherit from
     `mmdet.datasets.pipelines.transforms.Mosaic`.

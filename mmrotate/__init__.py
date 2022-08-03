@@ -65,6 +65,6 @@ assert (mmdet_version >= digit_version(mmdet_minimum_version)
     f'MMDetection {mmdet.__version__} is incompatible ' \
     f'with MMRotate {__version__}. ' \
     f'Please use MMDetection >= {mmdet_minimum_version}, ' \
-    f'<= {mmdet_maximum_version} instead.'
+    f'< {mmdet_maximum_version} instead.'
 
 __all__ = ['__version__', 'short_version', 'digit_version']

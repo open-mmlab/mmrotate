@@ -1,17 +1,22 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 from mmcv.utils import to_2tuple
-from mmdet.core.anchor import AnchorGenerator
+from mmdet.models.task_modules import AnchorGenerator
 
-from .builder import ROTATED_ANCHOR_GENERATORS
+from mmrotate.registry import TASK_UTILS
+from ..bbox import hbb2obb
 
 
-@ROTATED_ANCHOR_GENERATORS.register_module()
-class RotatedAnchorGenerator(AnchorGenerator):
+@TASK_UTILS.register_module()
+class FakeRotatedAnchorGenerator(AnchorGenerator):
     """Fake rotate anchor generator for 2D anchor-based detectors.
 
     Horizontal bounding box represented by (x,y,w,h,theta).
     """
+
+    def __init__(self, angle_version='oc', **kwargs):
+        super().__init__(**kwargs)
+        self.angle_version = angle_version
 
     def single_level_grid_priors(self,
                                  featmap_size,
@@ -22,7 +27,6 @@ class RotatedAnchorGenerator(AnchorGenerator):
 
         Note:
             This function is usually called by method ``self.grid_priors``.
-
         Args:
             featmap_size (tuple[int]): Size of the feature maps.
             level_idx (int): The index of corresponding feature map level.
@@ -30,29 +34,19 @@ class RotatedAnchorGenerator(AnchorGenerator):
             ``torch.float32``.
             device (str, optional): The device the tensor will be put on.
             Defaults to 'cuda'.
-
         Returns:
             torch.Tensor: Anchors in the overall feature maps.
         """
-        anchors = super(RotatedAnchorGenerator, self).single_level_grid_priors(
+        anchors = super().single_level_grid_priors(
             featmap_size, level_idx, dtype=dtype, device=device)
 
-        # The correct usage is：
-        #       from ..bbox.transforms import hbb2obb
-        #       anchors = hbb2obb(anchors, self.angle_version)
-        # instead of rudely setting the angle to all 0.
-        # However, the experiment shows that the performance has decreased.
-        num_anchors = anchors.size(0)
-        xy = (anchors[:, 2:] + anchors[:, :2]) / 2
-        wh = anchors[:, 2:] - anchors[:, :2]
-        theta = xy.new_zeros((num_anchors, 1))
-        anchors = torch.cat([xy, wh, theta], axis=1)
+        anchors = hbb2obb(anchors, self.angle_version)
 
         return anchors
 
 
-@ROTATED_ANCHOR_GENERATORS.register_module()
-class PseudoAnchorGenerator(AnchorGenerator):
+@TASK_UTILS.register_module()
+class PseudoRotatedAnchorGenerator(AnchorGenerator):
     """Non-Standard pseudo anchor generator that is used to generate valid
     flags only!"""
 

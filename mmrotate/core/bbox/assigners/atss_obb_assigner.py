@@ -1,15 +1,14 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 from mmcv.ops import points_in_polygons
-from mmdet.core.bbox.assigners.assign_result import AssignResult
-from mmdet.core.bbox.assigners.base_assigner import BaseAssigner
+from mmdet.models.task_modules.assigners.assign_result import AssignResult
+from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
 
-from ..builder import ROTATED_BBOX_ASSIGNERS
-from ..iou_calculators import build_iou_calculator
+from mmrotate.registry import TASK_UTILS
 from ..transforms import obb2poly
 
 
-@ROTATED_BBOX_ASSIGNERS.register_module()
+@TASK_UTILS.register_module()
 class ATSSObbAssigner(BaseAssigner):
     """Assign a corresponding gt bbox or background to each bbox.
 
@@ -29,7 +28,7 @@ class ATSSObbAssigner(BaseAssigner):
                  iou_calculator=dict(type='RBboxOverlaps2D')):
         self.topk = topk
         self.angle_version = angle_version
-        self.iou_calculator = build_iou_calculator(iou_calculator)
+        self.iou_calculator = TASK_UTILS.build(iou_calculator)
 
     def assign(self,
                bboxes,

@@ -1,7 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from .assigners import (ATSSKldAssigner, ATSSObbAssigner, ConvexAssigner,
                         MaxConvexIoUAssigner, SASAssigner)
-from .builder import build_assigner, build_bbox_coder, build_sampler
 from .coder import (CSLCoder, DeltaXYWHAHBBoxCoder, DeltaXYWHAOBBoxCoder,
                     GVFixCoder, GVRatioCoder, MidpointOffsetCoder)
 from .iou_calculators import RBboxOverlaps2D, rbbox_overlaps
@@ -19,6 +18,5 @@ __all__ = [
     'DeltaXYWHAHBBoxCoder', 'MidpointOffsetCoder', 'GVFixCoder',
     'GVRatioCoder', 'ConvexAssigner', 'MaxConvexIoUAssigner', 'SASAssigner',
     'ATSSKldAssigner', 'gaussian2bbox', 'gt2gaussian', 'GaussianMixture',
-    'build_assigner', 'build_bbox_coder', 'build_sampler', 'bbox_mapping_back',
-    'CSLCoder', 'ATSSObbAssigner'
+    'bbox_mapping_back', 'CSLCoder', 'ATSSObbAssigner'
 ]

@@ -1,12 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import mmcv
 import numpy as np
-from mmdet.datasets.pipelines import LoadImageFromFile
+from mmcv.transforms import LoadImageFromFile
 
-from ..builder import ROTATED_PIPELINES
+from mmrotate.registry import TRANSFORMS
 
 
-@ROTATED_PIPELINES.register_module()
+@TRANSFORMS.register_module()
 class LoadPatchFromImage(LoadImageFromFile):
     """Load an patch from the huge image.
 

@@ -6,10 +6,12 @@ import mmcv
 import numpy as np
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Polygon
-from mmdet.core.visualization import palette_val
-from mmdet.core.visualization.image import draw_labels, draw_masks
+from mmdet.visualization import palette_val
 
 from mmrotate.core.visualization.palette import get_palette
+
+# TODO: refactor visualization
+# from mmdet.core.visualization.image import draw_labels, draw_masks
 
 EPS = 1e-2
 
@@ -20,7 +22,6 @@ def _get_adaptive_scales(areas, min_area=800, max_area=30000):
     The scale range is [0.5, 1.0]. When the area is less than
     ``'min_area'``, the scale is 0.5 while the area is larger than
     ``'max_area'``, the scale is 1.0.
-
     Args:
         areas (ndarray): The areas of bboxes or masks with the
             shape of (n, ).
@@ -28,7 +29,6 @@ def _get_adaptive_scales(areas, min_area=800, max_area=30000):
             Default: 800.
         max_area (int): Upper bound areas for adaptive scales.
             Default: 30000.
-
     Returns:
         ndarray: The adaotive scales with the shape of (n, ).
     """
@@ -48,7 +48,6 @@ def draw_rbboxes(ax, bboxes, color='g', alpha=0.8, thickness=2):
             bounding boxes.
         alpha (float): Transparency of bounding boxes. Default: 0.8.
         thickness (int): Thickness of lines. Default: 2.
-
     Returns:
         matplotlib.Axes: The result axes.
     """
@@ -116,7 +115,6 @@ def imshow_det_rbboxes(img,
         wait_time (float): Value of waitKey param. Default: 0.
         out_file (str, optional): The filename to write the image.
             Default: None.
-
     Returns:
         ndarray: The image with bboxes drawn on it.
     """
@@ -162,8 +160,8 @@ def imshow_det_rbboxes(img,
     ax.axis('off')
 
     max_label = int(max(labels) if len(labels) > 0 else 0)
-    text_palette = palette_val(get_palette(text_color, max_label + 1))
-    text_colors = [text_palette[label] for label in labels]
+    # text_palette = palette_val(get_palette(text_color, max_label + 1))
+    # text_colors = [text_palette[label] for label in labels]
 
     num_bboxes = 0
     if bboxes is not None:
@@ -172,31 +170,31 @@ def imshow_det_rbboxes(img,
         colors = [bbox_palette[label] for label in labels[:num_bboxes]]
         draw_rbboxes(ax, bboxes, colors, alpha=0.8, thickness=thickness)
 
-        horizontal_alignment = 'left'
+        # horizontal_alignment = 'left'
         positions = bboxes[:, :2].astype(np.int32) + thickness
         areas = bboxes[:, 2] * bboxes[:, 3]
-        scales = _get_adaptive_scales(areas)
+        # scales = _get_adaptive_scales(areas)
         scores = bboxes[:, 5] if bboxes.shape[1] == 6 else None
-        draw_labels(
-            ax,
-            labels[:num_bboxes],
-            positions,
-            scores=scores,
-            class_names=class_names,
-            color=text_colors,
-            font_size=font_size,
-            scales=scales,
-            horizontal_alignment=horizontal_alignment)
+        # draw_labels(
+        #     ax,
+        #     labels[:num_bboxes],
+        #     positions,
+        #     scores=scores,
+        #     class_names=class_names,
+        #     color=text_colors,
+        #     font_size=font_size,
+        #     scales=scales,
+        #     horizontal_alignment=horizontal_alignment)
 
     if segms is not None:
         mask_palette = get_palette(mask_color, max_label + 1)
         colors = [mask_palette[label] for label in labels]
         colors = np.array(colors, dtype=np.uint8)
-        draw_masks(ax, img, segms, colors, with_edge=True)
+        # draw_masks(ax, img, segms, colors, with_edge=True)
 
         if num_bboxes < segms.shape[0]:
             segms = segms[num_bboxes:]
-            horizontal_alignment = 'center'
+            # horizontal_alignment = 'center'
             areas = []
             positions = []
             for mask in segms:
@@ -206,16 +204,16 @@ def imshow_det_rbboxes(img,
                 positions.append(centroids[largest_id])
                 areas.append(stats[largest_id, -1])
             areas = np.stack(areas, axis=0)
-            scales = _get_adaptive_scales(areas)
-            draw_labels(
-                ax,
-                labels[num_bboxes:],
-                positions,
-                class_names=class_names,
-                color=text_colors,
-                font_size=font_size,
-                scales=scales,
-                horizontal_alignment=horizontal_alignment)
+            # scales = _get_adaptive_scales(areas)
+            # draw_labels(
+            #     ax,
+            #     labels[num_bboxes:],
+            #     positions,
+            #     class_names=class_names,
+            #     color=text_colors,
+            #     font_size=font_size,
+            #     scales=scales,
+            #     horizontal_alignment=horizontal_alignment)
 
     plt.imshow(img)
 
