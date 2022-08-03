@@ -54,7 +54,7 @@ class DOTADataset(BaseDataset):
                    for i, c in enumerate(self.metainfo['CLASSES'])
                    }  # in mmdet v2.0 label is 0-based
         data_list = []
-        if self.ann_file is None:
+        if self.ann_file == '':
             img_files = glob.glob(self.data_prefix['img_path'] + '/*.png')
             for img_path in img_files:
                 data_info = {}
