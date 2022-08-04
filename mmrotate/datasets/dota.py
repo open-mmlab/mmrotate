@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import glob
 import os.path as osp
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 from mmengine.dataset import BaseDataset
 
