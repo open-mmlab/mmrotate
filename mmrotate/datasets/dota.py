@@ -3,10 +3,7 @@ import glob
 import os.path as osp
 from typing import List, Optional
 
-import mmcv
-import numpy as np
 from mmengine.dataset import BaseDataset
-from mmengine.fileio import FileClient
 
 from mmrotate.registry import DATASETS
 
@@ -16,10 +13,9 @@ class DOTADataset(BaseDataset):
     """DOTA dataset for detection.
 
     Args:
-        diff_thr (int): The difficulty threshold of ground truth.
-        file_client_args (dict): Arguments to instantiate a FileClient.
-            See :class:`mmengine.fileio.FileClient` for details.
-            Defaults to ``dict(backend='disk')``.
+        diff_thr (int): The difficulty threshold of ground truth. Bboxes
+        with difficulty higher than it will be ignored. The range of this
+        value should be non-negative integer. Defaults to 100.
     """
 
     METAINFO = {
@@ -36,13 +32,8 @@ class DOTADataset(BaseDataset):
                     (147, 116, 116), (0, 0, 255)]
     }
 
-    def __init__(self,
-                 diff_thr=100,
-                 file_client_args: dict = dict(backend='disk'),
-                 **kwargs) -> None:
+    def __init__(self, diff_thr=100, **kwargs) -> None:
         self.diff_thr = diff_thr
-        self.file_client_args = file_client_args
-        self.file_client = FileClient(**file_client_args)
         super().__init__(**kwargs)
 
     def load_data_list(self) -> List[dict]:
@@ -55,21 +46,15 @@ class DOTADataset(BaseDataset):
                    }  # in mmdet v2.0 label is 0-based
         data_list = []
         if self.ann_file == '':
-            img_files = glob.glob(self.data_prefix['img_path'] + '/*.png')
+            img_files = glob.glob(
+                osp.join(self.data_prefix['img_path'], '*.png'))
             for img_path in img_files:
                 data_info = {}
-                img_id = osp.split(self.ann_file)[1][:-4]
-                img_name = img_id + '.png'
-                data_info['file_name'] = img_name
                 data_info['img_path'] = img_path
-                data_info['img_id'] = osp.split(img_path)[1]
-
-                img_bytes = self.file_client.get(img_path)
-                img = mmcv.imfrombytes(img_bytes, backend='cv2')
-                width, height = img.shape[:2]
-                del img, img_bytes
-                data_info['height'] = height
-                data_info['width'] = width
+                img_name = osp.split(img_path)[1]
+                data_info['file_name'] = img_name
+                img_id = img_name[:-4]
+                data_info['img_id'] = img_id
 
                 instances = []
                 instance = {}
@@ -82,7 +67,7 @@ class DOTADataset(BaseDataset):
 
             return data_list
         else:
-            txt_files = glob.glob(self.ann_file + '/*.txt')
+            txt_files = glob.glob(osp.join(self.ann_file, '*.txt'))
             if len(txt_files) == 0:
                 raise ValueError('There is no txt file in ' f'{self.ann_file}')
             for txt_file in txt_files:
@@ -93,12 +78,6 @@ class DOTADataset(BaseDataset):
                 data_info['file_name'] = img_name
                 data_info['img_path'] = osp.join(self.data_prefix['img_path'],
                                                  img_name)
-                img_bytes = self.file_client.get(data_info['img_path'])
-                img = mmcv.imfrombytes(img_bytes, backend='cv2')
-                width, height = img.shape[:2]
-                del img, img_bytes
-                data_info['height'] = height
-                data_info['width'] = width
 
                 instances = []
                 with open(txt_file) as f:
@@ -106,8 +85,7 @@ class DOTADataset(BaseDataset):
                     for si in s:
                         instance = {}
                         bbox_info = si.split()
-                        instance['bbox'] = np.array(
-                            bbox_info[:8], dtype=np.float32)
+                        instance['bbox'] = [float(i) for i in bbox_info[:8]]
                         cls_name = bbox_info[8]
                         instance['bbox_label'] = cls_map[cls_name]
                         difficulty = int(bbox_info[9])
@@ -140,17 +118,12 @@ class DOTADataset(BaseDataset):
 
         filter_empty_gt = self.filter_cfg.get('filter_empty_gt', False) \
             if self.filter_cfg is not None else False
-        min_size = self.filter_cfg.get('min_size', 0) \
-            if self.filter_cfg is not None else 0
 
         valid_data_infos = []
         for i, data_info in enumerate(self.data_list):
-            width = data_info['width']
-            height = data_info['height']
             if filter_empty_gt and len(data_info['instances']) == 0:
                 continue
-            if min(width, height) >= min_size:
-                valid_data_infos.append(data_info)
+            valid_data_infos.append(data_info)
 
         return valid_data_infos
 
