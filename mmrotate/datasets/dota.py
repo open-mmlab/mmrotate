@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import glob
 import os.path as osp
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from mmengine.dataset import BaseDataset
 
@@ -13,6 +13,9 @@ class DOTADataset(BaseDataset):
     """DOTA dataset for detection.
 
     Args:
+        img_shape (tuple[int]): The shape of images. Due to the huge size
+            of the remote sensing image, we will cut it into slices with
+            the same shape. Defaults to (1024, 1024).
         diff_thr (int): The difficulty threshold of ground truth. Bboxes
         with difficulty higher than it will be ignored. The range of this
         value should be non-negative integer. Defaults to 100.
@@ -32,7 +35,11 @@ class DOTADataset(BaseDataset):
                     (147, 116, 116), (0, 0, 255)]
     }
 
-    def __init__(self, diff_thr=100, **kwargs) -> None:
+    def __init__(self,
+                 img_shape: Tuple[int, int] = (1024, 1024),
+                 diff_thr: int = 100,
+                 **kwargs) -> None:
+        self.img_shape = img_shape
         self.diff_thr = diff_thr
         super().__init__(**kwargs)
 
@@ -55,6 +62,8 @@ class DOTADataset(BaseDataset):
                 data_info['file_name'] = img_name
                 img_id = img_name[:-4]
                 data_info['img_id'] = img_id
+                data_info['height'] = self.img_shape[0]
+                data_info['width'] = self.img_shape[1]
 
                 instances = []
                 instance = {}
@@ -78,6 +87,8 @@ class DOTADataset(BaseDataset):
                 data_info['file_name'] = img_name
                 data_info['img_path'] = osp.join(self.data_prefix['img_path'],
                                                  img_name)
+                data_info['height'] = self.img_shape[0]
+                data_info['width'] = self.img_shape[1]
 
                 instances = []
                 with open(txt_file) as f:
@@ -98,14 +109,6 @@ class DOTADataset(BaseDataset):
                 data_list.append(data_info)
 
             return data_list
-
-    @property
-    def bbox_min_size(self) -> Optional[str]:
-        """Return the minimum size of bounding boxes in the images."""
-        if self.filter_cfg is not None:
-            return self.filter_cfg.get('bbox_min_size', None)
-        else:
-            return None
 
     def filter_data(self) -> List[dict]:
         """Filter annotations according to filter_cfg.
