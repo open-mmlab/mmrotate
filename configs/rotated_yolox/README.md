@@ -26,7 +26,7 @@ scenes, and we also provide deploy versions with ONNX, TensorRT, NCNN, and Openv
 |    Backbone     |    Bbox Loss Type    |    Size     |  mAP  | FPS  |                      Config                       | Download |
 | :-------------: | :------------------: | :---------: | :---: | :--: | :-----------------------------------------------: | :------: |
 | Rotated YOLOX-s |     Rotated IoU      | (1024,1024) | 74.36 | 53.1 |   [config](./rotated_yolox_s_300e_dota_le90.py)   |    -     |
-| Rotated YOLOX-s | Horizontal IoU + CSL | (1024,1024) |   -   |  -   | [config](./rotated_yolox_s_csl_300e_dota_le90.py) |    -     |
+| Rotated YOLOX-s | Horizontal IoU + CSL | (1024,1024) | 74.71 | 46.8 | [config](./rotated_yolox_s_csl_300e_dota_le90.py) |    -     |
 | Rotated YOLOX-s |         KLD          | (1024,1024) |   -   |  -   | [config](./rotated_yolox_s_kld_300e_dota_le90.py) |    -     |
 
 **Note**:
