@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-"""MMRotate provides 17 registry nodes to support using modules across
+"""MMRotate provides 18 registry nodes to support using modules across
 projects.
 
 Each node is a child of the root registry in MMEngine.
@@ -10,6 +10,7 @@ https://mmengine.readthedocs.io/en/latest/tutorials/registry.html.
 from mmengine.registry import DATA_SAMPLERS as MMENGINE_DATA_SAMPLERS
 from mmengine.registry import DATASETS as MMENGINE_DATASETS
 from mmengine.registry import HOOKS as MMENGINE_HOOKS
+from mmengine.registry import LOG_PROCESSORS as MMENGINE_LOG_PROCESSORS
 from mmengine.registry import LOOPS as MMENGINE_LOOPS
 from mmengine.registry import METRICS as MMENGINE_METRICS
 from mmengine.registry import MODEL_WRAPPERS as MMENGINE_MODEL_WRAPPERS
@@ -70,3 +71,6 @@ TASK_UTILS = Registry('task util', parent=MMENGINE_TASK_UTILS)
 VISUALIZERS = Registry('visualizer', parent=MMENGINE_VISUALIZERS)
 # manage visualizer backend
 VISBACKENDS = Registry('vis_backend', parent=MMENGINE_VISBACKENDS)
+
+# manage logprocessor
+LOG_PROCESSORS = Registry('log_processor', parent=MMENGINE_LOG_PROCESSORS)
