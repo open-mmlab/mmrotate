@@ -12,6 +12,10 @@ from mmrotate.registry import DATASETS
 class DOTADataset(BaseDataset):
     """DOTA dataset for detection.
 
+    Note: ``ann_file`` in DOTADataset is different from the BaseDataset.
+    In BaseDataset, it is the path of an annotation file. In DOTADataset,
+    it is the path of a folder containing XML files.
+
     Args:
         img_shape (tuple[int]): The shape of images. Due to the huge size
             of the remote sensing image, we will cut it into slices with
@@ -65,13 +69,8 @@ class DOTADataset(BaseDataset):
                 data_info['height'] = self.img_shape[0]
                 data_info['width'] = self.img_shape[1]
 
-                instances = []
-                instance = {}
-                instance['bbox'] = []
-                instance['bbox_label'] = []
-                instance['ignore_flag'] = 0
-                instances.append(instance)
-                data_info['instances'] = instances
+                instance = dict(bbox=[], bbox_label=[], ignore_flag=0)
+                data_info['instances'] = [instance]
                 data_list.append(data_info)
 
             return data_list
