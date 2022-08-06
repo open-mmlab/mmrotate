@@ -232,14 +232,15 @@ class DOTAMetric(BaseMetric):
         for data, pred in zip(data_batch, predictions):
             gt = copy.deepcopy(data['data_sample'])
             gt_instances = gt['gt_instances']
-            if gt_instances == {}:
-                raise Exception('Cannot find ground truths.')
             gt_ignore_instances = gt['ignored_instances']
-            ann = dict(
-                labels=gt_instances['labels'].cpu().numpy(),
-                bboxes=gt_instances['bboxes'].cpu().numpy(),
-                bboxes_ignore=gt_ignore_instances['bboxes'].cpu().numpy(),
-                labels_ignore=gt_ignore_instances['labels'].cpu().numpy())
+            if gt_instances == {}:
+                ann = dict()
+            else:
+                ann = dict(
+                    labels=gt_instances['labels'].cpu().numpy(),
+                    bboxes=gt_instances['bboxes'].cpu().numpy(),
+                    bboxes_ignore=gt_ignore_instances['bboxes'].cpu().numpy(),
+                    labels_ignore=gt_ignore_instances['labels'].cpu().numpy())
             result = dict()
             pred = pred['pred_instances']
             result['img_id'] = data['data_sample']['img_id']
