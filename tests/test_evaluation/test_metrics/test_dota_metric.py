@@ -32,7 +32,7 @@ class TestDOTAMetric(unittest.TestCase):
         bboxes_ignore = np.array([[0] * 5])
         labels_ignore = np.array([0])
         return dict(
-            img_id='0',
+            img_id='P2805__1024__0___0',
             gt_instances=dict(
                 bboxes=torch.from_numpy(bboxes),
                 labels=torch.from_numpy(labels)),
@@ -87,7 +87,7 @@ class TestDOTAMetric(unittest.TestCase):
 
         metric = DOTAMetric(
             format_only=True, outfile_prefix=f'{self.tmp_dir.name}/test')
-        metric.dataset_meta = dict(CLASSES=('plane', 'ship'))
+        metric.dataset_meta = dict(CLASSES=('plane', ))
         metric.process(
             data_batch=[
                 dict(
@@ -97,3 +97,19 @@ class TestDOTAMetric(unittest.TestCase):
         eval_results = metric.evaluate(size=1)
         self.assertDictEqual(eval_results, dict())
         self.assertTrue(osp.exists(f'{self.tmp_dir.name}/test.bbox.json'))
+
+    def test_merge_patches(self):
+        metric = DOTAMetric(
+            format_only=True,
+            merge_patches=True,
+            outfile_prefix=f'{self.tmp_dir.name}/Task1')
+        metric.dataset_meta = dict(CLASSES=('plane', ))
+        metric.process(
+            data_batch=[
+                dict(
+                    inputs=None, data_sample=self._create_dummy_data_sample())
+            ],
+            predictions=[dict(pred_instances=self._create_dummy_results())])
+        eval_results = metric.evaluate(size=1)
+        self.assertDictEqual(eval_results, dict())
+        self.assertTrue(osp.exists(f'{self.tmp_dir.name}/Task1/Task1.zip'))

@@ -1,16 +1,21 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
+import os
 import os.path as osp
+import re
 import tempfile
+import zipfile
 from collections import OrderedDict
 from typing import List, Optional, Sequence, Union
 
 import numpy as np
+import torch
+from mmcv.ops import nms_rotated
 from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
 
-from mmrotate.core import eval_rbbox_map
+from mmrotate.core import eval_rbbox_map, obb2poly_np
 from mmrotate.registry import METRICS
 
 
@@ -31,11 +36,16 @@ class DOTAMetric(BaseMetric):
             Default: (100, 300, 1000).
         format_only (bool): Format the output results without perform
             evaluation. It is useful when you want to format the result
-            to a specific format and submit it to the test server.
-            Defaults to False.
-        outfile_prefix (str, optional): The prefix of ZIP files. It includes
-            the file path and the prefix of filename, e.g., "a/b/prefix".
-            If not specified, a temp file will be created. Defaults to None.
+            to a specific format. Defaults to False.
+        outfile_prefix (str, optional): The prefix of json/zip files. It
+            includes the file path and the prefix of filename, e.g.,
+            "a/b/prefix". If not specified, a temp file will be created.
+            Defaults to None.
+        merge_patches (bool): Generate the full image's results by merging
+            patches' results.
+        iou_thr (float): IoU threshold of ``nms_rotated`` used in merge
+            patches. Defaults to 0.1.
+        version (str): Angle representations. Defaults to 'oc'.
         collect_device (str): Device name used for collecting results from
             different ranks during distributed training. Must be 'cpu' or
             'gpu'. Defaults to 'cpu'.
@@ -54,6 +64,9 @@ class DOTAMetric(BaseMetric):
                  proposal_nums: Sequence[int] = (100, 300, 1000),
                  format_only: bool = False,
                  outfile_prefix: Optional[str] = None,
+                 merge_patches: bool = False,
+                 iou_thr: float = 0.1,
+                 version: str = 'oc',
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None) -> None:
         super().__init__(collect_device=collect_device, prefix=prefix)
@@ -79,6 +92,88 @@ class DOTAMetric(BaseMetric):
             'be saved to a temp directory which will be cleaned up at the end.'
 
         self.outfile_prefix = outfile_prefix
+        self.merge_patches = merge_patches
+        self.iou_thr = iou_thr
+        self.version = version
+
+    def merge_results(self, results: Sequence[dict],
+                      outfile_prefix: str) -> str:
+        """Merge patches' predictions into full image's results and generate a
+        zip file for DOTA online evaluation.
+
+        You can submit it at:
+        https://captain-whu.github.io/DOTA/evaluation.html
+
+        Args:
+            results (Sequence[dict]): Testing results of the
+                dataset.
+            outfile_prefix (str): The filename prefix of the zip files. If the
+                prefix is "somepath/xxx", the zip files will be named
+                "somepath/xxx/xxx.zip".
+        """
+        id_list, dets_list = [], []
+        for idx, result in enumerate(results):
+            img_id = result.get('img_id', idx)
+            splitname = img_id.split('__')
+            oriname = splitname[0]
+            pattern1 = re.compile(r'__\d+___\d+')
+            x_y = re.findall(pattern1, img_id)
+            x_y_2 = re.findall(r'\d+', x_y[0])
+            x, y = int(x_y_2[0]), int(x_y_2[1])
+            labels = result['labels']
+            bboxes = result['bboxes']
+            scores = result['scores']
+            ori_bboxes = bboxes.copy()
+            ori_bboxes[..., :2] = ori_bboxes[..., :2] + np.array(
+                [x, y], dtype=np.float32)
+            dets = np.concatenate([ori_bboxes, scores[:, np.newaxis]], axis=1)
+            big_img_results = []
+            for i in range(len(self.dataset_meta['CLASSES'])):
+                if len(dets[labels == i]) == 0:
+                    big_img_results.append(dets[labels == i])
+                else:
+                    try:
+                        cls_dets = torch.from_numpy(dets[labels == i]).cuda()
+                    except:  # noqa: E722
+                        cls_dets = torch.from_numpy(dets[labels == i])
+                    nms_dets, keep_inds = nms_rotated(cls_dets[:, :5],
+                                                      cls_dets[:, -1],
+                                                      self.iou_thr)
+                    big_img_results.append(nms_dets.cpu().numpy())
+            id_list.append(oriname)
+            dets_list.append(big_img_results)
+
+        if osp.exists(outfile_prefix):
+            raise ValueError(f'The outfile_prefix should be a non-exist path, '
+                             f'but {outfile_prefix} is existing. '
+                             f'Please delete it firstly.')
+        os.makedirs(outfile_prefix)
+
+        files = [
+            osp.join(outfile_prefix, 'Task1_' + cls + '.txt')
+            for cls in self.dataset_meta['CLASSES']
+        ]
+        file_objs = [open(f, 'w') for f in files]
+        for img_id, dets_per_cls in zip(id_list, dets_list):
+            for f, dets in zip(file_objs, dets_per_cls):
+                if dets.size == 0:
+                    continue
+                bboxes = obb2poly_np(dets, self.version)
+                for bbox in bboxes:
+                    txt_element = [img_id, str(bbox[-1])
+                                   ] + [f'{p:.2f}' for p in bbox[:-1]]
+                    f.writelines(' '.join(txt_element) + '\n')
+
+        for f in file_objs:
+            f.close()
+
+        target_name = osp.split(outfile_prefix)[-1]
+        zip_path = osp.join(outfile_prefix, target_name + '.zip')
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as t:
+            for f in files:
+                t.write(f, osp.split(f)[-1])
+
+        return zip_path
 
     def results2json(self, results: Sequence[dict],
                      outfile_prefix: str) -> dict:
@@ -112,7 +207,7 @@ class DOTAMetric(BaseMetric):
                 data['image_id'] = image_id
                 data['bbox'] = bboxes[i].tolist()
                 data['score'] = float(scores[i])
-                data['category_id'] = int(labels[i])
+                data['category_id'] = int(label)
                 bbox_json_results.append(data)
 
         result_files = dict()
@@ -182,14 +277,19 @@ class DOTAMetric(BaseMetric):
         else:
             outfile_prefix = self.outfile_prefix
 
-        # convert predictions to coco format and dump to json file
-        _ = self.results2json(preds, outfile_prefix)
-
         eval_results = OrderedDict()
-        if self.format_only:
-            logger.info('results are saved in '
-                        f'{osp.dirname(outfile_prefix)}')
+        if self.merge_patches:
+            # convert predictions to txt format and dump to zip file
+            zip_path = self.merge_results(preds, outfile_prefix)
+            logger.info(f'The submission file save at {zip_path}')
             return eval_results
+        else:
+            # convert predictions to coco format and dump to json file
+            _ = self.results2json(preds, outfile_prefix)
+            if self.format_only:
+                logger.info('results are saved in '
+                            f'{osp.dirname(outfile_prefix)}')
+                return eval_results
 
         if self.metric == 'mAP':
             assert isinstance(self.iou_thrs, list)
