@@ -7,8 +7,9 @@ from typing import List, Optional, Sequence, Union
 
 import numpy as np
 from mmengine.evaluator import BaseMetric
-from mmengine.logging import MMLogger
 from mmengine.fileio import dump
+from mmengine.logging import MMLogger
+
 from mmrotate.core import eval_rbbox_map
 from mmrotate.registry import METRICS
 
@@ -76,7 +77,7 @@ class DOTAMetric(BaseMetric):
             assert outfile_prefix is not None, 'outfile_prefix must be not'
             'None when format_only is True, otherwise the result files will'
             'be saved to a temp directory which will be cleaned up at the end.'
-        
+
         self.outfile_prefix = outfile_prefix
 
     def results2json(self, results: Sequence[dict],
@@ -154,8 +155,10 @@ class DOTAMetric(BaseMetric):
             dets = []
             for label in range(len(self.dataset_meta['CLASSES'])):
                 index = np.where(result['labels'] == label)[0]
-                pred_bbox_scores = np.hstack(
-                    [result['bboxes'][index], result['scores'][index].reshape((-1, 1))])
+                pred_bbox_scores = np.hstack([
+                    result['bboxes'][index], result['scores'][index].reshape(
+                        (-1, 1))
+                ])
                 dets.append(pred_bbox_scores)
 
             self.results.append((ann, result, dets))
@@ -180,14 +183,14 @@ class DOTAMetric(BaseMetric):
             outfile_prefix = self.outfile_prefix
 
         # convert predictions to coco format and dump to json file
-        result_files = self.results2json(preds, outfile_prefix)
+        _ = self.results2json(preds, outfile_prefix)
 
         eval_results = OrderedDict()
         if self.format_only:
             logger.info('results are saved in '
                         f'{osp.dirname(outfile_prefix)}')
             return eval_results
-            
+
         if self.metric == 'mAP':
             assert isinstance(self.iou_thrs, list)
             dataset_name = self.dataset_meta['CLASSES']
