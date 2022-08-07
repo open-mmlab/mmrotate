@@ -5,6 +5,7 @@ from .coder import (CSLCoder, DeltaXYWHAHBBoxCoder, DeltaXYWHAOBBoxCoder,
                     GVFixCoder, GVRatioCoder, MidpointOffsetCoder)
 from .iou_calculators import RBboxOverlaps2D, rbbox_overlaps
 from .samplers import RRandomSampler
+from .structures import QuadriBoxes, RotatedBoxes
 from .transforms import (bbox_mapping_back, gaussian2bbox, gt2gaussian,
                          hbb2obb, norm_angle, obb2hbb, obb2poly, obb2poly_np,
                          obb2xyxy, poly2obb, poly2obb_np, rbbox2result,
@@ -18,5 +19,6 @@ __all__ = [
     'DeltaXYWHAHBBoxCoder', 'MidpointOffsetCoder', 'GVFixCoder',
     'GVRatioCoder', 'ConvexAssigner', 'MaxConvexIoUAssigner', 'SASAssigner',
     'ATSSKldAssigner', 'gaussian2bbox', 'gt2gaussian', 'GaussianMixture',
-    'bbox_mapping_back', 'CSLCoder', 'ATSSObbAssigner'
+    'bbox_mapping_back', 'CSLCoder', 'ATSSObbAssigner', 'RotatedBoxes',
+    'QuadriBoxes'
 ]

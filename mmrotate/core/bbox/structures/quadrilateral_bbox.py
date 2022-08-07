@@ -11,8 +11,23 @@ T = TypeVar('T')
 DeviceType = Union[str, torch.device]
 
 
-@register_bbox_mode('qbbox')
+@register_bbox_mode('qbox')
 class QuadriBoxes(BaseBoxes):
+    """The quadrilateral box class.
+
+    The ``_bbox_dim`` of ``QuadriBoxes`` is 8, which means the input should
+    have shape of (a0, a1, ..., 8). Each row of data means (x1, y1, x2, y2,
+    x3, y3, x4, y4) which are the coordinates of 4 vertices of the box.
+
+    ``QuadriBoxes`` usually works as the raw data loaded from dataset like
+    DOTA, DIOR, etc.
+
+    Args:
+        bboxes (Tensor or np.ndarray or Sequence): The box data with
+            shape (..., 8).
+        dtype (torch.dtype, Optional): data type of bboxes.
+        device (str or torch.device, Optional): device of bboxes.
+    """
 
     _bbox_dim = 8
 
@@ -86,7 +101,11 @@ class QuadriBoxes(BaseBoxes):
         return type(self)(bboxes)
 
     def clip(self: T, img_shape: Tuple[int, int]) -> T:
-        """Clip boxes according to border.
+        """Clip boxes according to the image shape.
+
+        In ``QuadriBoxes``, ``clip`` function only clones the original data,
+        because it's very tricky to handle quadrilateral boxes corssing the
+        image.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
@@ -194,7 +213,10 @@ class QuadriBoxes(BaseBoxes):
         return type(self)(bboxes)
 
     def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> torch.BoolTensor:
-        """Find bboxes as long as a part of bboxes is inside an region.
+        """Find bboxes inside the image.
+
+        In ``QuadriBoxes``, as long as the center of box is inside the
+        image, this box will be regarded as True.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.

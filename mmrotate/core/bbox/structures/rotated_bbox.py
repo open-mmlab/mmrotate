@@ -11,10 +11,84 @@ T = TypeVar('T')
 DeviceType = Union[str, torch.device]
 
 
-@register_bbox_mode('rbbox')
+@register_bbox_mode('rbox')
 class RotatedBoxes(BaseBoxes):
+    """The rotated box class used in MMRotate by default.
+
+    The ``_bbox_dim`` of ``RotatedBoxes`` is 5, which means the input should
+    have shape of (a0, a1, ..., 5). Each row of data means (x, y, w, h, t),
+    where 'x' and 'y' are the coordinates of the box center, 'w' and 'h' are
+    the length of box sides, 't' is the clock-wise angle represented in radian
+    to rotate a horizontal box (x, y, w, h).
+
+    In RotatedBoxes, we don't limit the range of the angle.
+
+
+    To get rotated boxes with a regular format, users can execute the
+    ``regular_bboxes`` function.
+
+    Args:
+        bboxes (Tensor or np.ndarray or Sequence): The box data with
+            shape (..., 5).
+        dtype (torch.dtype, Optional): data type of bboxes.
+        device (str or torch.device, Optional): device of bboxes.
+    """
 
     _bbox_dim = 5
+
+    def regularize_bboxes(self,
+                          pattern: Optional[str] = None,
+                          width_longer: bool = True,
+                          start_angle: float = -90) -> Tensor:
+        """Regularize rotated boxes.
+
+        Due to the angle periodicity, one rotated box can be represented in
+        many different (x, y, w, h, t).
+        In MMRotate, we implement three commonly used patterns:
+
+        - 'oc':
+        - 'le90':
+        - 'le135':
+
+        If the above three patterns of rotated boxes cannot meet demand.
+        Users can utilize ``width_logner`` and ``start_angle`` to custom
+        angle range.
+
+        Args:
+            pattern (str, Optional): Options of 'oc', 'le90' or 'le135'.
+                Defaults to None.
+            with_longer (bool): If True, regularized boxes widths are
+            start_angle (float):
+
+        Returns:
+            Tensor: Regularized box tensor.
+        """
+        bboxes = self.tensor
+        if pattern is not None:
+            if pattern == 'oc':
+                width_longer, start_angle = False, -90
+            elif pattern == 'le90':
+                width_longer, start_angle = True, -90
+            elif pattern == 'le135':
+                width_longer, start_angle = True, -45
+            else:
+                raise ValueError("pattern only can be 'oc', 'le90', and"
+                                 f"'le135', but get {pattern}.")
+        start_angle = start_angle / 180 * np.pi
+
+        x, y, w, h, t = bboxes.unbind(dim=-1)
+        if width_longer:
+            w_ = torch.where(w > h, w, h)
+            h_ = torch.where(w > h, h, w)
+            t = torch.where(w > h, t, t + np.pi / 2)
+            t = ((t - start_angle) % np.pi) + start_angle
+        else:
+            t = ((t - start_angle) % np.pi)
+            w_ = torch.where(t < np.pi / 2, w, h)
+            h_ = torch.where(t < np.pi / 2, h, w)
+            t = torch.where(t < np.pi / 2, t, t - np.pi / 2) + start_angle
+        bboxes = torch.stack([x, y, w_, h_, t], dim=-1)
+        return bboxes
 
     @property
     def centers(self) -> Tensor:
@@ -35,29 +109,6 @@ class RotatedBoxes(BaseBoxes):
     def heights(self) -> Tensor:
         """Return a tensor representing the heights of boxes."""
         return self.tensor[..., 3]
-
-    def regular_bboxes(self, pattern=None, width_longer=True, start_angle=-90):
-        bboxes = self.tensor
-        pattern_settings = dict(
-            oc=(False, -90), le90=(True, -90), le135=(True, -45))
-        if pattern is not None:
-            assert pattern in ['oc', 'le90', 'le135']
-            width_longer, start_angle = pattern_settings[pattern]
-        start_angle = start_angle / 180. * np.pi
-
-        x, y, w, h, t = bboxes.unbind(dim=-1)
-        if width_longer:
-            w_ = torch.where(w > h, w, h)
-            h_ = torch.where(w > h, h, w)
-            t = torch.where(w > h, t, t + np.pi / 2)
-            t = ((t - start_angle) % np.pi) + start_angle
-        else:
-            t = ((t - start_angle) % np.pi)
-            w_ = torch.where(t < np.pi / 2, w, h)
-            h_ = torch.where(t < np.pi / 2, h, w)
-            t = torch.where(t < np.pi / 2, t, t - np.pi / 2) + start_angle
-        bboxes = torch.stack([x, y, w_, h_, t], dim=-1)
-        return bboxes
 
     def flip(self: T,
              img_shape: Tuple[int, int],
@@ -101,7 +152,10 @@ class RotatedBoxes(BaseBoxes):
         return type(self)(bboxes)
 
     def clip(self: T, img_shape: Tuple[int, int]) -> T:
-        """Clip boxes according to border.
+        """Clip boxes according to the image shape.
+
+        In ``RotatedBoxes``, ``clip`` function only clones the original data,
+        because it's very tricky to handle rotate boxes corssing the image.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
@@ -166,7 +220,16 @@ class RotatedBoxes(BaseBoxes):
         return self(type)(self.corner2rbbox(corners))
 
     @staticmethod
-    def rbbox2corner(bboxes):
+    def rbbox2corner(bboxes: Tensor) -> Tensor:
+        """Convert rotated bbox (x, y, w, h, t) to corners ((x1, y1), (x2, y1),
+        (x1, y2), (x2, y2)).
+
+        Args:
+            bboxes (Tensor): Shape (..., 5) for bboxes.
+
+        Returns:
+            Tensor: Shape (..., 4, 2) for corners.
+        """
         ctr, w, h, theta = torch.split(bboxes, (2, 1, 1, 1), dim=-1)
         Cos, Sin = torch.cos(theta), torch.sin(theta)
         vec1 = torch.cat([w / 2 * Cos, w / 2 * Sin], dim=-1)
@@ -178,7 +241,16 @@ class RotatedBoxes(BaseBoxes):
         return torch.stack([pt1, pt2, pt3, pt4], dim=-2)
 
     @staticmethod
-    def corner2rbbox(corners):
+    def corner2rbbox(corners: Tensor) -> Tensor:
+        """Convert corners ((x1, y1), (x2, y1), (x1, y2), (x2, y2)) to rotated
+        box (x, y, w, h, t).
+
+        Args:
+            corners (Tensor): Shape (..., 4, 2) for corners.
+
+        Returns:
+            Tensor: Shape (..., 5) for bboxes.
+        """
         original_shape = corners.shape[:-2]
         points = corners.cpu().numpy().reshape(-1, 4, 2)
         rbboxes = []
@@ -207,7 +279,6 @@ class RotatedBoxes(BaseBoxes):
         scale_x, scale_y = scale_factor
         ctrs, w, h, t = torch.split(bboxes, [2, 1, 1, 1], dim=-1)
         Cos, Sin = torch.cos(t), torch.Sin(t)
-
         if mapping_back:
             scale_x, scale_y = 1 / scale_x, 1 / scale_y
 
@@ -242,7 +313,10 @@ class RotatedBoxes(BaseBoxes):
         return type(self)(bboxes)
 
     def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> torch.BoolTensor:
-        """Find bboxes as long as a part of bboxes is inside an region.
+        """Find bboxes inside the image.
+
+        In ``HorizontalBoxes``, as long as the center of box is inside the
+        image, this box will be regarded as True.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
