@@ -18,14 +18,9 @@ class RotatedBoxes(BaseBoxes):
     The ``_bbox_dim`` of ``RotatedBoxes`` is 5, which means the input should
     have shape of (a0, a1, ..., 5). Each row of data means (x, y, w, h, t),
     where 'x' and 'y' are the coordinates of the box center, 'w' and 'h' are
-    the length of box sides, 't' is the clock-wise angle represented in radian
-    to rotate a horizontal box (x, y, w, h).
-
-    In RotatedBoxes, we don't limit the range of the angle.
-
-
-    To get rotated boxes with a regular format, users can execute the
-    ``regular_bboxes`` function.
+    the length of box sides, 't' is the box angle represented in radian. A
+    rotated box can be regarded as rotating the horizontal box (x, y, w, h)
+    w.r.t its center by 't' radian CW.
 
     Args:
         bboxes (Tensor or np.ndarray or Sequence): The box data with
@@ -43,22 +38,44 @@ class RotatedBoxes(BaseBoxes):
         """Regularize rotated boxes.
 
         Due to the angle periodicity, one rotated box can be represented in
-        many different (x, y, w, h, t).
-        In MMRotate, we implement three commonly used patterns:
+        many different (x, y, w, h, t). To make each rotated box unique,
+        ``regularize_bboxes`` will take the remainder of the angle divided by
+        180 degrees.
 
-        - 'oc':
-        - 'le90':
-        - 'le135':
+        However, after taking the remainder of the angle, there are still two
+        representations for one rotate box. For example, (0, 0, 4, 5, 0.5) and
+        (0, 0, 5, 4, 0.5 + pi/2) are the same areas in the image. To solve the
+        problem, the code will swap edges w.r.t ``width_longer``:
 
-        If the above three patterns of rotated boxes cannot meet demand.
-        Users can utilize ``width_logner`` and ``start_angle`` to custom
-        angle range.
+        - width_longer=True: Make sure the width is longer than the height. If
+          not, swap the width and height. The angle ranges in [start_angle,
+          start_angle + 180). For the above example, the rotated box will be
+          represented as (0, 0, 5, 4, 0.5 + pi/2).
+        - width_longer=False: Make sure the angle is lower than
+          start_angle+pi/2. If not, swap the width and height. The angle
+          ranges in [start_angle, start_angle + 90). For the above example,
+          the rotated box will be represented as (0, 0, 4, 5, 0.5).
+
+        For convenience, three commonly used patterns are preset in
+        ``regualrize_bboxes``:
+
+        - 'oc': OpenCV Definition. Has the same box representation as
+          ``cv2.minAreaRect`` the angle ranges in [-90, 0). Equal to set
+          width_longer=False and start_angle=-90.
+        - 'le90': Long Edge Definition (90). the angle ranges in [-90, 90).
+          The width is always longer than the height. Equal to set
+          width_longer=True and start_angle=-90.
+        - 'le135': Long Edge Definition (135). the angle ranges in [-45, 135).
+          The width is always longer than the height. Equal to set
+          width_longer=True and start_angle=-45.
 
         Args:
-            pattern (str, Optional): Options of 'oc', 'le90' or 'le135'.
-                Defaults to None.
-            with_longer (bool): If True, regularized boxes widths are
-            start_angle (float):
+            pattern (str, Optional): Regularization pattern. Can only be 'oc',
+                'le90', or 'le135'. Defaults to None.
+            width_longer (bool): Whether to make sure width is larger than
+                height. Defaults to True.
+            start_angle (float): The starting angle of the box angle. Defaults
+                to -90.
 
         Returns:
             Tensor: Regularized box tensor.
@@ -78,11 +95,13 @@ class RotatedBoxes(BaseBoxes):
 
         x, y, w, h, t = bboxes.unbind(dim=-1)
         if width_longer:
+            # swap edge and angle if h >= w
             w_ = torch.where(w > h, w, h)
             h_ = torch.where(w > h, h, w)
             t = torch.where(w > h, t, t + np.pi / 2)
             t = ((t - start_angle) % np.pi) + start_angle
         else:
+            # swap edge and angle if angle >= pi/2
             t = ((t - start_angle) % np.pi)
             w_ = torch.where(t < np.pi / 2, w, h)
             h_ = torch.where(t < np.pi / 2, h, w)

@@ -52,12 +52,20 @@ class QuadriBoxes(BaseBoxes):
 
     @property
     def widths(self) -> Tensor:
-        """Return a tensor representing the widths of boxes."""
+        """Return a tensor representing the widths of boxes.
+
+        Quadrilateral boxes don't have the width concept. Use ``sqrt(areas)``
+        to replace the width.
+        """
         return torch.sqrt(self.areas)
 
     @property
     def heights(self) -> Tensor:
-        """Return a tensor representing the heights of boxes."""
+        """Return a tensor representing the heights of boxes.
+
+        Quadrilateral boxes don't have the height concept. Use ``sqrt(areas)``
+        to replace the heights.
+        """
         return torch.sqrt(self.areas)
 
     def flip(self: T,
