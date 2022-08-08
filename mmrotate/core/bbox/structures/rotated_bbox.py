@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import torch
 from mmdet.structures.bbox import BaseBoxes, register_bbox_mode
-from torch import Tensor
+from torch import BoolTensor, Tensor
 
 T = TypeVar('T')
 DeviceType = Union[str, torch.device]
@@ -15,12 +15,12 @@ DeviceType = Union[str, torch.device]
 class RotatedBoxes(BaseBoxes):
     """The rotated box class used in MMRotate by default.
 
-    The ``_bbox_dim`` of ``RotatedBoxes`` is 5, which means the input should
-    have shape of (a0, a1, ..., 5). Each row of data means (x, y, w, h, t),
-    where 'x' and 'y' are the coordinates of the box center, 'w' and 'h' are
-    the length of box sides, 't' is the box angle represented in radian. A
-    rotated box can be regarded as rotating the horizontal box (x, y, w, h)
-    w.r.t its center by 't' radian CW.
+    The ``_bbox_dim`` of ``RotatedBoxes`` is 5, which means the length of the
+    last dimension of the input should be 5. Each row of data means
+    (x, y, w, h, t), where 'x' and 'y' are the coordinates of the box center,
+    'w' and 'h' are the length of box sides, 't' is the box angle represented
+    in radian. A rotated box can be regarded as rotating the horizontal box
+    (x, y, w, h) w.r.t its center by 't' radian CW.
 
     Args:
         bboxes (Tensor or np.ndarray or Sequence): The box data with
@@ -74,8 +74,8 @@ class RotatedBoxes(BaseBoxes):
                 'le90', or 'le135'. Defaults to None.
             width_longer (bool): Whether to make sure width is larger than
                 height. Defaults to True.
-            start_angle (float): The starting angle of the box angle. Defaults
-                to -90.
+            start_angle (float): The starting angle of the box angle
+                represented in degrees. Defaults to -90.
 
         Returns:
             Tensor: Regularized box tensor.
@@ -193,7 +193,7 @@ class RotatedBoxes(BaseBoxes):
 
         Args:
             center (Tuple[float, float]): Rotation origin.
-            angle (float): Rotation angle.
+            angle (float): Rotation angle represented in degrees.
             img_shape (Tuple[int, int], Optional): A tuple of image height
                 and width. Defaults to None.
 
@@ -247,15 +247,15 @@ class RotatedBoxes(BaseBoxes):
         (x1, y2), (x2, y2)).
 
         Args:
-            bboxes (Tensor): Shape (..., 5) for bboxes.
+            bboxes (Tensor): Rotated box tensor with shape of (..., 5).
 
         Returns:
-            Tensor: Shape (..., 4, 2) for corners.
+            Tensor: Corner tensor with shape of (..., 4, 2).
         """
         ctr, w, h, theta = torch.split(bboxes, (2, 1, 1, 1), dim=-1)
-        Cos, Sin = torch.cos(theta), torch.sin(theta)
-        vec1 = torch.cat([w / 2 * Cos, w / 2 * Sin], dim=-1)
-        vec2 = torch.cat([-h / 2 * Sin, h / 2 * Cos], dim=-1)
+        cos_value, sin_value = torch.cos(theta), torch.sin(theta)
+        vec1 = torch.cat([w / 2 * cos_value, w / 2 * sin_value], dim=-1)
+        vec2 = torch.cat([-h / 2 * sin_value, h / 2 * cos_value], dim=-1)
         pt1 = ctr + vec1 + vec2
         pt2 = ctr + vec1 - vec2
         pt3 = ctr - vec1 - vec2
@@ -268,10 +268,10 @@ class RotatedBoxes(BaseBoxes):
         box (x, y, w, h, t).
 
         Args:
-            corners (Tensor): Shape (..., 4, 2) for corners.
+            corners (Tensor): Corner tensor with shape of (..., 4, 2).
 
         Returns:
-            Tensor: Shape (..., 5) for bboxes.
+            Tensor: Rotated box tensor with shape of (..., 5).
         """
         original_shape = corners.shape[:-2]
         points = corners.cpu().numpy().reshape(-1, 4, 2)
@@ -280,7 +280,7 @@ class RotatedBoxes(BaseBoxes):
             (x, y), (w, h), angle = cv2.minAreaRect(pts)
             rbboxes.append([x, y, w, h, angle / 180 * np.pi])
         rbboxes = corners.new_tensor(rbboxes)
-        return rbboxes.view(*original_shape, 5)
+        return rbboxes.reshape(*original_shape, 5)
 
     def rescale(self: T,
                 scale_factor: Tuple[float, float],
@@ -300,7 +300,7 @@ class RotatedBoxes(BaseBoxes):
         assert len(scale_factor) == 2
         scale_x, scale_y = scale_factor
         ctrs, w, h, t = torch.split(bboxes, [2, 1, 1, 1], dim=-1)
-        Cos, Sin = torch.cos(t), torch.sin(t)
+        cos_value, sin_value = torch.cos(t), torch.sin(t)
         if mapping_back:
             scale_x, scale_y = 1 / scale_x, 1 / scale_y
 
@@ -308,10 +308,10 @@ class RotatedBoxes(BaseBoxes):
         # rescale centers
         ctrs = ctrs * ctrs.new_tensor([scale_x, scale_y])
         # rescale width and height
-        w = w * torch.sqrt((scale_x * Cos)**2 + (scale_y * Sin)**2)
-        h = h * torch.sqrt((scale_x * Sin)**2 + (scale_y * Cos)**2)
+        w = w * torch.sqrt((scale_x * cos_value)**2 + (scale_y * sin_value)**2)
+        h = h * torch.sqrt((scale_x * sin_value)**2 + (scale_y * cos_value)**2)
         # recalculate theta
-        t = torch.atan2(scale_x * Sin, scale_y * Cos)
+        t = torch.atan2(scale_x * sin_value, scale_y * cos_value)
 
         bboxes = torch.cat([ctrs, w, h, t], dim=-1)
         return type(self)(bboxes)
@@ -324,7 +324,7 @@ class RotatedBoxes(BaseBoxes):
                 shapes. The length should be 2.
 
         Returns:
-            Tensor: Resized bboxes with the same shape as the original boxes.
+            T: Resized bboxes with the same shape as the original boxes.
         """
         bboxes = self.tensor
         assert len(scale_factor) == 2
@@ -334,7 +334,7 @@ class RotatedBoxes(BaseBoxes):
         bboxes = torch.cat([ctrs, wh, t], dim=-1)
         return type(self)(bboxes)
 
-    def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> torch.BoolTensor:
+    def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
         """Find bboxes inside the image.
 
         In ``HorizontalBoxes``, as long as the center of box is inside the
@@ -345,15 +345,14 @@ class RotatedBoxes(BaseBoxes):
 
         Returns:
             BoolTensor: Index of the remaining bboxes. Assuming the original
-            boxes have shape (a0, a1, ..., bbox_dim), the output has shape
-            (a0, a1, ...).
+            rotated boxes have shape (m, n, 5), the output has shape (m, n).
         """
         img_h, img_w = img_shape
         bboxes = self.tensor
         return (bboxes[..., 0] < img_w) & (bboxes[..., 0] > 0) \
             & (bboxes[..., 1] < img_h) & (bboxes[..., 1] > 0)
 
-    def find_inside_points(self, points: Tensor) -> torch.BoolTensor:
+    def find_inside_points(self, points: Tensor) -> BoolTensor:
         """Find inside box points.
 
         Args:
@@ -370,9 +369,9 @@ class RotatedBoxes(BaseBoxes):
         bboxes = bboxes[None, :, :]
         points = points[:, None, :]
         ctrs, wh, t = torch.split(bboxes, [2, 2, 1], dim=2)
-        Cos, Sin = torch.cos(t), torch.sin(t)
-        matrix = torch.cat([Cos, Sin, -Sin, Cos],
-                           dim=-1).view(1, bboxes.size(0), 2, 2)
+        cos_value, sin_value = torch.cos(t), torch.sin(t)
+        matrix = torch.cat([cos_value, sin_value, -sin_value, cos_value],
+                           dim=-1).reshape(1, bboxes.size(0), 2, 2)
 
         offset = points - ctrs
         offset = torch.matmul(matrix, offset[..., None])

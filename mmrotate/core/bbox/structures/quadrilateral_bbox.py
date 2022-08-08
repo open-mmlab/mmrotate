@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import torch
 from mmdet.structures.bbox import BaseBoxes, register_bbox_mode
-from torch import Tensor
+from torch import BoolTensor, Tensor
 
 T = TypeVar('T')
 DeviceType = Union[str, torch.device]
@@ -15,9 +15,9 @@ DeviceType = Union[str, torch.device]
 class QuadriBoxes(BaseBoxes):
     """The quadrilateral box class.
 
-    The ``_bbox_dim`` of ``QuadriBoxes`` is 8, which means the input should
-    have shape of (a0, a1, ..., 8). Each row of data means (x1, y1, x2, y2,
-    x3, y3, x4, y4) which are the coordinates of 4 vertices of the box.
+    The ``_bbox_dim`` of ``QuadriBoxes`` is 8, which means the length of the
+    last dimension of the input should be 8. Each row of data means (x1, y1,
+    x2, y2, x3, y3, x4, y4) which are the coordinates of 4 vertices of the box.
 
     ``QuadriBoxes`` usually works as the raw data loaded from dataset like
     DOTA, DIOR, etc.
@@ -35,14 +35,14 @@ class QuadriBoxes(BaseBoxes):
     def centers(self) -> Tensor:
         """Return a tensor representing the centers of boxes."""
         bboxes = self.tensor
-        bboxes = bboxes.view(*bboxes.shape[:-1], 4, 2)
+        bboxes = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
         return bboxes.mean(dim=-2)
 
     @property
     def areas(self) -> Tensor:
         """Return a tensor representing the areas of boxes."""
         bboxes = self.tensor
-        pts = bboxes.view(*bboxes.shape[:-1], 4, 2)
+        pts = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
         roll_pts = torch.roll(pts, 1, dims=-2)
         xyxy = torch.sum(
             pts[..., 0] * roll_pts[..., 1] - roll_pts[..., 0] * pts[..., 1],
@@ -131,7 +131,7 @@ class QuadriBoxes(BaseBoxes):
 
         Args:
             center (Tuple[float, float]): Rotation origin.
-            angle (float): Rotation angle.
+            angle (float): Rotation angle represented in degrees.
             img_shape (Tuple[int, int], Optional): A tuple of image height
                 and width. Defaults to None.
 
@@ -142,7 +142,7 @@ class QuadriBoxes(BaseBoxes):
         rotation_matrix = bboxes.new_tensor(
             cv2.getRotationMatrix2D(center, angle, 1))
 
-        corners = bboxes.view(*bboxes.shape[:-1], 4, 2)
+        corners = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
         corners = torch.cat(
             [corners, corners.new_ones(*corners.shape[:-1], 1)], dim=-1)
         corners_T = torch.transpose(corners, -1, -2)
@@ -168,7 +168,7 @@ class QuadriBoxes(BaseBoxes):
         bboxes = self.tensor
         if isinstance(homography_matrix, np.ndarray):
             homography_matrix = bboxes.new_tensor(homography_matrix)
-        corners = bboxes.view(*bboxes.shape[:-1], 4, 2)
+        corners = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
         corners = torch.cat(
             [corners, corners.new_ones(*corners.shape[:-1], 1)], dim=-1)
         corners_T = torch.transpose(corners, -1, -2)
@@ -208,7 +208,7 @@ class QuadriBoxes(BaseBoxes):
                 shapes. The length should be 2.
 
         Returns:
-            Tensor: Resized bboxes with the same shape as the original boxes.
+            T: Resized bboxes with the same shape as the original boxes.
         """
         bboxes = self.tensor
         assert len(scale_factor) == 2
@@ -216,13 +216,13 @@ class QuadriBoxes(BaseBoxes):
             'To protect the shape of QuadriBoxes not changes'
         scale_factor = bboxes.new_tensor(scale_factor)
 
-        bboxes = bboxes.view(*bboxes.shape[:-1], 4, 2)
+        bboxes = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
         centers = bboxes.mean(dim=-2)[..., None, :]
         bboxes = (bboxes - centers) * scale_factor + centers
-        bboxes = bboxes.view(*bboxes.shape[:-2], 8)
+        bboxes = bboxes.reshape(*bboxes.shape[:-2], 8)
         return type(self)(bboxes)
 
-    def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> torch.BoolTensor:
+    def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
         """Find bboxes inside the image.
 
         In ``QuadriBoxes``, as long as the center of box is inside the
@@ -233,17 +233,17 @@ class QuadriBoxes(BaseBoxes):
 
         Returns:
             BoolTensor: Index of the remaining bboxes. Assuming the original
-            boxes have shape (a0, a1, ..., bbox_dim), the output has shape
-            (a0, a1, ...).
+            quadrilateral boxes have shape (m, n, 8), the output has shape
+            (m, n).
         """
         img_h, img_w = img_shape
         bboxes = self.tensor
-        bboxes = bboxes.view(*bboxes.shape[:-1], 4, 2)
+        bboxes = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
         centers = bboxes.mean(dim=-2)
         return (centers[..., 0] < img_w) & (centers[..., 0] > 0) \
             & (centers[..., 1] < img_h) & (centers[..., 1] > 0)
 
-    def find_inside_points(self, points: Tensor) -> torch.BoolTensor:
+    def find_inside_points(self, points: Tensor) -> BoolTensor:
         """Find inside box points.
 
         Args:
@@ -257,7 +257,7 @@ class QuadriBoxes(BaseBoxes):
         if bboxes.dim() > 2:
             bboxes = bboxes.flatten(end_dim=-2)
 
-        corners = bboxes.view(-1, 4, 2)
+        corners = bboxes.reshape(-1, 4, 2)
         corners_next = torch.roll(corners, -1, dims=1)
         x1, y1 = corners.unbind(dim=2)
         x2, y2 = corners_next.unbind(dim=2)
