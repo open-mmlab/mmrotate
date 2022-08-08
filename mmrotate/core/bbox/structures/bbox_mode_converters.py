@@ -19,8 +19,10 @@ def hbbox2rbbox(bboxes: Tensor) -> Tensor:
     Returns:
         Tensor: Rotated box tensor.
     """
+    wh = bboxes[..., 2:] - bboxes[..., :2]
+    ctrs = (bboxes[..., 2:] + bboxes[..., :2]) / 2
     theta = bboxes.new_zeros((*bboxes.shape[:-1], 1))
-    return torch.cat([bboxes, theta], dim=-1)
+    return torch.cat([ctrs, wh, theta], dim=-1)
 
 
 @register_bbox_mode_converter('hbox', 'qbox')
@@ -34,7 +36,7 @@ def hbbox2qbbox(bboxes: Tensor) -> Tensor:
         Tensor: Quadrilateral box tensor.
     """
     x1, y1, x2, y2 = torch.split(bboxes, 1, dim=-1)
-    return torch.cat([x1, y1, x2, y1, x1, y2, x2, y2], dim=-1)
+    return torch.cat([x1, y1, x2, y1, x2, y2, x1, y2], dim=-1)
 
 
 @register_bbox_mode_converter('rbox', 'hbox')
@@ -87,8 +89,8 @@ def qbbox2hbbox(bboxes: Tensor) -> Tensor:
         Tensor: Horizontal box tensor.
     """
     bboxes = bboxes.view(*bboxes.shape[:-1], 4, 2)
-    x1y1 = bboxes.min(dim=-2)
-    x2y2 = bboxes.max(dim=-2)
+    x1y1, _ = bboxes.min(dim=-2)
+    x2y2, _ = bboxes.max(dim=-2)
     return torch.cat([x1y1, x2y2], dim=-1)
 
 

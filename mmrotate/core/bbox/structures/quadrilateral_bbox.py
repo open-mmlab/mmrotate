@@ -148,7 +148,7 @@ class QuadriBoxes(BaseBoxes):
         corners_T = torch.transpose(corners, -1, -2)
         corners_T = torch.matmul(rotation_matrix, corners_T)
         corners = torch.transpose(corners_T, -1, -2)
-        bboxes = corners.view(*corners.shape[:-2], 8)
+        bboxes = corners.reshape(*corners.shape[:-2], 8)
         return type(self)(bboxes)
 
     def project(self: T,
@@ -176,7 +176,7 @@ class QuadriBoxes(BaseBoxes):
         corners = torch.transpose(corners_T, -1, -2)
         # Convert to homogeneous coordinates by normalization
         corners = corners[..., :2] / corners[..., 2:3]
-        bboxes = corners.view(*corners.shape[:-2], 8)
+        bboxes = corners.reshape(*corners.shape[:-2], 8)
         return type(self)(bboxes)
 
     def rescale(self: T,
@@ -212,6 +212,8 @@ class QuadriBoxes(BaseBoxes):
         """
         bboxes = self.tensor
         assert len(scale_factor) == 2
+        assert scale_factor[0] == scale_factor[1], \
+            'To protect the shape of QuadriBoxes not changes'
         scale_factor = bboxes.new_tensor(scale_factor)
 
         bboxes = bboxes.view(*bboxes.shape[:-1], 4, 2)
@@ -256,7 +258,7 @@ class QuadriBoxes(BaseBoxes):
             bboxes = bboxes.flatten(end_dim=-2)
 
         corners = bboxes.view(-1, 4, 2)
-        corners_next = torch.roll(corners, -1, dim=1)
+        corners_next = torch.roll(corners, -1, dims=1)
         x1, y1 = corners.unbind(dim=2)
         x2, y2 = corners_next.unbind(dim=2)
         pt_x, pt_y = points.split([1, 1], dim=1)

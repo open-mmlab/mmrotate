@@ -147,12 +147,13 @@ class RotatedBoxes(BaseBoxes):
         flipped = bboxes.clone()
         if direction == 'horizontal':
             flipped[..., 0] = img_shape[1] - bboxes[..., 0]
+            flipped[..., 4] = -flipped[..., 4]
         elif direction == 'vertical':
             flipped[..., 1] = img_shape[0] - bboxes[..., 1]
+            flipped[..., 4] = -flipped[..., 4]
         else:
             flipped[..., 0] = img_shape[1] - bboxes[..., 0]
             flipped[..., 1] = img_shape[0] - bboxes[..., 1]
-        flipped[..., 4] = -flipped[..., 4]
         return type(self)(flipped)
 
     def translate(self: T, distances: Tuple[float, float]) -> T:
@@ -165,7 +166,7 @@ class RotatedBoxes(BaseBoxes):
         Returns:
             T: Translated boxes with the same shape as the original boxes.
         """
-        bboxes = self.tensor
+        bboxes = self.tensor.clone()
         assert len(distances) == 2
         bboxes[..., :2] = bboxes[..., :2] + bboxes.new_tensor(distances)
         return type(self)(bboxes)
@@ -228,6 +229,8 @@ class RotatedBoxes(BaseBoxes):
             T: Converted bboxes with the same shape as the original boxes.
         """
         bboxes = self.tensor
+        if isinstance(homography_matrix, np.ndarray):
+            homography_matrix = bboxes.new_tensor(homography_matrix)
         corners = self.rbbox2corner(bboxes)
         corners = torch.cat(
             [corners, corners.new_ones(*corners.shape[:-1], 1)], dim=-1)
@@ -236,7 +239,7 @@ class RotatedBoxes(BaseBoxes):
         corners = torch.transpose(corners_T, -1, -2)
         # Convert to homogeneous coordinates by normalization
         corners = corners[..., :2] / corners[..., 2:3]
-        return self(type)(self.corner2rbbox(corners))
+        return type(self)(self.corner2rbbox(corners))
 
     @staticmethod
     def rbbox2corner(bboxes: Tensor) -> Tensor:
@@ -297,7 +300,7 @@ class RotatedBoxes(BaseBoxes):
         assert len(scale_factor) == 2
         scale_x, scale_y = scale_factor
         ctrs, w, h, t = torch.split(bboxes, [2, 1, 1, 1], dim=-1)
-        Cos, Sin = torch.cos(t), torch.Sin(t)
+        Cos, Sin = torch.cos(t), torch.sin(t)
         if mapping_back:
             scale_x, scale_y = 1 / scale_x, 1 / scale_y
 
@@ -366,11 +369,10 @@ class RotatedBoxes(BaseBoxes):
 
         bboxes = bboxes[None, :, :]
         points = points[:, None, :]
-        num_points, num_bboxes = points.size(0), bboxes.size(0)
         ctrs, wh, t = torch.split(bboxes, [2, 2, 1], dim=2)
         Cos, Sin = torch.cos(t), torch.sin(t)
         matrix = torch.cat([Cos, Sin, -Sin, Cos],
-                           dim=-1).view(num_points, num_bboxes, 2, 2)
+                           dim=-1).view(1, bboxes.size(0), 2, 2)
 
         offset = points - ctrs
         offset = torch.matmul(matrix, offset[..., None])
