@@ -27,10 +27,11 @@ scenes, and we also provide deploy versions with ONNX, TensorRT, NCNN, and Openv
 | :-------------: | :------------------: | :---------: | :---: | :--: | :-----------------------------------------------: | :------: |
 | Rotated YOLOX-s |     Rotated IoU      | (1024,1024) | 74.36 | 53.1 |   [config](./rotated_yolox_s_300e_dota_le90.py)   |    -     |
 | Rotated YOLOX-s | Horizontal IoU + CSL | (1024,1024) | 74.71 | 46.8 | [config](./rotated_yolox_s_csl_300e_dota_le90.py) |    -     |
-| Rotated YOLOX-s |         KLD          | (1024,1024) |   -   |  -   | [config](./rotated_yolox_s_kld_300e_dota_le90.py) |    -     |
+| Rotated YOLOX-s |         KLD          | (1024,1024) | 75.23 | 53.0 | [config](./rotated_yolox_s_kld_300e_dota_le90.py) |    -     |
 
 **Note**:
 
+- Rotated YOLOX with KLD Loss is unstable during training, which will lead to nan and then cause CUDA Error.
 - Compared with original YOLOX in mmdet, Rotated YOLOX enable `grad_clip` to prevent nan at training process.
 - All models are trained with batch size 8 on one GPU.
 - FPS and speed are tested on a single RTX3090.

@@ -9,6 +9,6 @@ model = dict(
             loss_type='kld',
             fun='log1p',
             tau=1,
-            sqrt=False,
+            sqrt=True,
             reduction='sum',
             loss_weight=27.5)))
