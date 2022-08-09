@@ -62,107 +62,101 @@ class TestHorizontalBoxes(TestCase):
     def test_flip(self):
         th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
         img_shape = [50, 85]
-        bboxes = RotatedBoxes(th_bboxes)
-
         # horizontal flip
+        bboxes = RotatedBoxes(th_bboxes)
         flipped_bboxes_th = torch.Tensor([45, 40, 10, 20,
                                           -np.pi / 6]).reshape(1, 1, 5)
-        flipped_bboxes = bboxes.flip(img_shape, direction='horizontal')
-        assert_allclose(flipped_bboxes.tensor, flipped_bboxes_th)
+        bboxes.flip_(img_shape, direction='horizontal')
+        assert_allclose(bboxes.tensor, flipped_bboxes_th)
         # vertical flip
+        bboxes = RotatedBoxes(th_bboxes)
         flipped_bboxes_th = torch.Tensor([40, 10, 10, 20,
                                           -np.pi / 6]).reshape(1, 1, 5)
-        flipped_bboxes = bboxes.flip(img_shape, direction='vertical')
-        assert_allclose(flipped_bboxes.tensor, flipped_bboxes_th)
+        bboxes.flip_(img_shape, direction='vertical')
+        assert_allclose(bboxes.tensor, flipped_bboxes_th)
         # diagonal flip
+        bboxes = RotatedBoxes(th_bboxes)
         flipped_bboxes_th = torch.Tensor([45, 10, 10, 20,
                                           np.pi / 6]).reshape(1, 1, 5)
-        flipped_bboxes = bboxes.flip(img_shape, direction='diagonal')
-        assert_allclose(flipped_bboxes.tensor, flipped_bboxes_th)
+        bboxes.flip_(img_shape, direction='diagonal')
+        assert_allclose(bboxes.tensor, flipped_bboxes_th)
 
     def test_translate(self):
         th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
         bboxes = RotatedBoxes(th_bboxes)
-
-        translated_bboxes = bboxes.translate([23, 46])
+        bboxes.translate_([23, 46])
         translated_bboxes_th = torch.Tensor([63, 86, 10, 20,
                                              np.pi / 6]).reshape(1, 1, 5)
-        assert_allclose(translated_bboxes.tensor, translated_bboxes_th)
-        # negative
-        translated_bboxes = bboxes.translate([-6, -2])
-        translated_bboxes_th = torch.Tensor([34, 38, 10, 20,
-                                             np.pi / 6]).reshape(1, 1, 5)
-        assert_allclose(translated_bboxes.tensor, translated_bboxes_th)
+        assert_allclose(bboxes.tensor, translated_bboxes_th)
 
     def test_clip(self):
         th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
         img_shape = [13, 14]
         bboxes = RotatedBoxes(th_bboxes)
-
-        cliped_bboxes = bboxes.clip(img_shape)
+        bboxes.clip_(img_shape)
         cliped_bboxes_th = torch.Tensor([40, 40, 10, 20,
                                          np.pi / 6]).reshape(1, 1, 5)
-        assert_allclose(cliped_bboxes.tensor, cliped_bboxes_th)
-        # test clone
-        self.assertIsNot(cliped_bboxes.tensor, th_bboxes)
+        assert_allclose(bboxes.tensor, cliped_bboxes_th)
 
     def test_rotate(self):
         th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
         center = (50, 40)
         angle = 60
         bboxes = RotatedBoxes(th_bboxes)
-
-        rotated_bboxes = bboxes.rotate(center, angle)
+        bboxes.rotate_(center, angle)
         rotated_bboxes_th = torch.Tensor(
             [45, 40 + 5 * sqrt(3), 10, 20, -np.pi / 6]).reshape(1, 1, 5)
-        assert_allclose(rotated_bboxes.tensor, rotated_bboxes_th)
+        assert_allclose(bboxes.tensor, rotated_bboxes_th)
 
     def test_project(self):
         th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
         matrix = np.random.rand(3, 3)
         bboxes = RotatedBoxes(th_bboxes)
-        bboxes.project(matrix)
+        bboxes.project_(matrix)
 
     def test_rescale(self):
         th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
         scale_factor = [0.4, 0.4]
-        bboxes = RotatedBoxes(th_bboxes)
 
-        rescaled_bboxes = bboxes.rescale(scale_factor)
+        bboxes = RotatedBoxes(th_bboxes)
+        bboxes.rescale_(scale_factor)
         rescaled_bboxes_th = torch.Tensor([16, 16, 4, 8,
                                            np.pi / 6]).reshape(1, 1, 5)
-        assert_allclose(rescaled_bboxes.tensor, rescaled_bboxes_th)
-        rescaled_bboxes = bboxes.rescale(scale_factor, mapping_back=True)
+        assert_allclose(bboxes.tensor, rescaled_bboxes_th)
+        # test mapping_back
+        bboxes = RotatedBoxes(th_bboxes)
+        bboxes.rescale_(scale_factor, mapping_back=True)
         rescaled_bboxes_th = torch.Tensor([100, 100, 25, 50,
                                            np.pi / 6]).reshape(1, 1, 5)
-        assert_allclose(rescaled_bboxes.tensor, rescaled_bboxes_th)
+        assert_allclose(bboxes.tensor, rescaled_bboxes_th)
 
-    def test_resize_bboxes(self):
+    def test_resize(self):
         th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
         scale_factor = [0.4, 0.8]
         bboxes = RotatedBoxes(th_bboxes)
-
-        resized_bboxes = bboxes.resize_bboxes(scale_factor)
+        bboxes.resize_(scale_factor)
         resized_bboxes_th = torch.Tensor([40, 40, 4, 16,
                                           np.pi / 6]).reshape(1, 1, 5)
-        assert_allclose(resized_bboxes.tensor, resized_bboxes_th)
+        assert_allclose(bboxes.tensor, resized_bboxes_th)
 
     def test_is_bboxes_inside(self):
         th_bboxes = torch.Tensor([[10, 10, 10, 20, 0.3], [25, 25, 10, 20, 0.2],
                                   [35, 35, 10, 20, 0.1]]).reshape(1, 3, 5)
         img_shape = [30, 30]
         bboxes = RotatedBoxes(th_bboxes)
-
         index = bboxes.is_bboxes_inside(img_shape)
         index_th = torch.BoolTensor([True, True, False]).reshape(1, 3)
-        self.assertEqual(tuple(index.size()), (1, 3))
         assert_allclose(index, index_th)
 
     def test_find_inside_points(self):
-        th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
+        th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 5)
         bboxes = RotatedBoxes(th_bboxes)
         points = torch.Tensor([[20, 40], [30, 40], [37.5, 40], [40, 40]])
         index = bboxes.find_inside_points(points)
         index_th = torch.BoolTensor([False, False, True, True]).reshape(4, 1)
-        self.assertEqual(tuple(index.size()), (4, 1))
+        assert_allclose(index, index_th)
+        # test is_aligned
+        bboxes = bboxes.expand(4, 5)
+        index = bboxes.find_inside_points(points, is_aligned=True)
+        index_th = torch.BoolTensor([False, False, True, True])
         assert_allclose(index, index_th)

@@ -33,50 +33,44 @@ class TestQuadriBoxes(TestCase):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
                                   20]).reshape(1, 1, 8)
         img_shape = [50, 85]
-        bboxes = QuadriBoxes(th_bboxes)
 
         # horizontal flip
+        bboxes = QuadriBoxes(th_bboxes)
         flipped_bboxes_th = torch.Tensor([75, 10, 65, 10, 61, 20, 71,
                                           20]).reshape(1, 1, 8)
-        flipped_bboxes = bboxes.flip(img_shape, direction='horizontal')
-        assert_allclose(flipped_bboxes.tensor, flipped_bboxes_th)
+        bboxes.flip_(img_shape, direction='horizontal')
+        assert_allclose(bboxes.tensor, flipped_bboxes_th)
         # vertical flip
+        bboxes = QuadriBoxes(th_bboxes)
         flipped_bboxes_th = torch.Tensor([10, 40, 20, 40, 24, 30, 14,
                                           30]).reshape(1, 1, 8)
-        flipped_bboxes = bboxes.flip(img_shape, direction='vertical')
-        assert_allclose(flipped_bboxes.tensor, flipped_bboxes_th)
+        bboxes.flip_(img_shape, direction='vertical')
+        assert_allclose(bboxes.tensor, flipped_bboxes_th)
         # diagonal flip
+        bboxes = QuadriBoxes(th_bboxes)
         flipped_bboxes_th = torch.Tensor([75, 40, 65, 40, 61, 30, 71,
                                           30]).reshape(1, 1, 8)
-        flipped_bboxes = bboxes.flip(img_shape, direction='diagonal')
-        assert_allclose(flipped_bboxes.tensor, flipped_bboxes_th)
+        bboxes.flip_(img_shape, direction='diagonal')
+        assert_allclose(bboxes.tensor, flipped_bboxes_th)
 
     def test_translate(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
                                   20]).reshape(1, 1, 8)
         bboxes = QuadriBoxes(th_bboxes)
-
-        translated_bboxes = bboxes.translate([23, 46])
+        bboxes.translate_([23, 46])
         translated_bboxes_th = torch.Tensor([33, 56, 43, 56, 47, 66, 37,
                                              66]).reshape(1, 1, 8)
-        assert_allclose(translated_bboxes.tensor, translated_bboxes_th)
-        # negative
-        translated_bboxes = bboxes.translate([-6, -2])
-        translated_bboxes_th = torch.Tensor([4, 8, 14, 8, 18, 18, 8,
-                                             18]).reshape(1, 1, 8)
-        assert_allclose(translated_bboxes.tensor, translated_bboxes_th)
+        assert_allclose(bboxes.tensor, translated_bboxes_th)
 
     def test_clip(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
                                   20]).reshape(1, 1, 8)
         img_shape = [13, 14]
         bboxes = QuadriBoxes(th_bboxes)
-
-        cliped_bboxes = bboxes.clip(img_shape)
+        bboxes.clip_(img_shape)
         cliped_bboxes_th = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
                                          20]).reshape(1, 1, 8)
-        assert_allclose(cliped_bboxes.tensor, cliped_bboxes_th)
-        self.assertIsNot(cliped_bboxes.tensor, th_bboxes)
+        assert_allclose(bboxes.tensor, cliped_bboxes_th)
 
     def test_rotate(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 20, 20, 10,
@@ -84,47 +78,45 @@ class TestQuadriBoxes(TestCase):
         center = (15, 15)
         angle = 45
         bboxes = QuadriBoxes(th_bboxes)
-
-        rotated_bboxes = bboxes.rotate(center, angle)
+        bboxes.rotate_(center, angle)
         rotated_bboxes_th = torch.Tensor([
             15 - 5 * sqrt(2), 15, 15, 15 - 5 * sqrt(2), 15 + 5 * sqrt(2), 15,
             15, 15 + 5 * sqrt(2)
         ]).reshape(1, 1, 8)
-        assert_allclose(rotated_bboxes.tensor, rotated_bboxes_th)
+        assert_allclose(bboxes.tensor, rotated_bboxes_th)
 
     def test_project(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
                                   20]).reshape(1, 1, 8)
         matrix = np.random.rand(3, 3)
         bboxes = QuadriBoxes(th_bboxes)
-        bboxes.project(matrix)
+        bboxes.project_(matrix)
 
     def test_rescale(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
                                   20]).reshape(1, 1, 8)
         scale_factor = [0.4, 0.8]
-        bboxes = QuadriBoxes(th_bboxes)
 
-        rescaled_bboxes = bboxes.rescale(scale_factor)
+        bboxes = QuadriBoxes(th_bboxes)
+        bboxes.rescale_(scale_factor)
         rescaled_bboxes_th = torch.Tensor([4, 8, 8, 8, 9.6, 16, 5.6,
                                            16]).reshape(1, 1, 8)
-        assert_allclose(rescaled_bboxes.tensor, rescaled_bboxes_th)
-        rescaled_bboxes = bboxes.rescale(scale_factor, mapping_back=True)
+        assert_allclose(bboxes.tensor, rescaled_bboxes_th)
+        # test mapping back
+        bboxes = QuadriBoxes(th_bboxes)
+        bboxes.rescale_(scale_factor, mapping_back=True)
         rescaled_bboxes_th = torch.Tensor([25, 12.5, 50, 12.5, 60, 25, 35,
                                            25]).reshape(1, 1, 8)
-        assert_allclose(rescaled_bboxes.tensor, rescaled_bboxes_th)
+        assert_allclose(bboxes.tensor, rescaled_bboxes_th)
 
-    def test_resize_bboxes(self):
+    def test_resize(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
                                   20]).reshape(1, 1, 8)
         bboxes = QuadriBoxes(th_bboxes)
-
-        with self.assertRaises(AssertionError):
-            resized_bboxes = bboxes.resize_bboxes([0.4, 0.8])
-        resized_bboxes = bboxes.resize_bboxes([0.4, 0.4])
+        bboxes.resize_([0.4, 0.4])
         resized_bboxes_th = torch.Tensor(
             [14.2, 13, 18.2, 13, 19.8, 17, 15.8, 17]).reshape(1, 1, 8)
-        assert_allclose(resized_bboxes.tensor, resized_bboxes_th)
+        assert_allclose(bboxes.tensor, resized_bboxes_th)
 
     def test_is_bboxes_inside(self):
         th_bboxes = torch.Tensor([[10, 10, 20, 10, 24, 20, 14, 20],
@@ -136,15 +128,18 @@ class TestQuadriBoxes(TestCase):
 
         index = bboxes.is_bboxes_inside(img_shape)
         index_th = torch.BoolTensor([True, True, False]).reshape(1, 3)
-        self.assertEqual(tuple(index.size()), (1, 3))
         assert_allclose(index, index_th)
 
     def test_find_inside_points(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
-                                  20]).reshape(1, 1, 8)
+                                  20]).reshape(1, 8)
         bboxes = QuadriBoxes(th_bboxes)
         points = torch.Tensor([[9, 15], [11, 15], [12.5, 15], [17, 15]])
         index = bboxes.find_inside_points(points)
         index_th = torch.BoolTensor([False, False, True, True]).reshape(4, 1)
-        self.assertEqual(tuple(index.size()), (4, 1))
+        assert_allclose(index, index_th)
+        # test is_aligned
+        bboxes = bboxes.expand(4, 8)
+        index = bboxes.find_inside_points(points, is_aligned=True)
+        index_th = torch.BoolTensor([False, False, True, True])
         assert_allclose(index, index_th)
