@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import warnings
 from typing import Tuple, TypeVar, Union
 
 import cv2
@@ -59,6 +60,8 @@ class QuadriBoxes(BaseBoxes):
         Quadrilateral boxes don't have the width concept. Use ``sqrt(areas)``
         to replace the width.
         """
+        warnings.warn("Quadrilateral boxes don't have the width concept. "
+                      'We use ``sqrt(areas)`` to replace the width.')
         return torch.sqrt(self.areas)
 
     @property
@@ -68,6 +71,8 @@ class QuadriBoxes(BaseBoxes):
         Quadrilateral boxes don't have the height concept. Use ``sqrt(areas)``
         to replace the heights.
         """
+        warnings.warn("Quadrilateral boxes don't have the height concept. "
+                      'We use ``sqrt(areas)`` to replace the width.')
         return torch.sqrt(self.areas)
 
     def flip_(self,
