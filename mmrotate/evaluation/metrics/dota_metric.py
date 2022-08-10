@@ -23,6 +23,11 @@ from mmrotate.registry import METRICS
 class DOTAMetric(BaseMetric):
     """DOTA evaluation metric.
 
+    Note:  In addition to format the output results to JSON like CocoMetric,
+    it can also generate the full image's results by merging patches' results.
+    The premise is that you must use the tool provided by us to crop the DOTA
+    large images, which can be found at: ``tools/data/dota/split``.
+
     Args:
         iou_thrs (float or List[float]): IoU threshold. Defaults to 0.5.
         scale_ranges (List[tuple], optional): Scale ranges for evaluating
@@ -248,16 +253,16 @@ class DOTAMetric(BaseMetric):
             result['scores'] = pred['scores'].cpu().numpy()
             result['labels'] = pred['labels'].cpu().numpy()
 
-            dets = []
+            result['pred_bbox_scores'] = []
             for label in range(len(self.dataset_meta['CLASSES'])):
                 index = np.where(result['labels'] == label)[0]
                 pred_bbox_scores = np.hstack([
                     result['bboxes'][index], result['scores'][index].reshape(
                         (-1, 1))
                 ])
-                dets.append(pred_bbox_scores)
+                result['pred_bbox_scores'].append(pred_bbox_scores)
 
-            self.results.append((ann, result, dets))
+            self.results.append((ann, result))
 
     def compute_metrics(self, results: list) -> dict:
         """Compute the metrics from processed results.
@@ -269,7 +274,7 @@ class DOTAMetric(BaseMetric):
             and the values are corresponding results.
         """
         logger: MMLogger = MMLogger.get_current_instance()
-        gts, preds, dets = zip(*results)
+        gts, preds = zip(*results)
 
         tmp_dir = None
         if self.outfile_prefix is None:
@@ -300,7 +305,7 @@ class DOTAMetric(BaseMetric):
             for iou_thr in self.iou_thrs:
                 logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}')
                 mean_ap, _ = eval_rbbox_map(
-                    dets,
+                    preds['pred_bbox_scores'],
                     gts,
                     scale_ranges=self.scale_ranges,
                     iou_thr=iou_thr,
