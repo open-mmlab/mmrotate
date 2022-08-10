@@ -15,7 +15,7 @@ DeviceType = Union[str, torch.device]
 class RotatedBoxes(BaseBoxes):
     """The rotated box class used in MMRotate by default.
 
-    The ``_bbox_dim`` of ``RotatedBoxes`` is 5, which means the length of the
+    The ``bbox_dim`` of ``RotatedBoxes`` is 5, which means the length of the
     last dimension of the input should be 5. Each row of data means
     (x, y, w, h, t), where 'x' and 'y' are the coordinates of the box center,
     'w' and 'h' are the length of box sides, 't' is the box angle represented
@@ -31,7 +31,7 @@ class RotatedBoxes(BaseBoxes):
         clone (bool): Whether clone ``bboxes`` or not. Defaults to True.
     """
 
-    _bbox_dim = 5
+    bbox_dim = 5
 
     def regularize_bboxes(self,
                           pattern: Optional[str] = None,

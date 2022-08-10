@@ -15,7 +15,7 @@ DeviceType = Union[str, torch.device]
 class QuadriBoxes(BaseBoxes):
     """The quadrilateral box class.
 
-    The ``_bbox_dim`` of ``QuadriBoxes`` is 8, which means the length of the
+    The ``bbox_dim`` of ``QuadriBoxes`` is 8, which means the length of the
     last dimension of the input should be 8. Each row of data means (x1, y1,
     x2, y2, x3, y3, x4, y4) which are the coordinates of 4 vertices of the box.
 
@@ -31,7 +31,7 @@ class QuadriBoxes(BaseBoxes):
         clone (bool): Whether clone ``bboxes`` or not. Defaults to True.
     """
 
-    _bbox_dim = 8
+    bbox_dim = 8
 
     @property
     def centers(self) -> Tensor:
