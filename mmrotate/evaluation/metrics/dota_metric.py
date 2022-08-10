@@ -33,7 +33,7 @@ class DOTAMetric(BaseMetric):
              be used to evaluate metric.
         proposal_nums (Sequence[int]): Proposal number used for evaluating
             recalls, such as recall@100, recall@1000.
-            Default: (100, 300, 1000).
+            Defaults to (100, 300, 1000).
         format_only (bool): Format the output results without perform
             evaluation. It is useful when you want to format the result
             to a specific format. Defaults to False.
