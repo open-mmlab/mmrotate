@@ -21,8 +21,8 @@ class DOTADataset(BaseDataset):
             of the remote sensing image, we will cut it into slices with
             the same shape. Defaults to (1024, 1024).
         diff_thr (int): The difficulty threshold of ground truth. Bboxes
-        with difficulty higher than it will be ignored. The range of this
-        value should be non-negative integer. Defaults to 100.
+            with difficulty higher than it will be ignored. The range of this
+            value should be non-negative integer. Defaults to 100.
     """
 
     METAINFO = {
