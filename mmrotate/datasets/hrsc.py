@@ -10,8 +10,6 @@ from mmdet.datasets import XMLDataset
 from mmrotate.core import obb2poly_np
 from mmrotate.registry import DATASETS
 
-# from mmrotate.structures.bbox import obb2poly_np
-
 
 @DATASETS.register_module()
 class HRSCDataset(XMLDataset):
@@ -74,10 +72,16 @@ class HRSCDataset(XMLDataset):
         """
         assert self._metainfo.get('CLASSES', None) is not None, \
             'CLASSES in `XMLDataset` can not be None.'
-        self.catid2label = {
-            ('1' + '0' * 6 + cls_id): i
-            for i, cls_id in enumerate(self._metainfo['CLASSES_ID'])
-        }
+        if self.classwise:
+            self.catid2label = {
+                ('1' + '0' * 6 + cls_id): i
+                for i, cls_id in enumerate(self._metainfo['CLASSES_ID'])
+            }
+        else:
+            self._metainfo['CLASSES'] = ('ship', )
+            self._metainfo['PALETTE'] = [
+                (220, 20, 60),
+            ]
 
         data_list = []
         img_ids = mmcv.list_from_file(
@@ -132,9 +136,13 @@ class HRSCDataset(XMLDataset):
         instances = []
         for obj in raw_ann_info.findall('HRSC_Objects/HRSC_Object'):
             instance = {}
-            class_id = obj.find('Class_ID').text
-            if class_id not in self.catid2label.keys():
-                continue
+            if self.classwise:
+                class_id = obj.find('Class_ID').text
+                label = self.catid2label[class_id]
+                if class_id not in self.catid2label.keys():
+                    continue
+            else:
+                label = 0
 
             rbbox = np.array([[
                 float(obj.find('mbox_cx').text),
@@ -163,7 +171,7 @@ class HRSCDataset(XMLDataset):
             else:
                 instance['ignore_flag'] = 0
             instance['bbox'] = polygon
-            instance['bbox_label'] = self.catid2label[class_id]
+            instance['bbox_label'] = label
             instance['head'] = head
             instances.append(instance)
         data_info['instances'] = instances

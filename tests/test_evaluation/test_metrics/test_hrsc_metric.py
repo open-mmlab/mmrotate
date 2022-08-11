@@ -97,4 +97,3 @@ class TestHRSCMetric(unittest.TestCase):
         eval_results = metric.evaluate(size=1)
         self.assertDictEqual(eval_results, dict())
         self.assertTrue(osp.exists(f'{self.tmp_dir.name}/test.bbox.json'))
-
