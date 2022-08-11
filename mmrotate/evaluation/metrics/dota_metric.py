@@ -300,12 +300,13 @@ class DOTAMetric(BaseMetric):
         if self.metric == 'mAP':
             assert isinstance(self.iou_thrs, list)
             dataset_name = self.dataset_meta['CLASSES']
+            dets = [pred['pred_bbox_scores'] for pred in preds]
 
             mean_aps = []
             for iou_thr in self.iou_thrs:
                 logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}')
                 mean_ap, _ = eval_rbbox_map(
-                    preds['pred_bbox_scores'],
+                    dets,
                     gts,
                     scale_ranges=self.scale_ranges,
                     iou_thr=iou_thr,
