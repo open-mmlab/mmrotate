@@ -4,17 +4,14 @@ import xml.etree.ElementTree as ET
 from typing import List, Union
 
 import mmcv
-import numpy as np
-from mmcv import print_log
-from mmengine.dataset import BaseDataset
-from PIL import Image
+from mmdet.dataset import XMLDataset
 
 from mmrotate.core import obb2poly_np
 from mmrotate.registry import DATASETS
 
 
-@ROTATED_DATASETS.register_module()
-class HRSCDataset(BaseDataset):
+@DATASETS.register_module()
+class HRSCDataset(XMLDataset):
     """HRSC dataset for detection.
 
     Args:
