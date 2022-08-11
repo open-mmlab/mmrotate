@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from mmcv.ops import box_iou_rotated
 from mmcv.utils import print_log
-from mmdet.core import average_precision
+from mmdet.evaluation.functional import average_precision
 from terminaltables import AsciiTable
 
 
@@ -110,14 +110,13 @@ def get_cls_results(det_results, annotations, class_id):
     cls_gts = []
     cls_gts_ignore = []
     for ann in annotations:
-        gt_inds = ann['labels'] == class_id
-        cls_gts.append(ann['bboxes'][gt_inds, :])
-
-        if ann.get('labels_ignore', None) is not None:
+        if len(ann['bboxes']) != 0:
+            gt_inds = ann['labels'] == class_id
+            cls_gts.append(ann['bboxes'][gt_inds, :])
             ignore_inds = ann['labels_ignore'] == class_id
             cls_gts_ignore.append(ann['bboxes_ignore'][ignore_inds, :])
-
         else:
+            cls_gts.append(torch.zeros((0, 5), dtype=torch.float64))
             cls_gts_ignore.append(torch.zeros((0, 5), dtype=torch.float64))
 
     return cls_dets, cls_gts, cls_gts_ignore

@@ -1,12 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
-from mmdet.core import BaseBBoxCoder
+from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
 
-from mmrotate.core.bbox.transforms import norm_angle
-from ..builder import BBOX_CODERS
+from mmrotate.registry import TASK_UTILS
+from ..transforms import norm_angle
 
 
-@BBOX_CODERS.register_module()
+@TASK_UTILS.register_module()
 class DistanceAnglePointCoder(BaseBBoxCoder):
     """Distance Angle Point BBox coder.
 

@@ -1,13 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 # Modified from jbwang1997: https://github.com/jbwang1997/OBBDetection
 import torch
-from mmdet.core.bbox.coder.base_bbox_coder import BaseBBoxCoder
+from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
 
-from ..builder import ROTATED_BBOX_CODERS
+from mmrotate.registry import TASK_UTILS
 from ..transforms import obb2poly, poly2obb
 
 
-@ROTATED_BBOX_CODERS.register_module()
+@TASK_UTILS.register_module()
 class GVFixCoder(BaseBBoxCoder):
     """Gliding vertex fix coder.
 
@@ -99,7 +99,7 @@ class GVFixCoder(BaseBBoxCoder):
         return rbboxes
 
 
-@ROTATED_BBOX_CODERS.register_module()
+@TASK_UTILS.register_module()
 class GVRatioCoder(BaseBBoxCoder):
     """Gliding vertex ratio coder.
 

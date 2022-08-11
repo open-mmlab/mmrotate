@@ -2,12 +2,12 @@
 import math
 
 import torch
-from mmdet.core.bbox.coder.base_bbox_coder import BaseBBoxCoder
+from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
 
-from ..builder import ROTATED_BBOX_CODERS
+from mmrotate.registry import TASK_UTILS
 
 
-@ROTATED_BBOX_CODERS.register_module()
+@TASK_UTILS.register_module()
 class CSLCoder(BaseBBoxCoder):
     """Circular Smooth Label Coder.
 

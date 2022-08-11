@@ -1,12 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
-from mmdet.core.bbox.samplers.base_sampler import BaseSampler
-from mmdet.core.bbox.samplers.sampling_result import SamplingResult
+from mmdet.models.task_modules.samplers.base_sampler import BaseSampler
+from mmdet.models.task_modules.samplers.sampling_result import SamplingResult
 
-from ..builder import ROTATED_BBOX_SAMPLERS
+from mmrotate.registry import TASK_UTILS
 
 
-@ROTATED_BBOX_SAMPLERS.register_module()
+@TASK_UTILS.register_module()
 class RRandomSampler(BaseSampler):
     """Random sampler.
 
@@ -25,10 +25,10 @@ class RRandomSampler(BaseSampler):
                  neg_pos_ub=-1,
                  add_gt_as_proposals=True,
                  **kwargs):
-        from mmdet.core.bbox import demodata
+        from mmdet.utils.util_random import ensure_rng
         super(RRandomSampler, self).__init__(num, pos_fraction, neg_pos_ub,
                                              add_gt_as_proposals)
-        self.rng = demodata.ensure_rng(kwargs.get('rng', None))
+        self.rng = ensure_rng(kwargs.get('rng', None))
 
     def random_choice(self, gallery, num):
         """Random select some elements from the gallery.
@@ -36,11 +36,9 @@ class RRandomSampler(BaseSampler):
         If `gallery` is a Tensor, the returned indices will be a Tensor;
         If `gallery` is a ndarray or list, the returned indices will be a
         ndarray.
-
         Args:
             gallery (Tensor | ndarray | list): indices pool.
             num (int): expected sample num.
-
         Returns:
             Tensor or ndarray: sampled indices.
         """
@@ -83,19 +81,15 @@ class RRandomSampler(BaseSampler):
                gt_labels=None,
                **kwargs):
         """Sample positive and negative bboxes.
-
         This is a simple implementation of bbox sampling given candidates,
         assigning results and ground truth bboxes.
-
         Args:
             assign_result (:obj:`AssignResult`): Bbox assigning results.
             bboxes (torch.Tensor): Boxes to be sampled from.
             gt_bboxes (torch.Tensor): Ground truth bboxes.
             gt_labels (Tensor, optional): Class labels of ground truth bboxes.
-
         Returns:
             :obj:`SamplingResult`: Sampling result.
-
         Example:
             >>> from mmdet.core.bbox import RandomSampler
             >>> from mmdet.core.bbox import AssignResult

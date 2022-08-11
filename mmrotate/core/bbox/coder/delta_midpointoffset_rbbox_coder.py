@@ -3,13 +3,13 @@
 import mmcv
 import numpy as np
 import torch
-from mmdet.core.bbox.coder.base_bbox_coder import BaseBBoxCoder
+from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
 
-from ..builder import ROTATED_BBOX_CODERS
+from mmrotate.registry import TASK_UTILS
 from ..transforms import obb2poly, obb2xyxy, poly2obb
 
 
-@ROTATED_BBOX_CODERS.register_module()
+@TASK_UTILS.register_module()
 class MidpointOffsetCoder(BaseBBoxCoder):
     """Mid point offset coder. This coder encodes bbox (x1, y1, x2, y2) into \
     delta (dx, dy, dw, dh, da, db) and decodes delta (dx, dy, dw, dh, da, db) \

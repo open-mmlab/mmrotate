@@ -1,23 +1,34 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import List, Tuple
+
 import torch
 from mmcv.utils import to_2tuple
-from mmdet.core.anchor import AnchorGenerator
+from mmdet.models.task_modules import AnchorGenerator
+from torch import Tensor
 
-from .builder import ROTATED_ANCHOR_GENERATORS
+from mmrotate.registry import TASK_UTILS
+from ..bbox import hbb2obb
 
 
-@ROTATED_ANCHOR_GENERATORS.register_module()
-class RotatedAnchorGenerator(AnchorGenerator):
-    """Fake rotate anchor generator for 2D anchor-based detectors.
+@TASK_UTILS.register_module()
+class FakeRotatedAnchorGenerator(AnchorGenerator):
+    """Fake rotate anchor generator for 2D anchor-based detectors. Horizontal
+    bounding box represented by (x,y,w,h,theta).
 
-    Horizontal bounding box represented by (x,y,w,h,theta).
+    Args:
+        angle_version (str): Angle definition of rotated bbox.
+            Defaults to 'oc'.
     """
 
+    def __init__(self, angle_version: str = 'oc', **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.angle_version = angle_version
+
     def single_level_grid_priors(self,
-                                 featmap_size,
-                                 level_idx,
-                                 dtype=torch.float32,
-                                 device='cuda'):
+                                 featmap_size: Tuple[int],
+                                 level_idx: int,
+                                 dtype: torch.dtype = torch.float32,
+                                 device: str = 'cuda') -> Tensor:
         """Generate grid anchors of a single level.
 
         Note:
@@ -26,49 +37,43 @@ class RotatedAnchorGenerator(AnchorGenerator):
         Args:
             featmap_size (tuple[int]): Size of the feature maps.
             level_idx (int): The index of corresponding feature map level.
-            dtype (obj:`torch.dtype`): Date type of points.Defaults to
-            ``torch.float32``.
-            device (str, optional): The device the tensor will be put on.
-            Defaults to 'cuda'.
-
+            dtype (obj:`torch.dtype`): Date type of points. Defaults to
+                ``torch.float32``.
+            device (str): The device the tensor will be put on.
+                Defaults to ``cuda``.
         Returns:
-            torch.Tensor: Anchors in the overall feature maps.
+            Tensor: Anchors in the overall feature maps.
         """
-        anchors = super(RotatedAnchorGenerator, self).single_level_grid_priors(
+        anchors = super().single_level_grid_priors(
             featmap_size, level_idx, dtype=dtype, device=device)
 
-        # The correct usage is：
-        #       from ..bbox.transforms import hbb2obb
-        #       anchors = hbb2obb(anchors, self.angle_version)
-        # instead of rudely setting the angle to all 0.
-        # However, the experiment shows that the performance has decreased.
-        num_anchors = anchors.size(0)
-        xy = (anchors[:, 2:] + anchors[:, :2]) / 2
-        wh = anchors[:, 2:] - anchors[:, :2]
-        theta = xy.new_zeros((num_anchors, 1))
-        anchors = torch.cat([xy, wh, theta], axis=1)
+        anchors = hbb2obb(anchors, self.angle_version)
 
         return anchors
 
 
-@ROTATED_ANCHOR_GENERATORS.register_module()
-class PseudoAnchorGenerator(AnchorGenerator):
+@TASK_UTILS.register_module()
+class PseudoRotatedAnchorGenerator(AnchorGenerator):
     """Non-Standard pseudo anchor generator that is used to generate valid
     flags only!"""
 
-    def __init__(self, strides):
+    def __init__(self, strides: List[int]) -> None:
         self.strides = [to_2tuple(stride) for stride in strides]
 
     @property
-    def num_base_anchors(self):
+    def num_base_anchors(self) -> None:
         """list[int]: total number of base anchors in a feature grid"""
         return [1 for _ in self.strides]
 
-    def single_level_grid_anchors(self, featmap_sizes, device='cuda'):
+    def single_level_grid_anchors(self,
+                                  base_anchors: Tensor,
+                                  featmap_size: Tuple[int],
+                                  stride: Tuple[int],
+                                  device: str = 'cuda') -> None:
         """Calling its grid_anchors() method will raise NotImplementedError!"""
         raise NotImplementedError
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         indent_str = '    '
         repr_str = self.__class__.__name__ + '(\n'
         repr_str += f'{indent_str}strides={self.strides})'

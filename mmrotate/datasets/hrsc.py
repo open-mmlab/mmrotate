@@ -6,7 +6,7 @@ from collections import OrderedDict
 import mmcv
 import numpy as np
 from mmcv import print_log
-from mmdet.datasets import CustomDataset
+from mmengine.dataset import BaseDataset
 from PIL import Image
 
 from mmrotate.core import eval_rbbox_map, obb2poly_np, poly2obb_np
@@ -14,7 +14,7 @@ from .builder import ROTATED_DATASETS
 
 
 @ROTATED_DATASETS.register_module()
-class HRSCDataset(CustomDataset):
+class HRSCDataset(BaseDataset):
     """HRSC dataset for detection.
 
     Args:
