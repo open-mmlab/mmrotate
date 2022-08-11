@@ -1,10 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import warnings
 from typing import Optional, Tuple, TypeVar, Union
 
 import cv2
 import numpy as np
 import torch
 from mmdet.structures.bbox import BaseBoxes, register_bbox_mode
+from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from torch import BoolTensor, Tensor
 
 T = TypeVar('T')
@@ -167,14 +169,14 @@ class RotatedBoxes(BaseBoxes):
     def clip_(self, img_shape: Tuple[int, int]) -> None:
         """Inplace clip boxes according to the image shape.
 
-        In ``RotatedBoxes``, ``clip`` function do nothing about the original
+        In ``RotatedBoxes``, ``clip`` function does nothing about the original
         data, because it's very tricky to handle rotate boxes corssing the
         image.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
         """
-        pass
+        warnings.warn('The `clip` function does nothing in `RotatedBoxes`.')
 
     def rotate_(self, center: Tuple[float, float], angle: float) -> None:
         """Inplace rotate all boxes.
@@ -257,9 +259,7 @@ class RotatedBoxes(BaseBoxes):
         rbboxes = corners.new_tensor(rbboxes)
         return rbboxes.reshape(*original_shape, 5)
 
-    def rescale_(self,
-                 scale_factor: Tuple[float, float],
-                 mapping_back=False) -> None:
+    def rescale_(self, scale_factor: Tuple[float, float]) -> None:
         """Inplace rescale boxes w.r.t. rescale_factor.
 
         Note:
@@ -271,16 +271,12 @@ class RotatedBoxes(BaseBoxes):
         Args:
             scale_factor (Tuple[float, float]): factors for scaling boxes.
                 The length should be 2.
-            mapping_back (bool): Mapping back the rescaled bboxes.
-                Defaults to False.
         """
         bboxes = self.tensor
         assert len(scale_factor) == 2
         scale_x, scale_y = scale_factor
         ctrs, w, h, t = torch.split(bboxes, [2, 1, 1, 1], dim=-1)
         cos_value, sin_value = torch.cos(t), torch.sin(t)
-        if mapping_back:
-            scale_x, scale_y = 1 / scale_x, 1 / scale_y
 
         # Refer to https://github.com/facebookresearch/detectron2/blob/main/detectron2/structures/rotated_boxes.py # noqa
         # rescale centers
@@ -315,25 +311,26 @@ class RotatedBoxes(BaseBoxes):
     def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
         """Find bboxes inside the image.
 
-        In ``HorizontalBoxes``, as long as the center of box is inside the
-        image, this box will be regarded as True.
+        In ``RotatedBoxes``, as long as the center of box is inside the image,
+        this box will be regarded as True.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
 
         Returns:
-            BoolTensor: Index of the remaining bboxes. Assuming the original
-            rotated boxes have shape (m, n, 5), the output has shape (m, n).
+            BoolTensor: A BoolTensor indicating whether the box is inside
+            the image. Assuming the original boxes have shape (m, n, 5),
+            the output has shape (m, n).
         """
         img_h, img_w = img_shape
         bboxes = self.tensor
-        return (bboxes[..., 0] < img_w) & (bboxes[..., 0] > 0) \
-            & (bboxes[..., 1] < img_h) & (bboxes[..., 1] > 0)
+        return (bboxes[..., 0] <= img_w) & (bboxes[..., 0] >= 0) \
+            & (bboxes[..., 1] <= img_h) & (bboxes[..., 1] >= 0)
 
     def find_inside_points(self,
                            points: Tensor,
                            is_aligned: bool = False) -> BoolTensor:
-        """Find inside box points. Require bboxes dimension must be 2.
+        """Find inside box points. Boxes dimension must be 2.
 
         Args:
             points (Tensor): Points coordinates. Has shape of (m, 2).
@@ -342,10 +339,10 @@ class RotatedBoxes(BaseBoxes):
                 the same. Defaults to False.
 
         Returns:
-            BoolTensor: Index of inside box points. Assuming the boxes has
-            shape of (n, 5), if ``is_aligned`` is False. The index has
-            shape of (m, n). If ``is_aligned`` is True, m should be equal to n
-            and the index has shape of (m, ).
+            BoolTensor: A BoolTensor indicating whether the box is inside the
+            image. Assuming the boxes has shape of (n, 5), if ``is_aligned``
+            is False. The index has shape of (m, n). If ``is_aligned`` is True,
+            m should be equal to n and the index has shape of (m, ).
         """
         bboxes = self.tensor
         assert bboxes.dim() == 2, 'bboxes dimension must be 2.'
@@ -366,5 +363,84 @@ class RotatedBoxes(BaseBoxes):
         offset = offset.squeeze(-1)
         offset_x, offset_y = offset[..., 0], offset[..., 1]
         w, h = wh[..., 0], wh[..., 1]
-        return (offset_x < w / 2) & (offset_x > - w / 2) & \
-            (offset_y < h / 2) & (offset_y > - h / 2)
+        return (offset_x <= w / 2) & (offset_x >= - w / 2) & \
+            (offset_y <= h / 2) & (offset_y >= - h / 2)
+
+    @staticmethod
+    def bbox_overlaps(bboxes1: BaseBoxes,
+                      bboxes2: BaseBoxes,
+                      mode: str = 'iou',
+                      is_aligned: bool = False,
+                      eps: float = 1e-6) -> Tensor:
+        """Calculate overlap between two set of boxes with their modes
+        converted to ``RotatedBoxes``.
+
+        Args:
+            bboxes1 (:obj:`BaseBoxes`): BaseBoxes with shape of (m, bbox_dim)
+                or empty.
+            bboxes2 (:obj:`BaseBoxes`): BaseBoxes with shape of (n, bbox_dim)
+                or empty.
+            mode (str): "iou" (intersection over union), "iof" (intersection
+                over foreground). Defaults to "iou".
+            is_aligned (bool): If True, then m and n must be equal. Defaults
+                to False.
+            eps (float): A value added to the denominator for numerical
+                stability. Defaults to 1e-6.
+
+        Returns:
+            Tensor: shape (m, n) if ``is_aligned`` is False else shape (m,)
+        """
+        from ..iou_calculators import rbbox_overlaps
+        bboxes1 = bboxes1.convert_to('rbox')
+        bboxes2 = bboxes2.convert_to('rbox')
+        return rbbox_overlaps(
+            bboxes1.tensor,
+            bboxes2.tensor,
+            mode=mode,
+            is_aligned=is_aligned,
+            eps=eps)
+
+    @staticmethod
+    def from_bitmap_masks(masks: BitmapMasks) -> 'RotatedBoxes':
+        """Create boxes from ``BitmapMasks``.
+
+        Args:
+            masks (:obj:`BitmapMasks`): BitmapMasks with length of n.
+
+        Returns:
+            :obj:`RotatedBoxes`: Converted boxes with shape of (n, 5).
+        """
+        num_masks = len(masks)
+        if num_masks == 0:
+            return RotatedBoxes(np.zeros((0, 5), dtype=np.float32))
+        boxes = []
+        for idx in range(num_masks):
+            mask = masks.masks[idx]
+            points = np.stack(np.nonzero(mask), axis=-1).astype(np.float32)
+            (x, y), (w, h), angle = cv2.minAreaRect(points)
+            boxes.append([x, y, w, h, angle / 180 * np.pi])
+        return RotatedBoxes(boxes)
+
+    @staticmethod
+    def from_polygon_masks(masks: PolygonMasks) -> 'RotatedBoxes':
+        """Create boxes from ``PolygonMasks``.
+
+        Args:
+            masks (:obj:`BitmapMasks`): PolygonMasks
+
+        Returns:
+            :obj:`RotatedBoxes`: Converted boxes with shape of (n, 5).
+        """
+        num_masks = len(masks)
+        if num_masks == 0:
+            return RotatedBoxes(np.zeros((0, 5), dtype=np.float32))
+        boxes = []
+        for idx, poly_per_obj in enumerate(masks.masks):
+            pts_per_obj = []
+            for p in poly_per_obj:
+                pts_per_obj.append(
+                    np.array(p, dtype=np.float32).reshape(-1, 2))
+            pts_per_obj = np.concatenate(pts_per_obj, axis=0)
+            (x, y), (w, h), angle = cv2.minAreaRect(pts_per_obj)
+            boxes.append([x, y, w, h, angle / 180 * np.pi])
+        return RotatedBoxes(boxes)

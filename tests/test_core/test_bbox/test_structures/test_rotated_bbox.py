@@ -4,6 +4,7 @@ from unittest import TestCase
 
 import numpy as np
 import torch
+from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from mmengine.testing import assert_allclose
 
 from mmrotate.core.bbox.structures import RotatedBoxes
@@ -123,12 +124,6 @@ class TestHorizontalBoxes(TestCase):
         rescaled_bboxes_th = torch.Tensor([16, 16, 4, 8,
                                            np.pi / 6]).reshape(1, 1, 5)
         assert_allclose(bboxes.tensor, rescaled_bboxes_th)
-        # test mapping_back
-        bboxes = RotatedBoxes(th_bboxes)
-        bboxes.rescale_(scale_factor, mapping_back=True)
-        rescaled_bboxes_th = torch.Tensor([100, 100, 25, 50,
-                                           np.pi / 6]).reshape(1, 1, 5)
-        assert_allclose(bboxes.tensor, rescaled_bboxes_th)
 
     def test_resize(self):
         th_bboxes = torch.Tensor([40, 40, 10, 20, np.pi / 6]).reshape(1, 1, 5)
@@ -160,3 +155,22 @@ class TestHorizontalBoxes(TestCase):
         index = bboxes.find_inside_points(points, is_aligned=True)
         index_th = torch.BoolTensor([False, False, True, True])
         assert_allclose(index, index_th)
+
+    def test_from_masks(self):
+        bitmap_masks = BitmapMasks.random()
+        bboxes = RotatedBoxes.from_bitmap_masks(bitmap_masks)
+        self.assertIsInstance(bboxes, RotatedBoxes)
+        self.assertEqual(len(bboxes), len(bitmap_masks))
+        polygon_masks = PolygonMasks.random()
+        bboxes = RotatedBoxes.from_polygon_masks(polygon_masks)
+        self.assertIsInstance(bboxes, RotatedBoxes)
+        self.assertEqual(len(bboxes), len(bitmap_masks))
+        # zero length masks
+        bitmap_masks = BitmapMasks.random(num_masks=0)
+        bboxes = RotatedBoxes.from_bitmap_masks(bitmap_masks)
+        self.assertIsInstance(bboxes, RotatedBoxes)
+        self.assertEqual(len(bboxes), 0)
+        polygon_masks = PolygonMasks.random(num_masks=0)
+        bboxes = RotatedBoxes.from_polygon_masks(polygon_masks)
+        self.assertIsInstance(bboxes, RotatedBoxes)
+        self.assertEqual(len(bboxes), 0)
