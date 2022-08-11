@@ -2,14 +2,14 @@
 import cv2
 import numpy as np
 import torch
-from mmdet.structures.bbox import register_bbox_mode_converter
+from mmdet.structures.bbox import HorizontalBoxes, register_bbox_mode_converter
 from torch import Tensor
 
-from .quadrilateral_bbox import QuadriBoxes  # noqa
-from .rotated_bbox import RotatedBoxes  # noqa
+from .quadrilateral_bbox import QuadriBoxes
+from .rotated_bbox import RotatedBoxes
 
 
-@register_bbox_mode_converter('hbox', 'rbox')
+@register_bbox_mode_converter(HorizontalBoxes, RotatedBoxes)
 def hbbox2rbbox(bboxes: Tensor) -> Tensor:
     """Convert horizontal boxes to rotated boxes.
 
@@ -25,7 +25,7 @@ def hbbox2rbbox(bboxes: Tensor) -> Tensor:
     return torch.cat([ctrs, wh, theta], dim=-1)
 
 
-@register_bbox_mode_converter('hbox', 'qbox')
+@register_bbox_mode_converter(HorizontalBoxes, QuadriBoxes)
 def hbbox2qbbox(bboxes: Tensor) -> Tensor:
     """Convert horizontal boxes to quadrilateral boxes.
 
@@ -39,7 +39,7 @@ def hbbox2qbbox(bboxes: Tensor) -> Tensor:
     return torch.cat([x1, y1, x2, y1, x2, y2, x1, y2], dim=-1)
 
 
-@register_bbox_mode_converter('rbox', 'hbox')
+@register_bbox_mode_converter(RotatedBoxes, HorizontalBoxes)
 def rbbox2hbbox(bboxes: Tensor) -> Tensor:
     """Convert rotated boxes to horizontal boxes.
 
@@ -57,7 +57,7 @@ def rbbox2hbbox(bboxes: Tensor) -> Tensor:
     return torch.cat([ctrs - bias, ctrs + bias], dim=-1)
 
 
-@register_bbox_mode_converter('rbox', 'qbox')
+@register_bbox_mode_converter(RotatedBoxes, QuadriBoxes)
 def rbbox2qbbox(bboxes: Tensor) -> Tensor:
     """Convert rotated boxes to quadrilateral boxes.
 
@@ -78,7 +78,7 @@ def rbbox2qbbox(bboxes: Tensor) -> Tensor:
     return torch.cat([pt1, pt2, pt3, pt4], dim=-1)
 
 
-@register_bbox_mode_converter('qbox', 'hbox')
+@register_bbox_mode_converter(QuadriBoxes, HorizontalBoxes)
 def qbbox2hbbox(bboxes: Tensor) -> Tensor:
     """Convert quadrilateral boxes to horizontal boxes.
 
@@ -94,7 +94,7 @@ def qbbox2hbbox(bboxes: Tensor) -> Tensor:
     return torch.cat([x1y1, x2y2], dim=-1)
 
 
-@register_bbox_mode_converter('qbox', 'rbox')
+@register_bbox_mode_converter(QuadriBoxes, RotatedBoxes)
 def qbbox2rbbox(bboxes: Tensor) -> Tensor:
     """Convert quadrilateral boxes to rotated boxes.
 
