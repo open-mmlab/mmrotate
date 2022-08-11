@@ -4,19 +4,31 @@ import xml.etree.ElementTree as ET
 from typing import List, Union
 
 import mmcv
-from mmdet.dataset import XMLDataset
+import numpy as np
+from mmdet.datasets import XMLDataset
 
 from mmrotate.core import obb2poly_np
 from mmrotate.registry import DATASETS
+
+# from mmrotate.structures.bbox import obb2poly_np
 
 
 @DATASETS.register_module()
 class HRSCDataset(XMLDataset):
     """HRSC dataset for detection.
 
+    Note: There are two evaluation methods for HRSC datasets, which can be
+    chosen through ``classwise``. When ``classwise=False``, it means there
+    is only one class; When ``classwise=True``, it means there are 31
+    classes of ships.
+
     Args:
-        classwise (bool): Whether to use all classes or only ship.
-        angle_version (str): Angle representations. Defaults to 'oc'.
+        img_subdir (str): Subdir where images are stored.
+            Defaults to'AllImages'.
+        ann_subdir (str): Subdir where annotations are.
+            Defaults to 'Annotations'.
+        classwise (bool): Whether to use all 31 classes or only one class.
+            Defaults to False.
     """
 
     METAINFO = {
@@ -46,12 +58,13 @@ class HRSCDataset(XMLDataset):
     }
 
     def __init__(self,
-                 classwise: bool = True,
-                 angle_version: str = 'oc',
+                 img_subdir: str = 'AllImages',
+                 ann_subdir: str = 'Annotations',
+                 classwise: bool = False,
                  **kwargs) -> None:
         self.classwise = classwise
-        self.version = angle_version
-        super().__init__(**kwargs)
+        super().__init__(
+            img_subdir=img_subdir, ann_subdir=ann_subdir, **kwargs)
 
     def load_data_list(self) -> List[dict]:
         """Load annotation from XML style ann_file.
@@ -119,17 +132,20 @@ class HRSCDataset(XMLDataset):
         instances = []
         for obj in raw_ann_info.findall('HRSC_Objects/HRSC_Object'):
             instance = {}
-            name = obj.find('Class_ID').text
-            if name not in self._metainfo['CLASSES']:
+            class_id = obj.find('Class_ID').text
+            if class_id not in self.catid2label.keys():
                 continue
-            rbbox = [
+
+            rbbox = np.array([[
                 float(obj.find('mbox_cx').text),
                 float(obj.find('mbox_cy').text),
                 float(obj.find('mbox_w').text),
                 float(obj.find('mbox_h').text),
                 float(obj.find('mbox_ang').text), 0
-            ]
-            polygon = obb2poly_np(rbbox, 'le90')[0, :-1]
+            ]],
+                             dtype=np.float32)
+
+            polygon = obb2poly_np(rbbox, 'le90')[0, :-1].tolist()
             head = [
                 int(obj.find('header_x').text),
                 int(obj.find('header_y').text)
@@ -138,8 +154,8 @@ class HRSCDataset(XMLDataset):
             ignore = False
             if self.bbox_min_size is not None:
                 assert not self.test_mode
-                w = rbbox[2]
-                h = rbbox[3]
+                w = rbbox[0][2]
+                h = rbbox[0][3]
                 if w < self.bbox_min_size or h < self.bbox_min_size:
                     ignore = True
             if ignore:
@@ -147,7 +163,7 @@ class HRSCDataset(XMLDataset):
             else:
                 instance['ignore_flag'] = 0
             instance['bbox'] = polygon
-            instance['bbox_label'] = self.cat2label[name]
+            instance['bbox_label'] = self.catid2label[class_id]
             instance['head'] = head
             instances.append(instance)
         data_info['instances'] = instances
