@@ -2,10 +2,11 @@
 import argparse
 import os
 import os.path as osp
+import shutil
 import time
 from functools import partial
 from multiprocessing import Pool
-import shutil
+
 from PIL import Image
 
 Image.MAX_IMAGE_PIXELS = None
@@ -26,7 +27,8 @@ def add_parser(parser):
 
 def parse_args():
     """Parse arguments."""
-    parser = argparse.ArgumentParser(description='Add image shape in the end line of annotations')
+    parser = argparse.ArgumentParser(
+        description='Add image shape in the end line of annotations')
     add_parser(parser)
     args = parser.parse_args()
     assert args.data_dir is not None, "argument img_dir can't be None"
@@ -48,7 +50,8 @@ def load_data(img_dir, ann_dir, save_dir, nproc=10):
     assert osp.isdir(img_dir), f'The {img_dir} is not an existing dir!'
     assert osp.isdir(ann_dir), f'The {ann_dir} is not an existing dir!'
 
-    _load_func = partial(_load_data_single, img_dir=img_dir, ann_dir=ann_dir, save_dir=save_dir)
+    _load_func = partial(
+        _load_data_single, img_dir=img_dir, ann_dir=ann_dir, save_dir=save_dir)
     if nproc > 1:
         pool = Pool(nproc)
         pool.map(_load_func, os.listdir(img_dir))
@@ -91,7 +94,8 @@ def main():
 
     print('Processing...')
     start = time.time()
-    load_data(img_dir=img_dir, ann_dir=ann_dir, save_dir=save_dir, nproc=args.nproc)
+    load_data(
+        img_dir=img_dir, ann_dir=ann_dir, save_dir=save_dir, nproc=args.nproc)
     stop = time.time()
     print(f'Finish in {int(stop - start)} second!!!')
 
