@@ -1,7 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import random
 from math import sqrt
 from unittest import TestCase
 
+import cv2
 import numpy as np
 import torch
 from mmdet.structures.mask import BitmapMasks, PolygonMasks
@@ -77,7 +79,7 @@ class TestQuadriBoxes(TestCase):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 20, 20, 10,
                                   20]).reshape(1, 1, 8)
         center = (15, 15)
-        angle = 45
+        angle = -45
         bboxes = QuadriBoxes(th_bboxes)
         bboxes.rotate_(center, angle)
         rotated_bboxes_th = torch.Tensor([
@@ -89,9 +91,25 @@ class TestQuadriBoxes(TestCase):
     def test_project(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,
                                   20]).reshape(1, 1, 8)
-        matrix = np.random.rand(3, 3)
-        bboxes = QuadriBoxes(th_bboxes)
-        bboxes.project_(matrix)
+        bboxes1 = QuadriBoxes(th_bboxes)
+        bboxes2 = bboxes1.clone()
+
+        matrix = np.zeros((3, 3), dtype=np.float32)
+        center = [random.random() * 80, random.random() * 80]
+        angle = random.random() * 180
+        matrix[:2, :3] = cv2.getRotationMatrix2D(center, angle, 1)
+        x_translate = random.random() * 40
+        y_translate = random.random() * 40
+        matrix[0, 2] = matrix[0, 2] + x_translate
+        matrix[1, 2] = matrix[1, 2] + y_translate
+        scale_factor = random.random() * 2
+        matrix[2, 2] = 1 / scale_factor
+        bboxes1.project_(matrix)
+
+        bboxes2.rotate_(center, -angle)
+        bboxes2.translate_([x_translate, y_translate])
+        bboxes2.rescale_([scale_factor, scale_factor])
+        assert_allclose(bboxes1.tensor, bboxes2.tensor)
 
     def test_rescale(self):
         th_bboxes = torch.Tensor([10, 10, 20, 10, 24, 20, 14,

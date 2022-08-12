@@ -134,11 +134,12 @@ class QuadriBoxes(BaseBoxes):
 
         Args:
             center (Tuple[float, float]): Rotation origin.
-            angle (float): Rotation angle represented in degrees.
+            angle (float): Rotation angle represented in degrees. Positive
+                values mean clockwise rotation.
         """
         bboxes = self.tensor
         rotation_matrix = bboxes.new_tensor(
-            cv2.getRotationMatrix2D(center, angle, 1))
+            cv2.getRotationMatrix2D(center, -angle, 1))
 
         corners = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
         corners = torch.cat(
