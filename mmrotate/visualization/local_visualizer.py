@@ -1,14 +1,15 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import imp
 from typing import List, Optional
 
 import numpy as np
 import torch
-from ..registry import VISUALIZERS
 from mmdet.structures.mask import bitmap_to_polygon
-from mmdet.visualization.palette import _get_adaptive_scales, get_palette
-from mmrotate.core import obb2poly
 from mmdet.visualization import DetLocalVisualizer
+from mmdet.visualization.palette import _get_adaptive_scales, get_palette
+from mmengine.data import InstanceData
+
+from mmrotate.core import obb2poly
+from ..registry import VISUALIZERS
 
 
 @VISUALIZERS.register_module()
@@ -37,7 +38,7 @@ class RotLocalVisualizer(DetLocalVisualizer):
                 Defaults to 0.8.
     """
 
-    def _draw_instances(self, image: np.ndarray, instances: ['InstanceData'],
+    def _draw_instances(self, image: np.ndarray, instances: InstanceData,
                         classes: Optional[List[str]],
                         palette: Optional[List[tuple]]) -> np.ndarray:
         """Draw instances of GT or prediction.
@@ -68,8 +69,13 @@ class RotLocalVisualizer(DetLocalVisualizer):
             colors = [bbox_palette[label] for label in labels]
 
             # rbbox to polygon
-            polygons = obb2poly(torch.from_numpy(bboxes), 'oc').reshape(-1, 4, 2)[0]
-            self.draw_polygons(polygons, edge_colors=colors, alpha=self.alpha, line_widths=self.line_width)
+            polygons = obb2poly(torch.from_numpy(bboxes),
+                                'oc').reshape(-1, 4, 2)[0]
+            self.draw_polygons(
+                polygons,
+                edge_colors=colors,
+                alpha=self.alpha,
+                line_widths=self.line_width)
             positions = bboxes[:, :2] + self.line_width
             areas = bboxes[:, 2] * bboxes[:, 3]
             scales = _get_adaptive_scales(areas)

@@ -6,11 +6,9 @@ import mmcv
 import numpy as np
 from mmcv import Config, DictAction
 from mmdet.models.utils import mask2ndarray
-from mmdet.registry import VISUALIZERS
+from mmdet.registry import DATASETS, VISUALIZERS
 
-from mmrotate.datasets.builder import build_dataset
-
-# from mmdet.utils import register_all_modules
+from mmrotate.utils import register_all_modules
 
 
 def parse_args():
@@ -47,10 +45,10 @@ def main():
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
 
-    # register all modules in mmdet into the registries
-    # register_all_modules()
+    # register all modules in mmrotate into the registries
+    register_all_modules()
 
-    dataset = build_dataset(cfg.train_dataloader.dataset)
+    dataset = DATASETS.build(cfg.train_dataloader.dataset)
 
     visualizer = VISUALIZERS.build(cfg.visualizer)
     visualizer.dataset_meta = dataset.metainfo

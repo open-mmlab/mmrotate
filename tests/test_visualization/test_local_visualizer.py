@@ -5,9 +5,9 @@ from unittest import TestCase
 import cv2
 import numpy as np
 import torch
+from mmdet.structures import DetDataSample
 from mmengine.data import InstanceData
 
-from mmdet.structures import DetDataSample
 from mmrotate.visualization import RotLocalVisualizer
 
 
