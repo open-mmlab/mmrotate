@@ -48,6 +48,11 @@ class DOTAMetric(BaseMetric):
         iou_thr (float): IoU threshold of ``nms_rotated`` used in merge
             patches. Defaults to 0.1.
         angle_version (str): Angle representations. Defaults to 'oc'.
+        eval_mode (str): 'area' or '11points', 'area' means calculating the
+            area under precision-recall curve, '11points' means calculating
+            the average precision of recalls at [0, 0.1, ..., 1].
+            The PASCAL VOC2007 defaults to use '11points', while PASCAL
+            VOC2012 defaults to use 'area'. Defaults to '11points'.
         collect_device (str): Device name used for collecting results from
             different ranks during distributed training. Must be 'cpu' or
             'gpu'. Defaults to 'cpu'.
@@ -68,6 +73,7 @@ class DOTAMetric(BaseMetric):
                  merge_patches: bool = False,
                  iou_thr: float = 0.1,
                  angle_version: str = 'oc',
+                 eval_mode: str = '11points',
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None) -> None:
         super().__init__(collect_device=collect_device, prefix=prefix)
@@ -94,6 +100,8 @@ class DOTAMetric(BaseMetric):
         self.merge_patches = merge_patches
         self.iou_thr = iou_thr
         self.angle_version = angle_version
+
+        self.use_07_metric = True if eval_mode == '11points' else False
 
     def merge_results(self, results: Sequence[dict],
                       outfile_prefix: str) -> str:
@@ -304,6 +312,7 @@ class DOTAMetric(BaseMetric):
                     gts,
                     scale_ranges=self.scale_ranges,
                     iou_thr=iou_thr,
+                    use_07_metric=self.use_07_metric,
                     dataset=dataset_name,
                     logger=logger)
                 mean_aps.append(mean_ap)
