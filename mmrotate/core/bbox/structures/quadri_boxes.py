@@ -5,19 +5,20 @@ from typing import Tuple, TypeVar, Union
 import cv2
 import numpy as np
 import torch
-from mmdet.structures.bbox import BaseBoxes, register_bbox_mode
+from mmdet.structures.bbox import BaseBoxes, register_box
 from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from torch import BoolTensor, Tensor
 
 T = TypeVar('T')
 DeviceType = Union[str, torch.device]
+MaskType = Union[BitmapMasks, PolygonMasks]
 
 
-@register_bbox_mode('qbox')
+@register_box('qbox')
 class QuadriBoxes(BaseBoxes):
     """The quadrilateral box class.
 
-    The ``bbox_dim`` of ``QuadriBoxes`` is 8, which means the length of the
+    The ``box_dim`` of ``QuadriBoxes`` is 8, which means the length of the
     last dimension of the input should be 8. Each row of data means (x1, y1,
     x2, y2, x3, y3, x4, y4) which are the coordinates of 4 vertices of the box.
     The box must be convex. The order of 4 vertices can be both CW and CCW.
@@ -26,34 +27,34 @@ class QuadriBoxes(BaseBoxes):
     DOTA, DIOR, etc.
 
     Args:
-        bboxes (Tensor or np.ndarray or Sequence): The box data with
+        boxes (Tensor or np.ndarray or Sequence): The box data with
             shape (..., 8).
-        dtype (torch.dtype, Optional): data type of bboxes. Defaults to None.
-        device (str or torch.device, Optional): device of bboxes.
+        dtype (torch.dtype, Optional): data type of boxes. Defaults to None.
+        device (str or torch.device, Optional): device of boxes.
             Default to None.
-        clone (bool): Whether clone ``bboxes`` or not. Defaults to True.
+        clone (bool): Whether clone ``boxes`` or not. Defaults to True.
     """
 
-    bbox_dim = 8
+    box_dim = 8
 
     @property
     def vertices(self) -> Tensor:
         """Return a tensor representing the vertices of boxes."""
-        bboxes = self.tensor
-        return bboxes.reshape(*bboxes.shape[:-1], 4, 2)
+        boxes = self.tensor
+        return boxes.reshape(*boxes.shape[:-1], 4, 2)
 
     @property
     def centers(self) -> Tensor:
         """Return a tensor representing the centers of boxes."""
-        bboxes = self.tensor
-        bboxes = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
-        return bboxes.mean(dim=-2)
+        boxes = self.tensor
+        boxes = boxes.reshape(*boxes.shape[:-1], 4, 2)
+        return boxes.mean(dim=-2)
 
     @property
     def areas(self) -> Tensor:
         """Return a tensor representing the areas of boxes."""
-        bboxes = self.tensor
-        pts = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
+        boxes = self.tensor
+        pts = boxes.reshape(*boxes.shape[:-1], 4, 2)
         roll_pts = torch.roll(pts, 1, dims=-2)
         xyxy = torch.sum(
             pts[..., 0] * roll_pts[..., 1] - roll_pts[..., 0] * pts[..., 1],
@@ -86,7 +87,7 @@ class QuadriBoxes(BaseBoxes):
     def flip_(self,
               img_shape: Tuple[int, int],
               direction: str = 'horizontal') -> None:
-        """Inplace flip bboxes horizontally or vertically.
+        """Flip boxes horizontally or vertically in-place.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
@@ -104,18 +105,18 @@ class QuadriBoxes(BaseBoxes):
             flipped[..., 1::2] = img_shape[0] - flipped[..., 1::2]
 
     def translate_(self, distances: Tuple[float, float]) -> None:
-        """Inplace translate bboxes.
+        """Translate boxes in-place.
 
         Args:
             distances (Tuple[float, float]): translate distances. The first
                 is horizontal distance and the second is vertical distance.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         assert len(distances) == 2
-        self.tensor = bboxes + bboxes.new_tensor(distances).repeat(4)
+        self.tensor = boxes + boxes.new_tensor(distances).repeat(4)
 
     def clip_(self, img_shape: Tuple[int, int]) -> None:
-        """Inplace clip boxes according to the image shape.
+        """Clip boxes according to the image shape in-place.
 
         In ``QuadriBoxes``, ``clip`` function does nothing about the original
         data, because it's very tricky to handle rotate boxes corssing the
@@ -130,18 +131,18 @@ class QuadriBoxes(BaseBoxes):
         warnings.warn('The `clip` function does nothing in `QuadriBoxes`.')
 
     def rotate_(self, center: Tuple[float, float], angle: float) -> None:
-        """Inplace rotate all boxes.
+        """Rotate all boxes in-place.
 
         Args:
             center (Tuple[float, float]): Rotation origin.
             angle (float): Rotation angle represented in degrees. Positive
                 values mean clockwise rotation.
         """
-        bboxes = self.tensor
-        rotation_matrix = bboxes.new_tensor(
+        boxes = self.tensor
+        rotation_matrix = boxes.new_tensor(
             cv2.getRotationMatrix2D(center, -angle, 1))
 
-        corners = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
+        corners = boxes.reshape(*boxes.shape[:-1], 4, 2)
         corners = torch.cat(
             [corners, corners.new_ones(*corners.shape[:-1], 1)], dim=-1)
         corners_T = torch.transpose(corners, -1, -2)
@@ -150,16 +151,16 @@ class QuadriBoxes(BaseBoxes):
         self.tensor = corners.reshape(*corners.shape[:-2], 8)
 
     def project_(self, homography_matrix: Union[Tensor, np.ndarray]) -> None:
-        """Inplace geometric transformation for bbox.
+        """Geometric transformat boxes in-place.
 
         Args:
             homography_matrix (Tensor or np.ndarray]):
                 Shape (3, 3) for geometric transformation.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         if isinstance(homography_matrix, np.ndarray):
-            homography_matrix = bboxes.new_tensor(homography_matrix)
-        corners = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
+            homography_matrix = boxes.new_tensor(homography_matrix)
+        corners = boxes.reshape(*boxes.shape[:-1], 4, 2)
         corners = torch.cat(
             [corners, corners.new_ones(*corners.shape[:-1], 1)], dim=-1)
         corners_T = torch.transpose(corners, -1, -2)
@@ -170,49 +171,49 @@ class QuadriBoxes(BaseBoxes):
         self.tensor = corners.reshape(*corners.shape[:-2], 8)
 
     def rescale_(self, scale_factor: Tuple[float, float]) -> None:
-        """Inplace rescale boxes w.r.t. rescale_factor.
+        """Rescale boxes w.r.t. rescale_factor in-place.
 
         Note:
-            Both ``rescale_`` and ``resize_`` will enlarge or shrink bboxes
+            Both ``rescale_`` and ``resize_`` will enlarge or shrink boxes
             w.r.t ``scale_facotr``. The difference is that ``resize_`` only
-            changes the width and the height of bboxes, but ``rescale_`` also
+            changes the width and the height of boxes, but ``rescale_`` also
             rescales the box centers simultaneously.
 
         Args:
             scale_factor (Tuple[float, float]): factors for scaling boxes.
                 The length should be 2.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         assert len(scale_factor) == 2
-        scale_factor = bboxes.new_tensor(scale_factor).repeat(4)
-        self.tensor = bboxes * scale_factor
+        scale_factor = boxes.new_tensor(scale_factor).repeat(4)
+        self.tensor = boxes * scale_factor
 
     def resize_(self, scale_factor: Tuple[float, float]) -> None:
-        """Inplace resize the box width and height w.r.t scale_factor.
+        """Resize the box width and height w.r.t scale_factor in-place.
 
         Note:
-            Both ``rescale_`` and ``resize_`` will enlarge or shrink bboxes
+            Both ``rescale_`` and ``resize_`` will enlarge or shrink boxes
             w.r.t ``scale_facotr``. The difference is that ``resize_`` only
-            changes the width and the height of bboxes, but ``rescale_`` also
+            changes the width and the height of boxes, but ``rescale_`` also
             rescales the box centers simultaneously.
 
         Args:
             scale_factor (Tuple[float, float]): factors for scaling box
                 shapes. The length should be 2.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         assert len(scale_factor) == 2
         assert scale_factor[0] == scale_factor[1], \
             'To protect the shape of QuadriBoxes not changes'
-        scale_factor = bboxes.new_tensor(scale_factor)
+        scale_factor = boxes.new_tensor(scale_factor)
 
-        bboxes = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
-        centers = bboxes.mean(dim=-2)[..., None, :]
-        bboxes = (bboxes - centers) * scale_factor + centers
-        self.tensor = bboxes.reshape(*bboxes.shape[:-2], 8)
+        boxes = boxes.reshape(*boxes.shape[:-1], 4, 2)
+        centers = boxes.mean(dim=-2)[..., None, :]
+        boxes = (boxes - centers) * scale_factor + centers
+        self.tensor = boxes.reshape(*boxes.shape[:-2], 8)
 
-    def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
-        """Find bboxes inside the image.
+    def is_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
+        """Find boxes inside the image.
 
         In ``QuadriBoxes``, as long as the center of box is inside the
         image, this box will be regarded as True.
@@ -226,9 +227,9 @@ class QuadriBoxes(BaseBoxes):
             the output has shape (m, n).
         """
         img_h, img_w = img_shape
-        bboxes = self.tensor
-        bboxes = bboxes.reshape(*bboxes.shape[:-1], 4, 2)
-        centers = bboxes.mean(dim=-2)
+        boxes = self.tensor
+        boxes = boxes.reshape(*boxes.shape[:-1], 4, 2)
+        centers = boxes.mean(dim=-2)
         return (centers[..., 0] <= img_w) & (centers[..., 0] >= 0) \
             & (centers[..., 1] <= img_h) & (centers[..., 1] >= 0)
 
@@ -239,8 +240,8 @@ class QuadriBoxes(BaseBoxes):
 
         Args:
             points (Tensor): Points coordinates. Has shape of (m, 2).
-            is_aligned (bool): Whether ``points`` has been aligned with bboxes
-                or not. If True, the length of bboxes and ``points`` should be
+            is_aligned (bool): Whether ``points`` has been aligned with boxes
+                or not. If True, the length of boxes and ``points`` should be
                 the same. Defaults to False.
 
         Returns:
@@ -249,10 +250,10 @@ class QuadriBoxes(BaseBoxes):
             is False. The index has shape of (m, n). If ``is_aligned`` is
             True, m should be equal to n and the index has shape of (m, ).
         """
-        bboxes = self.tensor
-        assert bboxes.dim() == 2, 'bboxes dimension must be 2.'
+        boxes = self.tensor
+        assert boxes.dim() == 2, 'boxes dimension must be 2.'
 
-        corners = bboxes.reshape(-1, 4, 2)
+        corners = boxes.reshape(-1, 4, 2)
         corners_next = torch.roll(corners, -1, dims=1)
         x1, y1 = corners.unbind(dim=2)
         x2, y2 = corners_next.unbind(dim=2)
@@ -266,24 +267,24 @@ class QuadriBoxes(BaseBoxes):
             x2 = x2[None, :, :]
             y2 = y2[None, :, :]
         else:
-            assert bboxes.size(0) == points.size(0)
+            assert boxes.size(0) == points.size(0)
 
         values = (x1 - pt_x) * (y2 - pt_y) - (y1 - pt_y) * (x2 - pt_x)
         return (values >= 0).all(dim=-1) | (values <= 0).all(dim=-1)
 
     @staticmethod
-    def bbox_overlaps(bboxes1: BaseBoxes,
-                      bboxes2: BaseBoxes,
-                      mode: str = 'iou',
-                      is_aligned: bool = False,
-                      eps: float = 1e-6) -> Tensor:
+    def overlaps(boxes1: BaseBoxes,
+                 boxes2: BaseBoxes,
+                 mode: str = 'iou',
+                 is_aligned: bool = False,
+                 eps: float = 1e-6) -> Tensor:
         """Calculate overlap between two set of boxes with their modes
         converted to ``QuadriBoxes``.
 
         Args:
-            bboxes1 (:obj:`BaseBoxes`): BaseBoxes with shape of (m, bbox_dim)
+            boxes1 (:obj:`BaseBoxes`): BaseBoxes with shape of (m, box_dim)
                 or empty.
-            bboxes2 (:obj:`BaseBoxes`): BaseBoxes with shape of (n, bbox_dim)
+            boxes2 (:obj:`BaseBoxes`): BaseBoxes with shape of (n, box_dim)
                 or empty.
             mode (str): "iou" (intersection over union), "iof" (intersection
                 over foreground). Defaults to "iou".
@@ -297,49 +298,40 @@ class QuadriBoxes(BaseBoxes):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def from_bitmap_masks(masks: BitmapMasks) -> 'QuadriBoxes':
-        """Create boxes from ``BitmapMasks``.
+    def from_instance_masks(masks: MaskType) -> 'QuadriBoxes':
+        """Create boxes from instance masks.
 
         Args:
-            masks (:obj:`BitmapMasks`): BitmapMasks with length of n.
+            masks (:obj:`BitmapMasks` or :obj:`PolygonMasks`): BitmapMasks or
+                PolygonMasks instance with length of n.
 
         Returns:
             :obj:`QuadriBoxes`: Converted boxes with shape of (n, 8).
         """
         num_masks = len(masks)
         if num_masks == 0:
-            return QuadriBoxes(np.zeros((0, 8), dtype=np.float32))
+            return QuadriBoxes([], dtype=torch.float32)
+
         boxes = []
-        for idx in range(num_masks):
-            mask = masks.masks[idx]
-            points = np.stack(np.nonzero(mask), axis=-1).astype(np.float32)
-            rect = cv2.minAreaRect(points)
-            (x1, y1), (x2, y2), (x3, y3), (x4, y4) = cv2.boxPoints(rect)
-            boxes.append([x1, y1, x2, y2, x3, y3, x4, y4])
-        return QuadriBoxes(boxes)
-
-    @staticmethod
-    def from_polygon_masks(masks: PolygonMasks) -> 'QuadriBoxes':
-        """Create boxes from ``PolygonMasks``.
-
-        Args:
-            masks (:obj:`BitmapMasks`): PolygonMasks
-
-        Returns:
-            :obj:`QuadriBoxes`: Converted boxes with shape of (n, 8).
-        """
-        num_masks = len(masks)
-        if num_masks == 0:
-            return QuadriBoxes(np.zeros((0, 8), dtype=np.float32))
-        boxes = []
-        for idx, poly_per_obj in enumerate(masks.masks):
-            pts_per_obj = []
-            for p in poly_per_obj:
-                pts_per_obj.append(
-                    np.array(p, dtype=np.float32).reshape(-1, 2))
-            pts_per_obj = np.concatenate(pts_per_obj, axis=0)
-            rect = cv2.minAreaRect(pts_per_obj)
-            (x1, y1), (x2, y2), (x3, y3), (x4, y4) = cv2.boxPoints(rect)
-            boxes.append([x1, y1, x2, y2, x3, y3, x4, y4])
+        if isinstance(masks, BitmapMasks):
+            for idx in range(num_masks):
+                mask = masks.masks[idx]
+                points = np.stack(np.nonzero(mask), axis=-1).astype(np.float32)
+                rect = cv2.minAreaRect(points)
+                (x1, y1), (x2, y2), (x3, y3), (x4, y4) = cv2.boxPoints(rect)
+                boxes.append([x1, y1, x2, y2, x3, y3, x4, y4])
+        elif isinstance(masks, PolygonMasks):
+            for idx, poly_per_obj in enumerate(masks.masks):
+                pts_per_obj = []
+                for p in poly_per_obj:
+                    pts_per_obj.append(
+                        np.array(p, dtype=np.float32).reshape(-1, 2))
+                pts_per_obj = np.concatenate(pts_per_obj, axis=0)
+                rect = cv2.minAreaRect(pts_per_obj)
+                (x1, y1), (x2, y2), (x3, y3), (x4, y4) = cv2.boxPoints(rect)
+                boxes.append([x1, y1, x2, y2, x3, y3, x4, y4])
+        else:
+            raise TypeError(
+                '`masks` must be `BitmapMasks`  or `PolygonMasks`, '
+                f'but got {type(masks)}.')
         return QuadriBoxes(boxes)

@@ -5,19 +5,20 @@ from typing import Optional, Tuple, TypeVar, Union
 import cv2
 import numpy as np
 import torch
-from mmdet.structures.bbox import BaseBoxes, register_bbox_mode
+from mmdet.structures.bbox import BaseBoxes, register_box
 from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from torch import BoolTensor, Tensor
 
 T = TypeVar('T')
 DeviceType = Union[str, torch.device]
+MaskType = Union[BitmapMasks, PolygonMasks]
 
 
-@register_bbox_mode('rbox')
+@register_box('rbox')
 class RotatedBoxes(BaseBoxes):
     """The rotated box class used in MMRotate by default.
 
-    The ``bbox_dim`` of ``RotatedBoxes`` is 5, which means the length of the
+    The ``box_dim`` of ``RotatedBoxes`` is 5, which means the length of the
     last dimension of the input should be 5. Each row of data means
     (x, y, w, h, t), where 'x' and 'y' are the coordinates of the box center,
     'w' and 'h' are the length of box sides, 't' is the box angle represented
@@ -25,25 +26,25 @@ class RotatedBoxes(BaseBoxes):
     (x, y, w, h) w.r.t its center by 't' radian CW.
 
     Args:
-        bboxes (Tensor or np.ndarray or Sequence): The box data with
-            shape (..., 5).
-        dtype (torch.dtype, Optional): data type of bboxes. Defaults to None.
-        device (str or torch.device, Optional): device of bboxes.
+        data (Tensor or np.ndarray or Sequence): The box data with shape
+            (..., 5).
+        dtype (torch.dtype, Optional): data type of boxes. Defaults to None.
+        device (str or torch.device, Optional): device of boxes.
             Default to None.
-        clone (bool): Whether clone ``bboxes`` or not. Defaults to True.
+        clone (bool): Whether clone ``boxes`` or not. Defaults to True.
     """
 
-    bbox_dim = 5
+    box_dim = 5
 
-    def regularize_bboxes(self,
-                          pattern: Optional[str] = None,
-                          width_longer: bool = True,
-                          start_angle: float = -90) -> Tensor:
+    def regularize_boxes(self,
+                         pattern: Optional[str] = None,
+                         width_longer: bool = True,
+                         start_angle: float = -90) -> Tensor:
         """Regularize rotated boxes.
 
         Due to the angle periodicity, one rotated box can be represented in
         many different (x, y, w, h, t). To make each rotated box unique,
-        ``regularize_bboxes`` will take the remainder of the angle divided by
+        ``regularize_boxes`` will take the remainder of the angle divided by
         180 degrees.
 
         However, after taking the remainder of the angle, there are still two
@@ -61,7 +62,7 @@ class RotatedBoxes(BaseBoxes):
           the rotated box will be represented as (0, 0, 4, 5, 0.5).
 
         For convenience, three commonly used patterns are preset in
-        ``regualrize_bboxes``:
+        ``regualrize_boxes``:
 
         - 'oc': OpenCV Definition. Has the same box representation as
           ``cv2.minAreaRect`` the angle ranges in [-90, 0). Equal to set
@@ -84,7 +85,7 @@ class RotatedBoxes(BaseBoxes):
         Returns:
             Tensor: Regularized box tensor.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         if pattern is not None:
             if pattern == 'oc':
                 width_longer, start_angle = False, -90
@@ -97,7 +98,7 @@ class RotatedBoxes(BaseBoxes):
                                  f"'le135', but get {pattern}.")
         start_angle = start_angle / 180 * np.pi
 
-        x, y, w, h, t = bboxes.unbind(dim=-1)
+        x, y, w, h, t = boxes.unbind(dim=-1)
         if width_longer:
             # swap edge and angle if h >= w
             w_ = torch.where(w > h, w, h)
@@ -110,8 +111,8 @@ class RotatedBoxes(BaseBoxes):
             w_ = torch.where(t < np.pi / 2, w, h)
             h_ = torch.where(t < np.pi / 2, h, w)
             t = torch.where(t < np.pi / 2, t, t - np.pi / 2) + start_angle
-        bboxes = torch.stack([x, y, w_, h_, t], dim=-1)
-        return bboxes
+        boxes = torch.stack([x, y, w_, h_, t], dim=-1)
+        return boxes
 
     @property
     def centers(self) -> Tensor:
@@ -136,7 +137,7 @@ class RotatedBoxes(BaseBoxes):
     def flip_(self,
               img_shape: Tuple[int, int],
               direction: str = 'horizontal') -> None:
-        """Inplace flip bboxes horizontally or vertically.
+        """Flip boxes horizontally or vertically in-place.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
@@ -156,18 +157,18 @@ class RotatedBoxes(BaseBoxes):
             flipped[..., 1] = img_shape[0] - flipped[..., 1]
 
     def translate_(self, distances: Tuple[float, float]) -> None:
-        """Inplace translate bboxes.
+        """Translate boxes in-place.
 
         Args:
             distances (Tuple[float, float]): translate distances. The first
                 is horizontal distance and the second is vertical distance.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         assert len(distances) == 2
-        bboxes[..., :2] = bboxes[..., :2] + bboxes.new_tensor(distances)
+        boxes[..., :2] = boxes[..., :2] + boxes.new_tensor(distances)
 
     def clip_(self, img_shape: Tuple[int, int]) -> None:
-        """Inplace clip boxes according to the image shape.
+        """Clip boxes according to the image shape in-place.
 
         In ``RotatedBoxes``, ``clip`` function does nothing about the original
         data, because it's very tricky to handle rotate boxes corssing the
@@ -179,18 +180,18 @@ class RotatedBoxes(BaseBoxes):
         warnings.warn('The `clip` function does nothing in `RotatedBoxes`.')
 
     def rotate_(self, center: Tuple[float, float], angle: float) -> None:
-        """Inplace rotate all boxes.
+        """Rotate all boxes in-place.
 
         Args:
             center (Tuple[float, float]): Rotation origin.
             angle (float): Rotation angle represented in degrees. Positive
                 values mean clockwise rotation.
         """
-        bboxes = self.tensor
-        rotation_matrix = bboxes.new_tensor(
+        boxes = self.tensor
+        rotation_matrix = boxes.new_tensor(
             cv2.getRotationMatrix2D(center, -angle, 1))
 
-        centers, wh, t = torch.split(bboxes, [2, 2, 1], dim=-1)
+        centers, wh, t = torch.split(boxes, [2, 2, 1], dim=-1)
         t = t + angle / 180 * np.pi
         centers = torch.cat(
             [centers, centers.new_ones(*centers.shape[:-1], 1)], dim=-1)
@@ -200,16 +201,16 @@ class RotatedBoxes(BaseBoxes):
         self.tensor = torch.cat([centers, wh, t], dim=-1)
 
     def project_(self, homography_matrix: Union[Tensor, np.ndarray]) -> None:
-        """Inplace geometric transformation for bbox.
+        """Geometric transformat boxes in-place.
 
         Args:
             homography_matrix (Tensor or np.ndarray]):
                 Shape (3, 3) for geometric transformation.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         if isinstance(homography_matrix, np.ndarray):
-            homography_matrix = bboxes.new_tensor(homography_matrix)
-        corners = self.rbbox2corner(bboxes)
+            homography_matrix = boxes.new_tensor(homography_matrix)
+        corners = self.rbox2corner(boxes)
         corners = torch.cat(
             [corners, corners.new_ones(*corners.shape[:-1], 1)], dim=-1)
         corners_T = torch.transpose(corners, -1, -2)
@@ -217,20 +218,20 @@ class RotatedBoxes(BaseBoxes):
         corners = torch.transpose(corners_T, -1, -2)
         # Convert to homogeneous coordinates by normalization
         corners = corners[..., :2] / corners[..., 2:3]
-        self.tensor = self.corner2rbbox(corners)
+        self.tensor = self.corner2rbox(corners)
 
     @staticmethod
-    def rbbox2corner(bboxes: Tensor) -> Tensor:
-        """Convert rotated bbox (x, y, w, h, t) to corners ((x1, y1), (x2, y1),
+    def rbox2corner(boxes: Tensor) -> Tensor:
+        """Convert rotated box (x, y, w, h, t) to corners ((x1, y1), (x2, y1),
         (x1, y2), (x2, y2)).
 
         Args:
-            bboxes (Tensor): Rotated box tensor with shape of (..., 5).
+            boxes (Tensor): Rotated box tensor with shape of (..., 5).
 
         Returns:
             Tensor: Corner tensor with shape of (..., 4, 2).
         """
-        ctr, w, h, theta = torch.split(bboxes, (2, 1, 1, 1), dim=-1)
+        ctr, w, h, theta = torch.split(boxes, (2, 1, 1, 1), dim=-1)
         cos_value, sin_value = torch.cos(theta), torch.sin(theta)
         vec1 = torch.cat([w / 2 * cos_value, w / 2 * sin_value], dim=-1)
         vec2 = torch.cat([-h / 2 * sin_value, h / 2 * cos_value], dim=-1)
@@ -241,7 +242,7 @@ class RotatedBoxes(BaseBoxes):
         return torch.stack([pt1, pt2, pt3, pt4], dim=-2)
 
     @staticmethod
-    def corner2rbbox(corners: Tensor) -> Tensor:
+    def corner2rbox(corners: Tensor) -> Tensor:
         """Convert corners ((x1, y1), (x2, y1), (x1, y2), (x2, y2)) to rotated
         box (x, y, w, h, t).
 
@@ -253,30 +254,30 @@ class RotatedBoxes(BaseBoxes):
         """
         original_shape = corners.shape[:-2]
         points = corners.cpu().numpy().reshape(-1, 4, 2)
-        rbboxes = []
+        rboxes = []
         for pts in points:
             (x, y), (w, h), angle = cv2.minAreaRect(pts)
-            rbboxes.append([x, y, w, h, angle / 180 * np.pi])
-        rbboxes = corners.new_tensor(rbboxes)
-        return rbboxes.reshape(*original_shape, 5)
+            rboxes.append([x, y, w, h, angle / 180 * np.pi])
+        rboxes = corners.new_tensor(rboxes)
+        return rboxes.reshape(*original_shape, 5)
 
     def rescale_(self, scale_factor: Tuple[float, float]) -> None:
-        """Inplace rescale boxes w.r.t. rescale_factor.
+        """Rescale boxes w.r.t. rescale_factor in-place.
 
         Note:
-            Both ``rescale_`` and ``resize_`` will enlarge or shrink bboxes
+            Both ``rescale_`` and ``resize_`` will enlarge or shrink boxes
             w.r.t ``scale_facotr``. The difference is that ``resize_`` only
-            changes the width and the height of bboxes, but ``rescale_`` also
+            changes the width and the height of boxes, but ``rescale_`` also
             rescales the box centers simultaneously.
 
         Args:
             scale_factor (Tuple[float, float]): factors for scaling boxes.
                 The length should be 2.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         assert len(scale_factor) == 2
         scale_x, scale_y = scale_factor
-        ctrs, w, h, t = torch.split(bboxes, [2, 1, 1, 1], dim=-1)
+        ctrs, w, h, t = torch.split(boxes, [2, 1, 1, 1], dim=-1)
         cos_value, sin_value = torch.cos(t), torch.sin(t)
 
         # Refer to https://github.com/facebookresearch/detectron2/blob/main/detectron2/structures/rotated_boxes.py # noqa
@@ -290,27 +291,27 @@ class RotatedBoxes(BaseBoxes):
         self.tensor = torch.cat([ctrs, w, h, t], dim=-1)
 
     def resize_(self, scale_factor: Tuple[float, float]) -> None:
-        """Inplace resize the box width and height w.r.t scale_factor.
+        """Resize the box width and height w.r.t scale_factor in-place.
 
         Note:
-            Both ``rescale_`` and ``resize_`` will enlarge or shrink bboxes
+            Both ``rescale_`` and ``resize_`` will enlarge or shrink boxes
             w.r.t ``scale_facotr``. The difference is that ``resize_`` only
-            changes the width and the height of bboxes, but ``rescale_`` also
+            changes the width and the height of boxes, but ``rescale_`` also
             rescales the box centers simultaneously.
 
         Args:
             scale_factor (Tuple[float, float]): factors for scaling box
                 shapes. The length should be 2.
         """
-        bboxes = self.tensor
+        boxes = self.tensor
         assert len(scale_factor) == 2
-        ctrs, wh, t = torch.split(bboxes, [2, 2, 1], dim=-1)
-        scale_factor = bboxes.new_tensor(scale_factor)
+        ctrs, wh, t = torch.split(boxes, [2, 2, 1], dim=-1)
+        scale_factor = boxes.new_tensor(scale_factor)
         wh = wh * scale_factor
         self.tensor = torch.cat([ctrs, wh, t], dim=-1)
 
-    def is_bboxes_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
-        """Find bboxes inside the image.
+    def is_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
+        """Find boxes inside the image.
 
         In ``RotatedBoxes``, as long as the center of box is inside the image,
         this box will be regarded as True.
@@ -324,9 +325,9 @@ class RotatedBoxes(BaseBoxes):
             the output has shape (m, n).
         """
         img_h, img_w = img_shape
-        bboxes = self.tensor
-        return (bboxes[..., 0] <= img_w) & (bboxes[..., 0] >= 0) \
-            & (bboxes[..., 1] <= img_h) & (bboxes[..., 1] >= 0)
+        boxes = self.tensor
+        return (boxes[..., 0] <= img_w) & (boxes[..., 0] >= 0) \
+            & (boxes[..., 1] <= img_h) & (boxes[..., 1] >= 0)
 
     def find_inside_points(self,
                            points: Tensor,
@@ -335,8 +336,8 @@ class RotatedBoxes(BaseBoxes):
 
         Args:
             points (Tensor): Points coordinates. Has shape of (m, 2).
-            is_aligned (bool): Whether ``points`` has been aligned with bboxes
-                or not. If True, the length of bboxes and ``points`` should be
+            is_aligned (bool): Whether ``points`` has been aligned with boxes
+                or not. If True, the length of boxes and ``points`` should be
                 the same. Defaults to False.
 
         Returns:
@@ -345,19 +346,19 @@ class RotatedBoxes(BaseBoxes):
             is False. The index has shape of (m, n). If ``is_aligned`` is True,
             m should be equal to n and the index has shape of (m, ).
         """
-        bboxes = self.tensor
-        assert bboxes.dim() == 2, 'bboxes dimension must be 2.'
+        boxes = self.tensor
+        assert boxes.dim() == 2, 'boxes dimension must be 2.'
 
         if not is_aligned:
-            bboxes = bboxes[None, :, :]
+            boxes = boxes[None, :, :]
             points = points[:, None, :]
         else:
-            assert bboxes.size(0) == points.size(0)
+            assert boxes.size(0) == points.size(0)
 
-        ctrs, wh, t = torch.split(bboxes, [2, 2, 1], dim=-1)
+        ctrs, wh, t = torch.split(boxes, [2, 2, 1], dim=-1)
         cos_value, sin_value = torch.cos(t), torch.sin(t)
         matrix = torch.cat([cos_value, sin_value, -sin_value, cos_value],
-                           dim=-1).reshape(*bboxes.shape[:-1], 2, 2)
+                           dim=-1).reshape(*boxes.shape[:-1], 2, 2)
 
         offset = points - ctrs
         offset = torch.matmul(matrix, offset[..., None])
@@ -368,18 +369,18 @@ class RotatedBoxes(BaseBoxes):
             (offset_y <= h / 2) & (offset_y >= - h / 2)
 
     @staticmethod
-    def bbox_overlaps(bboxes1: BaseBoxes,
-                      bboxes2: BaseBoxes,
-                      mode: str = 'iou',
-                      is_aligned: bool = False,
-                      eps: float = 1e-6) -> Tensor:
-        """Calculate overlap between two set of boxes with their modes
+    def overlaps(boxes1: BaseBoxes,
+                 boxes2: BaseBoxes,
+                 mode: str = 'iou',
+                 is_aligned: bool = False,
+                 eps: float = 1e-6) -> Tensor:
+        """Calculate overlap between two set of boxes with their types
         converted to ``RotatedBoxes``.
 
         Args:
-            bboxes1 (:obj:`BaseBoxes`): BaseBoxes with shape of (m, bbox_dim)
+            boxes1 (:obj:`BaseBoxes`): BaseBoxes with shape of (m, box_dim)
                 or empty.
-            bboxes2 (:obj:`BaseBoxes`): BaseBoxes with shape of (n, bbox_dim)
+            boxes2 (:obj:`BaseBoxes`): BaseBoxes with shape of (n, box_dim)
                 or empty.
             mode (str): "iou" (intersection over union), "iof" (intersection
                 over foreground). Defaults to "iou".
@@ -391,57 +392,49 @@ class RotatedBoxes(BaseBoxes):
         Returns:
             Tensor: shape (m, n) if ``is_aligned`` is False else shape (m,)
         """
-        from ..iou_calculators import rbbox_overlaps
-        bboxes1 = bboxes1.convert_to('rbox')
-        bboxes2 = bboxes2.convert_to('rbox')
-        return rbbox_overlaps(
-            bboxes1.tensor,
-            bboxes2.tensor,
+        from ..iou_calculators import rbox_overlaps
+        boxes1 = boxes1.convert_to('rbox')
+        boxes2 = boxes2.convert_to('rbox')
+        return rbox_overlaps(
+            boxes1.tensor,
+            boxes2.tensor,
             mode=mode,
             is_aligned=is_aligned,
             eps=eps)
 
     @staticmethod
-    def from_bitmap_masks(masks: BitmapMasks) -> 'RotatedBoxes':
-        """Create boxes from ``BitmapMasks``.
+    def from_instance_masks(masks: MaskType) -> 'RotatedBoxes':
+        """Create boxes from instance masks.
 
         Args:
-            masks (:obj:`BitmapMasks`): BitmapMasks with length of n.
+            masks (:obj:`BitmapMasks` or :obj:`PolygonMasks`): BitmapMasks or
+                PolygonMasks instance with length of n.
 
         Returns:
             :obj:`RotatedBoxes`: Converted boxes with shape of (n, 5).
         """
         num_masks = len(masks)
         if num_masks == 0:
-            return RotatedBoxes(np.zeros((0, 5), dtype=np.float32))
+            return RotatedBoxes([], dtype=torch.float32)
+
         boxes = []
-        for idx in range(num_masks):
-            mask = masks.masks[idx]
-            points = np.stack(np.nonzero(mask), axis=-1).astype(np.float32)
-            (x, y), (w, h), angle = cv2.minAreaRect(points)
-            boxes.append([x, y, w, h, angle / 180 * np.pi])
-        return RotatedBoxes(boxes)
-
-    @staticmethod
-    def from_polygon_masks(masks: PolygonMasks) -> 'RotatedBoxes':
-        """Create boxes from ``PolygonMasks``.
-
-        Args:
-            masks (:obj:`BitmapMasks`): PolygonMasks
-
-        Returns:
-            :obj:`RotatedBoxes`: Converted boxes with shape of (n, 5).
-        """
-        num_masks = len(masks)
-        if num_masks == 0:
-            return RotatedBoxes(np.zeros((0, 5), dtype=np.float32))
-        boxes = []
-        for idx, poly_per_obj in enumerate(masks.masks):
-            pts_per_obj = []
-            for p in poly_per_obj:
-                pts_per_obj.append(
-                    np.array(p, dtype=np.float32).reshape(-1, 2))
-            pts_per_obj = np.concatenate(pts_per_obj, axis=0)
-            (x, y), (w, h), angle = cv2.minAreaRect(pts_per_obj)
-            boxes.append([x, y, w, h, angle / 180 * np.pi])
+        if isinstance(masks, BitmapMasks):
+            for idx in range(num_masks):
+                mask = masks.masks[idx]
+                points = np.stack(np.nonzero(mask), axis=-1).astype(np.float32)
+                (x, y), (w, h), angle = cv2.minAreaRect(points)
+                boxes.append([x, y, w, h, angle / 180 * np.pi])
+        elif isinstance(masks, PolygonMasks):
+            for idx, poly_per_obj in enumerate(masks.masks):
+                pts_per_obj = []
+                for p in poly_per_obj:
+                    pts_per_obj.append(
+                        np.array(p, dtype=np.float32).reshape(-1, 2))
+                pts_per_obj = np.concatenate(pts_per_obj, axis=0)
+                (x, y), (w, h), angle = cv2.minAreaRect(pts_per_obj)
+                boxes.append([x, y, w, h, angle / 180 * np.pi])
+        else:
+            raise TypeError(
+                '`masks` must be `BitmapMasks`  or `PolygonMasks`, '
+                f'but got {type(masks)}.')
         return RotatedBoxes(boxes)
