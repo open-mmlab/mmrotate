@@ -1,8 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from .loading import LoadPatchFromImage
-from .transforms import PolyRandomRotate, RMosaic, RRandomFlip, RResize
+from .loading import LoadPatchfromNDArray
+from .transforms import RandomChoiceRotate, RandomRotate, Rotate
 
-__all__ = [
-    'LoadPatchFromImage', 'RResize', 'RRandomFlip', 'PolyRandomRotate',
-    'RMosaic'
-]
+__all__ = [LoadPatchfromNDArray, Rotate, RandomRotate, RandomChoiceRotate]

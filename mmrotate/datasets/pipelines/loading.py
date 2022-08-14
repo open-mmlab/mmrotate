@@ -7,39 +7,78 @@ from mmrotate.registry import TRANSFORMS
 
 
 @TRANSFORMS.register_module()
-class LoadPatchFromImage(LoadImageFromFile):
-    """Load an patch from the huge image.
+class LoadPatchfromNDArray(LoadImageFromFile):
+    """Load a patch from the huge image w.r.t ``results['patch']``.
 
-    Similar with :obj:`LoadImageFromFile`, but only reserve a patch of
-    ``results['img']`` according to ``results['win']``.
+    Similar with :obj:`LoadImageFromFile`, but only extract a patch from the
+    original huge image w.r.t ``results['win']``.
+
+    Requaired Keys:
+
+    - img
+    - win
+
+    Modified Keys:
+
+    - img
+    - img_path
+    - img_shape
+    - ori_shape
+
+    Args:
+        to_float32 (bool): Whether to convert the loaded image to a float32
+            numpy array. If set to False, the loaded image is an uint8 array.
+            Defaults to False.
+        pad_val (Number or Sequence[Number]): Values to be filled in padding
+            areas when padding_mode is 'constant'. Defaults to 0.
+        padding_mode (str): Type of padding. Should be: constant, edge,
+            reflect or symmetric. Defaults to `constant`.
     """
 
-    def __call__(self, results):
-        """Call functions to add image meta information.
+    def __init__(self,
+                 *args,
+                 pad_val: float = 0,
+                 padding_mode: str = 'constant',
+                 **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.pad_val = pad_val
+        self.padding_mode = padding_mode
+
+    def transform(self, results: dict) -> dict:
+        """Transform function to add image meta information.
 
         Args:
-            results (dict): Result dict with image in ``results['img']``.
+            results (dict): Result dict with image array in ``results['img']``
+                and patch positioni n ``results['patch']``.
 
         Returns:
-            dict: The dict contains the loaded patch and meta information.
+            dict: The dict contains loaded patch and meta information.
         """
+        image = results['img']
+        img_h, img_w = image.shape[:2]
 
-        img = results['img']
-        x_start, y_start, x_stop, y_stop = results['win']
-        width = x_stop - x_start
-        height = y_stop - y_start
+        patch_xmin, patch_ymin, patch_xmax, patch_ymax = results['patch']
+        assert (patch_xmin < img_w) and (patch_xmax >= 0) and \
+            (patch_ymin < img_h) and (patch_ymax >= 0)
+        x1 = max(patch_xmin, 0)
+        y1 = max(patch_ymin, 0)
+        x2 = min(patch_xmax, img_w)
+        y2 = min(patch_ymax, img_h)
+        padding = (x1 - patch_xmin, y1 - patch_ymin, patch_xmax - x2,
+                   patch_ymax - y2)
 
-        patch = img[y_start:y_stop, x_start:x_stop]
-        if height > patch.shape[0] or width > patch.shape[1]:
-            patch = mmcv.impad(patch, shape=(height, width))
-
+        patch = image[y1:y2, x1:x2]
+        if any(padding):
+            patch = mmcv.impad(
+                patch,
+                padding=padding,
+                pad_val=self.pad_val,
+                padding_mode=self.padding_mode)
         if self.to_float32:
             patch = patch.astype(np.float32)
 
-        results['filename'] = None
-        results['ori_filename'] = None
+        results['img_path'] = None
         results['img'] = patch
-        results['img_shape'] = patch.shape
-        results['ori_shape'] = patch.shape
-        results['img_fields'] = ['img']
+        results['img_shape'] = patch.shape[:2]
+        results['ori_shape'] = patch.shape[:2]
         return results
