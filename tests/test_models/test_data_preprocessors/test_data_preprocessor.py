@@ -1,12 +1,14 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from math import sqrt
 from unittest import TestCase
+
 import numpy as np
 import torch
+from mmdet.testing import demo_mm_inputs
+from mmengine.testing import assert_allclose
 
 from mmrotate.models.data_preprocessors import RotDataPreprocessor
-from mmengine.testing import assert_allclose
-from mmdet.testing import demo_mm_inputs
+
 
 class TestRotDataPreprocessor(TestCase):
 
@@ -22,8 +24,7 @@ class TestRotDataPreprocessor(TestCase):
             10 - 2 * sqrt(2), 10
         ]).reshape(1, 1, 8)
         processor = RotDataPreprocessor(angle_version='le90')
-        inputs, data_samples = processor(packed_inputs)        
+        inputs, data_samples = processor(packed_inputs)
 
         th_rboxes = torch.Tensor([10, 10, 4, 4, np.pi / 4]).reshape(1, 1, 5)
         assert_allclose(data_samples.gt_instances.bboxes.tensor, th_rboxes)
- 

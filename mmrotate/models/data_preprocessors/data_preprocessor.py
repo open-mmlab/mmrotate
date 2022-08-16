@@ -32,16 +32,14 @@ class RotDataPreprocessor(DetDataPreprocessor):
         angle_version (str, Optional): Angle definition of 'rbb'. Can
         only be 'oc', 'le90', or 'le135'. Defaults to None, which means
         don't convert bbox from 'qbb' to 'rbb'.
-
     """
 
-    def __init__(self,
-                 angle_version: Optional(str) = None,
-                 **kwargs):
+    def __init__(self, angle_version: Optional(str) = None, **kwargs):
         super().__init__(**kwargs)
         if angle_version is not None:
             assert angle_version in ['oc', 'le90', 'le135'], \
-            'Unrecognized version, only "oc", "le90", and "le135" are supported'
+                'Unrecognized version, only "oc", "le90", and "le135" ' \
+                'are supported'
         self.angle_version = angle_version
 
     def forward(self,
@@ -65,6 +63,7 @@ class RotDataPreprocessor(DetDataPreprocessor):
 
         for data_samples in batch_data_samples:
             data_samples.gt_instances.bboxes.convert_to('rbox')
-            data_samples.gt_instances.bboxes.regularize_boxes(self.angle_version)
-            
+            data_samples.gt_instances.bboxes.regularize_boxes(
+                self.angle_version)
+
         return batch_inputs, batch_data_samples
