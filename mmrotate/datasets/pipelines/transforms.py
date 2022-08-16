@@ -1,24 +1,88 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Union
+from typing import List, Optional, Union
 
 import cv2
 import mmcv
 import numpy as np
 from mmcv.transforms import BaseTransform
 from mmcv.transforms.utils import cache_randomness
+from mmdet.structures.bbox import BaseBoxes
 
 from mmrotate.registry import TRANSFORMS
 
 
 @TRANSFORMS.register_module()
+class ConvertBoxType(BaseTransform):
+    """Convert boxes in results to a certain box type.
+
+    Args:
+        box_type_mapping (dict): A dictionary whose key will be used to search
+            the item in `results`, the value is the destination box type.
+    """
+
+    def __init__(self, box_type_mapping: dict) -> None:
+        self.box_type_mapping = box_type_mapping
+
+    def transform(self, results: dict) -> dict:
+        """The transform function."""
+        for key, dst_box_type in self.box_type_mapping.items():
+            assert key in results and isinstance(results[key], BaseBoxes), \
+                f"results['{key}'] not exists or not a instance of BaseBoxes."
+            results[key] = results[key].convert_to(dst_box_type)
+
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(box_type_mapping={self.box_type_mapping})'
+        return repr_str
+
+
+@TRANSFORMS.register_module()
 class Rotate(BaseTransform):
+    """Rotate the images, bboxes, masks and segmentation map by a certain
+    angle.
+
+    Required Keys:
+
+    - img
+    - gt_bboxes (BaseBoxes[torch.float32]) (optional)
+    - gt_masks (BitmapMasks | PolygonMasks) (optional)
+    - gt_seg_map (np.uint8) (optional)
+
+    Modified Keys:
+
+    - img
+    - gt_bboxes
+    - gt_masks
+    - gt_seg_map
+
+    Added Keys:
+
+    - homography_matrix
+
+    Args:
+        rotate_angle (int): An angle to rotate the image.
+        img_border_value (int or float or tuple): The filled values for
+            image border. If float, the same fill value will be used for
+            all the three channels of image. If tuple, it should be 3 elements.
+            Defaults to 128.
+        mask_border_value (int): The fill value used for masks. Defaults to 0.
+        seg_ignore_label (int): The fill value used for segmentation map.
+            Note this value must equals ``ignore_label`` in ``semantic_head``
+            of the corresponding config. Defaults to 255.
+        interpolation (str): Interpolation method, accepted values are
+            "nearest", "bilinear", "bicubic", "area", "lanczos" for 'cv2'
+            backend, "nearest", "bilinear" for 'pillow' backend. Defaults
+            to 'bilinear'.
+    """
 
     def __init__(self,
-                 rotate_angle,
+                 rotate_angle: int,
                  img_border_value: Union[int, float, tuple] = 128,
                  mask_border_value: int = 0,
                  seg_ignore_label: int = 255,
-                 interpolation: str = 'bilinear'):
+                 interpolation: str = 'bilinear') -> None:
         if isinstance(img_border_value, (float, int)):
             img_border_value = tuple([float(img_border_value)] * 3)
         elif isinstance(img_border_value, tuple):
@@ -30,6 +94,7 @@ class Rotate(BaseTransform):
             raise ValueError(
                 'img_border_value must be float or tuple with 3 elements.')
         self.rotate_angle = rotate_angle
+        self.img_border_value = img_border_value
         self.mask_border_value = mask_border_value
         self.seg_ignore_label = seg_ignore_label
         self.interpolation = interpolation
@@ -81,11 +146,11 @@ class Rotate(BaseTransform):
         """Rotate the bboxes."""
         img_shape = results['img_shape']
         center = (img_shape[1] * 0.5, img_shape[0] * 0.5)
-        bboxes = results['gt_bboxes']
-        bboxes.rotate_(center, self.rotate_angle)
-        bboxes.clip_(results['img_shape'])
+        results['gt_bboxes'].rotate_(center, self.rotate_angle)
+        results['gt_bboxes'].clip_(img_shape)
 
     def _filter_invalid(self, results: dict) -> None:
+        """Filter invalid data w.r.t `gt_bboxes`"""
         height, width = results['img_shape']
         if 'gt_bboxes' in results:
             bboxes = results['gt_bboxes']
@@ -108,7 +173,8 @@ class Rotate(BaseTransform):
                 results['gt_masks'] = results['gt_masks'][
                     valid_index.nonzero()[0]]
 
-    def transform(self, results: dict):
+    def transform(self, results: dict) -> dict:
+        """The transform function."""
         self.homography_matrix = self._get_homography_matrix(results)
         self._record_homography_matrix(results)
         self._transform_img(results)
@@ -121,40 +187,85 @@ class Rotate(BaseTransform):
         self._filter_invalid(results)
         return results
 
-    def __repr__(self):
-        pass
+    def __repr__(self) -> str:
+        repr_str = self.__class__.__name__
+        repr_str += f'(rotate_angle={self.rotate_angle}, '
+        repr_str += f'img_border_value={self.img_border_value}, '
+        repr_str += f'mask_border_value={self.mask_border_value}, '
+        repr_str += f'seg_ignore_label={self.seg_ignore_label}, '
+        repr_str += f'interpolation={self.interpolation})'
+        return repr_str
 
 
 @TRANSFORMS.register_module()
 class RandomRotate(BaseTransform):
+    """Random rotate image & bbox & masks.
+
+    The rotation angle will choice in [-angle_range, angle_range).
+
+    Required Keys:
+
+    - img
+    - gt_bboxes (BaseBoxes[torch.float32]) (optional)
+    - gt_masks (BitmapMasks | PolygonMasks) (optional)
+    - gt_seg_map (np.uint8) (optional)
+
+    Modified Keys:
+
+    - img
+    - gt_bboxes
+    - gt_masks
+    - gt_seg_map
+
+    Added Keys:
+
+    - homography_matrix
+
+    Args:
+        prob (float): The probability of whether to rotate or not. Defaults
+            to 0.5.
+        angle_range (int): The maximum range of rotation angle. The rotation
+            angle will lie in [-angle_range, angle_range). Defaults to 180.
+        rect_obj_labels (List[int], Optional): A list of labels whose
+            corresponding objects are alwags horizontal. If
+            results['gt_bboxes_labels'] has any label in ``rect_obj_labels``,
+            the rotation angle will only be choiced from [90, 180, -90, -180].
+            Defaults to None.
+        rotate_type (str): The type of rotate class to use. Defaults to
+            "Rotate".
+        **rotate_kwargs: Other keyword arguments for the ``rotate_type``.
+    """
 
     def __init__(self,
                  prob: float = 0.5,
-                 angle_range=180,
-                 rect_obj_labels=None,
-                 rotate_type='mmrotate.Rotate',
+                 angle_range: int = 180,
+                 rect_obj_labels: Optional[List[int]] = None,
+                 rotate_type: str = 'Rotate',
                  **rotate_kwargs) -> None:
         self.prob = prob
         self.angle_range = angle_range
         self.rect_obj_labels = rect_obj_labels
-        self.rotate_cfg = dict(type=rotate_type, **rotate_type)
+        self.rotate_cfg = dict(type=rotate_type, **rotate_kwargs)
         self.rotate = TRANSFORMS.build({'rotate_angle': 0, **self.rotate_cfg})
-        self.discrete_range = [90, 180, -90, -180]
+        self.horizontal_angles = [90, 180, -90, -180]
 
     @cache_randomness
     def _random_angle(self) -> int:
+        """Random angle."""
         return self.angle_range * (2 * np.random.rand() - 1)
 
     @cache_randomness
     def _random_discrete_range(self) -> int:
-        return np.random.choice(self.discrete_range)
+        """Random horizontal angle."""
+        return np.random.choice(self.horizontal_angles)
 
     @cache_randomness
-    def _is_rotate(self):
+    def _is_rotate(self) -> bool:
         """Randomly decide whether to rotate."""
-        return np.random.rand() < self.rotate_ratio
+        return np.random.rand() < self.prob
 
     def transform(self, results: dict) -> dict:
+        """The transform function."""
         if not self._is_rotate():
             return results
 
@@ -168,9 +279,53 @@ class RandomRotate(BaseTransform):
         self.rotate.rotate_angle = rotate_angle
         return self.rotate(results)
 
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(prob={self.prob}, '
+        repr_str += f'angle_range={self.angle_range}, '
+        repr_str += f'rect_obj_labels={self.rect_obj_labels}, '
+        repr_str += f'rotate_cfg={self.rotate_cfg})'
+        return repr_str
+
 
 @TRANSFORMS.register_module()
 class RandomChoiceRotate(BaseTransform):
+    """Random rotate image & bbox & masks from a list of angles.
+
+    Rotation angle will be randomly choiced from ``angles``.
+
+    Required Keys:
+
+    - img
+    - gt_bboxes (BaseBoxes[torch.float32]) (optional)
+    - gt_masks (BitmapMasks | PolygonMasks) (optional)
+    - gt_seg_map (np.uint8) (optional)
+
+    Modified Keys:
+
+    - img
+    - gt_bboxes
+    - gt_masks
+    - gt_seg_map
+
+    Added Keys:
+
+    - homography_matrix
+
+    Args:
+        angles (list[int]): Angles for rotation. 0 is the default value for
+            non-rotation and shouldn't be included in ``angles``.
+        prob (float or list[float]): If ``prob`` is a float, it is the
+            probability of whether to rotate. If ``prob`` is a list, it is
+            the probabilities of each rotation angle in ``angles``.
+        rect_obj_labels (List[int]): A list of labels whose corresponding
+            objects are alwags horizontal. If results['gt_bboxes_labels'] has
+            any label in ``rect_obj_labels``, the rotation angle will only be
+            choiced from [90, 180, -90, -180].
+        rotate_type (str): The type of rotate class to use. Defaults to
+            "Rotate".
+        **rotate_kwargs: Other keyword arguments for the ``rotate_type``.
+    """
 
     def __init__(self,
                  angles,
@@ -230,3 +385,11 @@ class RandomChoiceRotate(BaseTransform):
 
         self.rotate.rotate_angle = rotate_angle
         return self.rotate(results)
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(angles={self.angles}, '
+        repr_str += f'prob={self.prob}, '
+        repr_str += f'rect_obj_labels={self.rect_obj_labels}, '
+        repr_str += f'rotate_cfg={self.rotate_cfg})'
+        return repr_str
