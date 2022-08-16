@@ -100,7 +100,8 @@ class DOTAMetric(BaseMetric):
         self.merge_patches = merge_patches
         self.iou_thr = iou_thr
         self.angle_version = angle_version
-
+        assert eval_mode in ['area, 11points'], \
+            'Unrecognized mode, only "area" and "11points" are supported'
         self.use_07_metric = True if eval_mode == '11points' else False
 
     def merge_results(self, results: Sequence[dict],
