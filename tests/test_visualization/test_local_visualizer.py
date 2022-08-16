@@ -31,7 +31,7 @@ class TestRotLocalVisualizer(TestCase):
         # test gt_instances
         gt_instances = InstanceData()
         gt_instances.bboxes = _rand_rbboxes(num_bboxes, h, w)
-        gt_instances.labels = torch.randint(0, num_class, (5, ))
+        gt_instances.labels = torch.randint(0, num_class, (num_bboxes, ))
         gt_rot_data_sample = DetDataSample()
         gt_rot_data_sample.gt_instances = gt_instances
 
@@ -49,8 +49,8 @@ class TestRotLocalVisualizer(TestCase):
         # test gt_instances and pred_instances
         pred_instances = InstanceData()
         pred_instances.bboxes = _rand_rbboxes(num_bboxes, h, w)
-        pred_instances.labels = torch.randint(0, num_class, (5, ))
-        pred_instances.scores = torch.rand((5, ))
+        pred_instances.labels = torch.randint(0, num_class, (num_bboxes, ))
+        pred_instances.scores = torch.rand((num_bboxes, ))
         pred_rot_data_sample = DetDataSample()
         pred_rot_data_sample.pred_instances = pred_instances
 
@@ -79,8 +79,6 @@ class TestRotLocalVisualizer(TestCase):
             draw_pred=False,
             out_file=out_file)
         self._assert_image_and_shape(out_file, (h, w, 3))
-
-        # TODO: test gt_panoptic_seg
 
     def _assert_image_and_shape(self, out_file, out_shape):
         assert os.path.exists(out_file)

@@ -4,8 +4,8 @@ from typing import List, Optional
 import numpy as np
 import torch
 from mmdet.structures.mask import bitmap_to_polygon
-from mmdet.visualization import DetLocalVisualizer
-from mmdet.visualization.palette import _get_adaptive_scales, get_palette
+from mmdet.visualization import DetLocalVisualizer, get_palette
+from mmdet.visualization.palette import _get_adaptive_scales
 from mmengine.data import InstanceData
 
 from mmrotate.core import obb2poly
