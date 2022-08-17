@@ -54,7 +54,6 @@ class SARDataset(BaseDataset):
             data_info['file_name'] = img_name
             data_info['img_path'] = osp.join(self.data_prefix['img_path'],
                                              img_name)
-
             instances = []
             with open(txt_file) as f:
                 s = f.readlines()
