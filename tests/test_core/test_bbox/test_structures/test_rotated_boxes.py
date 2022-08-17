@@ -12,7 +12,7 @@ from mmengine.testing import assert_allclose
 from mmrotate.core.bbox.structures import RotatedBoxes
 
 
-class TestHorizontalBoxes(TestCase):
+class TestRotatedBoxes(TestCase):
 
     def test_regularize_boxes(self):
         th_boxes = torch.rand((3, 4, 5))
