@@ -111,8 +111,8 @@ class RotatedBoxes(BaseBoxes):
             w_ = torch.where(t < np.pi / 2, w, h)
             h_ = torch.where(t < np.pi / 2, h, w)
             t = torch.where(t < np.pi / 2, t, t - np.pi / 2) + start_angle
-        boxes = torch.stack([x, y, w_, h_, t], dim=-1)
-        return boxes
+        self.tensor = torch.stack([x, y, w_, h_, t], dim=-1)
+        return self.tensor
 
     @property
     def centers(self) -> Tensor:
