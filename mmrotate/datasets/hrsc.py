@@ -22,7 +22,7 @@ class HRSCDataset(XMLDataset):
 
     Args:
         img_subdir (str): Subdir where images are stored.
-            Defaults to'AllImages'.
+            Defaults to 'AllImages'.
         ann_subdir (str): Subdir where annotations are.
             Defaults to 'Annotations'.
         classwise (bool): Whether to use all 31 classes or only one class.
