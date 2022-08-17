@@ -1,18 +1,18 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import os.path as osp
 import xml.etree.ElementTree as ET
-from typing import List, Union
+from typing import List, Optional, Union
 
 import mmcv
 import numpy as np
-from mmdet.datasets import XMLDataset
+from mmengine.dataset import BaseDataset
 
 from mmrotate.core import obb2poly_np
 from mmrotate.registry import DATASETS
 
 
 @DATASETS.register_module()
-class HRSCDataset(XMLDataset):
+class HRSCDataset(BaseDataset):
     """HRSC dataset for detection.
 
     Note: There are two evaluation methods for HRSC datasets, which can be
@@ -100,6 +100,14 @@ class HRSCDataset(XMLDataset):
             data_list.append(parsed_data_info)
         return data_list
 
+    @property
+    def bbox_min_size(self) -> Optional[str]:
+        """Return the minimum size of bounding boxes in the images."""
+        if self.filter_cfg is not None:
+            return self.filter_cfg.get('bbox_min_size', None)
+        else:
+            return None
+
     def parse_data_info(self, img_info: dict) -> Union[dict, List[dict]]:
         """Parse raw annotation to target format.
 
@@ -153,6 +161,7 @@ class HRSCDataset(XMLDataset):
             ]],
                              dtype=np.float32)
 
+            # TODO: waitting for boxlist
             polygon = obb2poly_np(rbbox, 'le90')[0, :-1].tolist()
             head = [
                 int(obj.find('header_x').text),
@@ -176,3 +185,41 @@ class HRSCDataset(XMLDataset):
             instances.append(instance)
         data_info['instances'] = instances
         return data_info
+
+    def filter_data(self) -> List[dict]:
+        """Filter annotations according to filter_cfg.
+
+        Returns:
+            List[dict]: Filtered results.
+        """
+        if self.test_mode:
+            return self.data_list
+
+        filter_empty_gt = self.filter_cfg.get('filter_empty_gt', False) \
+            if self.filter_cfg is not None else False
+        min_size = self.filter_cfg.get('min_size', 0) \
+            if self.filter_cfg is not None else 0
+
+        valid_data_infos = []
+        for i, data_info in enumerate(self.data_list):
+            width = data_info['width']
+            height = data_info['height']
+            if filter_empty_gt and len(data_info['instances']) == 0:
+                continue
+            if min(width, height) >= min_size:
+                valid_data_infos.append(data_info)
+
+        return valid_data_infos
+
+    def get_cat_ids(self, idx: int) -> List[int]:
+        """Get COCO category ids by index.
+
+        Args:
+            idx (int): Index of data.
+
+        Returns:
+            List[int]: All categories in the image of specified index.
+        """
+
+        instances = self.get_data_info(idx)['instances']
+        return [instance['bbox_label'] for instance in instances]
