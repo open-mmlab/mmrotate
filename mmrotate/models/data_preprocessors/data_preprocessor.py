@@ -11,10 +11,6 @@ from mmrotate.registry import MODELS
 class RotDataPreprocessor(DetDataPreprocessor):
     """Data pre-processor for rotated object detection tasks.
 
-    Comparing with the :class:`mmdet.DetDataPreprocessor`,
-
-    1. It supports convert bbox from 'qbb' to 'rbb'.
-
     It provides the data pre-processing as follows
 
     - Collate and move data to the target device.
@@ -25,7 +21,10 @@ class RotDataPreprocessor(DetDataPreprocessor):
     - Convert inputs from bgr to rgb if the shape of input is (3, H, W).
     - Normalize image with defined std and mean.
     - Do batch augmentations during training.
-    - Convert bbox from 'qbb' to 'rbb'.
+    - Convert bbox from 'QuadriBoxes' to 'RotatedBoxes'.
+    
+    Comparing with the :class:`mmdet.DetDataPreprocessor`,
+    It supports convert bbox from 'QuadriBoxes' to 'RotatedBoxes'.
 
 
     Args:
