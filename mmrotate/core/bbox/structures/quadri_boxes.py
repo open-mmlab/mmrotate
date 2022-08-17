@@ -39,20 +39,29 @@ class QuadriBoxes(BaseBoxes):
 
     @property
     def vertices(self) -> Tensor:
-        """Return a tensor representing the vertices of boxes."""
+        """Return a tensor representing the vertices of boxes.
+
+        If boxes have shape of (m, 8), vertices have shape of (m, 4, 2)
+        """
         boxes = self.tensor
         return boxes.reshape(*boxes.shape[:-1], 4, 2)
 
     @property
     def centers(self) -> Tensor:
-        """Return a tensor representing the centers of boxes."""
+        """Return a tensor representing the centers of boxes.
+
+        If boxes have shape of (m, 8), centers have shape of (m, 2).
+        """
         boxes = self.tensor
         boxes = boxes.reshape(*boxes.shape[:-1], 4, 2)
         return boxes.mean(dim=-2)
 
     @property
     def areas(self) -> Tensor:
-        """Return a tensor representing the areas of boxes."""
+        """Return a tensor representing the areas of boxes.
+
+        If boxes have shape of (m, 8), areas have shape of (m, ).
+        """
         boxes = self.tensor
         pts = boxes.reshape(*boxes.shape[:-1], 4, 2)
         roll_pts = torch.roll(pts, 1, dims=-2)
@@ -66,8 +75,11 @@ class QuadriBoxes(BaseBoxes):
     def widths(self) -> Tensor:
         """Return a tensor representing the widths of boxes.
 
-        Quadrilateral boxes don't have the width concept. Use ``sqrt(areas)``
-        to replace the width.
+        If boxes have shape of (m, 8), widths have shape of (m, ).
+
+        notes:
+            Quadrilateral boxes don't have the width concept. Use
+            ``sqrt(areas)`` to replace the width.
         """
         warnings.warn("Quadrilateral boxes don't have the width concept. "
                       'We use ``sqrt(areas)`` to replace the width.')
@@ -77,8 +89,11 @@ class QuadriBoxes(BaseBoxes):
     def heights(self) -> Tensor:
         """Return a tensor representing the heights of boxes.
 
-        Quadrilateral boxes don't have the height concept. Use ``sqrt(areas)``
-        to replace the heights.
+        If boxes have shape of (m, 8), heights have shape of (m, ).
+
+        notes:
+            Quadrilateral boxes don't have the height concept. Use
+            ``sqrt(areas)`` to replace the heights.
         """
         warnings.warn("Quadrilateral boxes don't have the height concept. "
                       'We use ``sqrt(areas)`` to replace the width.')

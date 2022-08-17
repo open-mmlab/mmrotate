@@ -116,22 +116,34 @@ class RotatedBoxes(BaseBoxes):
 
     @property
     def centers(self) -> Tensor:
-        """Return a tensor representing the centers of boxes."""
+        """Return a tensor representing the centers of boxes.
+
+        If boxes have shape of (m, 8), centers have shape of (m, 2).
+        """
         return self.tensor[..., :2]
 
     @property
     def areas(self) -> Tensor:
-        """Return a tensor representing the areas of boxes."""
+        """Return a tensor representing the areas of boxes.
+
+        If boxes have shape of (m, 8), areas have shape of (m, ).
+        """
         return self.tensor[..., 2] * self.tensor[..., 3]
 
     @property
     def widths(self) -> Tensor:
-        """Return a tensor representing the widths of boxes."""
+        """Return a tensor representing the widths of boxes.
+
+        If boxes have shape of (m, 8), widths have shape of (m, ).
+        """
         return self.tensor[..., 2]
 
     @property
     def heights(self) -> Tensor:
-        """Return a tensor representing the heights of boxes."""
+        """Return a tensor representing the heights of boxes.
+
+        If boxes have shape of (m, 8), heights have shape of (m, ).
+        """
         return self.tensor[..., 3]
 
     def flip_(self,
