@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from numbers import Number
 from typing import List, Optional, Union
 
 import cv2
@@ -26,8 +27,10 @@ class ConvertBoxType(BaseTransform):
     def transform(self, results: dict) -> dict:
         """The transform function."""
         for key, dst_box_type in self.box_type_mapping.items():
-            assert key in results and isinstance(results[key], BaseBoxes), \
-                f"results['{key}'] not exists or not a instance of BaseBoxes."
+            if key not in results:
+                continue
+            assert isinstance(results[key], BaseBoxes), \
+                f"results['{key}'] not a instance of BaseBoxes."
             results[key] = results[key].convert_to(dst_box_type)
 
         return results
@@ -242,6 +245,7 @@ class RandomRotate(BaseTransform):
                  rect_obj_labels: Optional[List[int]] = None,
                  rotate_type: str = 'Rotate',
                  **rotate_kwargs) -> None:
+        assert 0 < angle_range <= 180
         self.prob = prob
         self.angle_range = angle_range
         self.rect_obj_labels = rect_obj_labels
@@ -255,7 +259,7 @@ class RandomRotate(BaseTransform):
         return self.angle_range * (2 * np.random.rand() - 1)
 
     @cache_randomness
-    def _random_discrete_range(self) -> int:
+    def _random_horizontal_angle(self) -> int:
         """Random horizontal angle."""
         return np.random.choice(self.horizontal_angles)
 
@@ -273,7 +277,7 @@ class RandomRotate(BaseTransform):
         if self.rect_obj_labels is not None and 'gt_bboxes_labels' in results:
             for label in self.rect_obj_labels:
                 if (results['gt_bboxes_labels'] == label).any():
-                    rotate_angle = self._random_discrete_range()
+                    rotate_angle = self._random_horizontal_angle()
                     break
 
         self.rotate.rotate_angle = rotate_angle
@@ -334,12 +338,12 @@ class RandomChoiceRotate(BaseTransform):
                  rotate_type='mmrotate.Rotate',
                  **rotate_kwargs) -> None:
         if isinstance(prob, list):
-            assert mmcv.is_list_of(prob, float)
+            assert mmcv.is_list_of(prob, Number)
             assert 0 <= sum(prob) <= 1
-        elif isinstance(prob, float):
+        elif isinstance(prob, Number):
             assert 0 <= prob <= 1
         else:
-            raise ValueError(f'probs must be float or list of float, but \
+            raise ValueError(f'probs must be number or list of number, but \
                               got `{type(prob)}`.')
         self.prob = prob
 
@@ -347,12 +351,12 @@ class RandomChoiceRotate(BaseTransform):
         assert 0 not in angles
         self.angles = angles
         if isinstance(self.prob, list):
-            assert len(self.prob, self.angles)
+            assert len(self.prob) == len(self.angles)
 
         self.rect_obj_labels = rect_obj_labels
-        self.rotate_cfg = dict(type=rotate_type, **rotate_type)
+        self.rotate_cfg = dict(type=rotate_type, **rotate_kwargs)
         self.rotate = TRANSFORMS.build({'rotate_angle': 0, **self.rotate_cfg})
-        self.discrete_range = [90, 180, -90, -180]
+        self.horizontal_angles = [90, 180, -90, -180]
 
     @cache_randomness
     def _choice_angle(self) -> int:
@@ -369,10 +373,12 @@ class RandomChoiceRotate(BaseTransform):
         return angle
 
     @cache_randomness
-    def _random_discrete_range(self) -> int:
-        return np.random.choice(self.discrete_range)
+    def _random_horizontal_angle(self) -> int:
+        """Random horizontal angle."""
+        return np.random.choice(self.horizontal_angles)
 
     def transform(self, results: dict) -> dict:
+        """The transform function."""
         rotate_angle = self._choice_angle()
         if rotate_angle == 0:
             return results
@@ -380,7 +386,7 @@ class RandomChoiceRotate(BaseTransform):
         if self.rect_obj_labels is not None and 'gt_bboxes_labels' in results:
             for label in self.rect_obj_labels:
                 if (results['gt_bboxes_labels'] == label).any():
-                    rotate_angle = self._random_discrete_range()
+                    rotate_angle = self._random_horizontal_angle()
                     break
 
         self.rotate.rotate_angle = rotate_angle

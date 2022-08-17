@@ -1,4 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Sequence, Union
+
 import mmcv
 import numpy as np
 from mmcv.transforms import LoadImageFromFile
@@ -29,15 +31,15 @@ class LoadPatchfromNDArray(LoadImageFromFile):
         to_float32 (bool): Whether to convert the loaded image to a float32
             numpy array. If set to False, the loaded image is an uint8 array.
             Defaults to False.
-        pad_val (Number or Sequence[Number]): Values to be filled in padding
-            areas when padding_mode is 'constant'. Defaults to 0.
+        pad_val (float or Sequence[float]): Values to be filled in padding
+            areas when padding_mode is 'constant'. Defaults to 128.
         padding_mode (str): Type of padding. Should be: constant, edge,
             reflect or symmetric. Defaults to `constant`.
     """
 
     def __init__(self,
                  *args,
-                 pad_val: float = 0,
+                 pad_val: Union[float, Sequence[float]] = 128,
                  padding_mode: str = 'constant',
                  **kwargs) -> None:
         super().__init__(*args, **kwargs)
