@@ -71,7 +71,7 @@ class HRSCDataset(XMLDataset):
             list[dict]: Annotation info from XML file.
         """
         assert self._metainfo.get('CLASSES', None) is not None, \
-            'CLASSES in `XMLDataset` can not be None.'
+            'CLASSES in `HRSCDataset` can not be None.'
         if self.classwise:
             self.catid2label = {
                 ('1' + '0' * 6 + cls_id): i
