@@ -32,14 +32,14 @@ class LoadPatchfromNDArray(LoadImageFromFile):
             numpy array. If set to False, the loaded image is an uint8 array.
             Defaults to False.
         pad_val (float or Sequence[float]): Values to be filled in padding
-            areas when padding_mode is 'constant'. Defaults to 128.
+            areas when padding_mode is 'constant'. Defaults to 0.
         padding_mode (str): Type of padding. Should be: constant, edge,
             reflect or symmetric. Defaults to `constant`.
     """
 
     def __init__(self,
                  *args,
-                 pad_val: Union[float, Sequence[float]] = 128,
+                 pad_val: Union[float, Sequence[float]] = 0,
                  padding_mode: str = 'constant',
                  **kwargs) -> None:
         super().__init__(*args, **kwargs)

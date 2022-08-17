@@ -69,7 +69,7 @@ class Rotate(BaseTransform):
         img_border_value (int or float or tuple): The filled values for
             image border. If float, the same fill value will be used for
             all the three channels of image. If tuple, it should be 3 elements.
-            Defaults to 128.
+            Defaults to 0.
         mask_border_value (int): The fill value used for masks. Defaults to 0.
         seg_ignore_label (int): The fill value used for segmentation map.
             Note this value must equals ``ignore_label`` in ``semantic_head``
@@ -82,7 +82,7 @@ class Rotate(BaseTransform):
 
     def __init__(self,
                  rotate_angle: int,
-                 img_border_value: Union[int, float, tuple] = 128,
+                 img_border_value: Union[int, float, tuple] = 0,
                  mask_border_value: int = 0,
                  seg_ignore_label: int = 255,
                  interpolation: str = 'bilinear') -> None:

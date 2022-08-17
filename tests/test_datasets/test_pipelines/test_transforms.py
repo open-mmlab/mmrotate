@@ -104,7 +104,7 @@ class TestRotate(unittest.TestCase):
                           self.check_keys)
 
         # test clockwise rotation with angle 90
-        transform = Rotate(rotate_angle=90)
+        transform = Rotate(rotate_angle=90, img_border_value=128)
         results_rotated = transform(copy.deepcopy(self.results_mask))
         # The image, masks, and semantic segmentation map
         # will be bilinearly interpolated.
