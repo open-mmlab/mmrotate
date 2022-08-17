@@ -98,6 +98,7 @@ def main():
         img_dir=img_dir, ann_dir=ann_dir, save_dir=save_dir, nproc=args.nproc)
     stop = time.time()
     print(f'Finish in {int(stop - start)} second!!!')
+    print(f'New annotations are saved at {save_dir}.')
 
 
 if __name__ == '__main__':
