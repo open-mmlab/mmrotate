@@ -322,14 +322,19 @@ class RotatedBoxes(BaseBoxes):
         wh = wh * scale_factor
         self.tensor = torch.cat([ctrs, wh, t], dim=-1)
 
-    def is_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
+    def is_inside(self,
+                  img_shape: Tuple[int, int],
+                  all_in: bool = False,
+                  allowed_border: int = 0) -> BoolTensor:
         """Find boxes inside the image.
-
-        In ``RotatedBoxes``, as long as the center of box is inside the image,
-        this box will be regarded as True.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
+            all_in (bool): Whether the boxes are all inside the image or part
+                inside the image. Defaults to False.
+            allowed_border (int): Boxes that extend beyond the image shape
+                boundary by more than ``allowed_border`` are considered
+                "outside" Defaults to 0.
 
         Returns:
             BoolTensor: A BoolTensor indicating whether the box is inside
@@ -338,8 +343,10 @@ class RotatedBoxes(BaseBoxes):
         """
         img_h, img_w = img_shape
         boxes = self.tensor
-        return (boxes[..., 0] <= img_w) & (boxes[..., 0] >= 0) \
-            & (boxes[..., 1] <= img_h) & (boxes[..., 1] >= 0)
+        return (boxes[..., 0] <= img_w + allowed_border) & \
+               (boxes[..., 1] <= img_h + allowed_border) & \
+               (boxes[..., 0] >= -allowed_border) & \
+               (boxes[..., 1] >= -allowed_border)
 
     def find_inside_points(self,
                            points: Tensor,

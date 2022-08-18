@@ -227,14 +227,19 @@ class QuadriBoxes(BaseBoxes):
         boxes = (boxes - centers) * scale_factor + centers
         self.tensor = boxes.reshape(*boxes.shape[:-2], 8)
 
-    def is_inside(self, img_shape: Tuple[int, int]) -> BoolTensor:
+    def is_inside(self,
+                  img_shape: Tuple[int, int],
+                  all_in: bool = False,
+                  allowed_border: int = 0) -> BoolTensor:
         """Find boxes inside the image.
-
-        In ``QuadriBoxes``, as long as the center of box is inside the
-        image, this box will be regarded as True.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
+            all_in (bool): Whether the boxes are all inside the image or part
+                inside the image. Defaults to False.
+            allowed_border (int): Boxes that extend beyond the image shape
+                boundary by more than ``allowed_border`` are considered
+                "outside" Defaults to 0.
 
         Returns:
             BoolTensor: A BoolTensor indicating whether the box is inside
@@ -245,8 +250,10 @@ class QuadriBoxes(BaseBoxes):
         boxes = self.tensor
         boxes = boxes.reshape(*boxes.shape[:-1], 4, 2)
         centers = boxes.mean(dim=-2)
-        return (centers[..., 0] <= img_w) & (centers[..., 0] >= 0) \
-            & (centers[..., 1] <= img_h) & (centers[..., 1] >= 0)
+        return (centers[..., 0] <= img_w + allowed_border) & \
+               (centers[..., 1] <= img_h + allowed_border) & \
+               (centers[..., 0] >= -allowed_border) & \
+               (centers[..., 1] >= -allowed_border)
 
     def find_inside_points(self,
                            points: Tensor,
