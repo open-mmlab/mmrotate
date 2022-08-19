@@ -335,14 +335,7 @@ class QuadriBoxes(BaseBoxes):
             return QuadriBoxes([], dtype=torch.float32)
 
         boxes = []
-        if isinstance(masks, BitmapMasks):
-            for idx in range(num_masks):
-                mask = masks.masks[idx]
-                points = np.stack(np.nonzero(mask), axis=-1).astype(np.float32)
-                rect = cv2.minAreaRect(points)
-                (x1, y1), (x2, y2), (x3, y3), (x4, y4) = cv2.boxPoints(rect)
-                boxes.append([x1, y1, x2, y2, x3, y3, x4, y4])
-        elif isinstance(masks, PolygonMasks):
+        if isinstance(masks, PolygonMasks):
             for idx, poly_per_obj in enumerate(masks.masks):
                 pts_per_obj = []
                 for p in poly_per_obj:
@@ -353,7 +346,11 @@ class QuadriBoxes(BaseBoxes):
                 (x1, y1), (x2, y2), (x3, y3), (x4, y4) = cv2.boxPoints(rect)
                 boxes.append([x1, y1, x2, y2, x3, y3, x4, y4])
         else:
-            raise TypeError(
-                '`masks` must be `BitmapMasks`  or `PolygonMasks`, '
-                f'but got {type(masks)}.')
+            masks = masks.to_ndarray()
+            for idx in range(num_masks):
+                coor_y, coor_x = np.nonzero(masks[idx])
+                points = np.stack([coor_x, coor_y], axis=-1).astype(np.float32)
+                rect = cv2.minAreaRect(points)
+                (x1, y1), (x2, y2), (x3, y3), (x4, y4) = cv2.boxPoints(rect)
+                boxes.append([x1, y1, x2, y2, x3, y3, x4, y4])
         return QuadriBoxes(boxes)
