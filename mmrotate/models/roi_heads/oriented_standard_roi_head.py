@@ -2,11 +2,11 @@
 import torch
 
 from mmrotate.core import rbbox2roi
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 from .rotate_standard_roi_head import RotatedStandardRoIHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class OrientedStandardRoIHead(RotatedStandardRoIHead):
     """Oriented RCNN roi head including one bbox head."""
 

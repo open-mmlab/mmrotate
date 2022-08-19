@@ -4,11 +4,42 @@ import copy
 import cv2
 import mmcv
 import numpy as np
+from mmcv.transforms import BaseTransform
 from mmdet.datasets.transforms import Mosaic, RandomCrop, RandomFlip, Resize
+from mmdet.structures.bbox import BaseBoxes
 from numpy import random
 
 from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
 from mmrotate.registry import TRANSFORMS
+
+
+@TRANSFORMS.register_module()
+class ConvertBoxType(BaseTransform):
+    """Convert boxes in results to a certain box type.
+
+    Args:
+        box_type_mapping (dict): A dictionary whose key will be used to search
+            the item in `results`, the value is the destination box type.
+    """
+
+    def __init__(self, box_type_mapping: dict) -> None:
+        self.box_type_mapping = box_type_mapping
+
+    def transform(self, results: dict) -> dict:
+        """The transform function."""
+        for key, dst_box_type in self.box_type_mapping.items():
+            if key not in results:
+                continue
+            assert isinstance(results[key], BaseBoxes), \
+                f"results['{key}'] not a instance of BaseBoxes."
+            results[key] = results[key].convert_to(dst_box_type)
+
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(box_type_mapping={self.box_type_mapping})'
+        return repr_str
 
 
 @TRANSFORMS.register_module()

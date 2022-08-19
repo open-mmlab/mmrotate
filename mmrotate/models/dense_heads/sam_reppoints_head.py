@@ -4,19 +4,17 @@ import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
 from mmcv.ops import DeformConv2d, min_area_polygons
-from mmcv.runner import force_fp32
-from mmdet.core import images_to_levels, multi_apply, unmap
-from mmdet.core.anchor.point_generator import MlvlPointGenerator
-from mmdet.core.utils import select_single_mlvl
 from mmdet.models.dense_heads.base_dense_head import BaseDenseHead
+from mmdet.models.task_modules.prior_generators import MlvlPointGenerator
+from mmdet.models.utils import (images_to_levels, multi_apply,
+                                select_single_mlvl, unmap)
 
-from mmrotate.core import (build_assigner, build_sampler,
-                           multiclass_nms_rotated, obb2poly, poly2obb)
-from ..builder import ROTATED_HEADS, build_loss
+from mmrotate.core import multiclass_nms_rotated, obb2poly, poly2obb
+from mmrotate.registry import MODELS, TASK_UTILS
 from .utils import get_num_level_anchors_inside, points_center_pts
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class SAMRepPointsHead(BaseDenseHead):
     """Rotated RepPoints head for SASM.
 
@@ -114,7 +112,7 @@ class SAMRepPointsHead(BaseDenseHead):
         self.stacked_convs = stacked_convs
         assert conv_bias == 'auto' or isinstance(conv_bias, bool)
         self.conv_bias = conv_bias
-        self.loss_cls = build_loss(loss_cls)
+        self.loss_cls = TASK_UTILS.build(loss_cls)
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
         self.conv_cfg = conv_cfg
@@ -128,23 +126,23 @@ class SAMRepPointsHead(BaseDenseHead):
         self.num_base_priors = self.prior_generator.num_base_priors[0]
         self.sampling = loss_cls['type'] not in ['FocalLoss']
         if self.train_cfg:
-            self.init_assigner = build_assigner(self.train_cfg.init.assigner)
-            self.refine_assigner = build_assigner(
+            self.init_assigner = TASK_UTILS.build(self.train_cfg.init.assigner)
+            self.refine_assigner = TASK_UTILS.build(
                 self.train_cfg.refine.assigner)
             # use PseudoSampler when sampling is False
             if self.sampling and hasattr(self.train_cfg, 'sampler'):
                 sampler_cfg = self.train_cfg.sampler
             else:
                 sampler_cfg = dict(type='PseudoSampler')
-            self.sampler = build_sampler(sampler_cfg, context=self)
+            self.sampler = TASK_UTILS.build(sampler_cfg, context=self)
         self.transform_method = transform_method
         self.use_sigmoid_cls = loss_cls.get('use_sigmoid', False)
         if self.use_sigmoid_cls:
             self.cls_out_channels = self.num_classes
         else:
             self.cls_out_channels = self.num_classes + 1
-        self.loss_bbox_init = build_loss(loss_bbox_init)
-        self.loss_bbox_refine = build_loss(loss_bbox_refine)
+        self.loss_bbox_init = TASK_UTILS.build(loss_bbox_init)
+        self.loss_bbox_refine = TASK_UTILS.build(loss_bbox_refine)
         self.topk = topk
         self.anti_factor = anti_factor
         self.version = version
@@ -676,7 +674,6 @@ class SAMRepPointsHead(BaseDenseHead):
         }
         return loss_dict_all
 
-    @force_fp32(apply_to=('cls_scores', 'pts_preds_init', 'pts_preds_refine'))
     def get_bboxes(self,
                    cls_scores,
                    pts_preds_init,

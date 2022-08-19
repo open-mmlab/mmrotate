@@ -1,14 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-from mmcv.runner import force_fp32
+from mmdet.models.dense_heads import AnchorHead
 
-from ..builder import ROTATED_HEADS
-from .rotated_anchor_head import RotatedAnchorHead
+from mmrotate.registry import MODELS
 
 
-@ROTATED_HEADS.register_module()
-class RotatedRetinaHead(RotatedAnchorHead):
+@MODELS.register_module()
+class RotatedRetinaHead(AnchorHead):
     r"""An anchor-based head used in `RotatedRetinaNet
     <https://arxiv.org/pdf/1708.02002.pdf>`_.
 
@@ -118,7 +117,6 @@ class RotatedRetinaHead(RotatedAnchorHead):
         bbox_pred = self.retina_reg(reg_feat)
         return cls_score, bbox_pred
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def filter_bboxes(self, cls_scores, bbox_preds):
         """Filter predicted bounding boxes at each position of the feature
         maps. Only one bounding boxes with highest score will be left at each
@@ -182,7 +180,6 @@ class RotatedRetinaHead(RotatedAnchorHead):
 
         return bboxes_list
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def refine_bboxes(self, cls_scores, bbox_preds):
         """This function will be used in S2ANet, whose num_anchors=1.
 

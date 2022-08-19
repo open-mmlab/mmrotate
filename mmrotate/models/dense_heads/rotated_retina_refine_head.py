@@ -1,12 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
-from mmcv.runner import force_fp32
 
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 from . import RotatedRetinaHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedRetinaRefineHead(RotatedRetinaHead):
     """Rotated Anchor-based refine head.
 
@@ -60,7 +59,6 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
             init_cfg=init_cfg,
             **kwargs)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def refine_bboxes(self, cls_scores, bbox_preds, rois):
         """Refine predicted bounding boxes at each position of the feature
         maps. This method will be used in R3Det in refinement stages.
@@ -131,7 +129,6 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
 
         return anchor_list, valid_flag_list
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -151,7 +148,6 @@ class RotatedRetinaRefineHead(RotatedRetinaHead):
             img_metas=img_metas,
             gt_bboxes_ignore=gt_bboxes_ignore)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,
