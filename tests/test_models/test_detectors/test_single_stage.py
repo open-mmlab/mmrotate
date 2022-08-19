@@ -4,10 +4,10 @@ import unittest
 from unittest import TestCase
 
 import torch
+from mmdet.structures import DetDataSample
 from mmengine.logging import MessageHub
 from parameterized import parameterized
 
-from mmdet.structures import DetDataSample
 from mmrotate.testing import demo_mm_inputs, get_detector_cfg
 from mmrotate.utils import register_all_modules
 
@@ -31,7 +31,8 @@ class TestSingleStageDetector(TestCase):
         self.assertTrue(detector.bbox_head)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py', ('cpu', 'cuda')),
+        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+         ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_loss_mode(self, cfg_file, devices):
         message_hub = MessageHub.get_instance(
@@ -60,7 +61,8 @@ class TestSingleStageDetector(TestCase):
             self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py', ('cpu', 'cuda')),
+        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+         ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_predict_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
@@ -89,7 +91,8 @@ class TestSingleStageDetector(TestCase):
                 self.assertIsInstance(batch_results[0], DetDataSample)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py', ('cpu', 'cuda')),
+        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+         ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_tensor_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)

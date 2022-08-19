@@ -4,11 +4,12 @@ from os.path import dirname, exists, join
 
 import numpy as np
 import torch
+from mmdet.structures import DetDataSample
 from mmengine.data import BaseDataElement as PixelData
 from mmengine.data import InstanceData
+
 from mmrotate.core.bbox.structures import RotatedBoxes
 
-from mmdet.structures import DetDataSample
 
 def _get_config_directory():
     """Find the predefined detector config directory."""
@@ -17,7 +18,7 @@ def _get_config_directory():
         repo_dpath = dirname(dirname(dirname(__file__)))
     except NameError:
         # For IPython development when this __file__ is not defined
-        import mmdet
+        import mmrotate
         repo_dpath = dirname(dirname(mmrotate.__file__))
     config_dpath = join(repo_dpath, 'configs')
     if not exists(config_dpath):
@@ -44,10 +45,12 @@ def get_detector_cfg(fname):
     model = copy.deepcopy(config.model)
     return model
 
+
 def _rand_bboxes(rng, num_boxes, w, h):
     cx, cy, bw, bh, t = rng.rand(num_boxes, 5).T
     bboxes = np.vstack([cx * w, cy * h, w * bw, h * bh, t]).T
     return bboxes
+
 
 def _rand_masks(rng, num_boxes, bboxes, img_w, img_h):
     from mmdet.structures.mask import BitmapMasks
@@ -58,6 +61,7 @@ def _rand_masks(rng, num_boxes, bboxes, img_w, img_h):
                 0.3).astype(np.int)
         masks[i:i + 1, bbox[1]:bbox[3], bbox[0]:bbox[2]] = mask
     return BitmapMasks(masks, height=img_h, width=img_w)
+
 
 def demo_mm_inputs(batch_size=2,
                    image_shapes=(3, 128, 128),
