@@ -1,4 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 529f71b (add UT)
 from unittest import TestCase
 
 import torch
@@ -52,3 +57,12 @@ class TestFakeRotatedAnchorGenerator(TestCase):
              [10.0000, 10.0000, 10.0000, 10.0000, -1.5708]])
 
         assert_allclose(anchors.tensor, expected_anchors)
+<<<<<<< HEAD
+=======
+# TODO
+>>>>>>> 61dcdf7 (init)
+=======
+# TODO
+>>>>>>> 9ce6d05 (fix lint & modify 'oc' in RotatedBoxes)
+=======
+>>>>>>> 529f71b (add UT)

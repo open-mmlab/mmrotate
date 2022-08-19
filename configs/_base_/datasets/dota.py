@@ -7,7 +7,15 @@ train_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
+<<<<<<< HEAD
+<<<<<<< HEAD
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
+=======
+    dict(type='mmdet.Resize', scale=(1024, 2014), keep_ratio=True),
+>>>>>>> 61dcdf7 (init)
+=======
+    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
+>>>>>>> bc74907 (fix size typo)
     dict(
         type='mmdet.RandomFlip',
         prob=0.75,
@@ -16,7 +24,15 @@ train_pipeline = [
 ]
 val_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+<<<<<<< HEAD
+<<<<<<< HEAD
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
+=======
+    dict(type='mmdet.Resize', scale=(1024, 2014), keep_ratio=True),
+>>>>>>> 61dcdf7 (init)
+=======
+    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
+>>>>>>> bc74907 (fix size typo)
     # avoid bboxes being resized
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
@@ -27,7 +43,15 @@ val_pipeline = [
 ]
 test_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+<<<<<<< HEAD
+<<<<<<< HEAD
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
+=======
+    dict(type='mmdet.Resize', scale=(1024, 2014), keep_ratio=True),
+>>>>>>> 61dcdf7 (init)
+=======
+    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
+>>>>>>> bc74907 (fix size typo)
     # avoid bboxes being resized
     dict(
         type='mmdet.PackDetInputs',
@@ -67,8 +91,18 @@ test_dataloader = val_dataloader
 val_evaluator = dict(type='DOTAMetric', metric='mAP')
 test_evaluator = val_evaluator
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 # inference on test dataset and format the output results
 # for submission. Note: the test set has no annotation.
+=======
+# inference on test dataset and
+# format the output results for submission.
+>>>>>>> 61dcdf7 (init)
+=======
+# inference on test dataset and format the output results
+# for submission. Note: the test set has no annotation.
+>>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
 # test_dataloader = dict(
 #     batch_size=1,
 #     num_workers=2,

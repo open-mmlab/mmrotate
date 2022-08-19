@@ -1,30 +1,29 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from ..builder import ROTATED_DETECTORS
-from .two_stage import RotatedTwoStageDetector
+from mmdet.models.detectors.two_stage import TwoStageDetector
+from mmdet.utils import ConfigType, OptConfigType, OptMultiConfig
+
+from mmrotate.registry import MODELS
 
 
-@ROTATED_DETECTORS.register_module()
-class RotatedFasterRCNN(RotatedTwoStageDetector):
-    """Implementation of Rotated `Faster R-CNN.`__
-
-    __ https://arxiv.org/abs/1506.01497
-    """
+@MODELS.register_module()
+class RotatedFasterRCNN(TwoStageDetector):
+    """Implementation of `Faster R-CNN <https://arxiv.org/abs/1506.01497>`_"""
 
     def __init__(self,
-                 backbone,
-                 rpn_head,
-                 roi_head,
-                 train_cfg,
-                 test_cfg,
-                 neck=None,
-                 pretrained=None,
-                 init_cfg=None):
-        super(RotatedFasterRCNN, self).__init__(
+                 backbone: ConfigType,
+                 rpn_head: ConfigType,
+                 roi_head: ConfigType,
+                 train_cfg: ConfigType,
+                 test_cfg: ConfigType,
+                 neck: OptConfigType = None,
+                 data_preprocessor: OptConfigType = None,
+                 init_cfg: OptMultiConfig = None) -> None:
+        super().__init__(
             backbone=backbone,
             neck=neck,
             rpn_head=rpn_head,
             roi_head=roi_head,
             train_cfg=train_cfg,
             test_cfg=test_cfg,
-            pretrained=pretrained,
-            init_cfg=init_cfg)
+            init_cfg=init_cfg,
+            data_preprocessor=data_preprocessor)

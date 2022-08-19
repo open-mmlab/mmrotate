@@ -6,9 +6,16 @@ from typing import List, Optional, Union
 import mmcv
 import numpy as np
 from mmengine.dataset import BaseDataset
+<<<<<<< HEAD
 from mmengine.fileio import list_from_file
 
 from mmrotate.core import obb2poly_np
+=======
+from mmengine.logging import print_log
+from PIL import Image
+
+from mmrotate.core import eval_rbbox_map, obb2poly_np, poly2obb_np
+>>>>>>> 825c3c6 (Update for mmcv-2.x & mmdet-3.x)
 from mmrotate.registry import DATASETS
 
 

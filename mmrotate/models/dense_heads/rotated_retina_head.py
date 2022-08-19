@@ -1,12 +1,29 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch.nn as nn
 from mmcv.cnn import ConvModule
+<<<<<<< HEAD
+<<<<<<< HEAD
 from mmdet.models.dense_heads import AnchorHead
 
 from mmrotate.registry import MODELS
 
 
 @MODELS.register_module()
+=======
+from mmcv.runner import force_fp32
+=======
+>>>>>>> 825c3c6 (Update for mmcv-2.x & mmdet-3.x)
+from mmdet.models.dense_heads import AnchorHead
+
+from mmrotate.registry import MODELS
+
+
+<<<<<<< HEAD
+@ROTATED_HEADS.register_module()
+>>>>>>> 61dcdf7 (init)
+=======
+@MODELS.register_module()
+>>>>>>> 825c3c6 (Update for mmcv-2.x & mmdet-3.x)
 class RotatedRetinaHead(AnchorHead):
     r"""An anchor-based head used in `RotatedRetinaNet
     <https://arxiv.org/pdf/1708.02002.pdf>`_.

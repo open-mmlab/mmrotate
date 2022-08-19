@@ -1,5 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import torch
 from mmcv.ops import box_iou_rotated
+from mmdet.structures.bbox import BaseBoxes, bbox_overlaps
 from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
@@ -18,6 +20,8 @@ class RBboxOverlaps2D(object):
         """Calculate IoU between 2D rotated bboxes.
 
         Args:
+<<<<<<< HEAD
+<<<<<<< HEAD
             bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
                 in <cx, cy, w, h, t> format, shape (m, 6) in
                 <cx, cy, w, h, t, score> format.
@@ -26,6 +30,25 @@ class RBboxOverlaps2D(object):
                 <cx, cy, w, h, t, score> format, or be empty.
             mode (str): 'iou' (intersection over union), 'iof' (intersection
                 over foreground). Defaults to 'iou'.
+=======
+            bboxes1 (:obj:`RotatedBoxes`): bboxes have shape (m, 5) in
+                <cx, cy, w, h, a> format.
+            bboxes2 (:obj:`RotatedBoxes`): bboxes have shape (m, 5) in
+                <cx, cy, w, h, a> format.
+            mode (str): "iou" (intersection over union), "iof" (intersection
+                over foreground), or "giou" (generalized intersection over
+                union).
+>>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
+=======
+            bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format.
+            bboxes2 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format, or be empty.
+            mode (str): 'iou' (intersection over union), 'iof' (intersection
+                over foreground). Defaults to 'iou'.
+>>>>>>> 2c1793c (add UT of RBoxOverlaps2D)
             is_aligned (bool): If True, then m and n must be equal.
                 Defaults to False.
 
@@ -35,6 +58,19 @@ class RBboxOverlaps2D(object):
         assert bboxes1.size(-1) in [0, 5, 6]
         assert bboxes2.size(-1) in [0, 5, 6]
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+        if bboxes1.size(-1) == 6:
+            bboxes1 = bboxes1[..., :5]
+<<<<<<< HEAD
+        if bboxes2.size(-1) == 6:
+            bboxes2 = bboxes2[..., :5]
+=======
+=======
+>>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
+        return rbbox_overlaps(bboxes1.tensor, bboxes2.tensor, mode, is_aligned)
+>>>>>>> 61dcdf7 (init)
+=======
         if bboxes1.size(-1) == 6:
             bboxes1 = bboxes1[..., :5]
         if bboxes2.size(-1) == 6:
@@ -46,7 +82,18 @@ class RBboxOverlaps2D(object):
             bboxes2 = bboxes2.tensor
 
         return rbbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+>>>>>>> 2c1793c (add UT of RBoxOverlaps2D)
 
+<<<<<<< HEAD
+        if isinstance(bboxes1, RotatedBoxes):
+            bboxes1 = bboxes1.tensor
+        if isinstance(bboxes2, RotatedBoxes):
+            bboxes2 = bboxes2.tensor
+
+        return rbbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+
+=======
+>>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
     def __repr__(self) -> str:
         """str: a string describing the module"""
         repr_str = self.__class__.__name__ + '()'
@@ -60,12 +107,27 @@ def rbbox_overlaps(bboxes1: Tensor,
     """Calculate overlap between two set of rotated bboxes.
 
     Args:
+<<<<<<< HEAD
         bboxes1 (Tensor): shape (B, m, 5) in <cx, cy, w, h, t> format
             or empty.
         bboxes2 (Tensor): shape (B, n, 5) in <cx, cy, w, h, t> format
             or empty.
         mode (str): 'iou' (intersection over union), 'iof' (intersection over
             foreground). Defaults to 'iou'.
+=======
+        bboxes1 (Tensor): shape (B, m, 5) in <cx, cy, w, h, a> format
+            or empty.
+        bboxes2 (Tensor): shape (B, n, 5) in <cx, cy, w, h, a> format
+            or empty.
+<<<<<<< HEAD
+        mode (str): "iou" (intersection over union), "iof" (intersection over
+            foreground) or "giou" (generalized intersection over union).
+            Defaults to "iou".
+>>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
+=======
+        mode (str): 'iou' (intersection over union), 'iof' (intersection over
+            foreground). Defaults to 'iou'.
+>>>>>>> 2c1793c (add UT of RBoxOverlaps2D)
         is_aligned (bool): If True, then m and n must be equal.
             Defaults to False.
 
@@ -107,6 +169,8 @@ class FakeRBboxOverlaps2D(object):
         """Calculate IoU between 2D minimum circumscribed hbbs of rbbs.
 
         Args:
+<<<<<<< HEAD
+<<<<<<< HEAD
             bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
                 in <cx, cy, w, h, t> format, shape (m, 6) in
                 <cx, cy, w, h, t, score> format.
@@ -115,12 +179,35 @@ class FakeRBboxOverlaps2D(object):
                 <cx, cy, w, h, t, score> format, or be empty.
             mode (str): 'iou' (intersection over union), 'iof' (intersection
                 over foreground).
+=======
+            bboxes1 (:obj:`RotatedBoxes`): bboxes have shape (m, 5) in
+                <cx, cy, w, h, t> format.
+            bboxes2 (:obj:`RotatedBoxes`): bboxes have shape (m, 5) in
+                <cx, cy, w, h, t> format.
+            mode (str): "iou" (intersection over union), "iof" (intersection
+                over foreground), or "giou" (generalized intersection over
+                union).
+>>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
+=======
+            bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format.
+            bboxes2 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format, or be empty.
+            mode (str): 'iou' (intersection over union), 'iof' (intersection
+                over foreground).
+>>>>>>> 2c1793c (add UT of RBoxOverlaps2D)
             is_aligned (bool): If True, then m and n must be equal.
                 Defaults to False.
 
         Returns:
             Tensor: shape (m, n) if ``is_aligned `` is False else shape (m,)
         """
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2c1793c (add UT of RBoxOverlaps2D)
         assert bboxes1.size(-1) in [0, 5, 6]
         assert bboxes2.size(-1) in [0, 5, 6]
 
@@ -133,6 +220,13 @@ class FakeRBboxOverlaps2D(object):
             bboxes1 = RotatedBoxes(bboxes1)
         if not isinstance(bboxes2, RotatedBoxes):
             bboxes2 = RotatedBoxes(bboxes2)
+<<<<<<< HEAD
+=======
+        assert bboxes1.size(-1) in [0, 5]
+        assert bboxes2.size(-1) in [0, 5]
+>>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
+=======
+>>>>>>> 2c1793c (add UT of RBoxOverlaps2D)
 
         return fake_rbbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
 
@@ -153,9 +247,21 @@ def fake_rbbox_overlaps(bboxes1: RotatedBoxes,
             format or empty.
         bboxes2 (:obj:`RotatedBoxes`): shape (B, n, 5) in <cx, cy, w, h, t>
             format or empty.
+<<<<<<< HEAD
+<<<<<<< HEAD
         mode (str): 'iou' (intersection over union), 'iof' (intersection over
             foreground).
             Defaults to 'iou'.
+=======
+        mode (str): "iou" (intersection over union), "iof" (intersection over
+            foreground) or "giou" (generalized intersection over union).
+            Defaults to "iou".
+>>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
+=======
+        mode (str): 'iou' (intersection over union), 'iof' (intersection over
+            foreground).
+            Defaults to 'iou'.
+>>>>>>> 2c1793c (add UT of RBoxOverlaps2D)
         is_aligned (bool): If True, then m and n must be equal.
             Defaults to False.
 
@@ -186,3 +292,75 @@ def fake_rbbox_overlaps(bboxes1: RotatedBoxes,
     clamped_bboxes2[:, 2:4].clamp_(min=1e-3)
 
     return box_iou_rotated(clamped_bboxes1, clamped_bboxes2, mode, is_aligned)
+
+
+def cast_tensor_type(x, scale=1., dtype=None):
+    if dtype == 'fp16':
+        # scale is for preventing overflows
+        x = (x / scale).half()
+    return x
+
+
+@TASK_UTILS.register_module()
+class RBbox2HBboxOverlaps2D:
+    """2D Overlaps (e.g. IoUs, GIoUs) Calculator."""
+
+    def __init__(self, scale=1., dtype=None):
+        self.scale = scale
+        self.dtype = dtype
+
+    def __call__(self,
+                 bboxes1: RotatedBoxes,
+                 bboxes2: BaseBoxes,
+                 mode: str = 'iou',
+                 is_aligned: bool = False) -> Tensor:
+        """Convert gt from rbb to hbb, and calculate IoU between hbboxes.
+
+        Args:
+            bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format.
+            bboxes2 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format, or be empty.
+            mode (str): 'iou' (intersection over union), 'iof' (intersection
+                over foreground).
+            is_aligned (bool): If True, then m and n must be equal.
+                Defaults to False.
+
+        Returns:
+            Tensor: shape (m, n) if ``is_aligned `` is False else shape (m,)
+        """
+        assert bboxes1.size(-1) in [0, 5, 6]
+        assert bboxes2.size(-1) in [0, 4, 5]
+
+        if bboxes1.size(-1) == 6:
+            bboxes1 = bboxes1[..., :5]
+        if bboxes2.size(-1) == 5:
+            bboxes2 = bboxes2[..., :4]
+
+        if not isinstance(bboxes1, RotatedBoxes):
+            bboxes1 = RotatedBoxes(bboxes1)
+        # convert rbb to minimum circumscribed hbb in <x1, y1, x2, y2> format.
+        bboxes1 = bboxes1.convert_to('hbox').tensor
+
+        if isinstance(bboxes2, BaseBoxes):
+            bboxes2 = bboxes2.tensor
+
+        if self.dtype == 'fp16':
+            # change tensor type to save cpu and cuda memory and keep speed
+            bboxes1 = cast_tensor_type(bboxes1, self.scale, self.dtype)
+            bboxes2 = cast_tensor_type(bboxes2, self.scale, self.dtype)
+            overlaps = bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+            if not overlaps.is_cuda and overlaps.dtype == torch.float16:
+                # resume cpu float32
+                overlaps = overlaps.float()
+            return overlaps
+
+        return bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+
+    def __repr__(self):
+        """str: a string describing the module"""
+        repr_str = self.__class__.__name__ + f'(' \
+            f'scale={self.scale}, dtype={self.dtype})'
+        return repr_str
