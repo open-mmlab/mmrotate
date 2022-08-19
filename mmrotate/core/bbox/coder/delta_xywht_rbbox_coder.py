@@ -60,9 +60,9 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         transform the ``bboxes`` into the ``gt_bboxes``.
 
         Args:
-            bboxes (torch.Tensor): Source boxes, e.g., object proposals.
-            gt_bboxes (torch.Tensor): Target of the transformation, e.g.,
-                ground-truth boxes.
+            bboxes (:obj:`RotatedBoxes`): Source boxes, e.g., object proposals.
+            gt_bboxes (:obj:`RotatedBoxes`): Target of the transformation,
+                e.g., ground-truth boxes.
 
         Returns:
             torch.Tensor: Box transformation deltas
@@ -85,7 +85,8 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         """Apply transformation `pred_bboxes` to `boxes`.
 
         Args:
-            bboxes (torch.Tensor): Basic boxes. Shape (B, N, 5) or (N, 5)
+            bboxes (:obj:`RotatedBoxes`): Basic boxes. Shape (B, N, 5) or \
+                (N, 5)
             pred_bboxes (torch.Tensor): Encoded offsets with respect to each \
                 roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or \
                (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H \
@@ -99,7 +100,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
                 width and height.
 
         Returns:
-            torch.Tensor: Decoded boxes.
+            :obj:`RotatedBoxes`: Decoded boxes.
         """
         assert pred_bboxes.size(0) == bboxes.size(0)
         if self.angle_version in ['oc', 'le135', 'le90']:
@@ -125,8 +126,10 @@ def bbox2delta(proposals,
     :func:`delta2bbox`.
 
     Args:
-        proposals (torch.Tensor): Boxes to be transformed, shape (N, ..., 5)
-        gt (torch.Tensor): Gt bboxes to be used as base, shape (N, ..., 5)
+        proposals (:obj:`RotatedBoxes`): Boxes to be transformed,
+            shape (N, ..., 5)
+        gt (:obj:`RotatedBoxes`): Gt bboxes to be used as base,
+            shape (N, ..., 5)
         means (Sequence[float]): Denormalizing means for delta coordinates
         stds (Sequence[float]): Denormalizing standard deviation for delta
             coordinates.
@@ -200,7 +203,7 @@ def delta2bbox(rois,
     :func:`bbox2delta`.
 
     Args:
-        rois (torch.Tensor): Boxes to be transformed. Has shape (N, 5).
+        rois (:obj:`RotatedBoxes`): Boxes to be transformed. Has shape (N, 5).
         deltas (torch.Tensor): Encoded offsets relative to each roi.
             Has shape (N, num_classes * 5) or (N, 5). Note
             N = num_base_anchors * W * H, when rois is a grid of
@@ -229,28 +232,36 @@ def delta2bbox(rois,
             Defaults to False.
 
     Returns:
-        Tensor: Boxes with shape (N, num_classes * 5) or (N, 5), where 5
-           represent cx, cy, w, h, a.
+        :obj:`RotatedBoxes`: Boxes with shape (N, num_classes * 5) or (N, 5),
+            where 5 represent cx, cy, w, h, a.
     """
+    num_bboxes = deltas.size(0)
+    if num_bboxes == 0:
+        return deltas
+
     rois = rois.tensor
     means = deltas.new_tensor(means).view(1, -1)
     stds = deltas.new_tensor(stds).view(1, -1)
-    denorm_deltas = deltas * stds + means
-    dx = denorm_deltas[:, 0::5]
-    dy = denorm_deltas[:, 1::5]
-    dw = denorm_deltas[:, 2::5]
-    dh = denorm_deltas[:, 3::5]
-    da = denorm_deltas[:, 4::5]
+    delta_shape = deltas.shape
+    reshaped_deltas = deltas.view(delta_shape[:-1] + (-1, 5))
+    denorm_deltas = reshaped_deltas * stds + means
+
+    dx = denorm_deltas[..., 0]
+    dy = denorm_deltas[..., 1]
+    dw = denorm_deltas[..., 2]
+    dh = denorm_deltas[..., 3]
+    da = denorm_deltas[..., 4]
     if norm_factor:
         da *= norm_factor * np.pi
     # Compute center of each roi
-    px = rois[:, 0].unsqueeze(1).expand_as(dx)
-    py = rois[:, 1].unsqueeze(1).expand_as(dy)
+
+    px = rois[..., None, 0]
+    py = rois[..., None, 1]
     # Compute width/height of each roi
-    pw = rois[:, 2].unsqueeze(1).expand_as(dw)
-    ph = rois[:, 3].unsqueeze(1).expand_as(dh)
+    pw = rois[..., None, 2]
+    ph = rois[..., None, 3]
     # Compute rotated angle of each roi
-    pa = rois[:, 4].unsqueeze(1).expand_as(da)
+    pa = rois[..., None, 4]
     dx_width = pw * dx
     dy_height = ph * dy
     max_ratio = np.abs(np.log(wh_ratio_clip))
