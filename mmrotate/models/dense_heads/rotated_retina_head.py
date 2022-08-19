@@ -2,13 +2,13 @@
 import torch.nn as nn
 from mmcv.cnn import ConvModule
 from mmcv.runner import force_fp32
+from mmdet.models.dense_heads import AnchorHead
 
 from ..builder import ROTATED_HEADS
-from .rotated_anchor_head import RotatedAnchorHead
 
 
 @ROTATED_HEADS.register_module()
-class RotatedRetinaHead(RotatedAnchorHead):
+class RotatedRetinaHead(AnchorHead):
     r"""An anchor-based head used in `RotatedRetinaNet
     <https://arxiv.org/pdf/1708.02002.pdf>`_.
 

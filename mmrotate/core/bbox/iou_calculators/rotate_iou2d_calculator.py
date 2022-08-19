@@ -41,8 +41,7 @@ class RBboxOverlaps2D(object):
             bboxes2 = bboxes2[..., :5]
         if bboxes1.size(-1) == 6:
             bboxes1 = bboxes1[..., :5]
-        return rbbox_overlaps(bboxes1.contiguous(), bboxes2.contiguous(), mode,
-                              is_aligned)
+        return rbbox_overlaps(bboxes1.tensor, bboxes2.tensor, mode, is_aligned)
 
     def __repr__(self):
         """str: a string describing the module"""
