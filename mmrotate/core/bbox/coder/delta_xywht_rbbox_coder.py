@@ -235,10 +235,6 @@ def delta2bbox(rois,
         :obj:`RotatedBoxes`: Boxes with shape (N, num_classes * 5) or (N, 5),
             where 5 represent cx, cy, w, h, a.
     """
-    num_bboxes = deltas.size(0)
-    if num_bboxes == 0:
-        return deltas
-
     rois = rois.tensor
     means = deltas.new_tensor(means).view(1, -1)
     stds = deltas.new_tensor(stds).view(1, -1)
