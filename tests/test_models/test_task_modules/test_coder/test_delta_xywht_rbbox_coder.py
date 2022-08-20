@@ -39,6 +39,12 @@ class TestDeltaBboxCoder(TestCase):
             RotatedBoxes(batch_rois), batch_deltas, max_shape=(32, 32))[0]
         assert_allclose(out, batch_out.tensor)
 
+        # empty deltas
+        rois = torch.zeros((0, 5))
+        deltas = torch.zeros((0, 5))
+        out = coder.decode(RotatedBoxes(rois), deltas, max_shape=(32, 32))
+        self.assertEqual(rois.shape, out.shape)
+
         # test add_ctr_clamp
         coder = DeltaXYWHTRBBoxCoder(add_ctr_clamp=True, ctr_clamp=2)
 

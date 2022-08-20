@@ -15,7 +15,8 @@ from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
 
-from mmrotate.core import eval_rbbox_map, obb2poly_np
+from mmrotate.core import eval_rbbox_map
+from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import METRICS
 
 
@@ -36,9 +37,6 @@ class DOTAMetric(BaseMetric):
         metric (str | list[str]): Metrics to be evaluated. Only support
             'mAP' now. If is list, the first setting in the list will
              be used to evaluate metric.
-        proposal_nums (Sequence[int]): Proposal number used for evaluating
-            recalls, such as recall@100, recall@1000.
-            Defaults to (100, 300, 1000).
         format_only (bool): Format the output results without perform
             evaluation. It is useful when you want to format the result
             to a specific format. Defaults to False.
@@ -50,7 +48,11 @@ class DOTAMetric(BaseMetric):
             patches' results.
         iou_thr (float): IoU threshold of ``nms_rotated`` used in merge
             patches. Defaults to 0.1.
-        version (str): Angle representations. Defaults to 'oc'.
+        eval_mode (str): 'area' or '11points', 'area' means calculating the
+            area under precision-recall curve, '11points' means calculating
+            the average precision of recalls at [0, 0.1, ..., 1].
+            The PASCAL VOC2007 defaults to use '11points', while PASCAL
+            VOC2012 defaults to use 'area'. Defaults to '11points'.
         collect_device (str): Device name used for collecting results from
             different ranks during distributed training. Must be 'cpu' or
             'gpu'. Defaults to 'cpu'.
@@ -66,12 +68,11 @@ class DOTAMetric(BaseMetric):
                  iou_thrs: Union[float, List[float]] = 0.5,
                  scale_ranges: Optional[List[tuple]] = None,
                  metric: Union[str, List[str]] = 'mAP',
-                 proposal_nums: Sequence[int] = (100, 300, 1000),
                  format_only: bool = False,
                  outfile_prefix: Optional[str] = None,
                  merge_patches: bool = False,
                  iou_thr: float = 0.1,
-                 version: str = 'oc',
+                 eval_mode: str = '11points',
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None) -> None:
         super().__init__(collect_device=collect_device, prefix=prefix)
@@ -83,12 +84,10 @@ class DOTAMetric(BaseMetric):
         if not isinstance(metric, str):
             assert len(metric) == 1
             metric = metric[0]
-        allowed_metrics = ['recall', 'mAP']
+        allowed_metrics = ['mAP']
         if metric not in allowed_metrics:
-            raise KeyError(
-                f"metric should be one of 'recall', 'mAP', but got {metric}.")
+            raise KeyError(f"metric should be one of 'mAP', but got {metric}.")
         self.metric = metric
-        self.proposal_nums = proposal_nums
 
         self.format_only = format_only
         if self.format_only:
@@ -99,7 +98,8 @@ class DOTAMetric(BaseMetric):
         self.outfile_prefix = outfile_prefix
         self.merge_patches = merge_patches
         self.iou_thr = iou_thr
-        self.version = version
+
+        self.use_07_metric = True if eval_mode == '11points' else False
 
     def merge_results(self, results: Sequence[dict],
                       outfile_prefix: str) -> str:
@@ -163,10 +163,12 @@ class DOTAMetric(BaseMetric):
             for f, dets in zip(file_objs, dets_per_cls):
                 if dets.size == 0:
                     continue
-                bboxes = obb2poly_np(dets, self.version)
-                for bbox in bboxes:
-                    txt_element = [img_id, str(bbox[-1])
-                                   ] + [f'{p:.2f}' for p in bbox[:-1]]
+                th_dets = torch.from_numpy(dets)
+                rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
+                qboxes = RotatedBoxes(rboxes).convert_to('qbox').tensor
+                for qbox, score in zip(qboxes, scores):
+                    txt_element = [img_id, str(score)
+                                   ] + [f'{p:.2f}' for p in qbox]
                     f.writelines(' '.join(txt_element) + '\n')
 
         for f in file_objs:
@@ -300,15 +302,17 @@ class DOTAMetric(BaseMetric):
         if self.metric == 'mAP':
             assert isinstance(self.iou_thrs, list)
             dataset_name = self.dataset_meta['CLASSES']
+            dets = [pred['pred_bbox_scores'] for pred in preds]
 
             mean_aps = []
             for iou_thr in self.iou_thrs:
                 logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}')
                 mean_ap, _ = eval_rbbox_map(
-                    preds['pred_bbox_scores'],
+                    dets,
                     gts,
                     scale_ranges=self.scale_ranges,
                     iou_thr=iou_thr,
+                    use_07_metric=self.use_07_metric,
                     dataset=dataset_name,
                     logger=logger)
                 mean_aps.append(mean_ap)
