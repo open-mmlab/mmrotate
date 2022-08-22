@@ -167,7 +167,7 @@ class DOTAMetric(BaseMetric):
                 rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
                 qboxes = RotatedBoxes(rboxes).convert_to('qbox').tensor
                 for qbox, score in zip(qboxes, scores):
-                    txt_element = [img_id, str(score)
+                    txt_element = [img_id, str(float(score))
                                    ] + [f'{p:.2f}' for p in qbox]
                     f.writelines(' '.join(txt_element) + '\n')
 
