@@ -5,7 +5,7 @@ import os.path as osp
 import re
 import tempfile
 import zipfile
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from typing import List, Optional, Sequence, Union
 
 import numpy as np
@@ -116,6 +116,7 @@ class DOTAMetric(BaseMetric):
                 prefix is "somepath/xxx", the zip files will be named
                 "somepath/xxx/xxx.zip".
         """
+        collector = defaultdict(list)
         id_list, dets_list = [], []
         for idx, result in enumerate(results):
             img_id = result.get('img_id', idx)
@@ -131,8 +132,17 @@ class DOTAMetric(BaseMetric):
             ori_bboxes = bboxes.copy()
             ori_bboxes[..., :2] = ori_bboxes[..., :2] + np.array(
                 [x, y], dtype=np.float32)
-            dets = np.concatenate([ori_bboxes, scores[:, np.newaxis]], axis=1)
+            label_dets = np.concatenate(
+                [labels[:, np.newaxis], ori_bboxes, scores[:, np.newaxis]],
+                axis=1)
+
+            id_list.append(oriname)
+            collector[oriname].append(label_dets)
+
+        for oriname, label_dets_list in collector.items():
             big_img_results = []
+            label_dets = np.concatenate(label_dets_list, axis=0)
+            labels, dets = label_dets[:, 0], label_dets[:, 1:]
             for i in range(len(self.dataset_meta['CLASSES'])):
                 if len(dets[labels == i]) == 0:
                     big_img_results.append(dets[labels == i])
@@ -145,7 +155,6 @@ class DOTAMetric(BaseMetric):
                                                       cls_dets[:, -1],
                                                       self.iou_thr)
                     big_img_results.append(nms_dets.cpu().numpy())
-            id_list.append(oriname)
             dets_list.append(big_img_results)
 
         if osp.exists(outfile_prefix):
