@@ -2,13 +2,11 @@
 from typing import List, Optional
 
 import numpy as np
-import torch
 from mmdet.structures.mask import bitmap_to_polygon
 from mmdet.visualization import DetLocalVisualizer, get_palette
 from mmdet.visualization.palette import _get_adaptive_scales
 from mmengine.data import InstanceData
 
-from mmrotate.core import obb2poly
 from ..registry import VISUALIZERS
 
 
@@ -69,8 +67,9 @@ class RotLocalVisualizer(DetLocalVisualizer):
             colors = [bbox_palette[label] for label in labels]
 
             # rbbox to polygon
-            polygons = obb2poly(torch.from_numpy(bboxes),
-                                'oc').reshape(-1, 4, 2)[0]
+            polygons = bboxes.convert_to('qbox').tensor
+            polygons = polygons.reshape(-1, 4, 2).numpy()
+            polygons = [p for p in polygons]
             self.draw_polygons(
                 polygons,
                 edge_colors=colors,
