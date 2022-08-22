@@ -117,7 +117,6 @@ class DOTAMetric(BaseMetric):
                 "somepath/xxx/xxx.zip".
         """
         collector = defaultdict(list)
-        id_list, dets_list = [], []
         for idx, result in enumerate(results):
             img_id = result.get('img_id', idx)
             splitname = img_id.split('__')
@@ -135,10 +134,9 @@ class DOTAMetric(BaseMetric):
             label_dets = np.concatenate(
                 [labels[:, np.newaxis], ori_bboxes, scores[:, np.newaxis]],
                 axis=1)
-
-            id_list.append(oriname)
             collector[oriname].append(label_dets)
 
+        id_list, dets_list = [], []
         for oriname, label_dets_list in collector.items():
             big_img_results = []
             label_dets = np.concatenate(label_dets_list, axis=0)
@@ -155,6 +153,7 @@ class DOTAMetric(BaseMetric):
                                                       cls_dets[:, -1],
                                                       self.iou_thr)
                     big_img_results.append(nms_dets.cpu().numpy())
+            id_list.append(oriname)
             dets_list.append(big_img_results)
 
         if osp.exists(outfile_prefix):
