@@ -52,9 +52,7 @@ class DOTADataset(BaseDataset):
         Returns:
             List[dict]: A list of annotation.
         """  # noqa: E501
-        cls_map = {c: i
-                   for i, c in enumerate(self.metainfo['CLASSES'])
-                   }  # in mmdet v2.0 label is 0-based
+        cls_map = {c: i for i, c in enumerate(self.metainfo['CLASSES'])}
         data_list = []
         if self.ann_file == '':
             img_files = glob.glob(
