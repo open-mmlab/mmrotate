@@ -8,7 +8,7 @@ class TestDOTADataset(unittest.TestCase):
 
     def test_dota_with_ann_file(self):
         dataset = DOTADataset(
-            data_root='tests/data/',
+            data_root='tests/data/dota/',
             ann_file='labelTxt/',
             data_prefix=dict(img_path='images/'),
             filter_cfg=dict(
@@ -22,7 +22,7 @@ class TestDOTADataset(unittest.TestCase):
         self.assertEqual(data_list[0]['img_id'], 'P2805__1024__0___0')
         self.assertEqual(data_list[0]['file_name'], 'P2805__1024__0___0.png')
         self.assertEqual(data_list[0]['img_path'],
-                         'tests/data/images/P2805__1024__0___0.png')
+                         'tests/data/dota/images/P2805__1024__0___0.png')
         self.assertEqual(len(data_list[0]['instances']), 4)
         self.assertEqual(dataset.get_cat_ids(0), [0, 0, 0, 0])
 
@@ -41,6 +41,6 @@ class TestDOTADataset(unittest.TestCase):
         self.assertEqual(data_list[0]['img_id'], 'P2805__1024__0___0')
         self.assertEqual(data_list[0]['file_name'], 'P2805__1024__0___0.png')
         self.assertEqual(data_list[0]['img_path'],
-                         'tests/data/images/P2805__1024__0___0.png')
+                         'tests/data/dota/images/P2805__1024__0___0.png')
         self.assertEqual(len(data_list[0]['instances']), 1)
         self.assertEqual(dataset.get_cat_ids(0), [[]])
