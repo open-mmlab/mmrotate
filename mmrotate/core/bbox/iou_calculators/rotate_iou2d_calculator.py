@@ -18,23 +18,34 @@ class RBboxOverlaps2D(object):
         """Calculate IoU between 2D rotated bboxes.
 
         Args:
-            bboxes1 (:obj:`RotatedBoxes`): bboxes have shape (m, 5) in
-                <cx, cy, w, h, a> format.
-            bboxes2 (:obj:`RotatedBoxes`): bboxes have shape (m, 5) in
-                <cx, cy, w, h, a> format.
-            mode (str): "iou" (intersection over union), "iof" (intersection
-                over foreground), or "giou" (generalized intersection over
-                union).
+            bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format.
+            bboxes2 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format, or be empty.
+            mode (str): 'iou' (intersection over union), 'iof' (intersection
+                over foreground). Defaults to 'iou'.
             is_aligned (bool): If True, then m and n must be equal.
                 Defaults to False.
 
         Returns:
             Tensor: shape (m, n) if ``is_aligned `` is False else shape (m,)
         """
-        assert bboxes1.size(-1) in [0, 5]
-        assert bboxes2.size(-1) in [0, 5]
+        assert bboxes1.size(-1) in [0, 5, 6]
+        assert bboxes2.size(-1) in [0, 5, 6]
 
-        return rbbox_overlaps(bboxes1.tensor, bboxes2.tensor, mode, is_aligned)
+        if bboxes1.size(-1) == 6:
+            bboxes1 = bboxes1[..., :5]
+        if bboxes2.size(-1) == 6:
+            bboxes2 = bboxes2[..., :5]
+
+        if isinstance(bboxes1, RotatedBoxes):
+            bboxes1 = bboxes1.tensor
+        if isinstance(bboxes2, RotatedBoxes):
+            bboxes2 = bboxes2.tensor
+
+        return rbbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
 
     def __repr__(self) -> str:
         """str: a string describing the module"""
@@ -53,9 +64,8 @@ def rbbox_overlaps(bboxes1: Tensor,
             or empty.
         bboxes2 (Tensor): shape (B, n, 5) in <cx, cy, w, h, a> format
             or empty.
-        mode (str): "iou" (intersection over union), "iof" (intersection over
-            foreground) or "giou" (generalized intersection over union).
-            Defaults to "iou".
+        mode (str): 'iou' (intersection over union), 'iof' (intersection over
+            foreground). Defaults to 'iou'.
         is_aligned (bool): If True, then m and n must be equal.
             Defaults to False.
 
@@ -97,21 +107,32 @@ class FakeRBboxOverlaps2D(object):
         """Calculate IoU between 2D minimum circumscribed hbbs of rbbs.
 
         Args:
-            bboxes1 (:obj:`RotatedBoxes`): bboxes have shape (m, 5) in
-                <cx, cy, w, h, t> format.
-            bboxes2 (:obj:`RotatedBoxes`): bboxes have shape (m, 5) in
-                <cx, cy, w, h, t> format.
-            mode (str): "iou" (intersection over union), "iof" (intersection
-                over foreground), or "giou" (generalized intersection over
-                union).
+            bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format.
+            bboxes2 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
+                in <cx, cy, w, h, t> format, shape (m, 6) in
+                <cx, cy, w, h, t, score> format, or be empty.
+            mode (str): 'iou' (intersection over union), 'iof' (intersection
+                over foreground).
             is_aligned (bool): If True, then m and n must be equal.
                 Defaults to False.
 
         Returns:
             Tensor: shape (m, n) if ``is_aligned `` is False else shape (m,)
         """
-        assert bboxes1.size(-1) in [0, 5]
-        assert bboxes2.size(-1) in [0, 5]
+        assert bboxes1.size(-1) in [0, 5, 6]
+        assert bboxes2.size(-1) in [0, 5, 6]
+
+        if bboxes1.size(-1) == 6:
+            bboxes1 = bboxes1[..., :5]
+        if bboxes2.size(-1) == 6:
+            bboxes2 = bboxes2[..., :5]
+
+        if not isinstance(bboxes1, RotatedBoxes):
+            bboxes1 = RotatedBoxes(bboxes1)
+        if not isinstance(bboxes2, RotatedBoxes):
+            bboxes2 = RotatedBoxes(bboxes2)
 
         return fake_rbbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
 
@@ -132,9 +153,9 @@ def fake_rbbox_overlaps(bboxes1: RotatedBoxes,
             format or empty.
         bboxes2 (:obj:`RotatedBoxes`): shape (B, n, 5) in <cx, cy, w, h, t>
             format or empty.
-        mode (str): "iou" (intersection over union), "iof" (intersection over
-            foreground) or "giou" (generalized intersection over union).
-            Defaults to "iou".
+        mode (str): 'iou' (intersection over union), 'iof' (intersection over
+            foreground).
+            Defaults to 'iou'.
         is_aligned (bool): If True, then m and n must be equal.
             Defaults to False.
 
