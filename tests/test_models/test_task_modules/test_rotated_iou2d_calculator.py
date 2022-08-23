@@ -1,10 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from unittest import TestCase
+
 import numpy as np
 import torch
-
-from mmrotate.core.bbox.iou_calculators import rbbox_overlaps, RBboxOverlaps2D, FakeRBboxOverlaps2D
 from mmengine.testing import assert_allclose
+
+from mmrotate.core.bbox.iou_calculators import (FakeRBboxOverlaps2D,
+                                                RBboxOverlaps2D,
+                                                rbbox_overlaps)
 from mmrotate.core.bbox.structures import RotatedBoxes
 
 
@@ -50,25 +53,25 @@ class TestRBoxOverlaps2D(TestCase):
         ious = overlap(bboxes1, bboxes2, 'iou', True)
         self.assertEqual(ious.size(), torch.Size([0, 1]))
         self.assertTrue(torch.all(ious == torch.empty((0, ))))
-        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1)) 
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
 
         # is_aligned is False
         bboxes1, num_bbox1 = self._construct_rbbox()
         bboxes2, num_bbox2 = self._construct_rbbox()
         ious = overlap(bboxes1, bboxes2, 'iou')
-        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1)) 
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
         self.assertEqual(ious.size(), (num_bbox1, num_bbox2))
 
     def test_rbbox_overlaps(self):
         # test allclose between rbbox_overlaps and the original official
         # implementation.
-        bboxes1 = torch.FloatTensor([
-            [1.0, 1.0, 3.0, 4.0, 0.5], [2.0, 2.0, 3.0, 4.0, 0.6],
-             [7.0, 7.0, 8.0, 8.0, 0.4]
-        ])
+        bboxes1 = torch.FloatTensor([[1.0, 1.0, 3.0, 4.0, 0.5],
+                                     [2.0, 2.0, 3.0, 4.0, 0.6],
+                                     [7.0, 7.0, 8.0, 8.0, 0.4]])
         bboxes2 = torch.FloatTensor([
-            [0.0, 2.0, 2.0, 5.0, 0.3], [2.0, 1.0, 3.0, 3.0, 0.5],
-             [5.0, 5.0, 6.0, 7.0, 0.4],
+            [0.0, 2.0, 2.0, 5.0, 0.3],
+            [2.0, 1.0, 3.0, 3.0, 0.5],
+            [5.0, 5.0, 6.0, 7.0, 0.4],
         ])
         ious = rbbox_overlaps(bboxes1, bboxes2, 'iou', is_aligned=True)
         # the gt is got with four decimal precision.
@@ -77,10 +80,10 @@ class TestRBoxOverlaps2D(TestCase):
 
         # test mode 'iof'
         ious = rbbox_overlaps(bboxes1, bboxes2, 'iof', is_aligned=True)
-        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1)) 
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
         self.assertEqual(ious.size(), (bboxes1.size(0), ))
         ious = rbbox_overlaps(bboxes1, bboxes2, 'iof')
-        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1)) 
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
         self.assertEqual(ious.size(), (bboxes1.size(0), bboxes2.size(0)))
 
     def test_fake_rbbox_overlaps_2d(self):
@@ -114,12 +117,11 @@ class TestRBoxOverlaps2D(TestCase):
         ious = overlap(bboxes1, bboxes2, 'iou', True)
         self.assertEqual(ious.size(), torch.Size([0, 1]))
         self.assertTrue(torch.all(ious == torch.empty((0, ))))
-        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1)) 
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
 
         # is_aligned is False
         bboxes1, num_bbox1 = self._construct_rbbox()
         bboxes2, num_bbox2 = self._construct_rbbox()
         ious = overlap(bboxes1, bboxes2, 'iou')
-        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1)) 
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
         self.assertEqual(ious.size(), (num_bbox1, num_bbox2))
-
