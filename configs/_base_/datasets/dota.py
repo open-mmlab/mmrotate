@@ -67,8 +67,8 @@ test_dataloader = val_dataloader
 val_evaluator = dict(type='DOTAMetric', metric='mAP')
 test_evaluator = val_evaluator
 
-# inference on test dataset and
-# format the output results for submission.
+# inference on test dataset and format the output results
+# for submission. Note: the test set has no annotation.
 # test_dataloader = dict(
 #     batch_size=1,
 #     num_workers=2,
