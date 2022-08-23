@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 import mmcv
 import numpy as np
 from mmengine.dataset import BaseDataset
+from mmengine.fileio import list_from_file
 
 from mmrotate.core import obb2poly_np
 from mmrotate.registry import DATASETS
@@ -84,7 +85,7 @@ class HRSCDataset(BaseDataset):
             ]
 
         data_list = []
-        img_ids = mmcv.list_from_file(
+        img_ids = list_from_file(
             self.ann_file, file_client_args=self.file_client_args)
         for img_id in img_ids:
             file_name = osp.join(self.img_subdir, f'{img_id}.bmp')
