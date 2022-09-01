@@ -1,23 +1,27 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from ..builder import ROTATED_DETECTORS
-from .single_stage import RotatedSingleStageDetector
+from mmdet.models.detectors.single_stage import SingleStageDetector
+from mmdet.utils import ConfigType, OptConfigType, OptMultiConfig
+
+from mmrotate.registry import MODELS
 
 
-@ROTATED_DETECTORS.register_module()
-class RotatedRetinaNet(RotatedSingleStageDetector):
-    """Implementation of Rotated `RetinaNet.`__
-
-    __ https://arxiv.org/abs/1708.02002
-    """
+@MODELS.register_module()
+class RotatedRetinaNet(SingleStageDetector):
+    """Implementation of `RetinaNet <https://arxiv.org/abs/1708.02002>`_"""
 
     def __init__(self,
-                 backbone,
-                 neck,
-                 bbox_head,
-                 train_cfg=None,
-                 test_cfg=None,
-                 pretrained=None,
-                 init_cfg=None):
-        super(RotatedRetinaNet,
-              self).__init__(backbone, neck, bbox_head, train_cfg, test_cfg,
-                             pretrained, init_cfg)
+                 backbone: ConfigType,
+                 neck: ConfigType,
+                 bbox_head: ConfigType,
+                 train_cfg: OptConfigType = None,
+                 test_cfg: OptConfigType = None,
+                 data_preprocessor: OptConfigType = None,
+                 init_cfg: OptMultiConfig = None) -> None:
+        super().__init__(
+            backbone=backbone,
+            neck=neck,
+            bbox_head=bbox_head,
+            train_cfg=train_cfg,
+            test_cfg=test_cfg,
+            data_preprocessor=data_preprocessor,
+            init_cfg=init_cfg)

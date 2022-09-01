@@ -65,8 +65,8 @@ class RotatedBoxes(BaseBoxes):
         ``regualrize_boxes``:
 
         - 'oc': OpenCV Definition. Has the same box representation as
-          ``cv2.minAreaRect`` the angle ranges in [-90, 0). Equal to set
-          width_longer=False and start_angle=-90.
+          ``cv2.minAreaRect`` the angle ranges in (0, 90]. Equal to set
+          width_longer=False and start_angle=0.
         - 'le90': Long Edge Definition (90). the angle ranges in [-90, 90).
           The width is always longer than the height. Equal to set
           width_longer=True and start_angle=-90.
@@ -88,7 +88,7 @@ class RotatedBoxes(BaseBoxes):
         boxes = self.tensor
         if pattern is not None:
             if pattern == 'oc':
-                width_longer, start_angle = False, -90
+                width_longer, start_angle = False, 0
             elif pattern == 'le90':
                 width_longer, start_angle = True, -90
             elif pattern == 'le135':
@@ -106,11 +106,11 @@ class RotatedBoxes(BaseBoxes):
             t = torch.where(w > h, t, t + np.pi / 2)
             t = ((t - start_angle) % np.pi) + start_angle
         else:
-            # swap edge and angle if angle >= pi/2
+            # swap edge and angle if angle > pi/2
             t = ((t - start_angle) % np.pi)
-            w_ = torch.where(t < np.pi / 2, w, h)
-            h_ = torch.where(t < np.pi / 2, h, w)
-            t = torch.where(t < np.pi / 2, t, t - np.pi / 2) + start_angle
+            w_ = torch.where(t <= np.pi / 2, w, h)
+            h_ = torch.where(t <= np.pi / 2, h, w)
+            t = torch.where(t <= np.pi / 2, t, t - np.pi / 2) + start_angle
         self.tensor = torch.stack([x, y, w_, h_, t], dim=-1)
         return self.tensor
 
