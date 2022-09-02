@@ -175,7 +175,7 @@ class DOTAMetric(BaseMetric):
                 rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
                 qboxes = RotatedBoxes(rboxes).convert_to('qbox').tensor
                 for qbox, score in zip(qboxes, scores):
-                    txt_element = [img_id, str(float(score))
+                    txt_element = [img_id, str(round(float(score), 2))
                                    ] + [f'{p:.2f}' for p in qbox]
                     f.writelines(' '.join(txt_element) + '\n')
 
@@ -232,20 +232,18 @@ class DOTAMetric(BaseMetric):
         return result_files
 
     def process(self, data_batch: Sequence[dict],
-                predictions: Sequence[dict]) -> None:
-        """Process one batch of data samples and predictions.
-
-        The processed
+                data_samples: Sequence[dict]) -> None:
+        """Process one batch of data samples and predictions. The processed
         results should be stored in ``self.results``, which will be used to
         compute the metrics when all batches have been processed.
+
         Args:
-            data_batch (Sequence[dict]): A batch of data
-                from the dataloader.
-            predictions (Sequence[dict]): A batch of outputs from
-                the model.
+            data_batch (dict): A batch of data from the dataloader.
+            data_samples (Sequence[dict]): A batch of data samples that
+                contain annotations and predictions.
         """
-        for data, pred in zip(data_batch, predictions):
-            gt = copy.deepcopy(data['data_sample'])
+        for data_sample in data_samples:
+            gt = copy.deepcopy(data_sample)
             gt_instances = gt['gt_instances']
             gt_ignore_instances = gt['ignored_instances']
             if gt_instances == {}:
@@ -257,8 +255,8 @@ class DOTAMetric(BaseMetric):
                     bboxes_ignore=gt_ignore_instances['bboxes'].cpu().numpy(),
                     labels_ignore=gt_ignore_instances['labels'].cpu().numpy())
             result = dict()
-            pred = pred['pred_instances']
-            result['img_id'] = data['data_sample']['img_id']
+            pred = data_sample['pred_instances']
+            result['img_id'] = data_sample['img_id']
             result['bboxes'] = pred['bboxes'].cpu().numpy()
             result['scores'] = pred['scores'].cpu().numpy()
             result['labels'] = pred['labels'].cpu().numpy()

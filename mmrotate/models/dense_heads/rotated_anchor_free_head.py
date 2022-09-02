@@ -1,13 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 
-from mmdet.core.anchor.point_generator import MlvlPointGenerator
 from mmdet.models.dense_heads import AnchorFreeHead
+from mmdet.models.task_modules.prior_generators import MlvlPointGenerator
 
-from mmrotate.core import build_bbox_coder
-from ..builder import ROTATED_HEADS, build_loss
+from mmrotate.registry import MODELS, TASK_UTILS
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedAnchorFreeHead(AnchorFreeHead):
     """Rotated Anchor-free head (Rotated FCOS, etc.).
 
@@ -77,9 +76,9 @@ class RotatedAnchorFreeHead(AnchorFreeHead):
         self.dcn_on_last_conv = dcn_on_last_conv
         assert conv_bias == 'auto' or isinstance(conv_bias, bool)
         self.conv_bias = conv_bias
-        self.loss_cls = build_loss(loss_cls)
-        self.loss_bbox = build_loss(loss_bbox)
-        self.bbox_coder = build_bbox_coder(bbox_coder)
+        self.loss_cls = TASK_UTILS.build(loss_cls)
+        self.loss_bbox = TASK_UTILS.build(loss_bbox)
+        self.bbox_coder = TASK_UTILS.build(bbox_coder)
 
         self.prior_generator = MlvlPointGenerator(strides)
 

@@ -3,18 +3,17 @@
 import torch
 import torch.nn as nn
 from mmcv.cnn import Scale
-from mmcv.runner import force_fp32
-from mmdet.core import reduce_mean
+from mmdet.utils import reduce_mean
 
-from mmrotate.core import build_bbox_coder, multiclass_nms_rotated
-from ..builder import ROTATED_HEADS
+from mmrotate.core import multiclass_nms_rotated
+from mmrotate.registry import MODELS, TASK_UTILS
 from .rotated_anchor_free_head import RotatedAnchorFreeHead
 from .rotated_fcos_head import RotatedFCOSHead
 
 INF = 1e8
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class CSLRFCOSHead(RotatedFCOSHead):
     """Use `Circular Smooth Label (CSL)
 
@@ -39,7 +38,7 @@ class CSLRFCOSHead(RotatedFCOSHead):
                      window='gaussian',
                      radius=6),
                  **kwargs):
-        self.angle_coder = build_bbox_coder(angle_coder)
+        self.angle_coder = TASK_UTILS.build(angle_coder)
         assert separate_angle, 'Only support separate angle in CSL'
         assert scale_angle is False, 'Only support no scale angle in CSL'
         self.coding_len = self.angle_coder.coding_len
@@ -54,8 +53,6 @@ class CSLRFCOSHead(RotatedFCOSHead):
             self.feat_channels, self.coding_len, 3, padding=1)
         self.scales = nn.ModuleList([Scale(1.0) for _ in self.strides])
 
-    @force_fp32(
-        apply_to=('cls_scores', 'bbox_preds', 'angle_preds', 'centernesses'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -297,8 +294,6 @@ class CSLRFCOSHead(RotatedFCOSHead):
             score_factors=mlvl_centerness)
         return det_bboxes, det_labels
 
-    @force_fp32(
-        apply_to=('cls_scores', 'bbox_preds', 'angle_preds', 'centerness'))
     def refine_bboxes(self, cls_scores, bbox_preds, angle_preds, centernesses):
         """This function will be used in S2ANet, whose num_anchors=1."""
         num_levels = len(cls_scores)

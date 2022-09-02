@@ -2,15 +2,14 @@
 from abc import ABCMeta
 
 import torch
-from mmcv.runner import BaseModule
-from mmdet.core import bbox2roi
+from mmdet.structures.bbox import bbox2roi
+from mmengine.model import BaseModule
 
-from mmrotate.core import build_assigner, build_sampler, obb2xyxy, rbbox2result
-from ..builder import (ROTATED_HEADS, build_head, build_roi_extractor,
-                       build_shared_head)
+from mmrotate.core import obb2xyxy, rbbox2result
+from mmrotate.registry import MODELS, TASK_UTILS
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedStandardRoIHead(BaseModule, metaclass=ABCMeta):
     """Simplest base rotated roi head including one bbox head.
 
@@ -42,7 +41,7 @@ class RotatedStandardRoIHead(BaseModule, metaclass=ABCMeta):
 
         if shared_head is not None:
             shared_head.pretrained = pretrained
-            self.shared_head = build_shared_head(shared_head)
+            self.shared_head = TASK_UTILS.build(shared_head)
 
         if bbox_head is not None:
             self.init_bbox_head(bbox_roi_extractor, bbox_head)
@@ -57,8 +56,8 @@ class RotatedStandardRoIHead(BaseModule, metaclass=ABCMeta):
         self.bbox_assigner = None
         self.bbox_sampler = None
         if self.train_cfg:
-            self.bbox_assigner = build_assigner(self.train_cfg.assigner)
-            self.bbox_sampler = build_sampler(
+            self.bbox_assigner = TASK_UTILS.build(self.train_cfg.assigner)
+            self.bbox_sampler = TASK_UTILS.build(
                 self.train_cfg.sampler, context=self)
 
     def init_bbox_head(self, bbox_roi_extractor, bbox_head):
@@ -68,8 +67,8 @@ class RotatedStandardRoIHead(BaseModule, metaclass=ABCMeta):
             bbox_roi_extractor (dict): Config of ``bbox_roi_extractor``.
             bbox_head (dict): Config of ``bbox_head``.
         """
-        self.bbox_roi_extractor = build_roi_extractor(bbox_roi_extractor)
-        self.bbox_head = build_head(bbox_head)
+        self.bbox_roi_extractor = TASK_UTILS.build(bbox_roi_extractor)
+        self.bbox_head = TASK_UTILS.build(bbox_head)
 
     def forward_dummy(self, x, proposals):
         """Dummy forward function.

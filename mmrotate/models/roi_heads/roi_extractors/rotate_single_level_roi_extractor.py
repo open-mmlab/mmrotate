@@ -2,15 +2,14 @@
 import torch
 import torch.nn as nn
 from mmcv import ops
-from mmcv.runner import force_fp32
-from mmcv.utils import to_2tuple
 from mmdet.models.roi_heads.roi_extractors.base_roi_extractor import \
     BaseRoIExtractor
+from mmengine.utils import to_2tuple
 
-from ...builder import ROTATED_ROI_EXTRACTORS
+from mmrotate.registry import MODELS
 
 
-@ROTATED_ROI_EXTRACTORS.register_module()
+@MODELS.register_module()
 class RotatedSingleRoIExtractor(BaseRoIExtractor):
     """Extract RoI features from a single level feature map.
 
@@ -87,7 +86,6 @@ class RotatedSingleRoIExtractor(BaseRoIExtractor):
         target_lvls = target_lvls.clamp(min=0, max=num_levels - 1).long()
         return target_lvls
 
-    @force_fp32(apply_to=('feats', ), out_fp16=True)
     def forward(self, feats, rois, roi_scale_factor=None):
         """Forward function.
 

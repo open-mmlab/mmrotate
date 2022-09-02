@@ -2,17 +2,16 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmcv.runner import BaseModule, auto_fp16, force_fp32
-from mmcv.utils import to_2tuple
-from mmdet.core import multi_apply
 from mmdet.models.losses import accuracy
-from mmdet.models.utils import build_linear_layer
+from mmdet.models.utils import multi_apply
+from mmengine.model import BaseModule
+from mmengine.utils import to_2tuple
 
-from mmrotate.core import build_bbox_coder, multiclass_nms_rotated
-from ...builder import ROTATED_HEADS, build_loss
+from mmrotate.core import multiclass_nms_rotated
+from mmrotate.registry import MODELS, TASK_UTILS
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedBBoxHead(BaseModule):
     """Simplest RoI head, with only two fc layers for classification and
     regression respectively.
@@ -74,9 +73,9 @@ class RotatedBBoxHead(BaseModule):
         self.cls_predictor_cfg = cls_predictor_cfg
         self.fp16_enabled = False
 
-        self.bbox_coder = build_bbox_coder(bbox_coder)
-        self.loss_cls = build_loss(loss_cls)
-        self.loss_bbox = build_loss(loss_bbox)
+        self.bbox_coder = TASK_UTILS.build(bbox_coder)
+        self.loss_cls = TASK_UTILS.build(loss_cls)
+        self.loss_bbox = TASK_UTILS.build(loss_bbox)
 
         in_channels = self.in_channels
         if self.with_avg_pool:
@@ -89,13 +88,13 @@ class RotatedBBoxHead(BaseModule):
                 cls_channels = self.loss_cls.get_cls_channels(self.num_classes)
             else:
                 cls_channels = num_classes + 1
-            self.fc_cls = build_linear_layer(
+            self.fc_cls = TASK_UTILS.build(
                 self.cls_predictor_cfg,
                 in_features=in_channels,
                 out_features=cls_channels)
         if self.with_reg:
             out_dim_reg = 5 if reg_class_agnostic else 5 * num_classes
-            self.fc_reg = build_linear_layer(
+            self.fc_reg = TASK_UTILS.build(
                 self.reg_predictor_cfg,
                 in_features=in_channels,
                 out_features=out_dim_reg)
@@ -128,7 +127,6 @@ class RotatedBBoxHead(BaseModule):
         """The custom accuracy."""
         return getattr(self.loss_cls, 'custom_accuracy', False)
 
-    @auto_fp16()
     def forward(self, x):
         """Forward function of Rotated BBoxHead."""
         if self.with_avg_pool:
@@ -271,7 +269,6 @@ class RotatedBBoxHead(BaseModule):
             bbox_weights = torch.cat(bbox_weights, 0)
         return labels, label_weights, bbox_targets, bbox_weights
 
-    @force_fp32(apply_to=('cls_score', 'bbox_pred'))
     def loss(self,
              cls_score,
              bbox_pred,
@@ -354,7 +351,6 @@ class RotatedBBoxHead(BaseModule):
                 losses['loss_bbox'] = bbox_pred[pos_inds].sum()
         return losses
 
-    @force_fp32(apply_to=('cls_score', 'bbox_pred'))
     def get_bboxes(self,
                    rois,
                    cls_score,
@@ -419,7 +415,6 @@ class RotatedBBoxHead(BaseModule):
                 bboxes, scores, cfg.score_thr, cfg.nms, cfg.max_per_img)
             return det_bboxes, det_labels
 
-    @force_fp32(apply_to=('bbox_preds', ))
     def refine_bboxes(self, rois, labels, bbox_preds, pos_is_gts, img_metas):
         """Refine bboxes during training.
 
@@ -463,7 +458,6 @@ class RotatedBBoxHead(BaseModule):
 
         return bboxes_list
 
-    @force_fp32(apply_to=('bbox_pred', ))
     def regress_by_class(self, rois, label, bbox_pred, img_meta):
         """Regress the bbox for the predicted class. Used in Cascade R-CNN.
 

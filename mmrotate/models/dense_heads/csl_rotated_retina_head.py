@@ -2,16 +2,15 @@
 
 import torch
 import torch.nn as nn
-from mmcv.runner import force_fp32
-from mmdet.core import images_to_levels, multi_apply, unmap
+from mmdet.models.utils import images_to_levels, multi_apply, unmap
 
-from mmrotate.core import build_bbox_coder, multiclass_nms_rotated
-from ... import obb2hbb, rotated_anchor_inside_flags
-from ..builder import ROTATED_HEADS, build_loss
+from mmrotate.core import (multiclass_nms_rotated, obb2hbb,
+                           rotated_anchor_inside_flags)
+from mmrotate.registry import MODELS, TASK_UTILS
 from .rotated_retina_head import RotatedRetinaHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class CSLRRetinaHead(RotatedRetinaHead):
     """Rotational Anchor-based refine head.
 
@@ -55,11 +54,11 @@ class CSLRRetinaHead(RotatedRetinaHead):
                              bias_prob=0.01),
                      ]),
                  **kwargs):
-        self.angle_coder = build_bbox_coder(angle_coder)
+        self.angle_coder = TASK_UTILS.build(angle_coder)
         self.coding_len = self.angle_coder.coding_len
         super(CSLRRetinaHead, self).__init__(**kwargs, init_cfg=init_cfg)
         self.shield_reg_angle = shield_reg_angle
-        self.loss_angle = build_loss(loss_angle)
+        self.loss_angle = TASK_UTILS.build(loss_angle)
         self.use_encoded_angle = use_encoded_angle
 
     def _init_layers(self):
@@ -170,7 +169,6 @@ class CSLRRetinaHead(RotatedRetinaHead):
 
         return loss_cls, loss_bbox, loss_angle
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'angle_clses'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -487,7 +485,6 @@ class CSLRRetinaHead(RotatedRetinaHead):
         else:
             return mlvl_bboxes, mlvl_scores
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'angle_clses'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

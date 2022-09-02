@@ -3,17 +3,17 @@
 import torch
 import torch.nn as nn
 from mmcv.cnn import Scale
-from mmcv.runner import force_fp32
-from mmdet.core import multi_apply, reduce_mean
+from mmdet.models.utils import multi_apply
+from mmdet.utils import reduce_mean
 
-from mmrotate.core import build_bbox_coder, multiclass_nms_rotated
-from ..builder import ROTATED_HEADS, build_loss
+from mmrotate.core import multiclass_nms_rotated
+from mmrotate.registry import MODELS, TASK_UTILS
 from .rotated_anchor_free_head import RotatedAnchorFreeHead
 
 INF = 1e8
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedFCOSHead(RotatedAnchorFreeHead):
     """Anchor-free head used in `FCOS <https://arxiv.org/abs/1904.01355>`_.
     The FCOS head does not use anchor boxes. Instead bounding boxes are
@@ -109,10 +109,10 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
             norm_cfg=norm_cfg,
             init_cfg=init_cfg,
             **kwargs)
-        self.loss_centerness = build_loss(loss_centerness)
+        self.loss_centerness = TASK_UTILS.build(loss_centerness)
         if self.separate_angle:
-            self.loss_angle = build_loss(loss_angle)
-            self.h_bbox_coder = build_bbox_coder(h_bbox_coder)
+            self.loss_angle = TASK_UTILS.build(loss_angle)
+            self.h_bbox_coder = TASK_UTILS.build(h_bbox_coder)
         # Angle predict length
 
     def _init_layers(self):
@@ -181,8 +181,6 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
             angle_pred = self.scale_angle(angle_pred).float()
         return cls_score, bbox_pred, angle_pred, centerness
 
-    @force_fp32(
-        apply_to=('cls_scores', 'bbox_preds', 'angle_preds', 'centernesses'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -479,8 +477,6 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
                     top_bottom.min(dim=-1)[0] / top_bottom.max(dim=-1)[0])
         return torch.sqrt(centerness_targets)
 
-    @force_fp32(
-        apply_to=('cls_scores', 'bbox_preds', 'angle_preds', 'centernesses'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,
@@ -631,8 +627,6 @@ class RotatedFCOSHead(RotatedAnchorFreeHead):
             score_factors=mlvl_centerness)
         return det_bboxes, det_labels
 
-    @force_fp32(
-        apply_to=('cls_scores', 'bbox_preds', 'angle_preds', 'centerness'))
     def refine_bboxes(self, cls_scores, bbox_preds, angle_preds, centernesses):
         """This function will be used in S2ANet, whose num_anchors=1."""
         num_levels = len(cls_scores)
