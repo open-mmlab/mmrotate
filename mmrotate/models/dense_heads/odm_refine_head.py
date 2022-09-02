@@ -1,14 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-from mmcv.runner import force_fp32
 
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 from ..utils import ORConv2d, RotationInvariantPooling
 from .rotated_retina_head import RotatedRetinaHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class ODMRefineHead(RotatedRetinaHead):
     """Rotated Anchor-based refine head. It's a part of the Oriented Detection
     Module (ODM), which produces orientation-sensitive features for
@@ -152,7 +151,6 @@ class ODMRefineHead(RotatedRetinaHead):
 
         return anchor_list, valid_flag_list
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -172,7 +170,6 @@ class ODMRefineHead(RotatedRetinaHead):
             img_metas=img_metas,
             gt_bboxes_ignore=gt_bboxes_ignore)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

@@ -1,7 +1,7 @@
 # Copyright (c) SJTU. All rights reserved.
 import warnings
 
-from mmcv.runner import ModuleList
+from mmengine.model import ModuleList
 
 from mmrotate.core import rbbox2result
 from ..builder import ROTATED_DETECTORS, build_backbone, build_head, build_neck

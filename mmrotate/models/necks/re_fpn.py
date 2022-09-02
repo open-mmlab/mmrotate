@@ -4,7 +4,7 @@ import warnings
 
 import e2cnn.nn as enn
 import torch.nn as nn
-from mmcv.runner import BaseModule, auto_fp16
+from mmengine.model import BaseModule
 
 from ..builder import ROTATED_NECKS
 from ..utils import (build_enn_feature, build_enn_norm_layer, ennConv,
@@ -278,7 +278,6 @@ class ReFPN(BaseModule):
                 for i in range(used_backbone_levels + 1, self.num_outs):
                     self.relus.append(ennReLU(out_channels))
 
-    @auto_fp16()
     def forward(self, inputs):
         """Forward function of ReFPN."""
         assert len(inputs) == len(self.in_channels)

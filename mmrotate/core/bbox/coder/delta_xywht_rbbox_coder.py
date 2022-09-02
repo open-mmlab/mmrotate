@@ -1,12 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import mmcv
 import numpy as np
 import torch
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
 
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import TASK_UTILS
-from mmrotate.structures.bbox import norm_angle
+from ..transforms import norm_angle
 
 
 @TASK_UTILS.register_module()
@@ -33,8 +32,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         ctr_clamp (int): the maximum pixel shift to clamp. Only used by
             YOLOF. Default 32.
     """
-    encode_bbox_dim = 5
-    decode_bbox_dim = 5
+    encode_size = 5
 
     def __init__(self,
                  target_means=(0., 0., 0., 0., 0.),
@@ -112,7 +110,6 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
             raise NotImplementedError
 
 
-@mmcv.jit(coderize=True)
 def bbox2delta(proposals,
                gt,
                means=(0., 0., 0., 0., 0.),
@@ -184,7 +181,6 @@ def bbox2delta(proposals,
     return deltas
 
 
-@mmcv.jit(coderize=True)
 def delta2bbox(rois,
                deltas,
                means=(0., 0., 0., 0., 0.),

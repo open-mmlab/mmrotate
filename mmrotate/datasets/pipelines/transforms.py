@@ -1,14 +1,15 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from numbers import Number
-from typing import List, Optional, Union
+import copy
 
 import cv2
 import mmcv
 import numpy as np
 from mmcv.transforms import BaseTransform
-from mmcv.transforms.utils import cache_randomness
+from mmdet.datasets.transforms import Mosaic, RandomCrop, RandomFlip, Resize
 from mmdet.structures.bbox import BaseBoxes
+from numpy import random
 
+from mmrotate.core import norm_angle, obb2poly_np, poly2obb_np
 from mmrotate.registry import TRANSFORMS
 
 
@@ -42,360 +43,534 @@ class ConvertBoxType(BaseTransform):
 
 
 @TRANSFORMS.register_module()
-class Rotate(BaseTransform):
-    """Rotate the images, bboxes, masks and segmentation map by a certain
-    angle.
-
-    Required Keys:
-
-    - img
-    - gt_bboxes (BaseBoxes[torch.float32]) (optional)
-    - gt_masks (BitmapMasks | PolygonMasks) (optional)
-    - gt_seg_map (np.uint8) (optional)
-
-    Modified Keys:
-
-    - img
-    - gt_bboxes
-    - gt_masks
-    - gt_seg_map
-
-    Added Keys:
-
-    - homography_matrix
+class RResize(Resize):
+    """Resize images & rotated bbox Inherit Resize pipeline class to handle
+    rotated bboxes.
 
     Args:
-        rotate_angle (int): An angle to rotate the image.
-        img_border_value (int or float or tuple): The filled values for
-            image border. If float, the same fill value will be used for
-            all the three channels of image. If tuple, it should be 3 elements.
-            Defaults to 0.
-        mask_border_value (int): The fill value used for masks. Defaults to 0.
-        seg_ignore_label (int): The fill value used for segmentation map.
-            Note this value must equals ``ignore_label`` in ``semantic_head``
-            of the corresponding config. Defaults to 255.
-        interpolation (str): Interpolation method, accepted values are
-            "nearest", "bilinear", "bicubic", "area", "lanczos" for 'cv2'
-            backend, "nearest", "bilinear" for 'pillow' backend. Defaults
-            to 'bilinear'.
+        img_scale (tuple or list[tuple]): Images scales for resizing.
+        multiscale_mode (str): Either "range" or "value".
+        ratio_range (tuple[float]): (min_ratio, max_ratio).
     """
 
     def __init__(self,
-                 rotate_angle: int,
-                 img_border_value: Union[int, float, tuple] = 0,
-                 mask_border_value: int = 0,
-                 seg_ignore_label: int = 255,
-                 interpolation: str = 'bilinear') -> None:
-        if isinstance(img_border_value, (float, int)):
-            img_border_value = tuple([float(img_border_value)] * 3)
-        elif isinstance(img_border_value, tuple):
-            assert len(img_border_value) == 3, \
-                f'img_border_value as tuple must have 3 elements, ' \
-                f'got {len(img_border_value)}.'
-            img_border_value = tuple([float(val) for val in img_border_value])
+                 img_scale=None,
+                 multiscale_mode='range',
+                 ratio_range=None):
+        super(RResize, self).__init__(
+            img_scale=img_scale,
+            multiscale_mode=multiscale_mode,
+            ratio_range=ratio_range,
+            keep_ratio=True)
+
+    def _resize_bboxes(self, results):
+        """Resize bounding boxes with ``results['scale_factor']``."""
+        for key in results.get('bbox_fields', []):
+            bboxes = results[key]
+            orig_shape = bboxes.shape
+            bboxes = bboxes.reshape((-1, 5))
+            w_scale, h_scale, _, _ = results['scale_factor']
+            bboxes[:, 0] *= w_scale
+            bboxes[:, 1] *= h_scale
+            bboxes[:, 2:4] *= np.sqrt(w_scale * h_scale)
+            results[key] = bboxes.reshape(orig_shape)
+
+
+@TRANSFORMS.register_module()
+class RRandomFlip(RandomFlip):
+    """
+
+    Args:
+        flip_ratio (float | list[float], optional): The flipping probability.
+            Default: None.
+        direction(str | list[str], optional): The flipping direction. Options
+            are 'horizontal', 'vertical', 'diagonal'.
+        version (str, optional): Angle representations. Defaults to 'oc'.
+    """
+
+    def __init__(self, flip_ratio=None, direction='horizontal', version='oc'):
+        self.version = version
+        super(RRandomFlip, self).__init__(flip_ratio, direction)
+
+    def bbox_flip(self, bboxes, img_shape, direction):
+        """Flip bboxes horizontally or vertically.
+
+        Args:
+            bboxes(ndarray): shape (..., 5*k)
+            img_shape(tuple): (height, width)
+
+        Returns:
+            numpy.ndarray: Flipped bounding boxes.
+        """
+        assert bboxes.shape[-1] % 5 == 0
+        orig_shape = bboxes.shape
+        bboxes = bboxes.reshape((-1, 5))
+        flipped = bboxes.copy()
+        if direction == 'horizontal':
+            flipped[:, 0] = img_shape[1] - bboxes[:, 0] - 1
+        elif direction == 'vertical':
+            flipped[:, 1] = img_shape[0] - bboxes[:, 1] - 1
+        elif direction == 'diagonal':
+            flipped[:, 0] = img_shape[1] - bboxes[:, 0] - 1
+            flipped[:, 1] = img_shape[0] - bboxes[:, 1] - 1
+            return flipped.reshape(orig_shape)
         else:
-            raise ValueError(
-                'img_border_value must be float or tuple with 3 elements.')
-        self.rotate_angle = rotate_angle
-        self.img_border_value = img_border_value
-        self.mask_border_value = mask_border_value
-        self.seg_ignore_label = seg_ignore_label
-        self.interpolation = interpolation
-
-    def _get_homography_matrix(self, results: dict) -> np.ndarray:
-        """Get the homography matrix for Rotate."""
-        img_shape = results['img_shape']
-        center = ((img_shape[1] - 1) * 0.5, (img_shape[0] - 1) * 0.5)
-        cv2_rotation_matrix = cv2.getRotationMatrix2D(center,
-                                                      -self.rotate_angle, 1.0)
-        return np.concatenate(
-            [cv2_rotation_matrix,
-             np.array([0, 0, 1]).reshape((1, 3))],
-            dtype=np.float32)
-
-    def _record_homography_matrix(self, results: dict) -> None:
-        """Record the homography matrix for the geometric transformation."""
-        if results.get('homography_matrix', None) is None:
-            results['homography_matrix'] = self.homography_matrix
+            raise ValueError(f'Invalid flipping direction "{direction}"')
+        if self.version == 'oc':
+            rotated_flag = (bboxes[:, 4] != np.pi / 2)
+            flipped[rotated_flag, 4] = np.pi / 2 - bboxes[rotated_flag, 4]
+            flipped[rotated_flag, 2] = bboxes[rotated_flag, 3]
+            flipped[rotated_flag, 3] = bboxes[rotated_flag, 2]
         else:
-            results['homography_matrix'] = self.homography_matrix @ results[
-                'homography_matrix']
+            flipped[:, 4] = norm_angle(np.pi - bboxes[:, 4], self.version)
+        return flipped.reshape(orig_shape)
 
-    def _transform_img(self, results: dict) -> None:
-        """Rotate the image."""
-        results['img'] = mmcv.imrotate(
-            results['img'],
-            self.rotate_angle,
-            border_value=self.img_border_value,
-            interpolation=self.interpolation)
 
-    def _transform_masks(self, results: dict) -> None:
-        """Rotate the masks."""
-        results['gt_masks'] = results['gt_masks'].rotate(
-            results['img_shape'],
-            self.rotate_angle,
-            border_value=self.mask_border_value,
-            interpolation=self.interpolation)
+@TRANSFORMS.register_module()
+class PolyRandomRotate(object):
+    """Rotate img & bbox.
+    Reference: https://github.com/hukaixuan19970627/OrientedRepPoints_DOTA
 
-    def _transform_seg(self, results: dict) -> None:
-        """Rotate the segmentation map."""
-        results['gt_seg_map'] = mmcv.imrotate(
-            results['gt_seg_map'],
-            self.rotate_angle,
-            border_value=self.seg_ignore_label,
-            interpolation='nearest')
+    Args:
+        rotate_ratio (float, optional): The rotating probability.
+            Default: 0.5.
+        mode (str, optional) : Indicates whether the angle is chosen in a
+            random range (mode='range') or in a preset list of angles
+            (mode='value'). Defaults to 'range'.
+        angles_range(int|list[int], optional): The range of angles.
+            If mode='range', angle_ranges is an int and the angle is chosen
+            in (-angles_range, +angles_ranges).
+            If mode='value', angles_range is a non-empty list of int and the
+            angle is chosen in angles_range.
+            Defaults to 180 as default mode is 'range'.
+        auto_bound(bool, optional): whether to find the new width and height
+            bounds.
+        rect_classes (None|list, optional): Specifies classes that needs to
+            be rotated by a multiple of 90 degrees.
+        version  (str, optional): Angle representations. Defaults to 'le90'.
+    """
 
-    def _transform_bboxes(self, results: dict) -> None:
-        """Rotate the bboxes."""
-        img_shape = results['img_shape']
-        center = (img_shape[1] * 0.5, img_shape[0] * 0.5)
-        results['gt_bboxes'].rotate_(center, self.rotate_angle)
-        results['gt_bboxes'].clip_(img_shape)
+    def __init__(self,
+                 rotate_ratio=0.5,
+                 mode='range',
+                 angles_range=180,
+                 auto_bound=False,
+                 rect_classes=None,
+                 version='le90'):
+        self.rotate_ratio = rotate_ratio
+        self.auto_bound = auto_bound
+        assert mode in ['range', 'value'], \
+            f"mode is supposed to be 'range' or 'value', but got {mode}."
+        if mode == 'range':
+            assert isinstance(angles_range, int), \
+                "mode 'range' expects angle_range to be an int."
+        else:
+            assert mmcv.is_seq_of(angles_range, int) and len(angles_range), \
+                "mode 'value' expects angle_range as a non-empty list of int."
+        self.mode = mode
+        self.angles_range = angles_range
+        self.discrete_range = [90, 180, -90, -180]
+        self.rect_classes = rect_classes
+        self.version = version
 
-    def _filter_invalid(self, results: dict) -> None:
-        """Filter invalid data w.r.t `gt_bboxes`"""
-        height, width = results['img_shape']
-        if 'gt_bboxes' in results:
-            bboxes = results['gt_bboxes']
-            valid_index = results['gt_bboxes'].is_inside([height,
-                                                          width]).numpy()
-            results['gt_bboxes'] = bboxes[valid_index]
+    @property
+    def is_rotate(self):
+        """Randomly decide whether to rotate."""
+        return np.random.rand() < self.rotate_ratio
 
-            # ignore_flags
-            if results.get('gt_ignore_flags', None) is not None:
-                results['gt_ignore_flags'] = \
-                    results['gt_ignore_flags'][valid_index]
+    def apply_image(self, img, bound_h, bound_w, interp=cv2.INTER_LINEAR):
+        """
+        img should be a numpy array, formatted as Height * Width * Nchannels
+        """
+        if len(img) == 0:
+            return img
+        return cv2.warpAffine(
+            img, self.rm_image, (bound_w, bound_h), flags=interp)
 
-            # labels
-            if results.get('gt_bboxes_labels', None) is not None:
-                results['gt_bboxes_labels'] = results['gt_bboxes_labels'][
-                    valid_index]
+    def apply_coords(self, coords):
+        """
+        coords should be a N * 2 array-like, containing N couples of (x, y)
+        points
+        """
+        if len(coords) == 0:
+            return coords
+        coords = np.asarray(coords, dtype=float)
+        return cv2.transform(coords[:, np.newaxis, :], self.rm_coords)[:, 0, :]
 
-            # mask fields
-            if results.get('gt_masks', None) is not None:
-                results['gt_masks'] = results['gt_masks'][
-                    valid_index.nonzero()[0]]
+    def create_rotation_matrix(self,
+                               center,
+                               angle,
+                               bound_h,
+                               bound_w,
+                               offset=0):
+        """Create rotation matrix."""
+        center += offset
+        rm = cv2.getRotationMatrix2D(tuple(center), angle, 1)
+        if self.auto_bound:
+            rot_im_center = cv2.transform(center[None, None, :] + offset,
+                                          rm)[0, 0, :]
+            new_center = np.array([bound_w / 2, bound_h / 2
+                                   ]) + offset - rot_im_center
+            rm[:, 2] += new_center
+        return rm
 
-    def transform(self, results: dict) -> dict:
-        """The transform function."""
-        self.homography_matrix = self._get_homography_matrix(results)
-        self._record_homography_matrix(results)
-        self._transform_img(results)
-        if results.get('gt_bboxes', None) is not None:
-            self._transform_bboxes(results)
-        if results.get('gt_masks', None) is not None:
-            self._transform_masks(results)
-        if results.get('gt_seg_map', None) is not None:
-            self._transform_seg(results)
-        self._filter_invalid(results)
+    def filter_border(self, bboxes, h, w):
+        """Filter the box whose center point is outside or whose side length is
+        less than 5."""
+        x_ctr, y_ctr = bboxes[:, 0], bboxes[:, 1]
+        w_bbox, h_bbox = bboxes[:, 2], bboxes[:, 3]
+        keep_inds = (x_ctr > 0) & (x_ctr < w) & (y_ctr > 0) & (y_ctr < h) & \
+                    (w_bbox > 5) & (h_bbox > 5)
+        return keep_inds
+
+    def __call__(self, results):
+        """Call function of PolyRandomRotate."""
+        if not self.is_rotate:
+            results['rotate'] = False
+            angle = 0
+        else:
+            results['rotate'] = True
+            if self.mode == 'range':
+                angle = self.angles_range * (2 * np.random.rand() - 1)
+            else:
+                i = np.random.randint(len(self.angles_range))
+                angle = self.angles_range[i]
+
+            class_labels = results['gt_labels']
+            for classid in class_labels:
+                if self.rect_classes:
+                    if classid in self.rect_classes:
+                        np.random.shuffle(self.discrete_range)
+                        angle = self.discrete_range[0]
+                        break
+
+        h, w, c = results['img_shape']
+        img = results['img']
+        results['rotate_angle'] = angle
+
+        image_center = np.array((w / 2, h / 2))
+        abs_cos, abs_sin = \
+            abs(np.cos(angle / 180 * np.pi)), abs(np.sin(angle / 180 * np.pi))
+        if self.auto_bound:
+            bound_w, bound_h = np.rint(
+                [h * abs_sin + w * abs_cos,
+                 h * abs_cos + w * abs_sin]).astype(int)
+        else:
+            bound_w, bound_h = w, h
+
+        self.rm_coords = self.create_rotation_matrix(image_center, angle,
+                                                     bound_h, bound_w)
+        self.rm_image = self.create_rotation_matrix(
+            image_center, angle, bound_h, bound_w, offset=-0.5)
+
+        img = self.apply_image(img, bound_h, bound_w)
+        results['img'] = img
+        results['img_shape'] = (bound_h, bound_w, c)
+        gt_bboxes = results.get('gt_bboxes', [])
+        labels = results.get('gt_labels', [])
+        gt_bboxes = np.concatenate(
+            [gt_bboxes, np.zeros((gt_bboxes.shape[0], 1))], axis=-1)
+        polys = obb2poly_np(gt_bboxes, self.version)[:, :-1].reshape(-1, 2)
+        polys = self.apply_coords(polys).reshape(-1, 8)
+        gt_bboxes = []
+        for pt in polys:
+            pt = np.array(pt, dtype=np.float32)
+            obb = poly2obb_np(pt, self.version) \
+                if poly2obb_np(pt, self.version) is not None\
+                else [0, 0, 0, 0, 0]
+            gt_bboxes.append(obb)
+        gt_bboxes = np.array(gt_bboxes, dtype=np.float32)
+        keep_inds = self.filter_border(gt_bboxes, bound_h, bound_w)
+        gt_bboxes = gt_bboxes[keep_inds, :]
+        labels = labels[keep_inds]
+        if len(gt_bboxes) == 0:
+            return None
+        results['gt_bboxes'] = gt_bboxes
+        results['gt_labels'] = labels
+
         return results
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         repr_str = self.__class__.__name__
-        repr_str += f'(rotate_angle={self.rotate_angle}, '
-        repr_str += f'img_border_value={self.img_border_value}, '
-        repr_str += f'mask_border_value={self.mask_border_value}, '
-        repr_str += f'seg_ignore_label={self.seg_ignore_label}, '
-        repr_str += f'interpolation={self.interpolation})'
+        repr_str += f'(rotate_ratio={self.rotate_ratio}, ' \
+                    f'base_angles={self.base_angles}, ' \
+                    f'angles_range={self.angles_range}, ' \
+                    f'auto_bound={self.auto_bound})'
         return repr_str
 
 
 @TRANSFORMS.register_module()
-class RandomRotate(BaseTransform):
-    """Random rotate image & bbox & masks.
+class RRandomCrop(RandomCrop):
+    """Random crop the image & bboxes.
 
-    The rotation angle will choice in [-angle_range, angle_range).
-
-    Required Keys:
-
-    - img
-    - gt_bboxes (BaseBoxes[torch.float32]) (optional)
-    - gt_masks (BitmapMasks | PolygonMasks) (optional)
-    - gt_seg_map (np.uint8) (optional)
-
-    Modified Keys:
-
-    - img
-    - gt_bboxes
-    - gt_masks
-    - gt_seg_map
-
-    Added Keys:
-
-    - homography_matrix
+    The absolute `crop_size` is sampled based on `crop_type` and `image_size`,
+    then the cropped results are generated.
 
     Args:
-        prob (float): The probability of whether to rotate or not. Defaults
-            to 0.5.
-        angle_range (int): The maximum range of rotation angle. The rotation
-            angle will lie in [-angle_range, angle_range). Defaults to 180.
-        rect_obj_labels (List[int], Optional): A list of labels whose
-            corresponding objects are alwags horizontal. If
-            results['gt_bboxes_labels'] has any label in ``rect_obj_labels``,
-            the rotation angle will only be choiced from [90, 180, -90, -180].
-            Defaults to None.
-        rotate_type (str): The type of rotate class to use. Defaults to
-            "Rotate".
-        **rotate_kwargs: Other keyword arguments for the ``rotate_type``.
+        crop_size (tuple): The relative ratio or absolute pixels of
+            height and width.
+        crop_type (str, optional): one of "relative_range", "relative",
+            "absolute", "absolute_range". "relative" randomly crops
+            (h * crop_size[0], w * crop_size[1]) part from an input of size
+            (h, w). "relative_range" uniformly samples relative crop size from
+            range [crop_size[0], 1] and [crop_size[1], 1] for height and width
+            respectively. "absolute" crops from an input with absolute size
+            (crop_size[0], crop_size[1]). "absolute_range" uniformly samples
+            crop_h in range [crop_size[0], min(h, crop_size[1])] and crop_w
+            in range [crop_size[0], min(w, crop_size[1])]. Default "absolute".
+        allow_negative_crop (bool, optional): Whether to allow a crop that does
+            not contain any bbox area. Default False.
+
+    Note:
+        - If the image is smaller than the absolute crop size, return the
+            original image.
+        - The keys for bboxes, labels must be aligned. That is, `gt_bboxes`
+          corresponds to `gt_labels`, and `gt_bboxes_ignore` corresponds to
+          `gt_labels_ignore`.
+        - If the crop does not contain any gt-bbox region and
+          `allow_negative_crop` is set to False, skip this image.
     """
 
     def __init__(self,
-                 prob: float = 0.5,
-                 angle_range: int = 180,
-                 rect_obj_labels: Optional[List[int]] = None,
-                 rotate_type: str = 'Rotate',
-                 **rotate_kwargs) -> None:
-        assert 0 < angle_range <= 180
-        self.prob = prob
-        self.angle_range = angle_range
-        self.rect_obj_labels = rect_obj_labels
-        self.rotate_cfg = dict(type=rotate_type, **rotate_kwargs)
-        self.rotate = TRANSFORMS.build({'rotate_angle': 0, **self.rotate_cfg})
-        self.horizontal_angles = [90, 180, -90, -180]
+                 crop_size,
+                 crop_type='absolute',
+                 allow_negative_crop=False,
+                 version='oc'):
+        self.version = version
+        super(RRandomCrop, self).__init__(crop_size, crop_type,
+                                          allow_negative_crop)
 
-    @cache_randomness
-    def _random_angle(self) -> int:
-        """Random angle."""
-        return self.angle_range * (2 * np.random.rand() - 1)
+    def _crop_data(self, results, crop_size, allow_negative_crop):
+        """Function to randomly crop images, bounding boxes.
 
-    @cache_randomness
-    def _random_horizontal_angle(self) -> int:
-        """Random horizontal angle."""
-        return np.random.choice(self.horizontal_angles)
+        Args:
+            results (dict): Result dict from loading pipeline.
+            crop_size (tuple): Expected absolute size after cropping, (h, w).
+            allow_negative_crop (bool): Whether to allow a crop that does not
+                contain any bbox area. Default to False.
 
-    @cache_randomness
-    def _is_rotate(self) -> bool:
-        """Randomly decide whether to rotate."""
-        return np.random.rand() < self.prob
+        Returns:
+            dict: Randomly cropped results, 'img_shape' key in result dict is
+                updated according to crop size.
+        """
+        assert crop_size[0] > 0 and crop_size[1] > 0
+        for key in results.get('bbox_fields', []):
+            assert results[key].shape[-1] % 5 == 0
 
-    def transform(self, results: dict) -> dict:
-        """The transform function."""
-        if not self._is_rotate():
-            return results
+        for key in results.get('img_fields', ['img']):
+            img = results[key]
+            margin_h = max(img.shape[0] - crop_size[0], 0)
+            margin_w = max(img.shape[1] - crop_size[1], 0)
+            offset_h = np.random.randint(0, margin_h + 1)
+            offset_w = np.random.randint(0, margin_w + 1)
+            crop_y1, crop_y2 = offset_h, offset_h + crop_size[0]
+            crop_x1, crop_x2 = offset_w, offset_w + crop_size[1]
 
-        rotate_angle = self._random_angle()
-        if self.rect_obj_labels is not None and 'gt_bboxes_labels' in results:
-            for label in self.rect_obj_labels:
-                if (results['gt_bboxes_labels'] == label).any():
-                    rotate_angle = self._random_horizontal_angle()
-                    break
+            # crop the image
+            img = img[crop_y1:crop_y2, crop_x1:crop_x2, ...]
+            img_shape = img.shape
+            results[key] = img
+        results['img_shape'] = img_shape
 
-        self.rotate.rotate_angle = rotate_angle
-        return self.rotate(results)
+        height, width, _ = img_shape
 
-    def __repr__(self):
-        repr_str = self.__class__.__name__
-        repr_str += f'(prob={self.prob}, '
-        repr_str += f'angle_range={self.angle_range}, '
-        repr_str += f'rect_obj_labels={self.rect_obj_labels}, '
-        repr_str += f'rotate_cfg={self.rotate_cfg})'
-        return repr_str
+        # crop bboxes accordingly and clip to the image boundary
+        for key in results.get('bbox_fields', []):
+            # e.g. gt_bboxes and gt_bboxes_ignore
+            bbox_offset = np.array([offset_w, offset_h, 0, 0, 0],
+                                   dtype=np.float32)
+            bboxes = results[key] - bbox_offset
+
+            valid_inds = (bboxes[:, 0] >=
+                          0) & (bboxes[:, 0] < width) & (bboxes[:, 1] >= 0) & (
+                              bboxes[:, 1] < height)
+            # If the crop does not contain any gt-bbox area and
+            # allow_negative_crop is False, skip this image.
+            if (key == 'gt_bboxes' and not valid_inds.any()
+                    and not allow_negative_crop):
+                return None
+            results[key] = bboxes[valid_inds, :]
+            # label fields. e.g. gt_labels and gt_labels_ignore
+            label_key = self.bbox2label.get(key)
+            if label_key in results:
+                results[label_key] = results[label_key][valid_inds]
+
+        return results
 
 
 @TRANSFORMS.register_module()
-class RandomChoiceRotate(BaseTransform):
-    """Random rotate image & bbox & masks from a list of angles.
+class RMosaic(Mosaic):
+    """Rotate Mosaic augmentation. Inherit from
+    `mmdet.datasets.pipelines.transforms.Mosaic`.
 
-    Rotation angle will be randomly choiced from ``angles``.
+    Given 4 images, mosaic transform combines them into
+    one output image. The output image is composed of the parts from each sub-
+    image.
 
-    Required Keys:
+    .. code:: text
+                        mosaic transform
+                           center_x
+                +------------------------------+
+                |       pad        |  pad      |
+                |      +-----------+           |
+                |      |           |           |
+                |      |  image1   |--------+  |
+                |      |           |        |  |
+                |      |           | image2 |  |
+     center_y   |----+-------------+-----------|
+                |    |   cropped   |           |
+                |pad |   image3    |  image4   |
+                |    |             |           |
+                +----|-------------+-----------+
+                     |             |
+                     +-------------+
 
-    - img
-    - gt_bboxes (BaseBoxes[torch.float32]) (optional)
-    - gt_masks (BitmapMasks | PolygonMasks) (optional)
-    - gt_seg_map (np.uint8) (optional)
-
-    Modified Keys:
-
-    - img
-    - gt_bboxes
-    - gt_masks
-    - gt_seg_map
-
-    Added Keys:
-
-    - homography_matrix
+     The mosaic transform steps are as follows:
+         1. Choose the mosaic center as the intersections of 4 images
+         2. Get the left top image according to the index, and randomly
+            sample another 3 images from the custom dataset.
+         3. Sub image will be cropped if image is larger than mosaic patch
 
     Args:
-        angles (list[int]): Angles for rotation. 0 is the default value for
-            non-rotation and shouldn't be included in ``angles``.
-        prob (float or list[float]): If ``prob`` is a float, it is the
-            probability of whether to rotate. If ``prob`` is a list, it is
-            the probabilities of each rotation angle in ``angles``.
-        rect_obj_labels (List[int]): A list of labels whose corresponding
-            objects are alwags horizontal. If results['gt_bboxes_labels'] has
-            any label in ``rect_obj_labels``, the rotation angle will only be
-            choiced from [90, 180, -90, -180].
-        rotate_type (str): The type of rotate class to use. Defaults to
-            "Rotate".
-        **rotate_kwargs: Other keyword arguments for the ``rotate_type``.
+        img_scale (Sequence[int]): Image size after mosaic pipeline of single
+            image. The shape order should be (height, width).
+            Defaults to (640, 640).
+        center_ratio_range (Sequence[float]): Center ratio range of mosaic
+            output. Defaults to (0.5, 1.5).
+        min_bbox_size (int | float): The minimum pixel for filtering
+            invalid bboxes after the mosaic pipeline. Defaults to 0.
+        bbox_clip_border (bool, optional): Whether to clip the objects outside
+            the border of the image. In some dataset like MOT17, the gt bboxes
+            are allowed to cross the border of images. Therefore, we don't
+            need to clip the gt bboxes in these cases. Defaults to True.
+        skip_filter (bool): Whether to skip filtering rules. If it
+            is True, the filter rule will not be applied, and the
+            `min_bbox_size` is invalid. Defaults to True.
+        pad_val (int): Pad value. Defaults to 114.
+        prob (float): Probability of applying this transformation.
+            Defaults to 1.0.
+        version  (str, optional): Angle representations. Defaults to `oc`.
     """
 
     def __init__(self,
-                 angles,
-                 prob: Union[float, List[float]] = 0.5,
-                 rect_obj_labels=None,
-                 rotate_type='mmrotate.Rotate',
-                 **rotate_kwargs) -> None:
-        if isinstance(prob, list):
-            assert mmcv.is_list_of(prob, Number)
-            assert 0 <= sum(prob) <= 1
-        elif isinstance(prob, Number):
-            assert 0 <= prob <= 1
+                 img_scale=(640, 640),
+                 center_ratio_range=(0.5, 1.5),
+                 min_bbox_size=10,
+                 bbox_clip_border=True,
+                 skip_filter=True,
+                 pad_val=114,
+                 prob=1.0,
+                 version='oc'):
+        super(RMosaic, self).__init__(
+            img_scale=img_scale,
+            center_ratio_range=center_ratio_range,
+            min_bbox_size=min_bbox_size,
+            bbox_clip_border=bbox_clip_border,
+            skip_filter=skip_filter,
+            pad_val=pad_val,
+            prob=1.0)
+
+    def _mosaic_transform(self, results):
+        """Mosaic transform function.
+
+        Args:
+            results (dict): Result dict.
+
+        Returns:
+            dict: Updated result dict.
+        """
+
+        assert 'mix_results' in results
+        mosaic_labels = []
+        mosaic_bboxes = []
+        if len(results['img'].shape) == 3:
+            mosaic_img = np.full(
+                (int(self.img_scale[0] * 2), int(self.img_scale[1] * 2), 3),
+                self.pad_val,
+                dtype=results['img'].dtype)
         else:
-            raise ValueError(f'probs must be number or list of number, but \
-                              got `{type(prob)}`.')
-        self.prob = prob
+            mosaic_img = np.full(
+                (int(self.img_scale[0] * 2), int(self.img_scale[1] * 2)),
+                self.pad_val,
+                dtype=results['img'].dtype)
 
-        assert isinstance(angles, list) and mmcv.is_list_of(angles, int)
-        assert 0 not in angles
-        self.angles = angles
-        if isinstance(self.prob, list):
-            assert len(self.prob) == len(self.angles)
+        # mosaic center x, y
+        center_x = int(
+            random.uniform(*self.center_ratio_range) * self.img_scale[1])
+        center_y = int(
+            random.uniform(*self.center_ratio_range) * self.img_scale[0])
+        center_position = (center_x, center_y)
 
-        self.rect_obj_labels = rect_obj_labels
-        self.rotate_cfg = dict(type=rotate_type, **rotate_kwargs)
-        self.rotate = TRANSFORMS.build({'rotate_angle': 0, **self.rotate_cfg})
-        self.horizontal_angles = [90, 180, -90, -180]
+        loc_strs = ('top_left', 'top_right', 'bottom_left', 'bottom_right')
+        for i, loc in enumerate(loc_strs):
+            if loc == 'top_left':
+                results_patch = copy.deepcopy(results)
+            else:
+                results_patch = copy.deepcopy(results['mix_results'][i - 1])
 
-    @cache_randomness
-    def _choice_angle(self) -> int:
-        """Choose the angle."""
-        angle_list = self.angles + [0]
-        if isinstance(self.prob, list):
-            non_prob = 1 - sum(self.prob)
-            prob_list = self.prob + [non_prob]
-        else:
-            non_prob = 1. - self.prob
-            single_ratio = self.prob / (len(angle_list) - 1)
-            prob_list = [single_ratio] * (len(angle_list) - 1) + [non_prob]
-        angle = np.random.choice(angle_list, p=prob_list)
-        return angle
+            img_i = results_patch['img']
+            h_i, w_i = img_i.shape[:2]
+            # keep_ratio resize
+            scale_ratio_i = min(self.img_scale[0] / h_i,
+                                self.img_scale[1] / w_i)
+            img_i = mmcv.imresize(
+                img_i, (int(w_i * scale_ratio_i), int(h_i * scale_ratio_i)))
 
-    @cache_randomness
-    def _random_horizontal_angle(self) -> int:
-        """Random horizontal angle."""
-        return np.random.choice(self.horizontal_angles)
+            # compute the combine parameters
+            paste_coord, crop_coord = self._mosaic_combine(
+                loc, center_position, img_i.shape[:2][::-1])
+            x1_p, y1_p, x2_p, y2_p = paste_coord
+            x1_c, y1_c, x2_c, y2_c = crop_coord
 
-    def transform(self, results: dict) -> dict:
-        """The transform function."""
-        rotate_angle = self._choice_angle()
-        if rotate_angle == 0:
-            return results
+            # crop and paste image
+            mosaic_img[y1_p:y2_p, x1_p:x2_p] = img_i[y1_c:y2_c, x1_c:x2_c]
 
-        if self.rect_obj_labels is not None and 'gt_bboxes_labels' in results:
-            for label in self.rect_obj_labels:
-                if (results['gt_bboxes_labels'] == label).any():
-                    rotate_angle = self._random_horizontal_angle()
-                    break
+            # adjust coordinate
+            gt_bboxes_i = results_patch['gt_bboxes']
+            gt_labels_i = results_patch['gt_labels']
 
-        self.rotate.rotate_angle = rotate_angle
-        return self.rotate(results)
+            if gt_bboxes_i.shape[0] > 0:
+                padw = x1_p - x1_c
+                padh = y1_p - y1_c
+                gt_bboxes_i[:, 0] = \
+                    scale_ratio_i * gt_bboxes_i[:, 0] + padw
+                gt_bboxes_i[:, 1] = \
+                    scale_ratio_i * gt_bboxes_i[:, 1] + padh
+                gt_bboxes_i[:, 2:4] = \
+                    scale_ratio_i * gt_bboxes_i[:, 2:4]
 
-    def __repr__(self):
-        repr_str = self.__class__.__name__
-        repr_str += f'(angles={self.angles}, '
-        repr_str += f'prob={self.prob}, '
-        repr_str += f'rect_obj_labels={self.rect_obj_labels}, '
-        repr_str += f'rotate_cfg={self.rotate_cfg})'
-        return repr_str
+            mosaic_bboxes.append(gt_bboxes_i)
+            mosaic_labels.append(gt_labels_i)
+
+        if len(mosaic_labels) > 0:
+            mosaic_bboxes = np.concatenate(mosaic_bboxes, 0)
+            mosaic_labels = np.concatenate(mosaic_labels, 0)
+
+            mosaic_bboxes, mosaic_labels = \
+                self._filter_box_candidates(
+                    mosaic_bboxes, mosaic_labels,
+                    2 * self.img_scale[1], 2 * self.img_scale[0]
+                )
+        # If results after rmosaic does not contain any valid gt-bbox,
+        # return None. And transform flows in MultiImageMixDataset will
+        # repeat until existing valid gt-bbox.
+        if len(mosaic_bboxes) == 0:
+            return None
+
+        results['img'] = mosaic_img
+        results['img_shape'] = mosaic_img.shape
+        results['gt_bboxes'] = mosaic_bboxes
+        results['gt_labels'] = mosaic_labels
+
+        return results
+
+    def _filter_box_candidates(self, bboxes, labels, w, h):
+        """Filter out small bboxes and outside bboxes after Mosaic."""
+        bbox_x, bbox_y, bbox_w, bbox_h = \
+            bboxes[:, 0], bboxes[:, 1], bboxes[:, 2], bboxes[:, 3]
+        valid_inds = (bbox_x > 0) & (bbox_x < w) & \
+                     (bbox_y > 0) & (bbox_y < h) & \
+                     (bbox_w > self.min_bbox_size) & \
+                     (bbox_h > self.min_bbox_size)
+        valid_inds = np.nonzero(valid_inds)[0]
+        return bboxes[valid_inds], labels[valid_inds]

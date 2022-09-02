@@ -1,12 +1,11 @@
 # Copyright (c) SJTU. All rights reserved.
 import torch
-from mmcv.runner import force_fp32
 
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 from .kfiou_rotate_retina_head import KFIoURRetinaHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class KFIoURRetinaRefineHead(KFIoURRetinaHead):
     """Rotational Anchor-based refine head. The difference from
     `RRetinaRefineHead` is that its loss_bbox requires bbox_pred, bbox_targets,
@@ -62,7 +61,6 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
             init_cfg=init_cfg,
             **kwargs)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def refine_bboxes(self, cls_scores, bbox_preds, rois):
         """Refine predicted bounding boxes at each position of the feature
         maps. This method will be used in R3Det in refinement stages.
@@ -132,7 +130,6 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
 
         return anchor_list, valid_flag_list
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -152,7 +149,6 @@ class KFIoURRetinaRefineHead(KFIoURRetinaHead):
             img_metas=img_metas,
             gt_bboxes_ignore=gt_bboxes_ignore)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,
