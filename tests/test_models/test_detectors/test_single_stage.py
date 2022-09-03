@@ -53,11 +53,10 @@ class TestSingleStageDetector(TestCase):
                 if not torch.cuda.is_available():
                     return unittest.skip('test requires GPU and torch+cuda')
                 detector = detector.cuda()
-
-            packed_inputs = demo_mm_inputs(2, [[3, 128, 128], [3, 125, 130]])
-            batch_inputs, data_samples = detector.data_preprocessor(
-                packed_inputs, True)
-            losses = detector.forward(batch_inputs, data_samples, mode='loss')
+            packed_inputs = demo_mm_inputs(
+                2, [[3, 128, 128], [3, 125, 130]], with_boxlist=True)
+            data = detector.data_preprocessor(packed_inputs, True)
+            losses = detector.forward(**data, mode='loss')
             self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
@@ -80,13 +79,11 @@ class TestSingleStageDetector(TestCase):
                 detector = detector.cuda()
 
             packed_inputs = demo_mm_inputs(2, [[3, 128, 128], [3, 125, 130]])
-            batch_inputs, data_samples = detector.data_preprocessor(
-                packed_inputs, False)
+            data = detector.data_preprocessor(packed_inputs, False)
             # Test forward test
             detector.eval()
             with torch.no_grad():
-                batch_results = detector.forward(
-                    batch_inputs, data_samples, mode='predict')
+                batch_results = detector.forward(**data, mode='predict')
                 self.assertEqual(len(batch_results), 2)
                 self.assertIsInstance(batch_results[0], DetDataSample)
 
@@ -110,8 +107,6 @@ class TestSingleStageDetector(TestCase):
                 detector = detector.cuda()
 
             packed_inputs = demo_mm_inputs(2, [[3, 128, 128], [3, 125, 130]])
-            batch_inputs, data_samples = detector.data_preprocessor(
-                packed_inputs, False)
-            batch_results = detector.forward(
-                batch_inputs, data_samples, mode='tensor')
+            data = detector.data_preprocessor(packed_inputs, False)
+            batch_results = detector.forward(**data, mode='tensor')
             self.assertIsInstance(batch_results, tuple)

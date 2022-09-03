@@ -65,8 +65,8 @@ class RotatedBoxes(BaseBoxes):
         ``regualrize_boxes``:
 
         - 'oc': OpenCV Definition. Has the same box representation as
-          ``cv2.minAreaRect`` the angle ranges in (0, 90]. Equal to set
-          width_longer=False and start_angle=0.
+          ``cv2.minAreaRect`` the angle ranges in [-90, 0). Equal to set
+          width_longer=False and start_angle=-90.
         - 'le90': Long Edge Definition (90). the angle ranges in [-90, 90).
           The width is always longer than the height. Equal to set
           width_longer=True and start_angle=-90.
@@ -88,7 +88,7 @@ class RotatedBoxes(BaseBoxes):
         boxes = self.tensor
         if pattern is not None:
             if pattern == 'oc':
-                width_longer, start_angle = False, 0
+                width_longer, start_angle = False, -90
             elif pattern == 'le90':
                 width_longer, start_angle = True, -90
             elif pattern == 'le135':
@@ -108,9 +108,9 @@ class RotatedBoxes(BaseBoxes):
         else:
             # swap edge and angle if angle > pi/2
             t = ((t - start_angle) % np.pi)
-            w_ = torch.where(t <= np.pi / 2, w, h)
-            h_ = torch.where(t <= np.pi / 2, h, w)
-            t = torch.where(t <= np.pi / 2, t, t - np.pi / 2) + start_angle
+            w_ = torch.where(t < np.pi / 2, w, h)
+            h_ = torch.where(t < np.pi / 2, h, w)
+            t = torch.where(t < np.pi / 2, t, t - np.pi / 2) + start_angle
         self.tensor = torch.stack([x, y, w_, h_, t], dim=-1)
         return self.tensor
 
@@ -437,7 +437,13 @@ class RotatedBoxes(BaseBoxes):
             return RotatedBoxes([], dtype=torch.float32)
 
         boxes = []
-        if isinstance(masks, PolygonMasks):
+        if isinstance(masks, BitmapMasks):
+            for idx in range(num_masks):
+                mask = masks.masks[idx]
+                points = np.stack(np.nonzero(mask), axis=-1).astype(np.float32)
+                (x, y), (w, h), angle = cv2.minAreaRect(points)
+                boxes.append([x, y, w, h, angle / 180 * np.pi])
+        elif isinstance(masks, PolygonMasks):
             for idx, poly_per_obj in enumerate(masks.masks):
                 pts_per_obj = []
                 for p in poly_per_obj:
@@ -447,10 +453,7 @@ class RotatedBoxes(BaseBoxes):
                 (x, y), (w, h), angle = cv2.minAreaRect(pts_per_obj)
                 boxes.append([x, y, w, h, angle / 180 * np.pi])
         else:
-            masks = masks.to_ndarray()
-            for idx in range(num_masks):
-                coor_y, coor_x = np.nonzero(masks[idx])
-                points = np.stack([coor_x, coor_y], axis=-1).astype(np.float32)
-                (x, y), (w, h), angle = cv2.minAreaRect(points)
-                boxes.append([x, y, w, h, angle / 180 * np.pi])
+            raise TypeError(
+                '`masks` must be `BitmapMasks`  or `PolygonMasks`, '
+                f'but got {type(masks)}.')
         return RotatedBoxes(boxes)

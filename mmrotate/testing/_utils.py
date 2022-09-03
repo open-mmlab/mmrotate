@@ -5,8 +5,8 @@ from os.path import dirname, exists, join
 import numpy as np
 import torch
 from mmdet.structures import DetDataSample
-from mmengine.data import BaseDataElement as PixelData
-from mmengine.data import InstanceData
+from mmengine.dataset import pseudo_collate
+from mmengine.structures import InstanceData, PixelData
 
 from mmrotate.core.bbox.structures import RotatedBoxes
 
@@ -69,7 +69,9 @@ def demo_mm_inputs(batch_size=2,
                    num_classes=10,
                    sem_seg_output_strides=1,
                    with_mask=False,
-                   with_semantic=False):
+                   with_semantic=False,
+                   with_boxlist=False,
+                   device='cpu'):
     """Create a superset of inputs needed to run test or train batches.
 
     Args:
@@ -84,6 +86,7 @@ def demo_mm_inputs(batch_size=2,
             Defaults to False.
         with_semantic (bool): whether to return semantic.
             Defaults to False.
+        device (str): Destination device type. Defaults to cpu.
     """
     rng = np.random.RandomState(0)
 
@@ -103,7 +106,7 @@ def demo_mm_inputs(batch_size=2,
         image = rng.randint(0, 255, size=image_shape, dtype=np.uint8)
 
         mm_inputs = dict()
-        mm_inputs['inputs'] = torch.from_numpy(image)
+        mm_inputs['inputs'] = torch.from_numpy(image).to(device)
 
         img_meta = {
             'img_id': idx,
@@ -128,7 +131,11 @@ def demo_mm_inputs(batch_size=2,
 
         bboxes = _rand_bboxes(rng, num_boxes, w, h)
         labels = rng.randint(1, num_classes, size=num_boxes)
-        gt_instances.bboxes = RotatedBoxes(torch.FloatTensor(bboxes))
+        # TODO: remove this part when all model adapted with BaseBoxes
+        if with_boxlist:
+            gt_instances.bboxes = RotatedBoxes(bboxes, dtype=torch.float32)
+        else:
+            gt_instances.bboxes = torch.FloatTensor(bboxes)
         gt_instances.labels = torch.LongTensor(labels)
 
         if with_mask:
@@ -144,7 +151,10 @@ def demo_mm_inputs(batch_size=2,
         # ignore_instances
         ignore_instances = InstanceData()
         bboxes = _rand_bboxes(rng, num_boxes, w, h)
-        ignore_instances.bboxes = torch.FloatTensor(bboxes)
+        if with_boxlist:
+            ignore_instances.bboxes = RotatedBoxes(bboxes, dtype=torch.float32)
+        else:
+            ignore_instances.bboxes = torch.FloatTensor(bboxes)
         data_sample.ignored_instances = ignore_instances
 
         # gt_sem_seg
@@ -159,9 +169,10 @@ def demo_mm_inputs(batch_size=2,
             gt_sem_seg_data = dict(sem_seg=gt_semantic_seg)
             data_sample.gt_sem_seg = PixelData(**gt_sem_seg_data)
 
-        mm_inputs['data_sample'] = data_sample
+        mm_inputs['data_samples'] = data_sample.to(device)
 
         # TODO: gt_ignore
 
         packed_inputs.append(mm_inputs)
-    return packed_inputs
+    data = pseudo_collate(packed_inputs)
+    return data
