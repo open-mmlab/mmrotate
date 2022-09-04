@@ -350,7 +350,7 @@ class RotatedBoxes(BaseBoxes):
 
     def find_inside_points(self,
                            points: Tensor,
-                           is_aligned: bool = False) -> BoolTensor:
+                           is_aligned: bool = False, eps: float = 0.01) -> BoolTensor:
         """Find inside box points. Boxes dimension must be 2.
 
         Args:
@@ -358,6 +358,8 @@ class RotatedBoxes(BaseBoxes):
             is_aligned (bool): Whether ``points`` has been aligned with boxes
                 or not. If True, the length of boxes and ``points`` should be
                 the same. Defaults to False.
+            eps (float): Make sure the points are inside not on the boudary.
+                Defaults to 0.01.
 
         Returns:
             BoolTensor: A BoolTensor indicating whether the box is inside the
@@ -384,8 +386,8 @@ class RotatedBoxes(BaseBoxes):
         offset = offset.squeeze(-1)
         offset_x, offset_y = offset[..., 0], offset[..., 1]
         w, h = wh[..., 0], wh[..., 1]
-        return (offset_x <= w / 2) & (offset_x >= - w / 2) & \
-            (offset_y <= h / 2) & (offset_y >= - h / 2)
+        return (offset_x <= w / 2 - eps) & (offset_x >= - w / 2  + eps) & \
+            (offset_y <= h / 2 - eps) & (offset_y >= - h / 2  + eps)
 
     @staticmethod
     def overlaps(boxes1: BaseBoxes,
