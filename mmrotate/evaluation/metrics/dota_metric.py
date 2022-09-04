@@ -15,7 +15,7 @@ from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
 
-from mmrotate.core import eval_rbbox_map
+from mmrotate.core import eval_maoe, eval_rbbox_map
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import METRICS
 
@@ -84,7 +84,7 @@ class DOTAMetric(BaseMetric):
         if not isinstance(metric, str):
             assert len(metric) == 1
             metric = metric[0]
-        allowed_metrics = ['mAP']
+        allowed_metrics = ['mAP', 'mAOE']
         if metric not in allowed_metrics:
             raise KeyError(f"metric should be one of 'mAP', but got {metric}.")
         self.metric = metric
@@ -299,7 +299,7 @@ class DOTAMetric(BaseMetric):
             return eval_results
         else:
             # convert predictions to coco format and dump to json file
-            _ = self.results2json(preds, outfile_prefix)
+            # _ = self.results2json(preds, outfile_prefix)
             if self.format_only:
                 logger.info('results are saved in '
                             f'{osp.dirname(outfile_prefix)}')
@@ -325,6 +325,23 @@ class DOTAMetric(BaseMetric):
                 eval_results[f'AP{int(iou_thr * 100):02d}'] = round(mean_ap, 3)
             eval_results['mAP'] = sum(mean_aps) / len(mean_aps)
             eval_results.move_to_end('mAP', last=False)
+        elif self.metric == 'mAOE':
+            dataset_name = self.dataset_meta['CLASSES']
+            dets = [pred['pred_bbox_scores'] for pred in preds]
+            mean_aoes = []
+            for iou_thr in self.iou_thrs:
+                logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}')
+                maoe, _ = eval_maoe(
+                    dets,
+                    gts,
+                    dataset=dataset_name,
+                    iou_thr=iou_thr,
+                    logger=logger)
+                mean_aoes.append(maoe)
+                eval_results[f'mAOE{int(iou_thr * 100):02d}'] = round(maoe, 3)
+            eval_results['mAOE'] = sum(mean_aoes) / len(mean_aoes)
+            eval_results.move_to_end('mAOE', last=False)
+
         else:
             raise NotImplementedError
         return eval_results
