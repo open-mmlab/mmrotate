@@ -5,7 +5,7 @@ import os.path as osp
 import re
 import tempfile
 import zipfile
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from typing import List, Optional, Sequence, Union
 
 import numpy as np
@@ -15,7 +15,8 @@ from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
 
-from mmrotate.core import eval_rbbox_map, obb2poly_np
+from mmrotate.core import eval_maoe, eval_rbbox_map
+from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import METRICS
 
 
@@ -47,7 +48,6 @@ class DOTAMetric(BaseMetric):
             patches' results.
         iou_thr (float): IoU threshold of ``nms_rotated`` used in merge
             patches. Defaults to 0.1.
-        angle_version (str): Angle representations. Defaults to 'oc'.
         eval_mode (str): 'area' or '11points', 'area' means calculating the
             area under precision-recall curve, '11points' means calculating
             the average precision of recalls at [0, 0.1, ..., 1].
@@ -72,7 +72,6 @@ class DOTAMetric(BaseMetric):
                  outfile_prefix: Optional[str] = None,
                  merge_patches: bool = False,
                  iou_thr: float = 0.1,
-                 angle_version: str = 'oc',
                  eval_mode: str = '11points',
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None) -> None:
@@ -85,7 +84,7 @@ class DOTAMetric(BaseMetric):
         if not isinstance(metric, str):
             assert len(metric) == 1
             metric = metric[0]
-        allowed_metrics = ['mAP']
+        allowed_metrics = ['mAP', 'mAOE']
         if metric not in allowed_metrics:
             raise KeyError(f"metric should be one of 'mAP', but got {metric}.")
         self.metric = metric
@@ -99,9 +98,7 @@ class DOTAMetric(BaseMetric):
         self.outfile_prefix = outfile_prefix
         self.merge_patches = merge_patches
         self.iou_thr = iou_thr
-        self.angle_version = angle_version
-        assert eval_mode in ['area, 11points'], \
-            'Unrecognized mode, only "area" and "11points" are supported'
+
         self.use_07_metric = True if eval_mode == '11points' else False
 
     def merge_results(self, results: Sequence[dict],
@@ -119,7 +116,7 @@ class DOTAMetric(BaseMetric):
                 prefix is "somepath/xxx", the zip files will be named
                 "somepath/xxx/xxx.zip".
         """
-        id_list, dets_list = [], []
+        collector = defaultdict(list)
         for idx, result in enumerate(results):
             img_id = result.get('img_id', idx)
             splitname = img_id.split('__')
@@ -134,8 +131,16 @@ class DOTAMetric(BaseMetric):
             ori_bboxes = bboxes.copy()
             ori_bboxes[..., :2] = ori_bboxes[..., :2] + np.array(
                 [x, y], dtype=np.float32)
-            dets = np.concatenate([ori_bboxes, scores[:, np.newaxis]], axis=1)
+            label_dets = np.concatenate(
+                [labels[:, np.newaxis], ori_bboxes, scores[:, np.newaxis]],
+                axis=1)
+            collector[oriname].append(label_dets)
+
+        id_list, dets_list = [], []
+        for oriname, label_dets_list in collector.items():
             big_img_results = []
+            label_dets = np.concatenate(label_dets_list, axis=0)
+            labels, dets = label_dets[:, 0], label_dets[:, 1:]
             for i in range(len(self.dataset_meta['CLASSES'])):
                 if len(dets[labels == i]) == 0:
                     big_img_results.append(dets[labels == i])
@@ -166,10 +171,12 @@ class DOTAMetric(BaseMetric):
             for f, dets in zip(file_objs, dets_per_cls):
                 if dets.size == 0:
                     continue
-                bboxes = obb2poly_np(dets, self.angle_version)
-                for bbox in bboxes:
-                    txt_element = [img_id, str(bbox[-1])
-                                   ] + [f'{p:.2f}' for p in bbox[:-1]]
+                th_dets = torch.from_numpy(dets)
+                rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
+                qboxes = RotatedBoxes(rboxes).convert_to('qbox').tensor
+                for qbox, score in zip(qboxes, scores):
+                    txt_element = [img_id, str(round(float(score), 2))
+                                   ] + [f'{p:.2f}' for p in qbox]
                     f.writelines(' '.join(txt_element) + '\n')
 
         for f in file_objs:
@@ -225,20 +232,18 @@ class DOTAMetric(BaseMetric):
         return result_files
 
     def process(self, data_batch: Sequence[dict],
-                predictions: Sequence[dict]) -> None:
-        """Process one batch of data samples and predictions.
-
-        The processed
+                data_samples: Sequence[dict]) -> None:
+        """Process one batch of data samples and predictions. The processed
         results should be stored in ``self.results``, which will be used to
         compute the metrics when all batches have been processed.
+
         Args:
-            data_batch (Sequence[dict]): A batch of data
-                from the dataloader.
-            predictions (Sequence[dict]): A batch of outputs from
-                the model.
+            data_batch (dict): A batch of data from the dataloader.
+            data_samples (Sequence[dict]): A batch of data samples that
+                contain annotations and predictions.
         """
-        for data, pred in zip(data_batch, predictions):
-            gt = copy.deepcopy(data['data_sample'])
+        for data_sample in data_samples:
+            gt = copy.deepcopy(data_sample)
             gt_instances = gt['gt_instances']
             gt_ignore_instances = gt['ignored_instances']
             if gt_instances == {}:
@@ -250,8 +255,8 @@ class DOTAMetric(BaseMetric):
                     bboxes_ignore=gt_ignore_instances['bboxes'].cpu().numpy(),
                     labels_ignore=gt_ignore_instances['labels'].cpu().numpy())
             result = dict()
-            pred = pred['pred_instances']
-            result['img_id'] = data['data_sample']['img_id']
+            pred = data_sample['pred_instances']
+            result['img_id'] = data_sample['img_id']
             result['bboxes'] = pred['bboxes'].cpu().numpy()
             result['scores'] = pred['scores'].cpu().numpy()
             result['labels'] = pred['labels'].cpu().numpy()
@@ -294,7 +299,7 @@ class DOTAMetric(BaseMetric):
             return eval_results
         else:
             # convert predictions to coco format and dump to json file
-            _ = self.results2json(preds, outfile_prefix)
+            # _ = self.results2json(preds, outfile_prefix)
             if self.format_only:
                 logger.info('results are saved in '
                             f'{osp.dirname(outfile_prefix)}')
@@ -320,6 +325,23 @@ class DOTAMetric(BaseMetric):
                 eval_results[f'AP{int(iou_thr * 100):02d}'] = round(mean_ap, 3)
             eval_results['mAP'] = sum(mean_aps) / len(mean_aps)
             eval_results.move_to_end('mAP', last=False)
+        elif self.metric == 'mAOE':
+            dataset_name = self.dataset_meta['CLASSES']
+            dets = [pred['pred_bbox_scores'] for pred in preds]
+            mean_aoes = []
+            for iou_thr in self.iou_thrs:
+                logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}')
+                maoe, _ = eval_maoe(
+                    dets,
+                    gts,
+                    dataset=dataset_name,
+                    iou_thr=iou_thr,
+                    logger=logger)
+                mean_aoes.append(maoe)
+                eval_results[f'mAOE{int(iou_thr * 100):02d}'] = round(maoe, 3)
+            eval_results['mAOE'] = sum(mean_aoes) / len(mean_aoes)
+            eval_results.move_to_end('mAOE', last=False)
+
         else:
             raise NotImplementedError
         return eval_results

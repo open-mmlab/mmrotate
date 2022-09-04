@@ -4,9 +4,12 @@ from multiprocessing import get_context
 import numpy as np
 import torch
 from mmcv.ops import box_iou_rotated
-from mmcv.utils import print_log
 from mmdet.evaluation.functional import average_precision
+from mmengine.logging import print_log
 from terminaltables import AsciiTable
+
+from mmrotate.core import RotatedBoxes, norm_angle
+from mmrotate.core.bbox.structures import rbox2qbox
 
 
 def tpfp_default(det_bboxes,
@@ -309,3 +312,262 @@ def print_map_summary(mean_ap,
         table = AsciiTable(table_data)
         table.inner_footing_row_border = True
         print_log('\n' + table.table, logger=logger)
+
+
+def eval_maoe(det_results,
+              annotations,
+              iou_thr=0.5,
+              dataset=None,
+              logger=None):
+    """Evaluate mAP of a rotated dataset.
+
+    Args:
+        det_results (list[list]): [[cls1_det, cls2_det, ...], ...].
+            The outer list indicates images, and the inner list indicates
+            per-class detected bboxes.
+        annotations (list[dict]): Ground truth annotations where each item of
+            the list indicates an image. Keys of annotations are:
+
+            - `bboxes`: numpy array of shape (n, 5)
+            - `labels`: numpy array of shape (n, )
+            - `bboxes_ignore` (optional): numpy array of shape (k, 5)
+            - `labels_ignore` (optional): numpy array of shape (k, )
+        scale_ranges (list[tuple] | None): Range of scales to be evaluated,
+            in the format [(min1, max1), (min2, max2), ...]. A range of
+            (32, 64) means the area range between (32**2, 64**2).
+            Default: None.
+        iou_thr (float): IoU threshold to be considered as matched.
+            Default: 0.5.
+        use_07_metric (bool): Whether to use the voc07 metric.
+        dataset (list[str] | str | None): Dataset name or dataset classes,
+            there are minor differences in metrics for different datasets, e.g.
+            "voc07", "imagenet_det", etc. Default: None.
+        logger (logging.Logger | str | None): The way to print the mAP
+            summary. See `mmcv.utils.print_log()` for details. Default: None.
+        nproc (int): Processes used for computing TP and FP.
+            Default: 4.
+
+    Returns:
+        tuple: (mAP, [dict, dict, ...])
+    """
+    assert len(det_results) == len(annotations)
+
+    num_classes = len(det_results[0])  # positive class num
+
+    eval_results = []
+    for i in range(num_classes):
+        # get gt and det bboxes of this class
+        cls_dets, cls_gts, cls_gts_ignore = get_cls_results(
+            det_results, annotations, i)
+
+        # compute tp and fp for each image
+        aoe_list = []
+        for cls_det, cls_gt, cls_gt_ignore in zip(cls_dets, cls_gts,
+                                                  cls_gts_ignore):
+            aoe = calculate_aoe(cls_det, cls_gt, cls_gt_ignore, iou_thr)
+            if len(aoe) > 0:
+                aoe_list = aoe_list + aoe
+        aoes = sum(aoe_list) / len(aoe_list) if len(aoe_list) else 0
+
+        # calculate gt number of each scale
+        # ignored gts or gts beyond the specific scale are not counted
+        num_gts = np.zeros(1)
+        for _, bbox in enumerate(cls_gts):
+            num_gts += bbox.shape[0]
+
+        # sort all det bboxes by score
+        cls_dets = np.vstack(cls_dets)
+        num_dets = cls_dets.shape[0]
+
+        eval_results.append({
+            'num_gts': num_gts,
+            'num_dets': num_dets,
+            'aoe': aoes,
+        })
+
+    all_aoes = []
+    for cls_result in eval_results:
+        if cls_result['num_gts'] > 0:
+            all_aoes.append(cls_result['aoe'])
+    mean_aoe = np.array(all_aoes).mean().item() if all_aoes else 0.0
+
+    print_maoe_summary(mean_aoe, eval_results, dataset, logger=logger)
+
+    return mean_aoe, eval_results
+
+
+def poly2rbox_single_v3(poly):
+    """poly:[x0,y0,x1,y1,x2,y2,x3,y3] to rrect:[x_ctr,y_ctr,w,h,angle]"""
+    poly = np.array(poly[:8], dtype=np.float32)
+
+    pt1 = (poly[0], poly[1])
+    pt2 = (poly[2], poly[3])
+    pt3 = (poly[4], poly[5])
+    pt4 = (poly[6], poly[7])
+
+    edge1 = np.sqrt((pt1[0] - pt2[0]) * (pt1[0] - pt2[0]) + (pt1[1] - pt2[1]) *
+                    (pt1[1] - pt2[1]))
+    edge2 = np.sqrt((pt2[0] - pt3[0]) * (pt2[0] - pt3[0]) + (pt2[1] - pt3[1]) *
+                    (pt2[1] - pt3[1]))
+
+    max_edge = max(edge1, edge2)
+    min_edge = min(edge1, edge2)
+    ratio = max_edge / min_edge
+    # print(ratio)
+    if ratio < 1.15:
+        angle1 = np.arctan2(
+            np.float(pt2[1] - pt1[1]), np.float(pt2[0] - pt1[0]))
+        angle2 = np.arctan2(
+            np.float(pt4[1] - pt1[1]), np.float(pt4[0] - pt1[0]))
+
+        angle1_norm = norm_angle(angle1, 'le135')
+        angle2_norm = norm_angle(angle2, 'le135')
+        if abs(angle1_norm) > abs(angle2_norm):
+            final_angle = angle2_norm
+        else:
+            final_angle = angle1_norm
+
+    else:
+        final_angle = 0
+
+        if edge1 > edge2:
+            final_angle = np.arctan2(
+                np.float(pt2[1] - pt1[1]), np.float(pt2[0] - pt1[0]))
+        elif edge2 >= edge1:
+            final_angle = np.arctan2(
+                np.float(pt4[1] - pt1[1]), np.float(pt4[0] - pt1[0]))
+
+        final_angle = norm_angle(final_angle, 'le135')
+
+    return float(final_angle)
+
+
+def calculate_aoe(det_bboxes, gt_bboxes, gt_bboxes_ignore=None, iou_thr=0.5):
+    """Check if detected bboxes are true positive or false positive.
+
+    Args:
+        det_bboxes (ndarray): Detected bboxes of this image, of shape (m, 6).
+        gt_bboxes (ndarray): GT bboxes of this image, of shape (n, 5).
+        gt_bboxes_ignore (ndarray): Ignored gt bboxes of this image,
+            of shape (k, 5). Default: None
+        iou_thr (float): IoU threshold to be considered as matched.
+            Default: 0.5.
+        area_ranges (list[tuple] | None): Range of bbox areas to be evaluated,
+            in the format [(min1, max1), (min2, max2), ...]. Default: None.
+
+    Returns:
+        list .
+    """
+    # an indicator of ignored gts
+    det_bboxes = np.array(det_bboxes)
+    gt_ignore_inds = np.concatenate(
+        (np.zeros(gt_bboxes.shape[0], dtype=np.bool),
+         np.ones(gt_bboxes_ignore.shape[0], dtype=np.bool)))
+    # stack gt_bboxes and gt_bboxes_ignore for convenience
+    gt_bboxes = np.vstack((gt_bboxes, gt_bboxes_ignore))
+
+    # if there is no gt bboxes in this image, then all det bboxes
+    # within area range are false positives
+    if gt_bboxes.shape[0] == 0:
+        return []
+
+    ious = box_iou_rotated(
+        torch.from_numpy(det_bboxes).float(),
+        torch.from_numpy(gt_bboxes).float()).numpy()
+    # for each det, the max iou with all gts
+    ious_max = ious.max(axis=1)
+    # for each det, which gt overlaps most with it
+    ious_argmax = ious.argmax(axis=1)
+    # sort all dets in descending order by scores
+    sort_inds = np.argsort(-det_bboxes[:, -1])
+
+    aoe_list = []
+    for i in sort_inds:
+        if ious_max[i] >= iou_thr:
+            matched_gt = ious_argmax[i]
+            if not gt_ignore_inds[matched_gt]:
+                # TODO Clean the codes and compare the
+                #  difference with maoe in oriented reppoints
+                # Use oc to select min theta
+                matched_bbox = RotatedBoxes(gt_bboxes[np.newaxis, matched_gt])
+                matched_bbox_a = matched_bbox.regularize_boxes('oc')
+                pred_bbox = RotatedBoxes(det_bboxes[np.newaxis, i][:, :-1])
+                pred_bbox_a = pred_bbox.regularize_boxes('oc')
+                angel_gt = matched_bbox_a[:, -1]
+                angel_bb = pred_bbox_a[:, -1]
+
+                diff_1 = abs(angel_bb - angel_gt)
+                diff_2 = 0.5 * np.pi - diff_1
+                # angle_diff_a = abs(angel_bb - angel_gt) * (180 / np.pi)
+                angle_diff_a = min(diff_1, diff_2) * (180 / np.pi)
+
+                matched_poly = rbox2qbox(matched_bbox.tensor)
+                pred_poly = rbox2qbox(pred_bbox.tensor)
+
+                a_gt = poly2rbox_single_v3(matched_poly[0])
+                a_pred = poly2rbox_single_v3(pred_poly[0])
+
+                angle_diff = abs(a_pred - a_gt) * 57.32
+
+                # angle_diff = abs(angel_bb - angel_gt) * (180 / np.pi)
+                angle_diff = angle_diff_a.numpy()
+                aoe_list.append(angle_diff)
+
+                # if not gt_covered[matched_gt]:
+                #     gt_covered[matched_gt] = True
+                #     aoe_list.append(angle_diff)
+
+                # aoe_list.append(abs(angel_bb - angel_gt) * (180 / np.pi))
+                # tp[k, i] = 1
+                # else:
+                #     aoe_list.append(angle_diff)
+
+                # aoe_list.append(abs(angel_bb - angel_gt) * (180 / np.pi))
+                # fp[k, i] = 1
+
+    return aoe_list
+
+
+def print_maoe_summary(mean_aoe, results, dataset=None, logger=None):
+    """Print mAP and results of each class.
+
+    A table will be printed to show the gts/dets/recall/AP of each class and
+    the mAP.
+
+    Args:
+        mean_aoe (float): Calculated from `eval_map()`.
+        results (list[dict]): Calculated from `eval_map()`.
+        dataset (list[str] | str | None): Dataset name or dataset classes.
+        scale_ranges (list[tuple] | None): Range of scales to be evaluated.
+        logger (logging.Logger | str | None): The way to print the mAP
+            summary. See `mmcv.utils.print_log()` for details. Default: None.
+    """
+
+    if logger == 'silent':
+        return
+
+    num_classes = len(results)
+
+    aoes = np.zeros(num_classes, dtype=np.float32)
+    num_gts = np.zeros(num_classes, dtype=int)
+    for i, cls_result in enumerate(results):
+        aoes[i] = cls_result['aoe']
+        num_gts[i] = cls_result['num_gts']
+
+    if dataset is None:
+        label_names = [str(i) for i in range(num_classes)]
+    else:
+        label_names = dataset
+
+    header = ['class', 'gts', 'dets', 'aoe']
+    table_data = [header]
+    for j in range(num_classes):
+        row_data = [
+            label_names[j], num_gts[j], results[j]['num_dets'],
+            f'{aoes[j]:.3f}'
+        ]
+        table_data.append(row_data)
+    table_data.append(['mAOE', '', '', f'{mean_aoe:.3f}'])
+    table = AsciiTable(table_data)
+    table.inner_footing_row_border = True
+    print_log('\n' + table.table, logger=logger)

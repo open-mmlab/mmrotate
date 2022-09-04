@@ -1,14 +1,13 @@
 # Copyright (c) SJTU. All rights reserved.
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-from mmcv.runner import force_fp32
 
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 from ..utils import ORConv2d, RotationInvariantPooling
 from .kfiou_rotate_retina_head import KFIoURRetinaHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class KFIoUODMRefineHead(KFIoURRetinaHead):
     """Rotated Anchor-based refine head for KFIoU. It's a part of the Oriented
     Detection Module (ODM), which produces orientation-sensitive features for
@@ -160,7 +159,6 @@ class KFIoUODMRefineHead(KFIoURRetinaHead):
 
         return anchor_list, valid_flag_list
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -181,7 +179,6 @@ class KFIoUODMRefineHead(KFIoURRetinaHead):
             img_metas=img_metas,
             gt_bboxes_ignore=gt_bboxes_ignore)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

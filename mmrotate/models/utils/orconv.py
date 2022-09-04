@@ -5,7 +5,7 @@ import math
 import torch
 import torch.nn.functional as F
 from mmcv.ops import active_rotated_filter
-from mmcv.utils import to_2tuple
+from mmengine.utils import to_2tuple
 from torch.nn.modules import Conv2d
 from torch.nn.parameter import Parameter
 

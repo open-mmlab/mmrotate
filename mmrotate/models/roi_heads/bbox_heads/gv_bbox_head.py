@@ -2,18 +2,16 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmcv.runner import BaseModule, auto_fp16, force_fp32
-from mmcv.utils import to_2tuple
-from mmdet.core import multi_apply
 from mmdet.models.losses import accuracy
-from mmdet.models.utils import build_linear_layer
+from mmdet.models.utils import multi_apply
+from mmengine.model import BaseModule
+from mmengine.utils import to_2tuple
 
-from mmrotate.core import (build_bbox_coder, hbb2obb, multiclass_nms_rotated,
-                           obb2xyxy)
-from ...builder import ROTATED_HEADS, build_loss
+from mmrotate.core import hbb2obb, multiclass_nms_rotated, obb2xyxy
+from mmrotate.registry import MODELS, TASK_UTILS
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class GVBBoxHead(BaseModule):
     """Gliding Vertex's RoI bbox head.
 
@@ -90,14 +88,14 @@ class GVBBoxHead(BaseModule):
         self.ratio_predictor_cfg = ratio_predictor_cfg
         self.fp16_enabled = False
 
-        self.bbox_coder = build_bbox_coder(bbox_coder)
-        self.fix_coder = build_bbox_coder(fix_coder)
-        self.ratio_coder = build_bbox_coder(ratio_coder)
+        self.bbox_coder = TASK_UTILS.build(bbox_coder)
+        self.fix_coder = TASK_UTILS.build(fix_coder)
+        self.ratio_coder = TASK_UTILS.build(ratio_coder)
 
-        self.loss_cls = build_loss(loss_cls)
-        self.loss_bbox = build_loss(loss_bbox)
-        self.loss_fix = build_loss(loss_fix)
-        self.loss_ratio = build_loss(loss_ratio)
+        self.loss_cls = TASK_UTILS.build(loss_cls)
+        self.loss_bbox = TASK_UTILS.build(loss_bbox)
+        self.loss_fix = TASK_UTILS.build(loss_fix)
+        self.loss_ratio = TASK_UTILS.build(loss_ratio)
         self.version = version
 
         self.relu = nn.ReLU(inplace=True)
@@ -116,22 +114,22 @@ class GVBBoxHead(BaseModule):
         last_dim = in_channels if self.num_shared_fcs == 0 \
             else self.fc_out_channels
 
-        self.fc_cls = build_linear_layer(
+        self.fc_cls = TASK_UTILS.build(
             self.cls_predictor_cfg,
             in_features=last_dim,
             out_features=num_classes + 1)
         out_dim_reg = 4 if reg_class_agnostic else 4 * num_classes
-        self.fc_reg = build_linear_layer(
+        self.fc_reg = TASK_UTILS.build(
             self.reg_predictor_cfg,
             in_features=last_dim,
             out_features=out_dim_reg)
         out_dim_fix = 4 if reg_class_agnostic else 4 * num_classes
-        self.fc_fix = build_linear_layer(
+        self.fc_fix = TASK_UTILS.build(
             self.fix_predictor_cfg,
             in_features=last_dim,
             out_features=out_dim_fix)
         out_dim_ratio = 1 if reg_class_agnostic else num_classes
-        self.fc_ratio = build_linear_layer(
+        self.fc_ratio = TASK_UTILS.build(
             self.ratio_predictor_cfg,
             in_features=last_dim,
             out_features=out_dim_ratio)
@@ -167,7 +165,6 @@ class GVBBoxHead(BaseModule):
         """The custom accuracy."""
         return getattr(self.loss_cls, 'custom_accuracy', False)
 
-    @auto_fp16()
     def forward(self, x):
         """Forward function."""
         if self.with_avg_pool:
@@ -337,7 +334,6 @@ class GVBBoxHead(BaseModule):
         return (labels, label_weights, bbox_targets, bbox_weights, fix_targets,
                 fix_weights, ratio_targets, ratio_weights)
 
-    @force_fp32(apply_to=('cls_score', 'bbox_pred', 'fix_pred', 'ratio_pred'))
     def loss(self,
              cls_score,
              bbox_pred,
@@ -468,7 +464,6 @@ class GVBBoxHead(BaseModule):
 
         return losses
 
-    @force_fp32(apply_to=('cls_score', 'bbox_pred', 'fix_pred', 'ratio_pred'))
     def get_bboxes(self,
                    rois,
                    cls_score,
@@ -544,7 +539,6 @@ class GVBBoxHead(BaseModule):
                 rbboxes, scores, cfg.score_thr, cfg.nms, cfg.max_per_img)
             return det_bboxes, det_labels
 
-    @force_fp32(apply_to=('bbox_preds', ))
     def refine_bboxes(self, rois, labels, bbox_preds, pos_is_gts, img_metas):
         """Refine bboxes during training.
 
@@ -588,7 +582,6 @@ class GVBBoxHead(BaseModule):
 
         return bboxes_list
 
-    @force_fp32(apply_to=('bbox_pred', ))
     def regress_by_class(self, rois, label, bbox_pred, img_meta):
         """Regress the bbox for the predicted class. Used in Cascade R-CNN.
 

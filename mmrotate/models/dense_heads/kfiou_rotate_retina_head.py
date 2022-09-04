@@ -1,9 +1,9 @@
 # Copyright (c) SJTU. All rights reserved.
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 from .rotated_retina_head import RotatedRetinaHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class KFIoURRetinaHead(RotatedRetinaHead):
     """Rotated Anchor-based head for KFIoU. The difference from `RRetinaHead`
     is that its loss_bbox requires bbox_pred, bbox_targets, pred_decode and

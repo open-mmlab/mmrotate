@@ -1,11 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from mmdet.core import bbox2roi
+from mmdet.structures.bbox import bbox2roi
 
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 from .rotate_standard_roi_head import RotatedStandardRoIHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class GVRatioRoIHead(RotatedStandardRoIHead):
     """Gliding vertex roi head including one bbox head."""
 
