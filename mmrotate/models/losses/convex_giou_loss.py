@@ -5,7 +5,7 @@ from mmcv.ops import convex_giou
 from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 
-from ..builder import ROTATED_LOSSES
+from mmrotate.registry import MODELS
 
 
 class ConvexGIoULossFuction(Function):
@@ -64,7 +64,7 @@ class ConvexGIoULossFuction(Function):
 convex_giou_loss = ConvexGIoULossFuction.apply
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class ConvexGIoULoss(nn.Module):
     """Convex GIoU loss.
 
@@ -260,7 +260,7 @@ class BCConvexGIoULossFuction(Function):
 bc_convex_giou_loss = BCConvexGIoULossFuction.apply
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class BCConvexGIoULoss(nn.Module):
     """BCConvex GIoU loss.
 
