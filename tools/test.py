@@ -3,6 +3,7 @@ import argparse
 import os
 import os.path as osp
 
+from mmdet.utils import register_all_modules as register_all_modules_mmdet
 from mmengine.config import Config, DictAction
 from mmengine.registry import RUNNERS
 from mmengine.runner import Runner
@@ -12,8 +13,7 @@ from mmrotate.utils import register_all_modules
 
 # TODO: support fuse_conv_bn and format_only
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description='MMDet test (and eval) a model')
+    parser = argparse.ArgumentParser(description='Test (and eval) a model')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument(
@@ -61,7 +61,6 @@ def trigger_visualization_hook(cfg, args):
             visualization_hook['wait_time'] = args.wait_time
         if args.show_dir:
             visualization_hook['test_out_dir'] = args.show_dir
-        print(visualization_hook)
     else:
         raise RuntimeError(
             'VisualizationHook must be included in default_hooks.'
@@ -76,6 +75,7 @@ def main():
 
     # register all modules in mmdet and mmrotate into the registries
     # do not init the default scope here because it will be init in the runner
+    register_all_modules_mmdet(init_default_scope=False)
     register_all_modules(init_default_scope=False)
 
     # load config
