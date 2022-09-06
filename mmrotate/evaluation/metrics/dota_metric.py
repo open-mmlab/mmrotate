@@ -16,7 +16,7 @@ from mmengine.fileio import dump
 from mmengine.logging import MMLogger
 
 from mmrotate.core import eval_rbbox_map
-from mmrotate.core.bbox.structures import RotatedBoxes
+from mmrotate.core.bbox.structures import rbox2qbox
 from mmrotate.registry import METRICS
 
 
@@ -173,7 +173,7 @@ class DOTAMetric(BaseMetric):
                     continue
                 th_dets = torch.from_numpy(dets)
                 rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
-                qboxes = RotatedBoxes(rboxes).convert_to('qbox').tensor
+                qboxes = rbox2qbox(rboxes)
                 for qbox, score in zip(qboxes, scores):
                     txt_element = [img_id, str(round(float(score), 2))
                                    ] + [f'{p:.2f}' for p in qbox]
