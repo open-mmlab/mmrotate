@@ -5,7 +5,7 @@ _base_ = [
 angle_version = 'le90'
 
 model = dict(
-    type='RotatedRetinaNet',
+    type='mmdet.RetinaNet',
     data_preprocessor=dict(
         type='mmdet.DetDataPreprocessor',
         mean=[123.675, 116.28, 103.53],
