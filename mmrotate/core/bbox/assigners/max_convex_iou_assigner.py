@@ -1,11 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import Optional, Union
+
 import torch
 from mmcv.ops import convex_iou
-from torch import Tensor
 from mmdet.models.task_modules.assigners.assign_result import AssignResult
 from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
 from mmengine.structures import InstanceData
+from torch import Tensor
+
 from mmrotate.registry import TASK_UTILS
 
 
@@ -211,7 +213,10 @@ class MaxConvexIoUAssigner(BaseAssigner):
             assigned_labels = None
 
         return AssignResult(
-            num_gts=num_gts, gt_inds=assigned_gt_inds, max_overlaps=max_overlaps, labels=assigned_labels)
+            num_gts=num_gts,
+            gt_inds=assigned_gt_inds,
+            max_overlaps=max_overlaps,
+            labels=assigned_labels)
 
     def convex_overlaps(self, gt_rbboxes: Tensor, points: Tensor) -> Tensor:
         """Compute overlaps between polygons and points.

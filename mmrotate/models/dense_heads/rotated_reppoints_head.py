@@ -1,17 +1,18 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 
 import torch
 from mmcv.ops import min_area_polygons
+from mmdet.models.dense_heads.reppoints_head import RepPointsHead
+from mmdet.models.utils import filter_scores_and_topk, multi_apply, unmap
+from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
 
-from mmrotate.registry import MODELS
-from mmdet.utils import InstanceList, OptInstanceList
-from mmdet.models.utils import (filter_scores_and_topk, multi_apply, unmap)
-from mmdet.models.dense_heads.reppoints_head import RepPointsHead
 from mmrotate.core.bbox.structures import qbox2rbox
+from mmrotate.registry import MODELS
+
 
 @MODELS.register_module()
 class RotatedRepPointsHead(RepPointsHead):
@@ -37,16 +38,13 @@ class RotatedRepPointsHead(RepPointsHead):
             dict]): Initialization config dict.
     """  # noqa: W605
 
-    def __init__(self,
-                 *args,
-                 **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         # avoid register scope error.
-        super().__init__(*args, 
-            loss_bbox=dict(type='mmdet.IoULoss', loss_weight=1.0), 
+        super().__init__(
+            *args,
+            loss_bbox=dict(type='mmdet.IoULoss', loss_weight=1.0),
             bbox_coder=dict(type='mmdet.DistancePointBBoxCoder'),
             **kwargs)
-
-    
 
     def points2bbox(self, pts: Tensor, y_first: bool = True) -> Tensor:
         """Converting the points set into quadrilateral box.
@@ -60,7 +58,7 @@ class RotatedRepPointsHead(RepPointsHead):
                 [x1, y1, x2, y2 ... xn, yn]. Defaults to True.
 
         Returns:
-            Tensor: each points set is converting to a qboxes 
+            Tensor: each points set is converting to a qboxes
                 [x1, y1, x2, y2 ... x4, y4].
         """
         if y_first:
@@ -321,8 +319,9 @@ class RotatedRepPointsHead(RepPointsHead):
                 points_shift = points_preds_init_.permute(
                     0, 2, 3, 1) * self.point_strides[i_lvl]
                 points_center = center[i_lvl][:, :2].repeat(1, self.num_points)
-                bbox.append(points_center +
-                            points_shift[i_img].reshape(-1, 2 * self.num_points))
+                bbox.append(
+                    points_center +
+                    points_shift[i_img].reshape(-1, 2 * self.num_points))
             bbox_list.append(bbox)
         cls_reg_targets_refine = self.get_targets(
             proposals_list=bbox_list,
@@ -413,7 +412,8 @@ class RotatedRepPointsHead(RepPointsHead):
         for level_idx, (cls_score, bbox_pred, priors) in enumerate(
                 zip(cls_score_list, bbox_pred_list, mlvl_priors)):
             assert cls_score.size()[-2:] == bbox_pred.size()[-2:]
-            bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, 2 * self.num_points)
+            bbox_pred = bbox_pred.permute(1, 2,
+                                          0).reshape(-1, 2 * self.num_points)
 
             cls_score = cls_score.permute(1, 2,
                                           0).reshape(-1, self.cls_out_channels)
@@ -432,7 +432,8 @@ class RotatedRepPointsHead(RepPointsHead):
 
             qbox_pred = self.points2bbox(bbox_pred, y_first=True)
             bbox_pos_center = priors[:, :2].repeat(1, 4)
-            qboxes = qbox_pred * self.point_strides[level_idx] + bbox_pos_center
+            qboxes = qbox_pred * self.point_strides[level_idx] \
+                + bbox_pos_center
             bboxes = qbox2rbox(qboxes)
 
             mlvl_bboxes.append(bboxes)

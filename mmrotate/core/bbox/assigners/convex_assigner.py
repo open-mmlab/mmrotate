@@ -1,10 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import Optional
+
 import torch
-from torch import Tensor
 from mmdet.models.task_modules.assigners.assign_result import AssignResult
 from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
 from mmengine.structures import InstanceData
+from torch import Tensor
+
 from mmrotate.registry import TASK_UTILS
 
 
@@ -88,7 +90,7 @@ class ConvexAssigner(BaseAssigner):
         gt_rbboxes = gt_instances.bboxes
         points = pred_instances.priors
         gt_labels = gt_instances.labels
-            
+
         num_points = points.shape[0]
         num_gts = gt_rbboxes.shape[0]
 
@@ -104,9 +106,9 @@ class ConvexAssigner(BaseAssigner):
                                                   -1,
                                                   dtype=torch.long)
             return AssignResult(
-                num_gts=num_gts, 
-                gt_inds=assigned_gt_inds, 
-                max_overlaps=None, 
+                num_gts=num_gts,
+                gt_inds=assigned_gt_inds,
+                max_overlaps=None,
                 labels=assigned_labels)
 
         points_xy = points[:, :2]
@@ -181,4 +183,7 @@ class ConvexAssigner(BaseAssigner):
             assigned_labels = None
 
         return AssignResult(
-            num_gts=num_gts, gt_inds=assigned_gt_inds, max_overlaps=None, labels=assigned_labels)
+            num_gts=num_gts,
+            gt_inds=assigned_gt_inds,
+            max_overlaps=None,
+            labels=assigned_labels)
