@@ -10,7 +10,7 @@ from mmengine.config import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
 
-from mmrotate.core.bbox.structures import qbox2rbox
+from mmrotate.core.bbox.structures import RotatedBoxes, qbox2rbox
 from mmrotate.registry import MODELS
 
 
@@ -33,7 +33,8 @@ class RotatedRepPointsHead(RepPointsHead):
             loss.
         loss_bbox_refine (:obj:`ConfigDict` or dict): Config of points loss in
             refinement.
-        transform_method (str): The methods to transform RepPoints to bbox.
+        transform_method (str): The methods to transform RepPoints to qbbox,
+            which cannot be 'moment' in here.
         init_cfg (:obj:`ConfigDict` or dict or list[:obj:`ConfigDict` or \
             dict]): Initialization config dict.
     """  # noqa: W605
@@ -46,32 +47,51 @@ class RotatedRepPointsHead(RepPointsHead):
             bbox_coder=dict(type='mmdet.DistancePointBBoxCoder'),
             **kwargs)
 
-    def points2bbox(self, pts: Tensor, y_first: bool = True) -> Tensor:
-        """Converting the points set into quadrilateral box.
-
-        Args:
-            pts (Tensor): the input points sets (fields), each points
-                set (fields) is represented as 2n scalar.
-            y_first (bool): if y_first=True, the point set is
-                represented as [y1, x1, y2, x2 ... yn, xn], otherwise
-                the point set is represented as
-                [x1, y1, x2, y2 ... xn, yn]. Defaults to True.
-
-        Returns:
-            Tensor: each points set is converting to a qboxes
-                [x1, y1, x2, y2 ... x4, y4].
-        """
-        if y_first:
-            pts = pts.reshape(-1, self.num_points, 2)
-            pts_dy = pts[:, :, 0::2]
-            pts_dx = pts[:, :, 1::2]
-            pts = torch.cat([pts_dx, pts_dy],
-                            dim=2).reshape(-1, 2 * self.num_points)
-        if self.transform_method == 'rotrect':
-            rotrect_pred = min_area_polygons(pts)
+    def forward_single(self, x: Tensor) -> Tuple[Tensor]:
+        """Forward feature map of a single FPN level."""
+        dcn_base_offset = self.dcn_base_offset.type_as(x)
+        # If we use center_init, the initial reppoints is from center points.
+        # If we use bounding bbox representation, the initial reppoints is
+        #   from regular grid placed on a pre-defined bbox.
+        if self.use_grid_points or not self.center_init:
+            scale = self.point_base_scale / 2
+            points_init = dcn_base_offset / dcn_base_offset.max() * scale
+            bbox_init = x.new_tensor([-scale, -scale, scale,
+                                      scale]).view(1, 4, 1, 1)
         else:
-            raise NotImplementedError
-        return rotrect_pred
+            points_init = 0
+        cls_feat = x
+        pts_feat = x
+        for cls_conv in self.cls_convs:
+            cls_feat = cls_conv(cls_feat)
+        for reg_conv in self.reg_convs:
+            pts_feat = reg_conv(pts_feat)
+        # initialize reppoints
+        pts_out_init = self.reppoints_pts_init_out(
+            self.relu(self.reppoints_pts_init_conv(pts_feat)))
+        if self.use_grid_points:
+            pts_out_init, bbox_out_init = self.gen_grid_from_reg(
+                pts_out_init, bbox_init.detach())
+        else:
+            pts_out_init = pts_out_init + points_init
+        # refine and classify reppoints
+        pts_out_init_grad_mul = (1 - self.gradient_mul) * pts_out_init.detach(
+        ) + self.gradient_mul * pts_out_init
+        dcn_offset = pts_out_init_grad_mul - dcn_base_offset
+        cls_out = self.reppoints_cls_out(
+            self.relu(self.reppoints_cls_conv(cls_feat, dcn_offset)))
+        pts_out_refine = self.reppoints_pts_refine_out(
+            self.relu(self.reppoints_pts_refine_conv(pts_feat, dcn_offset)))
+        if self.use_grid_points:
+            pts_out_refine, bbox_out_refine = self.gen_grid_from_reg(
+                pts_out_refine, bbox_out_init.detach())
+        else:
+            pts_out_refine = pts_out_refine + pts_out_init.detach()
+
+        if self.training:
+            return cls_out, pts_out_init, pts_out_refine
+        else:
+            return cls_out, pts_out_refine
 
     def _get_targets_single(self,
                             flat_proposals: Tensor,
@@ -430,11 +450,23 @@ class RotatedRepPointsHead(RepPointsHead):
             bbox_pred = filtered_results['bbox_pred']
             priors = filtered_results['priors']
 
-            qbox_pred = self.points2bbox(bbox_pred, y_first=True)
-            bbox_pos_center = priors[:, :2].repeat(1, 4)
-            qboxes = qbox_pred * self.point_strides[level_idx] \
-                + bbox_pos_center
-            bboxes = qbox2rbox(qboxes)
+            if bbox_pred.numel() != 0:
+                # there exist the bug in cuda function `min_area_polygon` when
+                # the input is small value. Transferring the predction of point
+                # offsets to the real positions in the whole image can avoid
+                # this issue sometimes. For more details, please refer to
+                # https://github.com/open-mmlab/mmrotate/issues/405
+                pts_pred = bbox_pred.reshape(-1, self.num_points, 2)
+                pts_pred_offsety = pts_pred[:, :, 0::2]
+                pts_pred_offsetx = pts_pred[:, :, 1::2]
+                pts_pred = torch.cat([pts_pred_offsetx, pts_pred_offsety],
+                                     dim=2).reshape(-1, 2 * self.num_points)
+                pts_pos_center = priors[:, :2].repeat(1, self.num_points)
+                pts = pts_pred * self.point_strides[level_idx] + pts_pos_center
+                qboxes = min_area_polygons(pts)
+                bboxes = qbox2rbox(qboxes)
+            else:
+                bboxes = bbox_pred.reshape((0, 5))
 
             mlvl_bboxes.append(bboxes)
             mlvl_scores.append(scores)
@@ -442,6 +474,7 @@ class RotatedRepPointsHead(RepPointsHead):
 
         results = InstanceData()
         results.bboxes = torch.cat(mlvl_bboxes)
+        results.bboxes = RotatedBoxes(results.bboxes)
         results.scores = torch.cat(mlvl_scores)
         results.labels = torch.cat(mlvl_labels)
 
