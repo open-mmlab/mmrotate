@@ -12,8 +12,9 @@ from ..transforms import norm_angle
 class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
     """Delta XYWHT RBBox coder. This coder is used for rotated objects
     detection (for example on task1 of DOTA dataset). this coder encodes bbox
-    (xc, yc, w, h, t) into delta (dx, dy, dw, dh, da) and decodes delta (dx,
-    dy, dw, dh, da) back to original bbox (xc, yc, w, h, t).
+    (cx, cy, w, h, t) into delta (dx, dy, dw, dh, dt) and decodes delta (dx,
+    dy, dw, dh, dt) back to original bbox (cx, cy, w, h, t). 't' is the box
+    angle represented in radian.
 
     Args:
         target_means (Sequence[float]): Denormalizing means of target for
@@ -118,7 +119,7 @@ def bbox2delta(proposals,
                norm_factor=None,
                edge_swap=False,
                proj_xy=False):
-    """We usually compute the deltas of x, y, w, h, a of proposals w.r.t ground
+    """We usually compute the deltas of cx, cy, w, h, t of proposals w.r.t ground
     truth bboxes to get regression target. This is the inverse function of
     :func:`delta2bbox`.
 
@@ -139,7 +140,7 @@ def bbox2delta(proposals,
 
     Returns:
         Tensor: deltas with shape (N, 5), where columns represent dx, dy,
-            dw, dh, da.
+            dw, dh, dt.
     """
     assert proposals.size() == gt.size()
     proposals = proposals.tensor
@@ -163,18 +164,18 @@ def bbox2delta(proposals,
         abs_dtheta2 = torch.abs(dtheta2)
         gw_regular = torch.where(abs_dtheta1 < abs_dtheta2, gw, gh)
         gh_regular = torch.where(abs_dtheta1 < abs_dtheta2, gh, gw)
-        da = torch.where(abs_dtheta1 < abs_dtheta2, dtheta1, dtheta2)
+        dt = torch.where(abs_dtheta1 < abs_dtheta2, dtheta1, dtheta2)
         dw = torch.log(gw_regular / pw)
         dh = torch.log(gh_regular / ph)
     else:
-        da = norm_angle(ga - pa, angle_version)
+        dt = norm_angle(ga - pa, angle_version)
         dw = torch.log(gw / pw)
         dh = torch.log(gh / ph)
 
     if norm_factor:
-        da /= norm_factor * np.pi
+        dt /= norm_factor * np.pi
 
-    deltas = torch.stack([dx, dy, dw, dh, da], dim=-1)
+    deltas = torch.stack([dx, dy, dw, dh, dt], dim=-1)
     means = deltas.new_tensor(means).unsqueeze(0)
     stds = deltas.new_tensor(stds).unsqueeze(0)
     deltas = deltas.sub_(means).div_(stds)
@@ -246,9 +247,9 @@ def delta2bbox(rois,
     dy = denorm_deltas[..., 1]
     dw = denorm_deltas[..., 2]
     dh = denorm_deltas[..., 3]
-    da = denorm_deltas[..., 4]
+    dt = denorm_deltas[..., 4]
     if norm_factor:
-        da *= norm_factor * np.pi
+        dt *= norm_factor * np.pi
     # Compute center of each roi
 
     px = rois[..., None, 0]
@@ -280,7 +281,7 @@ def delta2bbox(rois,
         gx = px + dx_width
         gy = py + dy_height
     # Compute angle
-    ga = norm_angle(pa + da, angle_version)
+    ga = norm_angle(pa + dt, angle_version)
     if max_shape is not None:
         gx = gx.clamp(min=0, max=max_shape[1] - 1)
         gy = gy.clamp(min=0, max=max_shape[0] - 1)

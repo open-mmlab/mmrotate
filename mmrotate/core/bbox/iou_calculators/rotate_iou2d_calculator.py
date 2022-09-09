@@ -20,12 +20,10 @@ class RBboxOverlaps2D(object):
         Args:
             bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
                 in <cx, cy, w, h, t> format, shape (m, 6) in
-                <cx, cy, w, h, t, score> format. 't' is the box angle
-                represented in radian.
+                <cx, cy, w, h, t, score> format.
             bboxes2 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (n, 5)
                 in <cx, cy, w, h, t> format, shape (n, 6) in
-                <cx, cy, w, h, t, score> format, or be empty. 't' is the box
-                angle represented in radian.
+                <cx, cy, w, h, t, score> format, or be empty.
             mode (str): 'iou' (intersection over union), 'iof' (intersection
                 over foreground). Defaults to 'iou'.
             is_aligned (bool): If True, then m and n must be equal.
@@ -111,12 +109,10 @@ class FakeRBboxOverlaps2D(object):
         Args:
             bboxes1 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (m, 5)
                 in <cx, cy, w, h, t> format, shape (m, 6) in
-                <cx, cy, w, h, t, score> format. 't' is the box angle
-                represented in radian.
+                <cx, cy, w, h, t, score> format.
             bboxes2 (:obj:`RotatedBoxes` or Tensor): bboxes have shape (n, 5)
                 in <cx, cy, w, h, t> format, shape (n, 6) in
-                <cx, cy, w, h, t, score> format, or be empty. 't' is the box
-                angle represented in radian.
+                <cx, cy, w, h, t, score> format, or be empty.
             mode (str): 'iou' (intersection over union), 'iof' (intersection
                 over foreground).
             is_aligned (bool): If True, then m and n must be equal.
