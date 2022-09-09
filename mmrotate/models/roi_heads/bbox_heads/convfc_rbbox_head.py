@@ -2,15 +2,13 @@
 import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-from mmcv.runner import force_fp32
 from mmdet.models.losses import accuracy
-from mmdet.models.utils import build_linear_layer
 
-from ...builder import ROTATED_HEADS
+from mmrotate.registry import MODELS, TASK_UTILS
 from .rotated_bbox_head import RotatedBBoxHead
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedConvFCBBoxHead(RotatedBBoxHead):
     r"""More general bbox head, with shared conv and fc layers and two optional
     separated branches.
@@ -100,14 +98,14 @@ class RotatedConvFCBBoxHead(RotatedBBoxHead):
                 cls_channels = self.loss_cls.get_cls_channels(self.num_classes)
             else:
                 cls_channels = self.num_classes + 1
-            self.fc_cls = build_linear_layer(
+            self.fc_cls = TASK_UTILS.build(
                 self.cls_predictor_cfg,
                 in_features=self.cls_last_dim,
                 out_features=cls_channels)
         if self.with_reg:
             out_dim_reg = (5 if self.reg_class_agnostic else 5 *
                            self.num_classes)
-            self.fc_reg = build_linear_layer(
+            self.fc_reg = TASK_UTILS.build(
                 self.reg_predictor_cfg,
                 in_features=self.reg_last_dim,
                 out_features=out_dim_reg)
@@ -206,7 +204,7 @@ class RotatedConvFCBBoxHead(RotatedBBoxHead):
         return cls_score, bbox_pred
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedShared2FCBBoxHead(RotatedConvFCBBoxHead):
     """Shared2FC RBBox head."""
 
@@ -223,7 +221,7 @@ class RotatedShared2FCBBoxHead(RotatedConvFCBBoxHead):
             **kwargs)
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedKFIoUShared2FCBBoxHead(RotatedConvFCBBoxHead):
     """KFIoU RoI head."""
 
@@ -239,7 +237,6 @@ class RotatedKFIoUShared2FCBBoxHead(RotatedConvFCBBoxHead):
             *args,
             **kwargs)
 
-    @force_fp32(apply_to=('cls_score', 'bbox_pred'))
     def loss(self,
              cls_score,
              bbox_pred,

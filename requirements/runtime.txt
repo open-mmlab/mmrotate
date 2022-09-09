@@ -1,7 +1,5 @@
 e2cnn
 matplotlib
-mmcv-full
-mmdet
 numpy
 pycocotools
 six

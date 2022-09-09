@@ -1,8 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 import torch.nn as nn
-from mmcv.cnn import normal_init
 from mmcv.ops import DeformConv2d, rotated_feature_align
+from mmengine.model import normal_init
 
 
 class AlignConv(nn.Module):

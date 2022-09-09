@@ -5,16 +5,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from mmcv.ops import batched_nms
-from mmcv.runner import force_fp32
-from mmdet.core import (anchor_inside_flags, images_to_levels, multi_apply,
-                        unmap)
 from mmdet.models.dense_heads.anchor_head import AnchorHead
+from mmdet.models.task_modules.prior_generators import anchor_inside_flags
+from mmdet.models.utils import images_to_levels, multi_apply, unmap
 
 from mmrotate.core import obb2xyxy
-from ..builder import ROTATED_HEADS
+from mmrotate.registry import MODELS
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RotatedRPNHead(AnchorHead):
     """Rotated RPN head for rotated bboxes.
 
@@ -301,7 +300,6 @@ class RotatedRPNHead(AnchorHead):
             avg_factor=num_total_samples)
         return loss_cls, loss_bbox
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -370,7 +368,6 @@ class RotatedRPNHead(AnchorHead):
             num_total_samples=num_total_samples)
         return dict(loss_rpn_cls=losses_cls, loss_rpn_bbox=losses_bbox)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

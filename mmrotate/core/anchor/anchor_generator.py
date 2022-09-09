@@ -4,10 +4,11 @@ from typing import List, Tuple
 import torch
 from mmcv.utils import to_2tuple
 from mmdet.models.task_modules import AnchorGenerator
+from mmdet.structures.bbox import HorizontalBoxes
 from torch import Tensor
 
+from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import TASK_UTILS
-from ..bbox import hbb2obb
 
 
 @TASK_UTILS.register_module()
@@ -15,12 +16,16 @@ class FakeRotatedAnchorGenerator(AnchorGenerator):
     """Fake rotate anchor generator for 2D anchor-based detectors. Horizontal
     bounding box represented by (x,y,w,h,theta).
 
+    Note: In mmrotate-0.x, the angle of anchor is always 0. If you want to
+    load models in 0.x directly, please set the `angle_version` to 'None'.
+
     Args:
-        angle_version (str): Angle definition of rotated bbox.
-            Defaults to 'oc'.
+        angle_version (str, optional): Angle definition of rotated bbox.
+            Can only be 'None', 'oc', 'le90', or 'le135'. 'None' means the
+            angle of anchor is always 0. Defaults to None.
     """
 
-    def __init__(self, angle_version: str = 'oc', **kwargs) -> None:
+    def __init__(self, angle_version: str = None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.angle_version = angle_version
 
@@ -46,9 +51,11 @@ class FakeRotatedAnchorGenerator(AnchorGenerator):
         """
         anchors = super().single_level_grid_priors(
             featmap_size, level_idx, dtype=dtype, device=device)
-
-        anchors = hbb2obb(anchors, self.angle_version)
-
+        anchors = HorizontalBoxes(anchors, clone=False)
+        anchors = anchors.convert_to('rbox')
+        if self.angle_version:
+            anchors = anchors.regularize_boxes(self.angle_version)
+            anchors = RotatedBoxes(anchors, clone=False)
         return anchors
 
 

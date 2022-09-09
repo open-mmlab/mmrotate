@@ -2,15 +2,14 @@
 from abc import ABCMeta
 
 import torch
-from mmcv.runner import BaseModule, ModuleList
-from mmdet.core import bbox2roi
+from mmdet.structures.bbox import bbox2roi
+from mmengine.model import BaseModule, ModuleList
 
-from mmrotate.core import (build_assigner, build_sampler, obb2xyxy,
-                           rbbox2result, rbbox2roi)
-from ..builder import ROTATED_HEADS, build_head, build_roi_extractor
+from mmrotate.core import obb2xyxy, rbbox2result, rbbox2roi
+from mmrotate.registry import MODELS, TASK_UTILS
 
 
-@ROTATED_HEADS.register_module()
+@MODELS.register_module()
 class RoITransRoIHead(BaseModule, metaclass=ABCMeta):
     """RoI Trans cascade roi head including one bbox head.
 
@@ -75,8 +74,8 @@ class RoITransRoIHead(BaseModule, metaclass=ABCMeta):
             bbox_head = [bbox_head for _ in range(self.num_stages)]
         assert len(bbox_roi_extractor) == len(bbox_head) == self.num_stages
         for roi_extractor, head in zip(bbox_roi_extractor, bbox_head):
-            self.bbox_roi_extractor.append(build_roi_extractor(roi_extractor))
-            self.bbox_head.append(build_head(head))
+            self.bbox_roi_extractor.append(TASK_UTILS.build(roi_extractor))
+            self.bbox_head.append(TASK_UTILS.build(head))
 
     def init_assigner_sampler(self):
         """Initialize assigner and sampler for each stage."""
@@ -85,10 +84,10 @@ class RoITransRoIHead(BaseModule, metaclass=ABCMeta):
         if self.train_cfg is not None:
             for idx, rcnn_train_cfg in enumerate(self.train_cfg):
                 self.bbox_assigner.append(
-                    build_assigner(rcnn_train_cfg.assigner))
+                    TASK_UTILS.build(rcnn_train_cfg.assigner))
                 self.current_stage = idx
                 self.bbox_sampler.append(
-                    build_sampler(rcnn_train_cfg.sampler, context=self))
+                    TASK_UTILS.build(rcnn_train_cfg.sampler, context=self))
 
     def forward_dummy(self, x, proposals):
         """Dummy forward function.
