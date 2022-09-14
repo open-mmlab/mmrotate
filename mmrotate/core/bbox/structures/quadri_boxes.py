@@ -229,14 +229,14 @@ class QuadriBoxes(BaseBoxes):
 
     def is_inside(self,
                   img_shape: Tuple[int, int],
-                  all_in: bool = False,
+                  all_inside: bool = False,
                   allowed_border: int = 0) -> BoolTensor:
         """Find boxes inside the image.
 
         Args:
             img_shape (Tuple[int, int]): A tuple of image height and width.
-            all_in (bool): Whether the boxes are all inside the image or part
-                inside the image. Defaults to False.
+            all_inside (bool): Whether the boxes are all inside the image or
+                part inside the image. Defaults to False.
             allowed_border (int): Boxes that extend beyond the image shape
                 boundary by more than ``allowed_border`` are considered
                 "outside" Defaults to 0.
