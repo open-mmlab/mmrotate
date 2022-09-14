@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 from mmcv.ops import box_iou_rotated
-from mmdet.structures.bbox import BaseBoxes, bbox_overlaps
+from mmdet.structures.bbox import BaseBoxes, bbox_overlaps, get_box_tensor
 from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
@@ -42,10 +42,8 @@ class RBboxOverlaps2D(object):
         if bboxes2.size(-1) == 6:
             bboxes2 = bboxes2[..., :5]
 
-        if isinstance(bboxes1, RotatedBoxes):
-            bboxes1 = bboxes1.tensor
-        if isinstance(bboxes2, RotatedBoxes):
-            bboxes2 = bboxes2.tensor
+        bboxes1 = get_box_tensor(bboxes1)
+        bboxes2 = get_box_tensor(bboxes2)
 
         return rbbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
 
@@ -190,7 +188,9 @@ def fake_rbbox_overlaps(bboxes1: RotatedBoxes,
     return box_iou_rotated(clamped_bboxes1, clamped_bboxes2, mode, is_aligned)
 
 
-def cast_tensor_type(x, scale=1., dtype=None):
+def cast_tensor_type(x: Tensor,
+                     scale: float = 1.,
+                     dtype: str = None) -> Tensor:
     if dtype == 'fp16':
         # scale is for preventing overflows
         x = (x / scale).half()
@@ -201,7 +201,7 @@ def cast_tensor_type(x, scale=1., dtype=None):
 class RBbox2HBboxOverlaps2D:
     """2D Overlaps (e.g. IoUs, GIoUs) Calculator."""
 
-    def __init__(self, scale=1., dtype=None):
+    def __init__(self, scale: float = 1., dtype: str = None) -> None:
         self.scale = scale
         self.dtype = dtype
 
@@ -239,9 +239,7 @@ class RBbox2HBboxOverlaps2D:
             bboxes1 = RotatedBoxes(bboxes1)
         # convert rbb to minimum circumscribed hbb in <x1, y1, x2, y2> format.
         bboxes1 = bboxes1.convert_to('hbox').tensor
-
-        if isinstance(bboxes2, BaseBoxes):
-            bboxes2 = bboxes2.tensor
+        bboxes2 = get_box_tensor(bboxes2)
 
         if self.dtype == 'fp16':
             # change tensor type to save cpu and cuda memory and keep speed
@@ -255,7 +253,7 @@ class RBbox2HBboxOverlaps2D:
 
         return bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """str: a string describing the module"""
         repr_str = self.__class__.__name__ + f'(' \
             f'scale={self.scale}, dtype={self.dtype})'

@@ -1,7 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Optional, Sequence
+
 import numpy as np
 import torch
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
+from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import TASK_UTILS
@@ -22,10 +25,10 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         target_stds (Sequence[float]): Denormalizing standard deviation of
             target for delta coordinates
         angle_version (str, optional): Angle representations. Defaults to 'oc'.
-        norm_factor (None|float, optional): Regularization factor of angle.
-        edge_swap (bool, optional): Whether swap the edge if w < h.
+        norm_factor (float, optional): Regularization factor of angle.
+        edge_swap (bool): Whether swap the edge if w < h.
             Defaults to False.
-        proj_xy (bool, optional): Whether project x and y according to angle.
+        proj_xy (bool): Whether project x and y according to angle.
             Defaults to False.
         add_ctr_clamp (bool): Whether to add center clamp, when added, the
             predicted box is clamped is its center is too far away from
@@ -36,14 +39,14 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
     encode_size = 5
 
     def __init__(self,
-                 target_means=(0., 0., 0., 0., 0.),
-                 target_stds=(1., 1., 1., 1., 1.),
-                 angle_version='oc',
-                 norm_factor=None,
-                 edge_swap=False,
-                 proj_xy=False,
-                 add_ctr_clamp=False,
-                 ctr_clamp=32):
+                 target_means: Sequence[float] = (0., 0., 0., 0., 0.),
+                 target_stds: Sequence[float] = (1., 1., 1., 1., 1.),
+                 angle_version: str = 'oc',
+                 norm_factor: Optional[float] = None,
+                 edge_swap: bool = False,
+                 proj_xy: bool = False,
+                 add_ctr_clamp: bool = False,
+                 ctr_clamp: int = 32) -> None:
         super().__init__()
         self.means = target_means
         self.stds = target_stds
@@ -54,7 +57,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         self.edge_swap = edge_swap
         self.proj_xy = proj_xy
 
-    def encode(self, bboxes, gt_bboxes):
+    def encode(self, bboxes: RotatedBoxes, gt_bboxes: RotatedBoxes) -> Tensor:
         """Get box regression transformation deltas that can be used to
         transform the ``bboxes`` into the ``gt_bboxes``.
 
@@ -64,7 +67,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
                 e.g., ground-truth boxes.
 
         Returns:
-            torch.Tensor: Box transformation deltas
+            Tensor: Box transformation deltas
         """
         assert bboxes.size(0) == gt_bboxes.size(0)
         assert bboxes.size(-1) == 5
@@ -77,16 +80,16 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
             raise NotImplementedError
 
     def decode(self,
-               bboxes,
-               pred_bboxes,
-               max_shape=None,
-               wh_ratio_clip=16 / 1000):
+               bboxes: RotatedBoxes,
+               pred_bboxes: Tensor,
+               max_shape: Optional[Sequence[int]] = None,
+               wh_ratio_clip: float = 16 / 1000) -> RotatedBoxes:
         """Apply transformation `pred_bboxes` to `boxes`.
 
         Args:
             bboxes (:obj:`RotatedBoxes`): Basic boxes. Shape (B, N, 5) or \
                 (N, 5)
-            pred_bboxes (torch.Tensor): Encoded offsets with respect to each \
+            pred_bboxes (Tensor): Encoded offsets with respect to each \
                 roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or \
                (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H \
                when rois is a grid of anchors.
@@ -111,14 +114,14 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
             raise NotImplementedError
 
 
-def bbox2delta(proposals,
-               gt,
-               means=(0., 0., 0., 0., 0.),
-               stds=(1., 1., 1., 1., 1.),
-               angle_version='oc',
-               norm_factor=None,
-               edge_swap=False,
-               proj_xy=False):
+def bbox2delta(proposals: RotatedBoxes,
+               gts: RotatedBoxes,
+               means: Sequence[float] = (0., 0., 0., 0., 0.),
+               stds: Sequence[float] = (1., 1., 1., 1., 1.),
+               angle_version: str = 'oc',
+               norm_factor: Optional[float] = None,
+               edge_swap: bool = False,
+               proj_xy: bool = False) -> Tensor:
     """We usually compute the deltas of cx, cy, w, h, t of proposals w.r.t ground
     truth bboxes to get regression target. This is the inverse function of
     :func:`delta2bbox`.
@@ -126,40 +129,40 @@ def bbox2delta(proposals,
     Args:
         proposals (:obj:`RotatedBoxes`): Boxes to be transformed,
             shape (N, ..., 5)
-        gt (:obj:`RotatedBoxes`): Gt bboxes to be used as base,
+        gts (:obj:`RotatedBoxes`): Gt bboxes to be used as base,
             shape (N, ..., 5)
         means (Sequence[float]): Denormalizing means for delta coordinates
         stds (Sequence[float]): Denormalizing standard deviation for delta
             coordinates.
-        angle_version (str, optional): Angle representations. Defaults to 'oc'.
-        norm_factor (None|float, optional): Regularization factor of angle.
-        edge_swap (bool, optional): Whether swap the edge if w < h.
+        angle_version (str): Angle representations. Defaults to 'oc'.
+        norm_factor (float, optional): Regularization factor of angle.
+        edge_swap (bool): Whether swap the edge if w < h.
             Defaults to False.
-        proj_xy (bool, optional): Whether project x and y according to angle.
+        proj_xy (bool): Whether project x and y according to angle.
             Defaults to False.
 
     Returns:
         Tensor: deltas with shape (N, 5), where columns represent dx, dy,
             dw, dh, dt.
     """
-    assert proposals.size() == gt.size()
+    assert proposals.size() == gts.size()
     proposals = proposals.tensor
-    gt = gt.regularize_boxes(angle_version)
+    gts = gts.regularize_boxes(angle_version)
     proposals = proposals.float()
-    gt = gt.float()
-    px, py, pw, ph, pa = proposals.unbind(dim=-1)
-    gx, gy, gw, gh, ga = gt.unbind(dim=-1)
+    gts = gts.float()
+    px, py, pw, ph, pt = proposals.unbind(dim=-1)
+    gx, gy, gw, gh, gt = gts.unbind(dim=-1)
 
     if proj_xy:
-        dx = (torch.cos(pa) * (gx - px) + torch.sin(pa) * (gy - py)) / pw
-        dy = (-torch.sin(pa) * (gx - px) + torch.cos(pa) * (gy - py)) / ph
+        dx = (torch.cos(pt) * (gx - px) + torch.sin(pt) * (gy - py)) / pw
+        dy = (-torch.sin(pt) * (gx - px) + torch.cos(pt) * (gy - py)) / ph
     else:
         dx = (gx - px) / pw
         dy = (gy - py) / ph
 
     if edge_swap:
-        dtheta1 = norm_angle(ga - pa, angle_version)
-        dtheta2 = norm_angle(ga - pa + np.pi / 2, angle_version)
+        dtheta1 = norm_angle(gt - pt, angle_version)
+        dtheta2 = norm_angle(gt - pt + np.pi / 2, angle_version)
         abs_dtheta1 = torch.abs(dtheta1)
         abs_dtheta2 = torch.abs(dtheta2)
         gw_regular = torch.where(abs_dtheta1 < abs_dtheta2, gw, gh)
@@ -168,7 +171,7 @@ def bbox2delta(proposals,
         dw = torch.log(gw_regular / pw)
         dh = torch.log(gh_regular / ph)
     else:
-        dt = norm_angle(ga - pa, angle_version)
+        dt = norm_angle(gt - pt, angle_version)
         dw = torch.log(gw / pw)
         dh = torch.log(gh / ph)
 
@@ -182,18 +185,18 @@ def bbox2delta(proposals,
     return deltas
 
 
-def delta2bbox(rois,
-               deltas,
-               means=(0., 0., 0., 0., 0.),
-               stds=(1., 1., 1., 1., 1.),
-               max_shape=None,
-               wh_ratio_clip=16 / 1000,
-               add_ctr_clamp=False,
-               ctr_clamp=32,
-               angle_version='oc',
-               norm_factor=None,
-               edge_swap=False,
-               proj_xy=False):
+def delta2bbox(rois: RotatedBoxes,
+               deltas: Tensor,
+               means: Sequence[float] = (0., 0., 0., 0., 0.),
+               stds: Sequence[float] = (1., 1., 1., 1., 1.),
+               max_shape: Optional[Sequence[int]] = None,
+               wh_ratio_clip: float = 16 / 1000,
+               add_ctr_clamp: bool = False,
+               ctr_clamp: int = 32,
+               angle_version: str = 'oc',
+               norm_factor: Optional[float] = None,
+               edge_swap: bool = False,
+               proj_xy: bool = False) -> RotatedBoxes:
     """Apply deltas to shift/scale base boxes. Typically the rois are anchor
     or proposed bounding boxes and the deltas are network outputs used to
     shift/scale those boxes. This is the inverse function of
@@ -201,7 +204,7 @@ def delta2bbox(rois,
 
     Args:
         rois (:obj:`RotatedBoxes`): Boxes to be transformed. Has shape (N, 5).
-        deltas (torch.Tensor): Encoded offsets relative to each roi.
+        deltas (Tensor): Encoded offsets relative to each roi.
             Has shape (N, num_classes * 5) or (N, 5). Note
             N = num_base_anchors * W * H, when rois is a grid of
             anchors.
@@ -221,11 +224,11 @@ def delta2bbox(rois,
             the original anchor's center. Only used by YOLOF. Default False.
         ctr_clamp (int): the maximum pixel shift to clamp. Only used by
             YOLOF. Default 32.
-        angle_version (str, optional): Angle representations. Defaults to 'oc'.
-        norm_factor (None|float, optional): Regularization factor of angle.
-        edge_swap (bool, optional): Whether swap the edge if w < h.
+        angle_version (str): Angle representations. Defaults to 'oc'.
+        norm_factor (float, optional): Regularization factor of angle.
+        edge_swap (bool): Whether swap the edge if w < h.
             Defaults to False.
-        proj_xy (bool, optional): Whether project x and y according to angle.
+        proj_xy (bool): Whether project x and y according to angle.
             Defaults to False.
 
     Returns:
@@ -258,7 +261,7 @@ def delta2bbox(rois,
     pw = rois[..., None, 2]
     ph = rois[..., None, 3]
     # Compute rotated angle of each roi
-    pa = rois[..., None, 4]
+    pt = rois[..., None, 4]
     dx_width = pw * dx
     dy_height = ph * dy
     max_ratio = np.abs(np.log(wh_ratio_clip))
@@ -275,13 +278,13 @@ def delta2bbox(rois,
     gh = ph * dh.exp()
     # Use network energy to shift the center of each roi
     if proj_xy:
-        gx = dx * pw * torch.cos(pa) - dy * ph * torch.sin(pa) + px
-        gy = dx * pw * torch.sin(pa) + dy * ph * torch.cos(pa) + py
+        gx = dx * pw * torch.cos(pt) - dy * ph * torch.sin(pt) + px
+        gy = dx * pw * torch.sin(pt) + dy * ph * torch.cos(pt) + py
     else:
         gx = px + dx_width
         gy = py + dy_height
     # Compute angle
-    ga = norm_angle(pa + dt, angle_version)
+    gt = norm_angle(pt + dt, angle_version)
     if max_shape is not None:
         gx = gx.clamp(min=0, max=max_shape[1] - 1)
         gy = gy.clamp(min=0, max=max_shape[0] - 1)
@@ -289,12 +292,12 @@ def delta2bbox(rois,
     if edge_swap:
         w_regular = torch.where(gw > gh, gw, gh)
         h_regular = torch.where(gw > gh, gh, gw)
-        theta_regular = torch.where(gw > gh, ga, ga + np.pi / 2)
+        theta_regular = torch.where(gw > gh, gt, gt + np.pi / 2)
         theta_regular = norm_angle(theta_regular, angle_version)
         decoded_bbox = torch.stack(
             [gx, gy, w_regular, h_regular, theta_regular],
             dim=-1).view_as(deltas)
     else:
-        decoded_bbox = torch.stack([gx, gy, gw, gh, ga],
+        decoded_bbox = torch.stack([gx, gy, gw, gh, gt],
                                    dim=-1).view(deltas.size())
     return RotatedBoxes(decoded_bbox)

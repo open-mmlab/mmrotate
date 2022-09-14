@@ -1,7 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from mmdet.models.task_modules.coders import DeltaXYWHBBoxCoder
 from mmdet.models.task_modules.coders.delta_xywh_bbox_coder import bbox2delta
-from mmdet.structures.bbox import BaseBoxes
+from mmdet.structures.bbox import HorizontalBoxes
+from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import TASK_UTILS
@@ -11,30 +12,29 @@ from mmrotate.registry import TASK_UTILS
 class DeltaXYWHHBBoxCoder(DeltaXYWHBBoxCoder):
     """Delta XYWH HBBox coder.
 
-    Following the practice in `R-CNN <https://arxiv.org/abs/1311.2524>`_, this
-    coder encodes bbox (x1, y1, x2, y2) into delta (dx, dy, dw, dh) and decodes
-    delta (dx, dy, dw, dh) back to original bbox (x1, y1, x2, y2).
+    This coder is almost the same as `DeltaXYWHBBoxCoder`. Besides the
+    gt_bboxes of encode is :obj:`RotatedBoxes`.
     """
 
-    def encode(self, bboxes, gt_bboxes):
+    def encode(self, bboxes: HorizontalBoxes,
+               gt_bboxes: RotatedBoxes) -> Tensor:
         """Get box regression transformation deltas that can be used to
         transform the ``bboxes`` into the ``gt_bboxes``.
 
         Args:
-            bboxes (:obj:`BaseBoxes` or Tensor): Source boxes, e.g.,
+            bboxes (:obj:`HorizontalBoxes`): Source boxes, e.g.,
                 object proposals.
-            gt_bboxes (:obj:`RotatedBoxes` or Tensor): Target of the
+            gt_bboxes (:obj:`RotatedBoxes`): Target of the
                 transformation, e.g., ground-truth boxes.
         Returns:
-            torch.Tensor: Box transformation deltas
+            Tensor: Box transformation deltas
         """
 
         assert bboxes.size(0) == gt_bboxes.size(0)
         assert bboxes.size(-1) == 4
         assert gt_bboxes.size(-1) == 5
 
-        if isinstance(bboxes, BaseBoxes):
-            bboxes = bboxes.tensor
+        bboxes = bboxes.tensor
 
         if not isinstance(gt_bboxes, RotatedBoxes):
             gt_bboxes = RotatedBoxes(gt_bboxes)
