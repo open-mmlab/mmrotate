@@ -10,6 +10,26 @@ from mmrotate.core.bbox.structures import RotatedBoxes
 
 class TestDeltaBboxCoder(TestCase):
 
+    def test_encode(self):
+        coder = DeltaXYWHTRBBoxCoder()
+
+        proposals = torch.Tensor([[0., 0., 1., 1., 0.], [0., 0., 1., 1., 0.1],
+                                  [0., 0., 1., 1., 0.1], [5., 5., 5., 5.,
+                                                          0.3]])
+        gt = torch.Tensor([[0.0000, 0.0000, 1.0000, 1.0000, 0.0000],
+                           [1.0000, 1.0000, 2.7183, 2.7183, 0.1000],
+                           [0.0000, 0.0000, 7.3891, 0.3679, 1.1000],
+                           [8.5000, 0.0000, 3.0327, 6.7493, 1.3000]])
+
+        expected_encode_bboxes = torch.Tensor(
+            [[0.0000, 0.0000, 0.0000, 0.0000, -1.5708],
+             [1.0000, 1.0000, 1.0000, 1.0000, -1.5708],
+             [0.0000, 0.0000, -0.9999, 2.0000, -0.5708],
+             [0.7000, -1.0000, 0.3000, -0.5000, -0.5708]])
+
+        out = coder.encode(RotatedBoxes(proposals), RotatedBoxes(gt))
+        assert_allclose(expected_encode_bboxes, out)
+
     def test_decode(self):
         coder = DeltaXYWHTRBBoxCoder()
 
