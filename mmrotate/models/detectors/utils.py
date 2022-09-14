@@ -191,7 +191,7 @@ class FeatureRefineModule(nn.Module):
                 best rbboxes of multiple scales of multiple images
         """
         mlvl_rbboxes = [
-            torch.cat(best_rbbox) for best_rbbox in zip(*best_rbboxes)
+            torch.cat(best_rbbox.tensor) for best_rbbox in zip(*best_rbboxes)
         ]
         out = []
         for x_scale, best_rbboxes_scale, fr_scale in zip(

@@ -234,8 +234,8 @@ def delta2bbox(rois,
     num_bboxes = deltas.size(0)
     if num_bboxes == 0:
         return RotatedBoxes(deltas)
-
-    rois = rois.tensor
+    if isinstance(rois, RotatedBoxes):
+        rois = rois.tensor
     means = deltas.new_tensor(means).view(1, -1)
     stds = deltas.new_tensor(stds).view(1, -1)
     delta_shape = deltas.shape

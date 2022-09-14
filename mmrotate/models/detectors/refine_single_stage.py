@@ -1,26 +1,44 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import List, Tuple, Union
 
+from mmdet.models.detectors.base import BaseDetector
+from mmdet.models.utils import unpack_gt_instances
+from mmdet.structures import OptSampleList, SampleList
+from mmdet.utils import ConfigType, OptConfigType, OptMultiConfig
+from mmengine.model import ModuleList
 from torch import Tensor
 
 from mmrotate.registry import MODELS
-from mmdet.structures import OptSampleList, SampleList
-from mmdet.utils import ConfigType, OptConfigType, OptMultiConfig
-from mmdet.models.detectors.single_stage import SingleStageDetector
-from mmdet.models.utils import unpack_gt_instances
+
 
 @MODELS.register_module()
-class RefineSingleStageDetector(SingleStageDetector):
+class RefineSingleStageDetector(BaseDetector):
     """Base class for refine single-stage detectors, which used by `S2A-Net`
     and `R3Det`.
 
+    Args:
+        backbone (:obj:`ConfigDict` or dict): The backbone module.
+        neck (:obj:`ConfigDict` or dict): The neck module.
+        bbox_head_init (:obj:`ConfigDict` or dict): The bbox head module of
+            the first stage.
+        bbox_head_refine (list[:obj:`ConfigDict` | dict]): The bbox head
+            module of the refine stage.
+        train_cfg (:obj:`ConfigDict` or dict, optional): The training config
+            of ATSS. Defaults to None.
+        test_cfg (:obj:`ConfigDict` or dict, optional): The testing config
+            of ATSS. Defaults to None.
+        data_preprocessor (:obj:`ConfigDict` or dict, optional): Config of
+            :class:`DetDataPreprocessor` to process the input data.
+            Defaults to None.
+        init_cfg (dict or list[dict], optional): Initialization config dict.
+            Defaults to None
     """
 
     def __init__(self,
                  backbone: ConfigType,
                  neck: OptConfigType = None,
                  bbox_head_init: OptConfigType = None,
-                 bbox_head_refine: OptConfigType = None,
+                 bbox_head_refine: List[OptConfigType] = None,
                  train_cfg: OptConfigType = None,
                  test_cfg: OptConfigType = None,
                  data_preprocessor: OptConfigType = None,
@@ -30,12 +48,15 @@ class RefineSingleStageDetector(SingleStageDetector):
         self.backbone = MODELS.build(backbone)
         if neck is not None:
             self.neck = MODELS.build(neck)
-        bbox_head_init.update(train_cfg=train_cfg)
+        bbox_head_init.update(train_cfg=train_cfg['init'])
         bbox_head_init.update(test_cfg=test_cfg)
-        bbox_head_refine.update(train_cfg=train_cfg)
-        bbox_head_refine.update(test_cfg=test_cfg)
         self.bbox_head_init = MODELS.build(bbox_head_init)
-        self.bbox_head_refine = MODELS.build(bbox_head_refine)
+        self.num_refine_stages = len(bbox_head_refine)
+        self.bbox_head_refine = ModuleList()
+        for i, refine_head in enumerate(bbox_head_refine):
+            refine_head.update(train_cfg=train_cfg['refine'][i])
+            refine_head.update(test_cfg=test_cfg)
+            self.bbox_head_refine.append(MODELS.build(refine_head))
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
 
@@ -64,20 +85,21 @@ class RefineSingleStageDetector(SingleStageDetector):
         loss_inputs = outs + (batch_gt_instances, batch_img_metas,
                               batch_gt_instances_ignore)
         init_losses = self.bbox_head_init.loss_by_feat(*loss_inputs)
- 
         for name, value in init_losses.items():
             losses[f'init_{name}'] = value
-        rois = self.bbox_head_refine[i].filter_bboxes(*outs)
+
+        rois = self.bbox_head_init.filter_bboxes(*outs)
         for i in range(self.num_refine_stages):
             lw = self.train_cfg.stage_loss_weights[i]
             x_refine = self.bbox_head_refine[i](x, rois)
             outs = self.bbox_head_refine[i](x_refine)
             loss_inputs = outs + (batch_gt_instances, batch_img_metas,
-                                batch_gt_instances_ignore)
-            refine_losses = self.bbox_head_refine[i].loss(*loss_inputs, rois=rois)
+                                  batch_gt_instances_ignore)
+            refine_losses = self.bbox_head_refine[i].loss(
+                *loss_inputs, rois=rois)
             for name, value in refine_losses.items():
                 losses[f'refine{i}_{name}'] = ([v * lw for v in value]
-                                           if 'loss' in name else value)
+                                               if 'loss' in name else value)
             if i + 1 in range(self.num_refine_stages):
                 rois = self.bbox_head_refine[i].refine_bboxes(*outs, rois=rois)
 
@@ -113,9 +135,9 @@ class RefineSingleStageDetector(SingleStageDetector):
         """
         x = self.extract_feat(batch_inputs)
         outs = self.bbox_head_init(x)
-        rois = self.bbox_head_refine[0].filter_bboxes(*outs)
+        rois = self.bbox_head_init.filter_bboxes(*outs)
         for i in range(self.num_refine_stages):
-            x_refine = self.bbox_head_refine[i](x, rois)
+            x_refine = self.bbox_head_refine[i].feature_refine(x, rois)
             outs = self.bbox_head_refine[i](x_refine)
             if i + 1 in range(self.num_refine_stages):
                 rois = self.bbox_head_refine[i].refine_bboxes(*outs, rois)
@@ -123,8 +145,8 @@ class RefineSingleStageDetector(SingleStageDetector):
         batch_img_metas = [
             data_samples.metainfo for data_samples in batch_data_samples
         ]
-        predictions = self.predict_by_feat(
-            *outs, rois, batch_img_metas=batch_img_metas, rescale=rescale)
+        predictions = self.bbox_head_refine[-1].predict_by_feat(
+            *outs, rois=rois, batch_img_metas=batch_img_metas, rescale=rescale)
 
         batch_data_samples = self.add_pred_to_datasample(
             batch_data_samples, predictions)
@@ -145,12 +167,26 @@ class RefineSingleStageDetector(SingleStageDetector):
         """
         x = self.extract_feat(batch_inputs)
         outs = self.bbox_head_init(x)
-        rois = self.bbox_head_refine[0].filter_bboxes(*outs)
+        rois = self.bbox_head_init.filter_bboxes(*outs)
         for i in range(self.num_refine_stages):
-            x_refine = self.bbox_head_refine[i](x, rois)
+            x_refine = self.bbox_head_refine[i].feature_refine(x, rois)
             outs = self.bbox_head_refine[i](x_refine)
             if i + 1 in range(self.num_refine_stages):
                 rois = self.bbox_head_refine[i].refine_bboxes(*outs, rois)
-                
+
         return outs
 
+    def extract_feat(self, batch_inputs: Tensor) -> Tuple[Tensor]:
+        """Extract features.
+
+        Args:
+            batch_inputs (Tensor): Image tensor with shape (N, C, H ,W).
+
+        Returns:
+            tuple[Tensor]: Multi-level features that may have
+            different resolutions.
+        """
+        x = self.backbone(batch_inputs)
+        if self.with_neck:
+            x = self.neck(x)
+        return x
