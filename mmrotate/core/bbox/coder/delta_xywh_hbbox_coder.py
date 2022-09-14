@@ -10,6 +10,7 @@ from mmrotate.registry import TASK_UTILS
 @TASK_UTILS.register_module()
 class DeltaXYWHHBBoxCoder(DeltaXYWHBBoxCoder):
     """Delta XYWH HBBox coder.
+
     Following the practice in `R-CNN <https://arxiv.org/abs/1311.2524>`_, this
     coder encodes bbox (x1, y1, x2, y2) into delta (dx, dy, dw, dh) and decodes
     delta (dx, dy, dw, dh) back to original bbox (x1, y1, x2, y2).
@@ -18,6 +19,7 @@ class DeltaXYWHHBBoxCoder(DeltaXYWHBBoxCoder):
     def encode(self, bboxes, gt_bboxes):
         """Get box regression transformation deltas that can be used to
         transform the ``bboxes`` into the ``gt_bboxes``.
+
         Args:
             bboxes (:obj:`BaseBoxes` or Tensor): Source boxes, e.g.,
                 object proposals.
