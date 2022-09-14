@@ -3,9 +3,9 @@ import unittest
 from unittest import TestCase
 
 import torch
+from mmdet.structures import DetDataSample
 from parameterized import parameterized
 
-from mmdet.structures import DetDataSample
 from mmrotate.testing import demo_mm_inputs, get_detector_cfg
 from mmrotate.utils import register_all_modules
 
@@ -55,7 +55,8 @@ class TestTwoStageBBox(TestCase):
             return unittest.skip('test requires GPU and torch+cuda')
         detector = detector.cuda()
 
-        packed_inputs = demo_mm_inputs(2, [[3, 128, 128], [3, 125, 130]], use_box_type=True)
+        packed_inputs = demo_mm_inputs(
+            2, [[3, 128, 128], [3, 125, 130]], use_box_type=True)
 
         data = detector.data_preprocessor(packed_inputs, True)
         # Test loss mode
@@ -79,7 +80,8 @@ class TestTwoStageBBox(TestCase):
             return unittest.skip('test requires GPU and torch+cuda')
         detector = detector.cuda()
 
-        packed_inputs = demo_mm_inputs(2, [[3, 128, 128], [3, 125, 130]], use_box_type=True)
+        packed_inputs = demo_mm_inputs(
+            2, [[3, 128, 128], [3, 125, 130]], use_box_type=True)
         data = detector.data_preprocessor(packed_inputs, False)
         # Test forward test
         detector.eval()
