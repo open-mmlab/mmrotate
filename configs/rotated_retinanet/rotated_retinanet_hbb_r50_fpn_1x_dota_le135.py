@@ -10,15 +10,7 @@ train_pipeline = [
         file_client_args={{_base_.file_client_args}}),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
-<<<<<<< HEAD
-<<<<<<< HEAD
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
-=======
-    dict(type='mmdet.Resize', scale=(1024, 2014), keep_ratio=True),
->>>>>>> 0289589 (update configs & RBboxOverlaps2D & FakeRBboxOverlaps2D)
-=======
-    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
->>>>>>> bc74907 (fix size typo)
     dict(type='mmdet.RandomFlip', prob=0.5),
     dict(type='mmdet.PackDetInputs')
 ]

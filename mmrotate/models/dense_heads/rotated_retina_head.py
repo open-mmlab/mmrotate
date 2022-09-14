@@ -1,36 +1,17 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-<<<<<<< HEAD
-<<<<<<< HEAD
 from mmdet.models.dense_heads import AnchorHead
 
 from mmrotate.registry import MODELS
 
 
 @MODELS.register_module()
-=======
-from mmcv.runner import force_fp32
-=======
->>>>>>> 825c3c6 (Update for mmcv-2.x & mmdet-3.x)
-from mmdet.models.dense_heads import AnchorHead
-
-from mmrotate.registry import MODELS
-
-
-<<<<<<< HEAD
-@ROTATED_HEADS.register_module()
->>>>>>> 61dcdf7 (init)
-=======
-@MODELS.register_module()
->>>>>>> 825c3c6 (Update for mmcv-2.x & mmdet-3.x)
 class RotatedRetinaHead(AnchorHead):
     r"""An anchor-based head used in `RotatedRetinaNet
     <https://arxiv.org/pdf/1708.02002.pdf>`_.
-
     The head contains two subnetworks. The first classifies anchor boxes and
     the second regresses deltas for the anchors.
-
     Args:
         num_classes (int): Number of categories excluding the background
             category.
@@ -112,13 +93,10 @@ class RotatedRetinaHead(AnchorHead):
 
     def forward_single(self, x):
         """Forward feature of a single scale level.
-
         Args:
             x (torch.Tensor): Features of a single scale level.
-
         Returns:
             tuple (torch.Tensor):
-
                 - cls_score (torch.Tensor): Cls scores for a single scale \
                     level the channels number is num_anchors * num_classes.
                 - bbox_pred (torch.Tensor): Box energies / deltas for a \
@@ -139,13 +117,11 @@ class RotatedRetinaHead(AnchorHead):
         maps. Only one bounding boxes with highest score will be left at each
         position. This filter will be used in R3Det prior to the first feature
         refinement stage.
-
         Args:
             cls_scores (list[Tensor]): Box scores for each scale level
                 Has shape (N, num_anchors * num_classes, H, W)
             bbox_preds (list[Tensor]): Box energies / deltas for each scale
                 level with shape (N, num_anchors * 5, H, W)
-
         Returns:
             list[list[Tensor]]: best or refined rbboxes of each level \
                 of each image.
@@ -205,7 +181,6 @@ class RotatedRetinaHead(AnchorHead):
                 Has shape (N, num_classes, H, W)
             bbox_preds (list[Tensor]): Box energies / deltas for each scale
                 level with shape (N, 5, H, W)
-
         Returns:
             list[list[Tensor]]: refined rbboxes of each level of each image.
         """

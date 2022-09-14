@@ -16,11 +16,7 @@ from mmengine.fileio import dump
 from mmengine.logging import MMLogger
 
 from mmrotate.core import eval_rbbox_map
-<<<<<<< HEAD
 from mmrotate.core.bbox.structures import rbox2qbox
-=======
-from mmrotate.core.bbox.structures import RotatedBoxes
->>>>>>> 1427fa6 (fix coder & dota metric)
 from mmrotate.registry import METRICS
 
 
@@ -28,11 +24,10 @@ from mmrotate.registry import METRICS
 class DOTAMetric(BaseMetric):
     """DOTA evaluation metric.
 
-    Note:  In addition to format the output resulvts to JSON like CocoMetric,
+    Note:  In addition to format the output results to JSON like CocoMetric,
     it can also generate the full image's results by merging patches' results.
     The premise is that you must use the tool provided by us to crop the DOTA
     large images, which can be found at: ``tools/data/dota/split``.
-
     Args:
         iou_thrs (float or List[float]): IoU threshold. Defaults to 0.5.
         scale_ranges (List[tuple], optional): Scale ranges for evaluating
@@ -112,7 +107,6 @@ class DOTAMetric(BaseMetric):
 
         You can submit it at:
         https://captain-whu.github.io/DOTA/evaluation.html
-
         Args:
             results (Sequence[dict]): Testing results of the
                 dataset.
@@ -121,6 +115,7 @@ class DOTAMetric(BaseMetric):
                 "somepath/xxx/xxx.zip".
         """
         collector = defaultdict(list)
+        id_list, dets_list = [], []
         for idx, result in enumerate(results):
             img_id = result.get('img_id', idx)
             splitname = img_id.split('__')
@@ -138,9 +133,10 @@ class DOTAMetric(BaseMetric):
             label_dets = np.concatenate(
                 [labels[:, np.newaxis], ori_bboxes, scores[:, np.newaxis]],
                 axis=1)
+
+            id_list.append(oriname)
             collector[oriname].append(label_dets)
 
-        id_list, dets_list = [], []
         for oriname, label_dets_list in collector.items():
             big_img_results = []
             label_dets = np.concatenate(label_dets_list, axis=0)
@@ -157,7 +153,6 @@ class DOTAMetric(BaseMetric):
                                                       cls_dets[:, -1],
                                                       self.iou_thr)
                     big_img_results.append(nms_dets.cpu().numpy())
-            id_list.append(oriname)
             dets_list.append(big_img_results)
 
         if osp.exists(outfile_prefix):
@@ -177,23 +172,9 @@ class DOTAMetric(BaseMetric):
                     continue
                 th_dets = torch.from_numpy(dets)
                 rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
-<<<<<<< HEAD
                 qboxes = rbox2qbox(rboxes)
                 for qbox, score in zip(qboxes, scores):
                     txt_element = [img_id, str(round(float(score), 2))
-=======
-                qboxes = RotatedBoxes(rboxes).convert_to('qbox').tensor
-                for qbox, score in zip(qboxes, scores):
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    txt_element = [img_id, str(score)
->>>>>>> 1427fa6 (fix coder & dota metric)
-=======
-                    txt_element = [img_id, str(float(score))
->>>>>>> e8486b9 (fix bug)
-=======
-                    txt_element = [img_id, str(round(float(score), 2))
->>>>>>> 825c3c6 (Update for mmcv-2.x & mmdet-3.x)
                                    ] + [f'{p:.2f}' for p in qbox]
                     f.writelines(' '.join(txt_element) + '\n')
 
@@ -215,7 +196,6 @@ class DOTAMetric(BaseMetric):
         There are 3 types of results: proposals, bbox predictions, mask
         predictions, and they have different data types. This method will
         automatically recognize the type, and dump them to json files.
-
         Args:
             results (Sequence[dict]): Testing results of the
                 dataset.
@@ -223,7 +203,6 @@ class DOTAMetric(BaseMetric):
                 prefix is "somepath/xxx", the json files will be named
                 "somepath/xxx.bbox.json", "somepath/xxx.segm.json",
                 "somepath/xxx.proposal.json".
-
         Returns:
             dict: Possible keys are "bbox", "segm", "proposal", and
             values are corresponding filenames.
@@ -251,10 +230,11 @@ class DOTAMetric(BaseMetric):
 
     def process(self, data_batch: Sequence[dict],
                 data_samples: Sequence[dict]) -> None:
-        """Process one batch of data samples and predictions. The processed
+        """Process one batch of data samples and predictions.
+
+        The processed
         results should be stored in ``self.results``, which will be used to
         compute the metrics when all batches have been processed.
-
         Args:
             data_batch (dict): A batch of data from the dataloader.
             data_samples (Sequence[dict]): A batch of data samples that

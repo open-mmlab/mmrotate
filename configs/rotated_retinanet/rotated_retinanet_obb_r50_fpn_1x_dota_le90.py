@@ -5,30 +5,14 @@ _base_ = [
 angle_version = 'le90'
 
 model = dict(
-<<<<<<< HEAD
-<<<<<<< HEAD
     type='mmdet.RetinaNet',
-=======
-    type='RotatedRetinaNet',
->>>>>>> 61dcdf7 (init)
-=======
-    type='mmdet.RetinaNet',
->>>>>>> bc74907 (fix size typo)
     data_preprocessor=dict(
         type='mmdet.DetDataPreprocessor',
         mean=[123.675, 116.28, 103.53],
         std=[58.395, 57.12, 57.375],
         bgr_to_rgb=True,
         pad_size_divisor=32,
-<<<<<<< HEAD
-<<<<<<< HEAD
         boxlist2tensor=False),
-=======
-        with_box_wrapped=True),
->>>>>>> 61dcdf7 (init)
-=======
-        boxlist2tensor=False),
->>>>>>> 825c3c6 (Update for mmcv-2.x & mmdet-3.x)
     backbone=dict(
         type='mmdet.ResNet',
         depth=50,

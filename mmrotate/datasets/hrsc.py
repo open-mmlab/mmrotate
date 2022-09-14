@@ -6,16 +6,9 @@ from typing import List, Optional, Union
 import mmcv
 import numpy as np
 from mmengine.dataset import BaseDataset
-<<<<<<< HEAD
 from mmengine.fileio import list_from_file
 
 from mmrotate.core import obb2poly_np
-=======
-from mmengine.logging import print_log
-from PIL import Image
-
-from mmrotate.core import eval_rbbox_map, obb2poly_np, poly2obb_np
->>>>>>> 825c3c6 (Update for mmcv-2.x & mmdet-3.x)
 from mmrotate.registry import DATASETS
 
 
@@ -27,7 +20,6 @@ class HRSCDataset(BaseDataset):
     chosen through ``classwise``. When ``classwise=False``, it means there
     is only one class; When ``classwise=True``, it means there are 31
     classes of ships.
-
     Args:
         img_subdir (str): Subdir where images are stored.
             Defaults to 'AllImages'.
@@ -122,7 +114,6 @@ class HRSCDataset(BaseDataset):
         Args:
             img_info (dict): Raw image information, usually it includes
                 `img_id`, `file_name`, and `xml_path`.
-
         Returns:
             Union[dict, List[dict]]: Parsed annotation.
         """
@@ -224,7 +215,6 @@ class HRSCDataset(BaseDataset):
 
         Args:
             idx (int): Index of data.
-
         Returns:
             List[int]: All categories in the image of specified index.
         """
