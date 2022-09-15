@@ -12,6 +12,7 @@ from mmrotate.structures.bbox import norm_angle
 @TASK_UTILS.register_module()
 class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
     """Delta XYWHT HBBox coder.
+
     this coder encodes bbox (x1, y1, x2, y2) into delta (dx, dy, dw, dh, dt)
     and decodes delta (dx, dy, dw, dh, dt) back to original bbox
     (cx, cy, w, h, t).
@@ -57,6 +58,7 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
     def encode(self, bboxes, gt_bboxes):
         """Get box regression transformation deltas that can be used to
         transform the ``bboxes`` into the ``gt_bboxes``.
+
         Args:
             bboxes (:obj:`BaseBoxes`): Source boxes, e.g., object proposals.
             gt_bboxes (:obj:`RotatedBoxes`): Target of the transformation,
@@ -119,7 +121,9 @@ def bbox2delta(proposals,
                norm_factor=None,
                edge_swap=False):
     """We usually compute the deltas of x, y, w, h, a of proposals w.r.t ground
-    truth bboxes to get regression target. This is the inverse function of
+    truth bboxes to get regression target.
+
+    This is the inverse function of
     :func:`delta2bbox`.
     Args:
         proposals (torch.Tensor): Boxes to be transformed, shape (N, ..., 4)
