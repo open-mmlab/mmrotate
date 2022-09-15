@@ -1,7 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import unittest
+
 import torch
 from parameterized import parameterized
+
 from mmrotate.models.losses import GDLoss, GDLoss_v1
 
 
@@ -16,17 +18,12 @@ class TestGDLoss(unittest.TestCase):
             # only reduction_override from [None, 'none', 'mean', 'sum']
             # is not allowed
             reduction_override = True
-            GDLoss('gwd')(pred, target, weight, reduction_override=reduction_override)
+            GDLoss('gwd')(
+                pred, target, weight, reduction_override=reduction_override)
 
-
-    @parameterized.expand([
-        ('gwd', (0, 5)),
-        ('gwd', (10, 5)),
-        ('kld', (10, 5)),
-        ('jd', (10, 5)),
-        ('kld_symmax', (10, 5)),
-        ('kld_symmin', (10, 5))
-    ])
+    @parameterized.expand([('gwd', (0, 5)), ('gwd', (10, 5)), ('kld', (10, 5)),
+                           ('jd', (10, 5)), ('kld_symmax', (10, 5)),
+                           ('kld_symmin', (10, 5))])
     def test_regression_losses(self, loss_type, input_shape):
         pred = torch.rand(input_shape)
         target = torch.rand(input_shape)
@@ -53,12 +50,18 @@ class TestGDLoss(unittest.TestCase):
             # reduction is None, 'none' or 'mean'.
             reduction_override = 'sum'
             GDLoss(loss_type)(
-                pred, target, avg_factor=10, reduction_override=reduction_override)
+                pred,
+                target,
+                avg_factor=10,
+                reduction_override=reduction_override)
 
         # Test loss forward with avg_factor and reduction
         for reduction_override in [None, 'none', 'mean']:
             GDLoss(loss_type)(
-                pred, target, avg_factor=10, reduction_override=reduction_override)
+                pred,
+                target,
+                avg_factor=10,
+                reduction_override=reduction_override)
             self.assertIsInstance(loss, torch.Tensor)
 
 
@@ -73,15 +76,11 @@ class TestGDLoss_v1(unittest.TestCase):
             # only reduction_override from [None, 'none', 'mean', 'sum']
             # is not allowed
             reduction_override = True
-            GDLoss_v1('gwd')(pred, target, weight, reduction_override=reduction_override)
+            GDLoss_v1('gwd')(
+                pred, target, weight, reduction_override=reduction_override)
 
-
-    @parameterized.expand([
-        ('gwd', (0, 5)),
-        ('gwd', (10, 5)),
-        ('kld', (10, 5)),
-        ('bcd', (10, 5))
-    ])
+    @parameterized.expand([('gwd', (0, 5)), ('gwd', (10, 5)), ('kld', (10, 5)),
+                           ('bcd', (10, 5))])
     def test_regression_losses(self, loss_type, input_shape):
         pred = torch.rand(input_shape)
         target = torch.rand(input_shape)
