@@ -54,7 +54,7 @@ class TestSingleStageDetector(TestCase):
                     return unittest.skip('test requires GPU and torch+cuda')
                 detector = detector.cuda()
             packed_inputs = demo_mm_inputs(
-                2, [[3, 128, 128], [3, 125, 130]], with_boxlist=True)
+                2, [[3, 128, 128], [3, 125, 130]], use_box_type=True)
             data = detector.data_preprocessor(packed_inputs, True)
             losses = detector.forward(**data, mode='loss')
             self.assertIsInstance(losses, dict)
@@ -78,7 +78,8 @@ class TestSingleStageDetector(TestCase):
                     return unittest.skip('test requires GPU and torch+cuda')
                 detector = detector.cuda()
 
-            packed_inputs = demo_mm_inputs(2, [[3, 128, 128], [3, 125, 130]])
+            packed_inputs = demo_mm_inputs(
+                2, [[3, 128, 128], [3, 125, 130]], use_box_type=True)
             data = detector.data_preprocessor(packed_inputs, False)
             # Test forward test
             detector.eval()
@@ -106,7 +107,8 @@ class TestSingleStageDetector(TestCase):
                     return unittest.skip('test requires GPU and torch+cuda')
                 detector = detector.cuda()
 
-            packed_inputs = demo_mm_inputs(2, [[3, 128, 128], [3, 125, 130]])
+            packed_inputs = demo_mm_inputs(
+                2, [[3, 128, 128], [3, 125, 130]], use_box_type=True)
             data = detector.data_preprocessor(packed_inputs, False)
             batch_results = detector.forward(**data, mode='tensor')
             self.assertIsInstance(batch_results, tuple)

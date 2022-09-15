@@ -2,9 +2,9 @@
 from typing import List, Tuple
 
 import torch
-from mmcv.utils import to_2tuple
 from mmdet.models.task_modules import AnchorGenerator
 from mmdet.structures.bbox import HorizontalBoxes
+from mmengine.utils import to_2tuple
 from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
