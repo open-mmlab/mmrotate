@@ -146,7 +146,7 @@ def bbox2delta(proposals: HorizontalBoxes,
             Defaults to False.
     Returns:
         Tensor: deltas with shape (N, 5), where columns represent dx, dy,
-            dw, dh, dt.
+        dw, dh, dt.
     """
     proposals = proposals.tensor
     proposals = proposals.float()
@@ -231,7 +231,7 @@ def delta2bbox(rois: HorizontalBoxes,
 
     Returns:
         :obj:`RotatedBoxes`: Boxes with shape (N, num_classes * 5) or (N, 5),
-            where 5 represent cx, cy, w, h, t.
+        where 5 represent cx, cy, w, h, t.
     """
     num_bboxes = deltas.size(0)
     if num_bboxes == 0:

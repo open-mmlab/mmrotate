@@ -143,7 +143,7 @@ def bbox2delta(proposals: RotatedBoxes,
 
     Returns:
         Tensor: deltas with shape (N, 5), where columns represent dx, dy,
-            dw, dh, dt.
+        dw, dh, dt.
     """
     assert proposals.size() == gts.size()
     proposals = proposals.tensor
@@ -233,7 +233,7 @@ def delta2bbox(rois: RotatedBoxes,
 
     Returns:
         :obj:`RotatedBoxes`: Boxes with shape (N, num_classes * 5) or (N, 5),
-            where 5 represent cx, cy, w, h, a.
+        where 5 represent cx, cy, w, h, a.
     """
     num_bboxes = deltas.size(0)
     if num_bboxes == 0:
