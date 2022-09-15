@@ -6,7 +6,7 @@ from mmdet.structures.bbox import BaseBoxes
 
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import TASK_UTILS
-from mmrotate.structures.bbox import norm_angle
+from ..transforms import norm_angle
 
 
 @TASK_UTILS.register_module()
