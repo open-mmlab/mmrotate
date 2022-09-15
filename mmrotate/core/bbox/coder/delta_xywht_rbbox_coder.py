@@ -251,7 +251,7 @@ def delta2bbox(rois: Tensor,
     """
     num_bboxes = deltas.size(0)
     if num_bboxes == 0:
-        return RotatedBoxes(deltas)
+        return deltas
 
     means = deltas.new_tensor(means).view(1, -1)
     stds = deltas.new_tensor(stds).view(1, -1)
