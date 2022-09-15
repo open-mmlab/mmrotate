@@ -1,9 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
+from mmdet.structures.bbox import get_box_tensor
 from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
@@ -80,25 +81,26 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
             raise NotImplementedError
 
     def decode(self,
-               bboxes: RotatedBoxes,
+               bboxes: Union[RotatedBoxes, Tensor],
                pred_bboxes: Tensor,
                max_shape: Optional[Sequence[int]] = None,
                wh_ratio_clip: float = 16 / 1000) -> RotatedBoxes:
         """Apply transformation `pred_bboxes` to `boxes`.
 
         Args:
-            bboxes (:obj:`RotatedBoxes`): Basic boxes. Shape (B, N, 5) or \
-                (N, 5)
-            pred_bboxes (Tensor): Encoded offsets with respect to each \
-                roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or \
-               (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H \
-               when rois is a grid of anchors.
-            max_shape (Sequence[int] or torch.Tensor or Sequence[ \
-               Sequence[int]],optional): Maximum bounds for boxes, specifies \
-               (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then \
-               the max_shape should be a Sequence[Sequence[int]] \
-               and the length of max_shape should also be B.
-            wh_ratio_clip (float, optional): The allowed ratio between
+            bboxes (:obj:`RotatedBoxes` or Tensor): Basic boxes.
+                Shape (B, N, 4) or (N, 4). In two stage detectors and refine
+                single stage detectors, the bboxes can be Tensor.
+            pred_bboxes (Tensor): Encoded offsets with respect to each
+                roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or
+                (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H
+                when rois is a grid of anchors.
+            max_shape (Sequence[int] or Tensor or Sequence[
+                Sequence[int]], optional): Maximum bounds for boxes, specifies
+                (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then
+                the max_shape should be a Sequence[Sequence[int]]
+                and the length of max_shape should also be B.
+            wh_ratio_clip (float): The allowed ratio between
                 width and height.
 
         Returns:
@@ -106,6 +108,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         """
         assert pred_bboxes.size(0) == bboxes.size(0)
         if self.angle_version in ['oc', 'le135', 'le90']:
+            bboxes = get_box_tensor(bboxes)
             return delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
                               max_shape, wh_ratio_clip, self.add_ctr_clamp,
                               self.ctr_clamp, self.angle_version,
@@ -185,7 +188,7 @@ def bbox2delta(proposals: RotatedBoxes,
     return deltas
 
 
-def delta2bbox(rois: RotatedBoxes,
+def delta2bbox(rois: Tensor,
                deltas: Tensor,
                means: Sequence[float] = (0., 0., 0., 0., 0.),
                stds: Sequence[float] = (1., 1., 1., 1., 1.),
@@ -203,7 +206,7 @@ def delta2bbox(rois: RotatedBoxes,
     :func:`bbox2delta`.
 
     Args:
-        rois (:obj:`RotatedBoxes`): Boxes to be transformed. Has shape (N, 5).
+        rois (Tensor): Boxes to be transformed. Has shape (N, 5).
         deltas (Tensor): Encoded offsets relative to each roi.
             Has shape (N, num_classes * 5) or (N, 5). Note
             N = num_base_anchors * W * H, when rois is a grid of
@@ -239,7 +242,6 @@ def delta2bbox(rois: RotatedBoxes,
     if num_bboxes == 0:
         return RotatedBoxes(deltas)
 
-    rois = rois.tensor
     means = deltas.new_tensor(means).view(1, -1)
     stds = deltas.new_tensor(stds).view(1, -1)
     delta_shape = deltas.shape
