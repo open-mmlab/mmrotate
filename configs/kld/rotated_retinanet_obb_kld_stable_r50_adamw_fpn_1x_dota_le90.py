@@ -1,4 +1,4 @@
-_base_ = ['./rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90.py']
+_base_ = './rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90.py'
 
 optimizer = dict(
     _delete_=True,
