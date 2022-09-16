@@ -93,7 +93,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
 
         Args:
             bboxes (:obj:`RotatedBoxes` or Tensor): Basic boxes.
-                Shape (B, N, 4) or (N, 4). In two stage detectors and refine
+                Shape (B, N, 5) or (N, 5). In two stage detectors and refine
                 single stage detectors, the bboxes can be Tensor.
             pred_bboxes (Tensor): Encoded offsets with respect to each
                 roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or
