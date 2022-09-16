@@ -14,11 +14,10 @@ from ..transforms import norm_angle
 
 @TASK_UTILS.register_module()
 class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
-    """Delta XYWHT HBBox coder.
-
-    This coder encodes bbox (x1, y1, x2, y2) into
+    """Delta XYWHT HBBox coder. This coder encodes bbox (x1, y1, x2, y2) into
     delta (dx, dy, dw, dh, dt) and decodes delta (dx, dy, dw, dh, dt) back to
     original bbox (cx, cy, w, h, t).
+
     Args:
         target_means (Sequence[float]): Denormalizing means of target for
             delta coordinates.
@@ -71,6 +70,7 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
                 e.g.,object proposals.
             gt_bboxes (:obj:`RotatedBoxes`): Target of the transformation,
                 e.g., ground-truth boxes.
+
         Returns:
             Tensor: Box transformation deltas
         """
@@ -91,6 +91,7 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
             max_shape: Optional[Sequence[int]] = None,
             wh_ratio_clip: float = 16 / 1000) -> Union[RotatedBoxes, Tensor]:
         """Apply transformation `pred_bboxes` to `boxes`.
+
         Args:
             bboxes (:obj:`HorizontalBoxes` or Tensor): Basic boxes.
                 Shape (B, N, 4) or (N, 4). In two stage detectors and refine
@@ -106,6 +107,7 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
                 and the length of max_shape should also be B.
             wh_ratio_clip (float): The allowed ratio between
                 width and height.
+
         Returns:
             Union[:obj:`RotatedBoxes`, Tensor]: Decoded boxes.
         """
@@ -139,6 +141,7 @@ def bbox2delta(proposals: HorizontalBoxes,
     truth bboxes to get regression target.
 
     This is the inverse function of :func:`delta2bbox`.
+
     Args:
         proposals (:obj:`HorizontalBoxes`): Boxes to be transformed,
             shape (N, ..., 4)
@@ -211,6 +214,7 @@ def delta2bbox(rois: Tensor,
     or proposed bounding boxes and the deltas are network outputs used to
     shift/scale those boxes. This is the inverse function of
     :func:`bbox2delta`.
+
     Args:
         rois (Tensor): Boxes to be transformed.
             Has shape (N, 4).
@@ -234,6 +238,7 @@ def delta2bbox(rois: Tensor,
         norm_factor (float, optional): Regularization factor of angle.
         edge_swap (bool): Whether swap the edge if w < h.
             Defaults to False.
+
     Returns:
         Tensor: Boxes with shape (N, num_classes * 5) or (N, 5),
         where 5 represent cx, cy, w, h, t.
