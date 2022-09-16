@@ -1,15 +1,17 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Tuple, Union, Optional
+from typing import List, Optional, Tuple, Union
 
 import torch
-from torch import Tensor
-from mmrotate.registry import MODELS
 from mmdet.models.dense_heads.retina_head import RetinaHead
-from mmrotate.models.detectors.utils import FeatureRefineModule
+from mmdet.models.utils import select_single_mlvl
 from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
-from mmdet.models.utils import select_single_mlvl
+from torch import Tensor
+
 from mmrotate.core.bbox.structures import RotatedBoxes
+from mmrotate.models.detectors.utils import FeatureRefineModule
+from mmrotate.registry import MODELS
+
 
 @MODELS.register_module()
 class R3Head(RetinaHead):
@@ -74,9 +76,9 @@ class R3Head(RetinaHead):
                 best_pred_i = best_pred[img_id]
                 best_anchor_i = anchors.gather(
                     dim=-2, index=best_ind_i).squeeze(dim=-2)
-                best_bbox_i = self.bbox_coder.decode(RotatedBoxes(best_anchor_i),
-                                                     best_pred_i)
-                bboxes_list[img_id].append(best_bbox_i.tensor.detach())
+                best_bbox_i = self.bbox_coder.decode(
+                    RotatedBoxes(best_anchor_i), best_pred_i)
+                bboxes_list[img_id].append(best_bbox_i.detach())
 
         return bboxes_list
 
@@ -93,26 +95,18 @@ class R3RefineHead(RetinaHead):
         frm_cfg (dict): Config of the feature refine module.
     """  # noqa: W605
 
-    def __init__(self,
-                 num_classes,
-                 in_channels,
-                 frm_cfg=None,
-                 **kwargs):
-        super().__init__(
-            num_classes,
-            in_channels,
-            **kwargs)
+    def __init__(self, num_classes, in_channels, frm_cfg=None, **kwargs):
+        super().__init__(num_classes, in_channels, **kwargs)
         self.feat_refine_module = FeatureRefineModule(**frm_cfg)
         self.bboxes_as_anchors = None
 
-    def loss_by_feat(
-            self,
-            cls_scores: List[Tensor],
-            bbox_preds: List[Tensor],
-            batch_gt_instances: InstanceList,
-            batch_img_metas: List[dict],
-            batch_gt_instances_ignore: OptInstanceList = None,
-            rois: List[Tensor] = None) -> dict:
+    def loss_by_feat(self,
+                     cls_scores: List[Tensor],
+                     bbox_preds: List[Tensor],
+                     batch_gt_instances: InstanceList,
+                     batch_img_metas: List[dict],
+                     batch_gt_instances_ignore: OptInstanceList = None,
+                     rois: List[Tensor] = None) -> dict:
         """Calculate the loss based on the features extracted by the detection
         head.
 
@@ -165,7 +159,8 @@ class R3RefineHead(RetinaHead):
                   image.
         """
         anchor_list = [[
-            RotatedBoxes(bboxes_img_lvl).detach() for bboxes_img_lvl in bboxes_img
+            RotatedBoxes(bboxes_img_lvl).detach()
+            for bboxes_img_lvl in bboxes_img
         ] for bboxes_img in self.bboxes_as_anchors]
 
         # for each image, we compute valid flags of multi level anchors
@@ -176,7 +171,6 @@ class R3RefineHead(RetinaHead):
             valid_flag_list.append(multi_level_flags)
 
         return anchor_list, valid_flag_list
-
 
     def predict_by_feat(self,
                         cls_scores: List[Tensor],
@@ -204,7 +198,7 @@ class R3RefineHead(RetinaHead):
             score_factors (list[Tensor], optional): Score factor for
                 all scale level, each is a 4D-tensor, has shape
                 (batch_size, num_priors * 1, H, W). Defaults to None.
-            rois (list[Tensor]): 
+            rois (list[Tensor]):
             batch_img_metas (list[dict], Optional): Batch image meta info.
                 Defaults to None.
             cfg (ConfigDict, optional): Test / postprocessing
@@ -270,7 +264,7 @@ class R3RefineHead(RetinaHead):
 
         Args:
             x (Tensor): Features.
-            roi (Tensor): 
+            roi (Tensor):
 
         Returns:
             tuple:
