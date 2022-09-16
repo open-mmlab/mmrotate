@@ -32,8 +32,7 @@ class TestRefineSingleStageDetector(TestCase):
         self.assertTrue(detector.bbox_head_refine)
 
     @parameterized.expand([
-        ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py',
-         ('cpu', 'cuda')),
+        ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py', ('cpu', 'cuda')),
     ])
     def test_refine_single_stage_forward_loss_mode(self, cfg_file, devices):
         message_hub = MessageHub.get_instance(
@@ -61,8 +60,7 @@ class TestRefineSingleStageDetector(TestCase):
             self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
-        ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py',
-         ('cpu', 'cuda')),
+        ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py', ('cpu', 'cuda')),
     ])
     def test_refine_single_stage_forward_predict_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
@@ -90,8 +88,7 @@ class TestRefineSingleStageDetector(TestCase):
                 self.assertIsInstance(batch_results[0], DetDataSample)
 
     @parameterized.expand([
-        ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py',
-         ('cpu', 'cuda')),
+        ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py', ('cpu', 'cuda')),
     ])
     def test_refine_single_stage_forward_tensor_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
