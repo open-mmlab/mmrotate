@@ -1,10 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
-from mmdet.structures.bbox import HorizontalBoxes
+from mmdet.structures.bbox import HorizontalBoxes, get_box_tensor
 from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
@@ -14,10 +14,11 @@ from ..transforms import norm_angle
 
 @TASK_UTILS.register_module()
 class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
-    """Delta XYWHT HBBox coder. This coder encodes bbox (x1, y1, x2, y2) into
+    """Delta XYWHT HBBox coder.
+
+    This coder encodes bbox (x1, y1, x2, y2) into
     delta (dx, dy, dw, dh, dt) and decodes delta (dx, dy, dw, dh, dt) back to
     original bbox (cx, cy, w, h, t).
-
     Args:
         target_means (Sequence[float]): Denormalizing means of target for
             delta coordinates.
@@ -35,6 +36,8 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
             Defaults to False.
         ctr_clamp (int): the maximum pixel shift to clamp. Only used by
             YOLOF. Defaults to 32.
+        use_box_type (bool): Whether to warp decoded boxes with the
+            box type data structure. Defaults to True.
     """
     encode_size = 5
 
@@ -46,8 +49,9 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
                  edge_swap: bool = False,
                  clip_border: bool = True,
                  add_ctr_clamp: bool = False,
-                 ctr_clamp: int = 32) -> None:
-        super().__init__()
+                 ctr_clamp: int = 32,
+                 use_box_type=True) -> None:
+        super().__init__(use_box_type=use_box_type)
         self.means = target_means
         self.stds = target_stds
         self.angle_version = angle_version
@@ -67,7 +71,6 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
                 e.g.,object proposals.
             gt_bboxes (:obj:`RotatedBoxes`): Target of the transformation,
                 e.g., ground-truth boxes.
-
         Returns:
             Tensor: Box transformation deltas
         """
@@ -81,16 +84,17 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
         else:
             raise NotImplementedError
 
-    def decode(self,
-               bboxes: HorizontalBoxes,
-               pred_bboxes: Tensor,
-               max_shape: Optional[Sequence[int]] = None,
-               wh_ratio_clip: float = 16 / 1000) -> RotatedBoxes:
+    def decode(
+            self,
+            bboxes: Union[HorizontalBoxes, Tensor],
+            pred_bboxes: Tensor,
+            max_shape: Optional[Sequence[int]] = None,
+            wh_ratio_clip: float = 16 / 1000) -> Union[RotatedBoxes, Tensor]:
         """Apply transformation `pred_bboxes` to `boxes`.
-
         Args:
-            bboxes (:obj:`HorizontalBoxes`): Basic boxes.
-                Shape (B, N, 4) or (N, 4)
+            bboxes (:obj:`HorizontalBoxes` or Tensor): Basic boxes.
+                Shape (B, N, 4) or (N, 4). In two stage detectors and refine
+                single stage detectors, the bboxes can be Tensor.
             pred_bboxes (Tensor): Encoded offsets with respect to each
                 roi. Has shape (B, N, num_classes * 5) or (B, N, 5) or
                 (N, num_classes * 5) or (N, 5). Note N = num_anchors * W * H
@@ -102,22 +106,26 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
                 and the length of max_shape should also be B.
             wh_ratio_clip (float): The allowed ratio between
                 width and height.
-
         Returns:
-            :obj:`RotatedBoxes`: Decoded boxes.
+            Union[:obj:`RotatedBoxes`, Tensor]: Decoded boxes.
         """
         assert pred_bboxes.size(0) == bboxes.size(0)
         if pred_bboxes.ndim == 3:
             assert pred_bboxes.size(1) == bboxes.size(1)
         assert bboxes.size(-1) == 4
         assert pred_bboxes.size(-1) == 5
-        if self.angle_version in ['oc', 'le135', 'le90']:
-            return delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
-                              wh_ratio_clip, self.add_ctr_clamp,
-                              self.ctr_clamp, self.angle_version,
-                              self.norm_factor, self.edge_swap)
-        else:
-            raise NotImplementedError
+        assert self.angle_version in ['oc', 'le135', 'le90']
+        bboxes = get_box_tensor(bboxes)
+        decoded_bboxes = delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
+                                    wh_ratio_clip, self.add_ctr_clamp,
+                                    self.ctr_clamp, self.angle_version,
+                                    self.norm_factor, self.edge_swap)
+        if self.use_box_type:
+            assert decoded_bboxes.size(-1) == 5, \
+                ('Cannot warp decoded boxes with box type when decoded'
+                 'boxes have shape of (N, num_classes * 5)')
+            decoded_bboxes = RotatedBoxes(decoded_bboxes)
+        return decoded_bboxes
 
 
 def bbox2delta(proposals: HorizontalBoxes,
@@ -131,7 +139,6 @@ def bbox2delta(proposals: HorizontalBoxes,
     truth bboxes to get regression target.
 
     This is the inverse function of :func:`delta2bbox`.
-
     Args:
         proposals (:obj:`HorizontalBoxes`): Boxes to be transformed,
             shape (N, ..., 4)
@@ -146,7 +153,7 @@ def bbox2delta(proposals: HorizontalBoxes,
             Defaults to False.
     Returns:
         Tensor: deltas with shape (N, 5), where columns represent dx, dy,
-            dw, dh, dt.
+        dw, dh, dt.
     """
     proposals = proposals.tensor
     proposals = proposals.float()
@@ -190,7 +197,7 @@ def bbox2delta(proposals: HorizontalBoxes,
     return deltas
 
 
-def delta2bbox(rois: HorizontalBoxes,
+def delta2bbox(rois: Tensor,
                deltas: Tensor,
                means: Sequence[float] = (0., 0., 0., 0., 0.),
                stds: Sequence[float] = (1., 1., 1., 1., 1.),
@@ -199,14 +206,13 @@ def delta2bbox(rois: HorizontalBoxes,
                ctr_clamp: int = 32,
                angle_version: str = 'oc',
                norm_factor: Optional[float] = None,
-               edge_swap: bool = False) -> RotatedBoxes:
+               edge_swap: bool = False) -> Tensor:
     """Apply deltas to shift/scale base boxes. Typically the rois are anchor
     or proposed bounding boxes and the deltas are network outputs used to
     shift/scale those boxes. This is the inverse function of
     :func:`bbox2delta`.
-
     Args:
-        rois (:obj:`HorizontalBoxes`): Boxes to be transformed.
+        rois (Tensor): Boxes to be transformed.
             Has shape (N, 4).
         deltas (Tensor): Encoded offsets relative to each roi.
             Has shape (N, num_classes * 5) or (N, 5). Note
@@ -228,16 +234,14 @@ def delta2bbox(rois: HorizontalBoxes,
         norm_factor (float, optional): Regularization factor of angle.
         edge_swap (bool): Whether swap the edge if w < h.
             Defaults to False.
-
     Returns:
-        :obj:`RotatedBoxes`: Boxes with shape (N, num_classes * 5) or (N, 5),
-            where 5 represent cx, cy, w, h, t.
+        Tensor: Boxes with shape (N, num_classes * 5) or (N, 5),
+        where 5 represent cx, cy, w, h, t.
     """
     num_bboxes = deltas.size(0)
     if num_bboxes == 0:
-        return RotatedBoxes(deltas)
+        return deltas
 
-    rois = rois.tensor
     means = deltas.new_tensor(means).view(1, -1)
     stds = deltas.new_tensor(stds).view(1, -1)
     delta_shape = deltas.shape
@@ -291,4 +295,4 @@ def delta2bbox(rois: HorizontalBoxes,
         decoded_bbox = torch.stack([gx, gy, gw, gh, gt],
                                    dim=-1).view_as(deltas)
 
-    return RotatedBoxes(decoded_bbox)
+    return decoded_bbox
