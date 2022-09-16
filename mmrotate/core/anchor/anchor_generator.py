@@ -4,8 +4,8 @@ from typing import List, Tuple
 import torch
 from mmdet.models.task_modules import AnchorGenerator
 from mmdet.structures.bbox import HorizontalBoxes
-from mmengine.utils import to_2tuple
 from torch import Tensor
+from torch.nn.modules.utils import _pair
 
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import TASK_UTILS
@@ -65,19 +65,20 @@ class PseudoRotatedAnchorGenerator(AnchorGenerator):
     flags only!"""
 
     def __init__(self, strides: List[int]) -> None:
-        self.strides = [to_2tuple(stride) for stride in strides]
+        self.strides = [_pair(stride) for stride in strides]
+        # self.base_sizes = [min(stride) for stride in self.strides]
 
     @property
-    def num_base_anchors(self) -> None:
-        """list[int]: total number of base anchors in a feature grid"""
+    def num_base_priors(self) -> None:
+        """list[int]: total number of base priors in a feature grid"""
         return [1 for _ in self.strides]
 
-    def single_level_grid_anchors(self,
-                                  base_anchors: Tensor,
-                                  featmap_size: Tuple[int],
-                                  stride: Tuple[int],
-                                  device: str = 'cuda') -> None:
-        """Calling its grid_anchors() method will raise NotImplementedError!"""
+    def single_level_grid_priors(self,
+                                 base_anchors: Tensor,
+                                 featmap_size: Tuple[int],
+                                 stride: Tuple[int],
+                                 device: str = 'cuda') -> None:
+        """Calling its grid_priors() method will raise NotImplementedError!"""
         raise NotImplementedError
 
     def __repr__(self) -> str:
