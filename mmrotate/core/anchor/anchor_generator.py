@@ -66,23 +66,8 @@ class PseudoRotatedAnchorGenerator(AnchorGenerator):
 
     def __init__(self, strides: List[int]) -> None:
         self.strides = [_pair(stride) for stride in strides]
-        # self.base_sizes = [min(stride) for stride in self.strides]
 
     @property
     def num_base_priors(self) -> None:
         """list[int]: total number of base priors in a feature grid"""
         return [1 for _ in self.strides]
-
-    def single_level_grid_priors(self,
-                                 base_anchors: Tensor,
-                                 featmap_size: Tuple[int],
-                                 stride: Tuple[int],
-                                 device: str = 'cuda') -> None:
-        """Calling its grid_priors() method will raise NotImplementedError!"""
-        raise NotImplementedError
-
-    def __repr__(self) -> str:
-        indent_str = '    '
-        repr_str = self.__class__.__name__ + '(\n'
-        repr_str += f'{indent_str}strides={self.strides})'
-        return repr_str

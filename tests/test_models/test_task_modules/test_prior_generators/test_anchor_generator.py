@@ -52,3 +52,19 @@ class TestFakeRotatedAnchorGenerator(TestCase):
              [10.0000, 10.0000, 10.0000, 10.0000, -1.5708]])
 
         assert_allclose(anchors.tensor, expected_anchors)
+
+
+class TestPseudoRotatedAnchorGenerator(TestCase):
+
+    def setUp(self):
+        register_all_modules()
+
+    def test_standard_anchor_generator(self):
+        anchor_generator_cfg = dict(
+            type='PseudoRotatedAnchorGenerator', strides=[8, 16, 32, 64, 128])
+
+        anchor_generator = TASK_UTILS.build(anchor_generator_cfg)
+        self.assertEqual(anchor_generator.num_base_priors,
+                         anchor_generator.num_base_anchors)
+        self.assertEqual(anchor_generator.num_base_priors, [1, 1, 1, 1, 1])
+        self.assertIsNotNone(anchor_generator)
