@@ -5,7 +5,7 @@ import torch
 from mmdet.models.losses.utils import weighted_loss
 from torch import nn
 
-from ..builder import ROTATED_LOSSES
+from mmrotate.registry import MODELS
 
 
 def xy_wh_r_2_xy_sigma(xywhr):
@@ -309,7 +309,7 @@ def kld_symmin_loss(pred, target, fun='log1p', tau=1.0, alpha=1.0, sqrt=True):
     return postprocess(kld_symmin, fun=fun, tau=tau)
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class GDLoss(nn.Module):
     """Gaussian based loss.
 

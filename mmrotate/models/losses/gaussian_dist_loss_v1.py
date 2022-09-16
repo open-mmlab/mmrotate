@@ -4,7 +4,7 @@ from copy import deepcopy
 import torch
 from torch import nn
 
-from ..builder import ROTATED_LOSSES
+from mmrotate.registry import MODELS
 
 
 def xy_wh_r_2_xy_sigma(xywhr):
@@ -151,7 +151,7 @@ def kld_loss(pred, target, fun='log1p', tau=1.0):
     return kl_loss
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class GDLoss_v1(nn.Module):
     """Gaussian based loss.
 
@@ -220,9 +220,11 @@ class GDLoss_v1(nn.Module):
         _kwargs = deepcopy(self.kwargs)
         _kwargs.update(kwargs)
 
-        mask = (weight > 0).detach()
-        pred = pred[mask]
-        target = target[mask]
+        if weight is not None:
+            mask = (weight > 0).detach()
+            pred = pred[mask]
+            target = target[mask]
+
         pred = self.preprocess(pred)
         target = self.preprocess(target)
 
