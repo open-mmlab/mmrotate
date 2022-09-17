@@ -68,7 +68,7 @@ model = dict(
             stacked_convs=2,
             feat_channels=256,
             frm_cfg=dict(
-                in_channels=256, featmap_strides=[8, 16, 32, 64, 128]),
+                type='FRM', feat_channels=256, strides=[8, 16, 32, 64, 128]),
             anchor_generator=dict(
                 type='PseudoRotatedAnchorGenerator',
                 strides=[8, 16, 32, 64, 128]),
