@@ -1,8 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import List
+
 import torch
 import torch.nn as nn
 from mmcv.ops import DeformConv2d, rotated_feature_align
+from mmdet.utils import OptConfigType
 from mmengine.model import normal_init
+from torch import Tensor
 
 
 class AlignConv(nn.Module):
@@ -138,26 +142,26 @@ class FeatureRefineModule(nn.Module):
 
     Args:
         in_channels (int): Number of input channels.
-        featmap_strides (list): The strides of featmap.
-        conv_cfg (dict, optional): Config dict for convolution layer.
-            Default: None.
-        norm_cfg (dict, optional): Config dict for normalization layer.
-            Default: None.
+        featmap_strides (list[int]): The strides of featmap.
+        conv_cfg (:obj:`ConfigDict` or dict, optional): Config dict for
+            convolution layer. Defaults to None.
+        norm_cfg (:obj:`ConfigDict` or dict, optional): Config dict for
+            normalization layer. Defaults to None.
     """
 
     def __init__(self,
-                 in_channels,
-                 featmap_strides,
-                 conv_cfg=None,
-                 norm_cfg=None):
-        super(FeatureRefineModule, self).__init__()
+                 in_channels: int,
+                 featmap_strides: List[int],
+                 conv_cfg: OptConfigType = None,
+                 norm_cfg: OptConfigType = None) -> None:
+        super().__init__()
         self.in_channels = in_channels
         self.featmap_strides = featmap_strides
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
         self._init_layers()
 
-    def _init_layers(self):
+    def _init_layers(self) -> None:
         """Initialize layers of feature refine module."""
         self.conv_5_1 = nn.Conv2d(
             in_channels=self.in_channels,
@@ -176,19 +180,23 @@ class FeatureRefineModule(nn.Module):
             out_channels=self.in_channels,
             kernel_size=1)
 
-    def init_weights(self):
+    def init_weights(self) -> None:
         """Initialize weights of feature refine module."""
         normal_init(self.conv_5_1, std=0.01)
         normal_init(self.conv_1_5, std=0.01)
         normal_init(self.conv_1_1, std=0.01)
 
-    def forward(self, x, best_rbboxes):
-        """
+    def forward(self, x: List[Tensor],
+                best_rbboxes: List[List[Tensor]]) -> List[Tensor]:
+        """Forward function.
+
         Args:
-            x (list[Tensor]):
-                feature maps of multiple scales
-            best_rbboxes (list[list[Tensor]]):
-                best rbboxes of multiple scales of multiple images
+            x (list[Tensor]): feature maps of multiple scales
+            best_rbboxes (list[list[Tensor]]): best rbboxes of multiple
+                scales of multiple images
+
+        Returns:
+            list[Tensor]: refined feature maps of multiple scales.
         """
         mlvl_rbboxes = [
             torch.cat(best_rbbox) for best_rbbox in zip(*best_rbboxes)

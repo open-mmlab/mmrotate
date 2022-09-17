@@ -33,8 +33,8 @@ class R3Head(RetinaHead):
                 level with shape (N, num_anchors * 5, H, W)
 
         Returns:
-            list[list[Tensor]]: best or refined rbboxes of each level \
-                of each image.
+            list[list[Tensor]]: best or refined rbboxes of each level
+            of each image.
         """
         num_levels = len(cls_scores)
         assert num_levels == len(bbox_preds)
@@ -96,8 +96,13 @@ class R3RefineHead(RetinaHead):
         frm_cfg (dict): Config of the feature refine module.
     """  # noqa: W605
 
-    def __init__(self, num_classes, in_channels, frm_cfg=None, **kwargs):
-        super().__init__(num_classes, in_channels, **kwargs)
+    def __init__(self,
+                 num_classes: int,
+                 in_channels: int,
+                 frm_cfg: dict = None,
+                 **kwargs) -> None:
+        super().__init__(
+            num_classes=num_classes, in_channels=in_channels, **kwargs)
         self.feat_refine_module = FeatureRefineModule(**frm_cfg)
         self.bboxes_as_anchors = None
 
@@ -260,20 +265,23 @@ class R3RefineHead(RetinaHead):
             result_list.append(results)
         return result_list
 
-    def feature_refine(self, x, roi):
+    def feature_refine(self, x: List[Tensor],
+                       rois: List[List[Tensor]]) -> List[Tensor]:
         """Refine the input feature use feature refine module.
 
         Args:
-            x (list[Tensor]): features of each image.
-            rois (list[list[Tensor]]): input rbboxes of each level of each
-                image. rois output by former stages and are to be refined
+            x (list[Tensor]): feature maps of multiple scales.
+            rois (list[list[Tensor]]): input rbboxes of multiple
+                scales of multiple images, output by former stages
+                and are to be refined.
 
         Returns:
-            list[Tensor]: refined features of each image.
+            list[Tensor]: refined feature maps of multiple scales.
         """
-        return self.feat_refine_module(x, roi)
+        return self.feat_refine_module(x, rois)
 
-    def refine_bboxes(self, cls_scores, bbox_preds, rois):
+    def refine_bboxes(self, cls_scores: List[Tensor], bbox_preds: List[Tensor],
+                      rois: List[List[Tensor]]) -> List[List[Tensor]]:
         """Refine predicted bounding boxes at each position of the feature
         maps. This method will be used in R3Det in refinement stages.
 
@@ -286,8 +294,8 @@ class R3RefineHead(RetinaHead):
                 image. rois output by former stages and are to be refined
 
         Returns:
-            list[list[Tensor]]: best or refined rbboxes of each level of each \
-                image.
+            list[list[Tensor]]: best or refined rbboxes of each level of each
+            image.
         """
         num_levels = len(cls_scores)
         assert num_levels == len(bbox_preds)

@@ -77,7 +77,6 @@ class RefineSingleStageDetector(BaseDetector):
         x = self.extract_feat(batch_inputs)
 
         losses = dict()
-
         outs = self.bbox_head_init(x)
         outputs = unpack_gt_instances(batch_data_samples)
         (batch_gt_instances, batch_gt_instances_ignore,
