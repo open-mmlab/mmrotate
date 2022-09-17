@@ -6,16 +6,16 @@ from mmengine import Config
 from mmengine.structures import InstanceData
 
 from mmrotate.core.bbox.structures import RotatedBoxes
-from mmrotate.models.dense_heads import R3Head, R3RefineHead
+from mmrotate.models.dense_heads import S2AHead, S2ARefineHead
 from mmrotate.utils import register_all_modules
 
 
-class TestR3Head(TestCase):
+class TestS2AHead(TestCase):
 
     def setUp(self):
         register_all_modules()
 
-    def test_r3_head_loss(self):
+    def test_s2a_head_loss(self):
         """Tests anchor head loss when truth is empty and non-empty."""
         s = 256
         img_metas = [{
@@ -23,16 +23,15 @@ class TestR3Head(TestCase):
             'pad_shape': (s, s, 3),
             'scale_factor': 1,
         }]
-        init_head = R3Head(
+        init_head = S2AHead(
             num_classes=4,
             in_channels=1,
             stacked_convs=1,
             anchor_generator=dict(
                 type='FakeRotatedAnchorGenerator',
                 angle_version='oc',
-                octave_base_scale=4,
-                scales_per_octave=3,
-                ratios=[1.0, 0.5, 2.0],
+                scales=[4],
+                ratios=[1.0],
                 strides=[8, 16, 32, 64, 128]),
             bbox_coder=dict(
                 type='DeltaXYWHTRBBoxCoder',
@@ -70,12 +69,15 @@ class TestR3Head(TestCase):
                 allowed_border=0,
                 pos_weight=-1,
                 debug=False))
-        refine_head = R3RefineHead(
+        refine_head = S2ARefineHead(
             num_classes=4,
             in_channels=1,
             stacked_convs=1,
             frm_cfg=dict(
-                type='FRM', feat_channels=256, strides=[8, 16, 32, 64, 128]),
+                type='AlignConv',
+                feat_channels=256,
+                kernel_size=3,
+                strides=[8, 16, 32, 64, 128]),
             anchor_generator=dict(
                 type='PseudoRotatedAnchorGenerator',
                 strides=[8, 16, 32, 64, 128]),
@@ -102,7 +104,7 @@ class TestR3Head(TestCase):
             torch.rand(1, 1, s // (2**(i + 2)), s // (2**(i + 2)))
             for i in range(len(init_head.prior_generator.strides)))
 
-        # test filter_bboxes of R3Head
+        # test filter_bboxes of S2AHead
         cls_scores, bbox_preds = init_head(feats)
         init_rois = init_head.filter_bboxes(cls_scores, bbox_preds)
         self.assertEqual(len(init_rois), 1)
@@ -113,9 +115,9 @@ class TestR3Head(TestCase):
         self.assertEqual(init_rois[0][3].shape, (64, 5))
         self.assertEqual(init_rois[0][4].shape, (16, 5))
 
-        # test loss_by_feat of R3RefineHead
+        # test loss_by_feat of S2ARefineHead
         feats = (
-            torch.rand(1, 1, s // (2**(i + 2)), s // (2**(i + 2)))
+            torch.rand(1, 256, s // (2**(i + 2)), s // (2**(i + 2)))
             for i in range(len(refine_head.prior_generator.strides)))
         cls_scores, bbox_preds = refine_head.forward(feats)
 

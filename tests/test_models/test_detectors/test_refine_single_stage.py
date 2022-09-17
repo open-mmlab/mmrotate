@@ -18,7 +18,8 @@ class TestRefineSingleStageDetector(TestCase):
         register_all_modules()
 
     @parameterized.expand([
-        'r3det/r3det_tiny_r50_fpn_1x_dota_oc.py',
+        'r3det/r3det_r50_fpn_1x_dota_oc.py',
+        's2anet/s2anet_r50_fpn_1x_dota_le135.py',
     ])
     def test_init(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -33,6 +34,7 @@ class TestRefineSingleStageDetector(TestCase):
 
     @parameterized.expand([
         ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py', ('cpu', 'cuda')),
+        ('s2anet/s2anet_r50_fpn_1x_dota_le135.py', ('cpu', 'cuda')),
     ])
     def test_refine_single_stage_forward_loss_mode(self, cfg_file, devices):
         message_hub = MessageHub.get_instance(
@@ -61,6 +63,7 @@ class TestRefineSingleStageDetector(TestCase):
 
     @parameterized.expand([
         ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py', ('cpu', 'cuda')),
+        ('s2anet/s2anet_r50_fpn_1x_dota_le135.py', ('cpu', 'cuda')),
     ])
     def test_refine_single_stage_forward_predict_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
@@ -89,6 +92,7 @@ class TestRefineSingleStageDetector(TestCase):
 
     @parameterized.expand([
         ('r3det/r3det_tiny_r50_fpn_1x_dota_oc.py', ('cpu', 'cuda')),
+        ('s2anet/s2anet_r50_fpn_1x_dota_le135.py', ('cpu', 'cuda')),
     ])
     def test_refine_single_stage_forward_tensor_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
