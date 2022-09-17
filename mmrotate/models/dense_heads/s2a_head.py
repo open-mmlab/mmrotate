@@ -1,9 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import List, Optional, Tuple, Union
 
+import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-import torch
 from mmdet.models.dense_heads.retina_head import RetinaHead
 from mmdet.models.utils import select_single_mlvl
 from mmdet.utils import InstanceList, OptInstanceList
@@ -13,7 +13,7 @@ from torch import Tensor
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import MODELS, TASK_UTILS
 from ..utils import ORConv2d, RotationInvariantPooling
-from mmrotate.models.detectors.utils import AlignConvModule
+
 
 @MODELS.register_module()
 class S2AHead(RetinaHead):

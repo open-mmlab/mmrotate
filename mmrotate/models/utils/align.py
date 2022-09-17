@@ -1,13 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import torch
-from mmcv.ops import DeformConv2d, DeformConv2dPack, rotated_feature_align
-from mmengine.model import BaseModule, normal_init
-from torch import nn
 from typing import List
 
-from mmrotate.registry import TASK_UTILS
+import torch
+from mmcv.ops import DeformConv2d, DeformConv2dPack, rotated_feature_align
 from mmdet.utils import OptConfigType
-from torch import Tensor
+from mmengine.model import BaseModule, normal_init
+from torch import Tensor, nn
+
+from mmrotate.registry import TASK_UTILS
 
 
 @TASK_UTILS.register_module()
@@ -110,6 +110,7 @@ class PseudoAlignModule(BaseModule):
 @TASK_UTILS.register_module()
 class DCNAlignModule(DeformConv2dPack):
     """DCN Align Module.
+
     All args are from DeformConv2dPack.
     TODO: maybe use build_conv_layer is more flexible.
     """
@@ -132,6 +133,7 @@ class FRM(BaseModule):
         norm_cfg (:obj:`ConfigDict` or dict, optional): Config dict for
             normalization layer. Defaults to None.
     """
+
     def __init__(self,
                  feat_channels: int,
                  strides: List[int],
@@ -181,9 +183,7 @@ class FRM(BaseModule):
         Returns:
             list[Tensor]: refined feature maps of multiple scales.
         """
-        mlvl_rbboxes = [
-            torch.cat(best_rbbox) for best_rbbox in zip(*anchors)
-        ]
+        mlvl_rbboxes = [torch.cat(best_rbbox) for best_rbbox in zip(*anchors)]
         out = []
         for x_scale, best_rbboxes_scale, fr_scale in zip(
                 x, mlvl_rbboxes, self.strides):
