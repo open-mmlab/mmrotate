@@ -1,17 +1,21 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-# Modified from jbwang1997: https://github.com/jbwang1997/OBBDetection
+from typing import Optional, Sequence, Union
+
 import numpy as np
 import torch
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
+from mmdet.structures.bbox import HorizontalBoxes, get_box_tensor
+from torch import Tensor
 
+from mmrotate.core.bbox.structures import (RotatedBoxes, qbox2rbox, rbox2hbox,
+                                           rbox2qbox)
 from mmrotate.registry import TASK_UTILS
-from ..transforms import obb2poly, obb2xyxy, poly2obb
 
 
 @TASK_UTILS.register_module()
 class MidpointOffsetCoder(BaseBBoxCoder):
-    """Mid point offset coder. This coder encodes bbox (x1, y1, x2, y2) into \
-    delta (dx, dy, dw, dh, da, db) and decodes delta (dx, dy, dw, dh, da, db) \
+    """Mid point offset coder. This coder encodes bbox (x1, y1, x2, y2) into
+    delta (dx, dy, dw, dh, da, db) and decodes delta (dx, dy, dw, dh, da, db)
     back to original bbox (x1, y1, x2, y2).
 
     Args:
@@ -19,50 +23,55 @@ class MidpointOffsetCoder(BaseBBoxCoder):
             delta coordinates
         target_stds (Sequence[float]): Denormalizing standard deviation of
             target for delta coordinates
-        angle_range (str, optional): Angle representations. Defaults to 'oc'.
+        use_box_type (bool): Whether to warp decoded boxes with the
+            box type data structure. Defaults to True.
     """
+    encode_size = 6
 
     def __init__(self,
-                 target_means=(0., 0., 0., 0., 0., 0.),
-                 target_stds=(1., 1., 1., 1., 1., 1.),
-                 angle_range='oc'):
-        super(BaseBBoxCoder, self).__init__()
+                 target_means: Sequence[float] = (0., 0., 0., 0., 0.),
+                 target_stds: Sequence[float] = (1., 1., 1., 1., 1.),
+                 use_box_type=True) -> None:
+        super().__init__(use_box_type=use_box_type)
         self.means = target_means
         self.stds = target_stds
-        self.version = angle_range
 
-    def encode(self, bboxes, gt_bboxes):
+    def encode(self, bboxes: Union[HorizontalBoxes, Tensor],
+               gt_bboxes: Union[RotatedBoxes, Tensor]) -> Tensor:
         """Get box regression transformation deltas that can be used to
         transform the ``bboxes`` into the ``gt_bboxes``.
 
         Args:
-            bboxes (torch.Tensor): Source boxes, e.g., object proposals.
-            gt_bboxes (torch.Tensor): Target of the transformation, e.g.,
-                ground-truth boxes.
+            bboxes (:obj:`HorizontalBoxes` or Tensor): Source boxes,
+                e.g.,object proposals.
+            gt_bboxes (:obj:`RotatedBoxes` or Tensor): Target of the
+                transformation, e.g., ground-truth boxes.
 
         Returns:
-            torch.Tensor: Box transformation deltas
+            torch.Tensor: Box transformation deltas.
         """
         assert bboxes.size(0) == gt_bboxes.size(0)
         assert bboxes.size(-1) == 4
         assert gt_bboxes.size(-1) == 5
-        encoded_bboxes = bbox2delta(bboxes, gt_bboxes, self.means, self.stds,
-                                    self.version)
+        bboxes = get_box_tensor(bboxes)
+        gt_bboxes = get_box_tensor(gt_bboxes)
+        encoded_bboxes = bbox2delta(bboxes, gt_bboxes, self.means, self.stds)
         return encoded_bboxes
 
-    def decode(self,
-               bboxes,
-               pred_bboxes,
-               max_shape=None,
-               wh_ratio_clip=16 / 1000):
+    def decode(
+            self,
+            bboxes: Union[HorizontalBoxes, Tensor],
+            pred_bboxes: Tensor,
+            max_shape: Optional[Sequence[int]] = None,
+            wh_ratio_clip: float = 16 / 1000) -> Union[RotatedBoxes, Tensor]:
         """Apply transformation `pred_bboxes` to `bboxes`.
 
         Args:
-            bboxes (torch.Tensor): Basic boxes. Shape (B, N, 4) or (N, 4)
-            pred_bboxes (torch.Tensor): Encoded offsets with respect to each
-                roi. Has shape (B, N, 5) or (N, 5).
+            bboxes (:obj:`HorizontalBoxes` or Tensor): Basic boxes.
+                Shape (B, N, 4) or (N, 4)
+            pred_bboxes (Tensor): Encoded offsets with respect to each
+                roi. Has shape (B, N, 6) or (N, 6).
                 Note N = num_anchors * W * H when rois is a grid of anchors.
-
             max_shape (Sequence[int] or torch.Tensor or Sequence[
                Sequence[int]],optional): Maximum bounds for boxes, specifies
                (H, W, C) or (H, W). If bboxes shape is (B, N, 6), then
@@ -72,22 +81,26 @@ class MidpointOffsetCoder(BaseBBoxCoder):
                 width and height.
 
         Returns:
-            torch.Tensor: Decoded boxes.
+            Union[:obj:`RotatedBoxes`, Tensor]: Decoded boxes.
         """
         assert pred_bboxes.size(0) == bboxes.size(0)
         assert bboxes.size(-1) == 4
         assert pred_bboxes.size(-1) == 6
+        bboxes = get_box_tensor(bboxes)
         decoded_bboxes = delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
-                                    wh_ratio_clip, self.version)
-
+                                    wh_ratio_clip)
+        if self.use_box_type:
+            assert decoded_bboxes.size(-1) == 5, \
+                ('Cannot warp decoded boxes with box type when decoded'
+                 'boxes have shape of (N, num_classes * 5)')
+            decoded_bboxes = RotatedBoxes(decoded_bboxes)
         return decoded_bboxes
 
 
-def bbox2delta(proposals,
-               gt,
-               means=(0., 0., 0., 0., 0., 0.),
-               stds=(1., 1., 1., 1., 1., 1.),
-               version='oc'):
+def bbox2delta(proposals: Tensor,
+               gts: Tensor,
+               means: Sequence[float] = (0., 0., 0., 0., 0.),
+               stds: Sequence[float] = (1., 1., 1., 1., 1.)):
     """Compute deltas of proposals w.r.t. gt.
 
     We usually compute the deltas of x, y, w, h, a, b of proposals w.r.t ground
@@ -95,26 +108,25 @@ def bbox2delta(proposals,
     :func:`delta2bbox`.
 
     Args:
-        proposals (torch.Tensor): Boxes to be transformed, shape (N, ..., 4)
-        gt (torch.Tensor): Gt bboxes to be used as base, shape (N, ..., 5)
+        proposals (Tensor): Boxes to be transformed, shape (N, ..., 4)
+        gt (Tensor): Gt bboxes to be used as base, shape (N, ..., 5)
         means (Sequence[float]): Denormalizing means for delta coordinates
         stds (Sequence[float]): Denormalizing standard deviation for delta
             coordinates.
-        version (str, optional): Angle representations. Defaults to 'oc'.
 
     Returns:
         Tensor: deltas with shape (N, 6), where columns represent dx, dy,
-            dw, dh, da, db.
+        dw, dh, da, db.
     """
     proposals = proposals.float()
-    gt = gt.float()
+    gts = gts.float()
 
     px = (proposals[..., 0] + proposals[..., 2]) * 0.5
     py = (proposals[..., 1] + proposals[..., 3]) * 0.5
     pw = proposals[..., 2] - proposals[..., 0]
     ph = proposals[..., 3] - proposals[..., 1]
 
-    hbb, poly = obb2xyxy(gt, version), obb2poly(gt, version)
+    hbb, poly = rbox2hbox(gts), rbox2qbox(gts)
     gx = (hbb[..., 0] + hbb[..., 2]) * 0.5
     gy = (hbb[..., 1] + hbb[..., 3]) * 0.5
     gw = hbb[..., 2] - hbb[..., 0]
@@ -147,12 +159,11 @@ def bbox2delta(proposals,
     return deltas
 
 
-def delta2bbox(rois,
-               deltas,
-               means=(0., 0., 0., 0., 0., 0.),
-               stds=(1., 1., 1., 1., 1., 1.),
-               wh_ratio_clip=16 / 1000,
-               version='oc'):
+def delta2bbox(rois: Tensor,
+               deltas: Tensor,
+               means: Sequence[float] = (0., 0., 0., 0., 0.),
+               stds: Sequence[float] = (1., 1., 1., 1., 1.),
+               wh_ratio_clip: float = 16 / 1000):
     """Apply deltas to shift/scale base boxes.
 
     Typically the rois are anchor or proposed bounding boxes and the deltas
@@ -161,41 +172,42 @@ def delta2bbox(rois,
 
 
     Args:
-        rois (torch.Tensor): Boxes to be transformed. Has shape (N, 4).
-        deltas (torch.Tensor): Encoded offsets relative to each roi.
-            Has shape (N, num_classes * 4) or (N, 4). Note
+        rois (Tensor): Boxes to be transformed. Has shape (N, 4).
+        deltas (Tensor): Encoded offsets relative to each roi.
+            Has shape (N, num_classes * 6) or (N, 6). Note
             N = num_base_anchors * W * H, when rois is a grid of
             anchors.
         means (Sequence[float]): Denormalizing means for delta coordinates.
-            Default (0., 0., 0., 0., 0., 0.).
+            Defaults to (0., 0., 0., 0., 0., 0.).
         stds (Sequence[float]): Denormalizing standard deviation for delta
-            coordinates. Default (1., 1., 1., 1., 1., 1.).
-        wh_ratio_clip (float): Maximum aspect ratio for boxes. Default
+            coordinates. Defaults to (1., 1., 1., 1., 1., 1.).
+        wh_ratio_clip (float): Maximum aspect ratio for boxes. Defaults to
             16 / 1000.
-        version (str, optional): Angle representations. Defaults to 'oc'.
 
     Returns:
         Tensor: Boxes with shape (N, num_classes * 5) or (N, 5), where 5
-           represent cx, cy, w, h, a.
+        represent cx, cy, w, h, a.
     """
-    means = deltas.new_tensor(means).repeat(1, deltas.size(1) // 6)
-    stds = deltas.new_tensor(stds).repeat(1, deltas.size(1) // 6)
-    denorm_deltas = deltas * stds + means
-    dx = denorm_deltas[:, 0::6]
-    dy = denorm_deltas[:, 1::6]
-    dw = denorm_deltas[:, 2::6]
-    dh = denorm_deltas[:, 3::6]
-    da = denorm_deltas[:, 4::6]
-    db = denorm_deltas[:, 5::6]
+    means = deltas.new_tensor(means).view(1, -1)
+    stds = deltas.new_tensor(stds).view(1, -1)
+    delta_shape = deltas.shape
+    reshaped_deltas = deltas.view(delta_shape[:-1] + (-1, 6))
+    denorm_deltas = reshaped_deltas * stds + means
+    dx = denorm_deltas[..., 0::6]
+    dy = denorm_deltas[..., 1::6]
+    dw = denorm_deltas[..., 2::6]
+    dh = denorm_deltas[..., 3::6]
+    da = denorm_deltas[..., 4::6]
+    db = denorm_deltas[..., 5::6]
     max_ratio = np.abs(np.log(wh_ratio_clip))
     dw = dw.clamp(min=-max_ratio, max=max_ratio)
     dh = dh.clamp(min=-max_ratio, max=max_ratio)
     # Compute center of each roi
-    px = ((rois[:, 0] + rois[:, 2]) * 0.5).unsqueeze(1).expand_as(dx)
-    py = ((rois[:, 1] + rois[:, 3]) * 0.5).unsqueeze(1).expand_as(dy)
+    px = ((rois[..., None, None, 0] + rois[..., None, None, 2]) * 0.5)
+    py = ((rois[..., None, None, 1] + rois[..., None, None, 3]) * 0.5)
     # Compute width/height of each roi
-    pw = (rois[:, 2] - rois[:, 0]).unsqueeze(1).expand_as(dw)
-    ph = (rois[:, 3] - rois[:, 1]).unsqueeze(1).expand_as(dh)
+    pw = (rois[..., None, None, 2] - rois[..., None, None, 0])
+    ph = (rois[..., None, None, 3] - rois[..., None, None, 1])
     # Use exp(network energy) to enlarge/shrink each roi
     gw = pw * dw.exp()
     gh = ph * dh.exp()
@@ -222,8 +234,12 @@ def delta2bbox(rois,
                           center_polys[..., 1::2] * center_polys[..., 1::2])
     max_diag_len, _ = torch.max(diag_len, dim=-1, keepdim=True)
     diag_scale_factor = max_diag_len / diag_len
-    center_polys = center_polys * diag_scale_factor.repeat_interleave(
-        2, dim=-1)
+    center_polys_shape = center_polys.shape
+    center_polys = center_polys.view(*center_polys_shape[:3], 4,
+                                     -1) * diag_scale_factor.view(
+                                         *center_polys_shape[:3], 4, 1)
+    center_polys = center_polys.view(center_polys_shape)
     rectpolys = center_polys + center
-    obboxes = poly2obb(rectpolys, version)
-    return obboxes
+    rbboxes = qbox2rbox(rectpolys).view(delta_shape[:-1] + (5, ))
+
+    return rbboxes
