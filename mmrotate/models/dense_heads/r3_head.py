@@ -19,7 +19,8 @@ class R3Head(RetinaHead):
     <https://arxiv.org/pdf/1908.05612.pdf>`_.
     """  # noqa: W605
 
-    def filter_bboxes(self, cls_scores, bbox_preds):
+    def filter_bboxes(self, cls_scores: List[Tensor],
+                      bbox_preds: List[Tensor]) -> List[List[Tensor]]:
         """Filter predicted bounding boxes at each position of the feature
         maps. Only one bounding boxes with highest score will be left at each
         position. This filter will be used in R3Det prior to the first feature
@@ -263,12 +264,12 @@ class R3RefineHead(RetinaHead):
         """Refine the input feature use feature refine module.
 
         Args:
-            x (Tensor): Features.
-            roi (Tensor):
+            x (list[Tensor]): features of each image.
+            rois (list[list[Tensor]]): input rbboxes of each level of each
+                image. rois output by former stages and are to be refined
 
         Returns:
-            tuple:
-                Refined features.
+            list[Tensor]: refined features of each image.
         """
         return self.feat_refine_module(x, roi)
 
