@@ -3,7 +3,6 @@ from typing import List
 
 import torch
 from mmcv.ops import DeformConv2d, DeformConv2dPack, rotated_feature_align
-from mmdet.utils import OptConfigType
 from mmengine.model import BaseModule, normal_init
 from torch import Tensor, nn
 
@@ -118,7 +117,7 @@ class DCNAlignModule(DeformConv2dPack):
     def forward(self, x: List[Tensor],
                 anchors: List[List[Tensor]]) -> List[Tensor]:
         """Forward function."""
-        return super(DCNAlignModule, self).forward(x)
+        return [super(DCNAlignModule, self).forward(xi) for xi in x]
 
 
 @TASK_UTILS.register_module()
@@ -134,16 +133,10 @@ class FRM(BaseModule):
             normalization layer. Defaults to None.
     """
 
-    def __init__(self,
-                 feat_channels: int,
-                 strides: List[int],
-                 conv_cfg: OptConfigType = None,
-                 norm_cfg: OptConfigType = None) -> None:
+    def __init__(self, feat_channels: int, strides: List[int]) -> None:
         super().__init__()
         self.feat_channels = feat_channels
         self.strides = strides
-        self.conv_cfg = conv_cfg
-        self.norm_cfg = norm_cfg
         self._init_layers()
 
     def _init_layers(self) -> None:

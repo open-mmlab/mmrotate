@@ -25,9 +25,9 @@ class RefineSingleStageDetector(BaseDetector):
         bbox_head_refine (list[:obj:`ConfigDict` | dict]): The bbox head
             module of the refine stage.
         train_cfg (:obj:`ConfigDict` or dict, optional): The training config
-            of ATSS. Defaults to None.
+            of RefineSingleStageDetector. Defaults to None.
         test_cfg (:obj:`ConfigDict` or dict, optional): The testing config
-            of ATSS. Defaults to None.
+            of RefineSingleStageDetector. Defaults to None.
         data_preprocessor (:obj:`ConfigDict` or dict, optional): Config of
             :class:`DetDataPreprocessor` to process the input data.
             Defaults to None.
