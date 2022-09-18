@@ -40,6 +40,7 @@ model = dict(
             use_box_type=True),
         bbox_coder=dict(
             type='MidpointOffsetCoder',
+            angle_version=angle_version,
             target_means=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
             target_stds=[1.0, 1.0, 1.0, 1.0, 0.5, 0.5]),
         loss_cls=dict(

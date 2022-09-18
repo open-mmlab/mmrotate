@@ -23,6 +23,8 @@ class MidpointOffsetCoder(BaseBBoxCoder):
             delta coordinates
         target_stds (Sequence[float]): Denormalizing standard deviation of
             target for delta coordinates
+        angle_version (str, optional): Angle representations.
+            Defaults to 'oc'.
         use_box_type (bool): Whether to warp decoded boxes with the
             box type data structure. Defaults to True.
     """
@@ -31,10 +33,13 @@ class MidpointOffsetCoder(BaseBBoxCoder):
     def __init__(self,
                  target_means: Sequence[float] = (0., 0., 0., 0., 0., 0.),
                  target_stds: Sequence[float] = (1., 1., 1., 1., 1., 1.),
+                 angle_version: str = 'oc',
                  use_box_type=True) -> None:
         super().__init__(use_box_type=use_box_type)
         self.means = target_means
         self.stds = target_stds
+        self.angle_version = angle_version
+        assert self.angle_version in ['oc', 'le135', 'le90']
 
     def encode(self, bboxes: Union[HorizontalBoxes, Tensor],
                gt_bboxes: Union[RotatedBoxes, Tensor]) -> Tensor:
@@ -54,7 +59,7 @@ class MidpointOffsetCoder(BaseBBoxCoder):
         assert bboxes.size(-1) == 4
         assert gt_bboxes.size(-1) == 5
         bboxes = get_box_tensor(bboxes)
-        gt_bboxes = get_box_tensor(gt_bboxes)
+        gt_bboxes = gt_bboxes.regularize_boxes(self.angle_version)
         encoded_bboxes = bbox2delta(bboxes, gt_bboxes, self.means, self.stds)
         return encoded_bboxes
 
@@ -89,6 +94,8 @@ class MidpointOffsetCoder(BaseBBoxCoder):
         bboxes = get_box_tensor(bboxes)
         decoded_bboxes = delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
                                     wh_ratio_clip)
+        decoded_bboxes = RotatedBoxes(decoded_bboxes).regularize_boxes(
+            self.angle_version)
         if self.use_box_type:
             assert decoded_bboxes.size(-1) == 5, \
                 ('Cannot warp decoded boxes with box type when decoded'
