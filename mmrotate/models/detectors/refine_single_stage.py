@@ -49,13 +49,15 @@ class RefineSingleStageDetector(BaseDetector):
         self.backbone = MODELS.build(backbone)
         if neck is not None:
             self.neck = MODELS.build(neck)
-        bbox_head_init.update(train_cfg=train_cfg['init'])
+        if train_cfg is not None:
+            bbox_head_init.update(train_cfg=train_cfg['init'])
         bbox_head_init.update(test_cfg=test_cfg)
         self.bbox_head_init = MODELS.build(bbox_head_init)
         self.num_refine_stages = len(bbox_head_refine)
         self.bbox_head_refine = ModuleList()
         for i, refine_head in enumerate(bbox_head_refine):
-            refine_head.update(train_cfg=train_cfg['refine'][i])
+            if train_cfg is not None:
+                refine_head.update(train_cfg=train_cfg['refine'][i])
             refine_head.update(test_cfg=test_cfg)
             self.bbox_head_refine.append(MODELS.build(refine_head))
         self.train_cfg = train_cfg
