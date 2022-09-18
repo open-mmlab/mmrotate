@@ -49,15 +49,13 @@ class RefineSingleStageDetector(BaseDetector):
         self.backbone = MODELS.build(backbone)
         if neck is not None:
             self.neck = MODELS.build(neck)
-        if train_cfg is not None:
-            bbox_head_init.update(train_cfg=train_cfg['init'])
+        bbox_head_init.update(train_cfg=train_cfg['init'])
         bbox_head_init.update(test_cfg=test_cfg)
         self.bbox_head_init = MODELS.build(bbox_head_init)
         self.num_refine_stages = len(bbox_head_refine)
         self.bbox_head_refine = ModuleList()
         for i, refine_head in enumerate(bbox_head_refine):
-            if train_cfg is not None:
-                refine_head.update(train_cfg=train_cfg['refine'][i])
+            refine_head.update(train_cfg=train_cfg['refine'][i])
             refine_head.update(test_cfg=test_cfg)
             self.bbox_head_refine.append(MODELS.build(refine_head))
         self.train_cfg = train_cfg
@@ -90,7 +88,7 @@ class RefineSingleStageDetector(BaseDetector):
         keys = init_losses.keys()
         for key in list(keys):
             if 'loss' in key and 'init' not in key:
-                init_losses[f'init_{key}'] = init_losses.pop(key)
+                init_losses[f'{key}_init'] = init_losses.pop(key)
         losses.update(init_losses)
 
         rois = self.bbox_head_init.filter_bboxes(*outs)
@@ -110,7 +108,7 @@ class RefineSingleStageDetector(BaseDetector):
                         loss = [item * weight for item in loss]
                     else:
                         loss = loss * weight
-                    refine_losses[f'refine_{i}_{key}'] = loss
+                    refine_losses[f'{key}_refine_{i}'] = loss
             losses.update(refine_losses)
 
             if i + 1 in range(self.num_refine_stages):
