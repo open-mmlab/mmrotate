@@ -58,10 +58,10 @@ class TestDeltaBboxCoder(TestCase):
         assert_allclose(out, batch_out.tensor)
 
         # empty deltas
-        rois = torch.zeros((0, 5))
+        rois = torch.zeros((0, 4))
         deltas = torch.zeros((0, 5))
         out = coder.decode(HorizontalBoxes(rois), deltas, max_shape=(32, 32))
-        self.assertEqual(rois.shape, out.shape)
+        self.assertEqual((0, 5), out.shape)
 
         # test add_ctr_clamp
         coder = DeltaXYWHTHBBoxCoder(add_ctr_clamp=True, ctr_clamp=2)

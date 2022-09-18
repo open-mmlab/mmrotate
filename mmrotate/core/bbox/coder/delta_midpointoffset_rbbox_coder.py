@@ -29,8 +29,8 @@ class MidpointOffsetCoder(BaseBBoxCoder):
     encode_size = 6
 
     def __init__(self,
-                 target_means: Sequence[float] = (0., 0., 0., 0., 0.),
-                 target_stds: Sequence[float] = (1., 1., 1., 1., 1.),
+                 target_means: Sequence[float] = (0., 0., 0., 0., 0., 0.),
+                 target_stds: Sequence[float] = (1., 1., 1., 1., 1., 1.),
                  use_box_type=True) -> None:
         super().__init__(use_box_type=use_box_type)
         self.means = target_means
@@ -99,8 +99,8 @@ class MidpointOffsetCoder(BaseBBoxCoder):
 
 def bbox2delta(proposals: Tensor,
                gts: Tensor,
-               means: Sequence[float] = (0., 0., 0., 0., 0.),
-               stds: Sequence[float] = (1., 1., 1., 1., 1.)):
+               means: Sequence[float] = (0., 0., 0., 0., 0., 0.),
+               stds: Sequence[float] = (1., 1., 1., 1., 1., 1.)):
     """Compute deltas of proposals w.r.t. gt.
 
     We usually compute the deltas of x, y, w, h, a, b of proposals w.r.t ground
@@ -161,8 +161,8 @@ def bbox2delta(proposals: Tensor,
 
 def delta2bbox(rois: Tensor,
                deltas: Tensor,
-               means: Sequence[float] = (0., 0., 0., 0., 0.),
-               stds: Sequence[float] = (1., 1., 1., 1., 1.),
+               means: Sequence[float] = (0., 0., 0., 0., 0., 0.),
+               stds: Sequence[float] = (1., 1., 1., 1., 1., 1.),
                wh_ratio_clip: float = 16 / 1000):
     """Apply deltas to shift/scale base boxes.
 
@@ -188,6 +188,10 @@ def delta2bbox(rois: Tensor,
         Tensor: Boxes with shape (N, num_classes * 5) or (N, 5), where 5
         represent cx, cy, w, h, a.
     """
+    num_bboxes = deltas.size(0)
+    if num_bboxes == 0:
+        return deltas.new_zeros((0, 5))
+
     means = deltas.new_tensor(means).view(1, -1)
     stds = deltas.new_tensor(stds).view(1, -1)
     delta_shape = deltas.shape
