@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from collections import Sequence
 from typing import List, Tuple, Union
 
 from mmdet.models.detectors.base import BaseDetector
@@ -84,21 +85,32 @@ class RefineSingleStageDetector(BaseDetector):
         loss_inputs = outs + (batch_gt_instances, batch_img_metas,
                               batch_gt_instances_ignore)
         init_losses = self.bbox_head_init.loss_by_feat(*loss_inputs)
-        for name, value in init_losses.items():
-            losses[f'init_{name}'] = value
+        keys = init_losses.keys()
+        for key in list(keys):
+            if 'loss' in key and 'init' not in key:
+                init_losses[f'init_{key}'] = init_losses.pop(key)
+        losses.update(init_losses)
 
         rois = self.bbox_head_init.filter_bboxes(*outs)
         for i in range(self.num_refine_stages):
-            lw = self.train_cfg.stage_loss_weights[i]
+            weight = self.train_cfg.stage_loss_weights[i]
             x_refine = self.bbox_head_refine[i].feature_refine(x, rois)
             outs = self.bbox_head_refine[i](x_refine)
             loss_inputs = outs + (batch_gt_instances, batch_img_metas,
                                   batch_gt_instances_ignore)
             refine_losses = self.bbox_head_refine[i].loss_by_feat(
                 *loss_inputs, rois=rois)
-            for name, value in refine_losses.items():
-                losses[f'refine{i}_{name}'] = ([v * lw for v in value]
-                                               if 'loss' in name else value)
+            keys = refine_losses.keys()
+            for key in list(keys):
+                if 'loss' in key and 'refine' not in key:
+                    loss = refine_losses.pop(key)
+                    if isinstance(loss, Sequence):
+                        loss = [item * weight for item in loss]
+                    else:
+                        loss = loss * weight
+                    refine_losses[f'refine_{i}_{key}'] = loss
+                losses.update(refine_losses)
+
             if i + 1 in range(self.num_refine_stages):
                 rois = self.bbox_head_refine[i].refine_bboxes(*outs, rois=rois)
 
