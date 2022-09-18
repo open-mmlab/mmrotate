@@ -109,7 +109,7 @@ class RefineSingleStageDetector(BaseDetector):
                     else:
                         loss = loss * weight
                     refine_losses[f'refine_{i}_{key}'] = loss
-                losses.update(refine_losses)
+            losses.update(refine_losses)
 
             if i + 1 in range(self.num_refine_stages):
                 rois = self.bbox_head_refine[i].refine_bboxes(*outs, rois=rois)
