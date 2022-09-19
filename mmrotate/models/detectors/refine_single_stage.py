@@ -139,12 +139,12 @@ class RefineSingleStageDetector(BaseDetector):
             'pred_instances'. And the ``pred_instances`` usually
             contains following keys.
 
-                - scores (Tensor): Classification scores, has a shape
-                    (num_instance, )
-                - labels (Tensor): Labels of bboxes, has a shape
-                    (num_instances, ).
-                - bboxes (Tensor): Has a shape (num_instances, 5),
-                    the last dimension 5 arrange as (x, y, w, h, t).
+            - scores (Tensor): Classification scores, has a shape
+              (num_instance, )
+            - labels (Tensor): Labels of bboxes, has a shape
+              (num_instances, ).
+            - bboxes (Tensor): Has a shape (num_instances, 5),
+              the last dimension 5 arrange as (x, y, w, h, t).
         """
         x = self.extract_feat(batch_inputs)
         outs = self.bbox_head_init(x)

@@ -133,10 +133,11 @@ class S2ARefineHead(RetinaHead):
 
         Returns:
             tuple:
-                cls_score (Tensor): Cls scores for a single scale level
-                    the channels number is num_anchors * num_classes.
-                bbox_pred (Tensor): Box energies / deltas for a single scale
-                    level, the channels number is num_anchors * 4.
+
+            - cls_score (Tensor): Cls scores for a single scale level
+              the channels number is num_anchors * num_classes.
+            - bbox_pred (Tensor): Box energies / deltas for a single scale
+              level, the channels number is num_anchors * 4.
         """
         x = self.or_conv(x)
         reg_feat = x
@@ -203,9 +204,9 @@ class S2ARefineHead(RetinaHead):
         Returns:
             tuple:
 
-                - anchor_list (list[list[Tensor]]): Anchors of each image.
-                - valid_flag_list (list[list[Tensor]]): Valid flags of each
-                  image.
+            - anchor_list (list[list[Tensor]]): Anchors of each image.
+            - valid_flag_list (list[list[Tensor]]): Valid flags of each
+              image.
         """
         anchor_list = [[
             RotatedBoxes(bboxes_img_lvl).detach()
@@ -262,12 +263,12 @@ class S2ARefineHead(RetinaHead):
             list[:obj:`InstanceData`]: Object detection results of each image
             after the post process. Each item usually contains following keys.
 
-                - scores (Tensor): Classification scores, has a shape
-                  (num_instance, )
-                - labels (Tensor): Labels of bboxes, has a shape
-                  (num_instances, ).
-                - bboxes (Tensor): Has a shape (num_instances, 4),
-                  the last dimension 4 arrange as (x1, y1, x2, y2).
+            - scores (Tensor): Classification scores, has a shape
+              (num_instance, )
+            - labels (Tensor): Labels of bboxes, has a shape
+              (num_instances, ).
+            - bboxes (Tensor): Has a shape (num_instances, 4),
+              the last dimension 4 arrange as (x1, y1, x2, y2).
         """
         assert len(cls_scores) == len(bbox_preds)
         assert rois is not None
