@@ -28,9 +28,16 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
             Defaults to False.
         add_ctr_clamp (bool): Whether to add center clamp, when added, the
             predicted box is clamped is its center is too far away from
-            the original anchor's center. Only used by YOLOF. Default False.
+            the original anchor's center. Only used by YOLOF.
+            Defaults to False.
         ctr_clamp (int): the maximum pixel shift to clamp. Only used by
+<<<<<<< HEAD
             YOLOF. Default 32.
+=======
+            YOLOF. Defaults to 32.
+        use_box_type (bool): Whether to warp decoded boxes with the
+            box type data structure. Defaults to True.
+>>>>>>> e9471a6 (Refactor oriented rcnn (#515))
     """
     encode_size = 5
 
@@ -49,6 +56,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         self.add_ctr_clamp = add_ctr_clamp
         self.ctr_clamp = ctr_clamp
         self.angle_version = angle_version
+        assert self.angle_version in ['oc', 'le135', 'le90']
         self.norm_factor = norm_factor
         self.edge_swap = edge_swap
         self.proj_xy = proj_xy
@@ -68,12 +76,9 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         assert bboxes.size(0) == gt_bboxes.size(0)
         assert bboxes.size(-1) == 5
         assert gt_bboxes.size(-1) == 5
-        if self.angle_version in ['oc', 'le135', 'le90']:
-            return bbox2delta(bboxes, gt_bboxes, self.means, self.stds,
-                              self.angle_version, self.norm_factor,
-                              self.edge_swap, self.proj_xy)
-        else:
-            raise NotImplementedError
+        return bbox2delta(bboxes, gt_bboxes, self.means, self.stds,
+                          self.angle_version, self.norm_factor, self.edge_swap,
+                          self.proj_xy)
 
     def decode(self,
                bboxes,
@@ -101,6 +106,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
             :obj:`RotatedBoxes`: Decoded boxes.
         """
         assert pred_bboxes.size(0) == bboxes.size(0)
+<<<<<<< HEAD
         if self.angle_version in ['oc', 'le135', 'le90']:
             return delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
                               max_shape, wh_ratio_clip, self.add_ctr_clamp,
@@ -108,6 +114,22 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
                               self.norm_factor, self.edge_swap, self.proj_xy)
         else:
             raise NotImplementedError
+=======
+        bboxes = get_box_tensor(bboxes)
+        decoded_bboxes = delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
+                                    max_shape, wh_ratio_clip,
+                                    self.add_ctr_clamp, self.ctr_clamp,
+                                    self.angle_version, self.norm_factor,
+                                    self.edge_swap, self.proj_xy)
+
+        if self.use_box_type:
+            assert decoded_bboxes.size(-1) == 5, \
+                ('Cannot warp decoded boxes with box type when decoded boxes'
+                 'have shape of (N, num_classes * 5)')
+            decoded_bboxes = RotatedBoxes(decoded_bboxes)
+
+        return decoded_bboxes
+>>>>>>> e9471a6 (Refactor oriented rcnn (#515))
 
 
 def bbox2delta(proposals,
@@ -205,9 +227,9 @@ def delta2bbox(rois,
             N = num_base_anchors * W * H, when rois is a grid of
             anchors.
         means (Sequence[float]): Denormalizing means for delta coordinates.
-            Default (0., 0., 0., 0., 0.).
+            Defaults to (0., 0., 0., 0., 0.).
         stds (Sequence[float]): Denormalizing standard deviation for delta
-            coordinates. Default (1., 1., 1., 1., 1.).
+            coordinates. Defaults to (1., 1., 1., 1., 1.).
         max_shape (Sequence[int] or torch.Tensor or Sequence[
             Sequence[int]],optional): Maximum bounds for boxes, specifies
            (H, W, C) or (H, W). If bboxes shape is (B, N, 5), then
@@ -217,12 +239,20 @@ def delta2bbox(rois,
             16 / 1000.
         add_ctr_clamp (bool): Whether to add center clamp, when added, the
             predicted box is clamped is its center is too far away from
-            the original anchor's center. Only used by YOLOF. Default False.
+            the original anchor's center. Only used by YOLOF.
+            Defaults to False.
         ctr_clamp (int): the maximum pixel shift to clamp. Only used by
+<<<<<<< HEAD
             YOLOF. Default 32.
         angle_version (str, optional): Angle representations. Defaults to 'oc'.
         norm_factor (None|float, optional): Regularization factor of angle.
         edge_swap (bool, optional): Whether swap the edge if w < h.
+=======
+            YOLOF. Defaults to 32.
+        angle_version (str): Angle representations. Defaults to 'oc'.
+        norm_factor (float, optional): Regularization factor of angle.
+        edge_swap (bool): Whether swap the edge if w < h.
+>>>>>>> e9471a6 (Refactor oriented rcnn (#515))
             Defaults to False.
         proj_xy (bool, optional): Whether project x and y according to angle.
             Defaults to False.
