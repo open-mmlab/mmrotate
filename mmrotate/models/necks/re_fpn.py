@@ -6,7 +6,7 @@ import e2cnn.nn as enn
 import torch.nn as nn
 from mmengine.model import BaseModule
 
-from ..builder import ROTATED_NECKS
+from mmrotate.registry import MODELS
 from ..utils import (build_enn_feature, build_enn_norm_layer, ennConv,
                      ennInterpolate, ennMaxPool, ennReLU)
 
@@ -145,7 +145,7 @@ class ConvModule(enn.EquivariantModule):
         return input_shape
 
 
-@ROTATED_NECKS.register_module()
+@MODELS.register_module()
 class ReFPN(BaseModule):
     """ReFPN.
 

@@ -8,7 +8,7 @@ import torch.utils.checkpoint as cp
 from mmengine.model import BaseModule
 from torch.nn.modules.batchnorm import _BatchNorm
 
-from ..builder import ROTATED_BACKBONES
+from mmrotate.registry import MODELS
 from ..utils import (build_enn_divide_feature, build_enn_norm_layer,
                      build_enn_trivial_feature, ennAvgPool, ennConv,
                      ennMaxPool, ennReLU, ennTrivialConv)
@@ -402,7 +402,7 @@ class ResLayer(nn.Sequential):
         super(ResLayer, self).__init__(*layers)
 
 
-@ROTATED_BACKBONES.register_module()
+@MODELS.register_module()
 class ReResNet(BaseModule):
     """ReResNet backbone.
 
@@ -472,7 +472,7 @@ class ReResNet(BaseModule):
                  zero_init_residual=True,
                  pretrained=None,
                  init_cfg=None):
-        super(ReResNet, self).__init__()
+        super(ReResNet, self).__init__(init_cfg)
         self.in_type = build_enn_trivial_feature(3)
 
         assert not (init_cfg and pretrained), \
