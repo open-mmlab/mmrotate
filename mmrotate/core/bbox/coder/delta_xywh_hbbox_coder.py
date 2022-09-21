@@ -1,7 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Union
+
 from mmdet.models.task_modules.coders import DeltaXYWHBBoxCoder
 from mmdet.models.task_modules.coders.delta_xywh_bbox_coder import bbox2delta
-from mmdet.structures.bbox import HorizontalBoxes
+from mmdet.structures.bbox import HorizontalBoxes, get_box_tensor
 from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
@@ -16,8 +18,8 @@ class DeltaXYWHHBBoxCoder(DeltaXYWHBBoxCoder):
     gt_bboxes of encode is :obj:`RotatedBoxes`.
     """
 
-    def encode(self, bboxes: HorizontalBoxes,
-               gt_bboxes: RotatedBoxes) -> Tensor:
+    def encode(self, bboxes: Union[HorizontalBoxes, Tensor],
+               gt_bboxes: Union[RotatedBoxes, Tensor]) -> Tensor:
         """Get box regression transformation deltas that can be used to
         transform the ``bboxes`` into the ``gt_bboxes``.
 
@@ -34,7 +36,7 @@ class DeltaXYWHHBBoxCoder(DeltaXYWHBBoxCoder):
         assert bboxes.size(-1) == 4
         assert gt_bboxes.size(-1) == 5
 
-        bboxes = bboxes.tensor
+        bboxes = get_box_tensor(bboxes)
 
         if not isinstance(gt_bboxes, RotatedBoxes):
             gt_bboxes = RotatedBoxes(gt_bboxes)

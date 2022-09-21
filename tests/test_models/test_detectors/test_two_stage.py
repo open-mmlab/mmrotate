@@ -17,6 +17,7 @@ class TestTwoStageBBox(TestCase):
 
     @parameterized.expand([
         'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
+        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
     ])
     def test_init(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -40,6 +41,7 @@ class TestTwoStageBBox(TestCase):
 
     @parameterized.expand([
         'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
+        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
     ])
     def test_two_stage_forward_loss_mode(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -65,6 +67,7 @@ class TestTwoStageBBox(TestCase):
 
     @parameterized.expand([
         'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
+        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
     ])
     def test_two_stage_forward_predict_mode(self, cfg_file):
         model = get_detector_cfg(cfg_file)

@@ -23,7 +23,7 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
             delta coordinates.
         target_stds (Sequence[float]): Denormalizing standard deviation of
             target for delta coordinates
-        angle_range (str): Angle representations. Defaults to 'oc'.
+        angle_version (str): Angle representations. Defaults to 'oc'.
         norm_factor (float, optional): Regularization factor of angle.
         edge_swap (bool): Whether swap the edge if w < h.
             Defaults to False.
@@ -54,6 +54,7 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
         self.means = target_means
         self.stds = target_stds
         self.angle_version = angle_version
+        assert self.angle_version in ['oc', 'le135', 'le90']
         self.norm_factor = norm_factor
         self.edge_swap = edge_swap
         self.clip_border = clip_border
@@ -77,12 +78,8 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
         assert bboxes.size(0) == gt_bboxes.size(0)
         assert bboxes.size(-1) == 4
         assert gt_bboxes.size(-1) == 5
-        if self.angle_version in ['oc', 'le135', 'le90']:
-            return bbox2delta(bboxes, gt_bboxes, self.means, self.stds,
-                              self.angle_version, self.norm_factor,
-                              self.edge_swap)
-        else:
-            raise NotImplementedError
+        return bbox2delta(bboxes, gt_bboxes, self.means, self.stds,
+                          self.angle_version, self.norm_factor, self.edge_swap)
 
     def decode(
             self,
@@ -116,7 +113,6 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
             assert pred_bboxes.size(1) == bboxes.size(1)
         assert bboxes.size(-1) == 4
         assert pred_bboxes.size(-1) == 5
-        assert self.angle_version in ['oc', 'le135', 'le90']
         bboxes = get_box_tensor(bboxes)
         decoded_bboxes = delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
                                     wh_ratio_clip, self.add_ctr_clamp,
