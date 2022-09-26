@@ -1,13 +1,20 @@
 _base_ = [
-    '../_base_/datasets/dotav1.py', '../_base_/schedules/schedule_1x.py',
+    '../_base_/datasets/dota.py', '../_base_/schedules/schedule_1x.py',
     '../_base_/default_runtime.py'
 ]
 
 angle_version = 'le90'
 model = dict(
-    type='RoITransformer',
+    type='mmdet.CascadeRCNN',
+    data_preprocessor=dict(
+        type='mmdet.DetDataPreprocessor',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        bgr_to_rgb=True,
+        pad_size_divisor=32,
+        boxtype2tensor=False),
     backbone=dict(
-        type='ResNet',
+        type='mmdet.ResNet',
         depth=50,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
@@ -17,35 +24,36 @@ model = dict(
         style='pytorch',
         init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
     neck=dict(
-        type='FPN',
+        type='mmdet.FPN',
         in_channels=[256, 512, 1024, 2048],
         out_channels=256,
         num_outs=5),
     rpn_head=dict(
-        type='RotatedRPNHead',
+        type='mmdet.RPNHead',
         in_channels=256,
         feat_channels=256,
-        version=angle_version,
         anchor_generator=dict(
-            type='AnchorGenerator',
+            type='mmdet.AnchorGenerator',
             scales=[8],
             ratios=[0.5, 1.0, 2.0],
-            strides=[4, 8, 16, 32, 64]),
+            strides=[4, 8, 16, 32, 64],
+            use_box_type=True),
         bbox_coder=dict(
-            type='DeltaXYWHBBoxCoder',
-            target_means=[.0, .0, .0, .0],
-            target_stds=[1.0, 1.0, 1.0, 1.0]),
+            type='DeltaXYWHHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0],
+            use_box_type=True),
         loss_cls=dict(
-            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
-        loss_bbox=dict(type='SmoothL1Loss', beta=1.0 / 9.0, loss_weight=1.0)),
+            type='mmdet.CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='mmdet.SmoothL1Loss', beta=1.0 / 9.0, loss_weight=1.0)),
     roi_head=dict(
-        type='RoITransRoIHead',
-        version=angle_version,
+        type='mmdet.CascadeRoIHead',
         num_stages=2,
         stage_loss_weights=[1, 1],
         bbox_roi_extractor=[
             dict(
-                type='SingleRoIExtractor',
+                type='mmdet.SingleRoIExtractor',
                 roi_layer=dict(
                     type='RoIAlign', output_size=7, sampling_ratio=0),
                 out_channels=256,
@@ -62,58 +70,67 @@ model = dict(
         ],
         bbox_head=[
             dict(
-                type='RotatedShared2FCBBoxHead',
+                type='mmdet.Shared2FCBBoxHead',
+                predict_box_type='rbox',
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
                 num_classes=15,
+                reg_predictor_cfg=dict(type='mmdet.Linear'),
+                cls_predictor_cfg=dict(type='mmdet.Linear'),
                 bbox_coder=dict(
-                    type='DeltaXYWHAHBBoxCoder',
-                    angle_range=angle_version,
+                    type='DeltaXYWHTHBBoxCoder',
+                    angle_version=angle_version,
                     norm_factor=2,
                     edge_swap=True,
-                    target_means=[0., 0., 0., 0., 0.],
-                    target_stds=[0.1, 0.1, 0.2, 0.2, 1]),
+                    target_means=(.0, .0, .0, .0, .0),
+                    target_stds=(0.1, 0.1, 0.2, 0.2, 0.1),
+                    use_box_type=True),
                 reg_class_agnostic=True,
                 loss_cls=dict(
-                    type='CrossEntropyLoss',
+                    type='mmdet.CrossEntropyLoss',
                     use_sigmoid=False,
                     loss_weight=1.0),
-                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
-                               loss_weight=1.0)),
+                loss_bbox=dict(
+                    type='mmdet.SmoothL1Loss', beta=1.0, loss_weight=1.0)),
             dict(
-                type='RotatedShared2FCBBoxHead',
+                type='mmdet.Shared2FCBBoxHead',
+                predict_box_type='rbox',
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
                 num_classes=15,
+                reg_predictor_cfg=dict(type='mmdet.Linear'),
+                cls_predictor_cfg=dict(type='mmdet.Linear'),
                 bbox_coder=dict(
-                    type='DeltaXYWHAOBBoxCoder',
-                    angle_range=angle_version,
+                    type='DeltaXYWHTRBBoxCoder',
+                    angle_version=angle_version,
                     norm_factor=None,
                     edge_swap=True,
                     proj_xy=True,
                     target_means=[0., 0., 0., 0., 0.],
-                    target_stds=[0.05, 0.05, 0.1, 0.1, 0.5]),
+                    target_stds=[0.05, 0.05, 0.1, 0.1, 0.05]),
                 reg_class_agnostic=False,
                 loss_cls=dict(
-                    type='CrossEntropyLoss',
+                    type='mmdet.CrossEntropyLoss',
                     use_sigmoid=False,
                     loss_weight=1.0),
-                loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
+                loss_bbox=dict(
+                    type='mmdet.SmoothL1Loss', beta=1.0, loss_weight=1.0))
         ]),
     # model training and testing settings
     train_cfg=dict(
         rpn=dict(
             assigner=dict(
-                type='MaxIoUAssigner',
+                type='mmdet.MaxIoUAssigner',
                 pos_iou_thr=0.7,
                 neg_iou_thr=0.3,
                 min_pos_iou=0.3,
                 match_low_quality=True,
-                ignore_iof_thr=-1),
+                ignore_iof_thr=-1,
+                iou_calculator=dict(type='RBbox2HBboxOverlaps2D')),
             sampler=dict(
-                type='RandomSampler',
+                type='mmdet.RandomSampler',
                 num=256,
                 pos_fraction=0.5,
                 neg_pos_ub=-1,
@@ -129,15 +146,15 @@ model = dict(
         rcnn=[
             dict(
                 assigner=dict(
-                    type='MaxIoUAssigner',
+                    type='mmdet.MaxIoUAssigner',
                     pos_iou_thr=0.5,
                     neg_iou_thr=0.5,
                     min_pos_iou=0.5,
                     match_low_quality=False,
                     ignore_iof_thr=-1,
-                    iou_calculator=dict(type='BboxOverlaps2D')),
+                    iou_calculator=dict(type='RBbox2HBboxOverlaps2D')),
                 sampler=dict(
-                    type='RandomSampler',
+                    type='mmdet.RandomSampler',
                     num=512,
                     pos_fraction=0.25,
                     neg_pos_ub=-1,
@@ -146,7 +163,7 @@ model = dict(
                 debug=False),
             dict(
                 assigner=dict(
-                    type='MaxIoUAssigner',
+                    type='mmdet.MaxIoUAssigner',
                     pos_iou_thr=0.5,
                     neg_iou_thr=0.5,
                     min_pos_iou=0.5,
@@ -154,7 +171,7 @@ model = dict(
                     ignore_iof_thr=-1,
                     iou_calculator=dict(type='RBboxOverlaps2D')),
                 sampler=dict(
-                    type='RRandomSampler',
+                    type='mmdet.RandomSampler',
                     num=512,
                     pos_fraction=0.25,
                     neg_pos_ub=-1,
@@ -172,28 +189,7 @@ model = dict(
             nms_pre=2000,
             min_bbox_size=0,
             score_thr=0.05,
-            nms=dict(type=angle_version, iou_thr=0.1),
+            nms=dict(type='nms_rotated', iou_threshold=0.1),
             max_per_img=2000)))
 
-img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-train_pipeline = [
-    dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='RResize', img_scale=(1024, 1024)),
-    dict(
-        type='RRandomFlip',
-        flip_ratio=[0.25, 0.25, 0.25],
-        direction=['horizontal', 'vertical', 'diagonal'],
-        version=angle_version),
-    dict(type='Normalize', **img_norm_cfg),
-    dict(type='Pad', size_divisor=32),
-    dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
-]
-data = dict(
-    train=dict(pipeline=train_pipeline, version=angle_version),
-    val=dict(version=angle_version),
-    test=dict(version=angle_version))
-
-optimizer = dict(lr=0.005)
+optim_wrapper = dict(optimizer=dict(lr=0.005))
