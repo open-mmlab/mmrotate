@@ -2,11 +2,11 @@
 import unittest
 
 import torch
+from mmdet.structures import DetDataSample
 from mmengine.config import ConfigDict
 from mmengine.structures import InstanceData
 
 from mmrotate.models.dense_heads import RotatedRepPointsHead
-from mmdet.structures import DetDataSample
 from mmrotate.utils import register_all_modules
 
 
@@ -34,28 +34,28 @@ class TestRotatedRepPointsHead(unittest.TestCase):
                 loss_bbox_init=dict(type='ConvexGIoULoss', loss_weight=0.375),
                 loss_bbox_refine=dict(type='ConvexGIoULoss', loss_weight=1.0),
                 transform_method='rotrect'),
-                train_cfg=dict(
-                    init=dict(
-                        assigner=dict(type='ConvexAssigner', scale=4, pos_num=1),
-                        allowed_border=-1,
-                        pos_weight=-1,
-                        debug=False),
-                    refine=dict(
-                        assigner=dict(
-                            type='MaxConvexIoUAssigner',
-                            pos_iou_thr=0.4,
-                            neg_iou_thr=0.3,
-                            min_pos_iou=0,
-                            ignore_iof_thr=-1),
-                        allowed_border=-1,
-                        pos_weight=-1,
-                        debug=False)),
-                test_cfg=dict(
-                    nms_pre=2000,
-                    min_bbox_size=0,
-                    score_thr=0.05,
-                    nms=dict(type='nms_rotated', iou_threshold=0.4),
-                    max_per_img=2000))
+            train_cfg=dict(
+                init=dict(
+                    assigner=dict(type='ConvexAssigner', scale=4, pos_num=1),
+                    allowed_border=-1,
+                    pos_weight=-1,
+                    debug=False),
+                refine=dict(
+                    assigner=dict(
+                        type='MaxConvexIoUAssigner',
+                        pos_iou_thr=0.4,
+                        neg_iou_thr=0.3,
+                        min_pos_iou=0,
+                        ignore_iof_thr=-1),
+                    allowed_border=-1,
+                    pos_weight=-1,
+                    debug=False)),
+            test_cfg=dict(
+                nms_pre=2000,
+                min_bbox_size=0,
+                score_thr=0.05,
+                nms=dict(type='nms_rotated', iou_threshold=0.4),
+                max_per_img=2000))
         reppoints_head = RotatedRepPointsHead(**cfg).cuda()
         s = 256
         img_metas = [{
@@ -75,7 +75,10 @@ class TestRotatedRepPointsHead(unittest.TestCase):
         forward_outputs = reppoints_head.forward(x)
 
         gt_instances = InstanceData()
-        gt_instances.bboxes = torch.Tensor([[100.6326, 70.8874, 130.6667, 70.8874, 130.6667, 86.8757, 100.6326, 86.8757]]).cuda()
+        gt_instances.bboxes = torch.Tensor([[
+            100.6326, 70.8874, 130.6667, 70.8874, 130.6667, 86.8757, 100.6326,
+            86.8757
+        ]]).cuda()
         gt_instances.labels = torch.LongTensor([2]).cuda()
         gt_bboxes_ignore = None
         one_gt_losses = reppoints_head.loss_by_feat(*forward_outputs,
