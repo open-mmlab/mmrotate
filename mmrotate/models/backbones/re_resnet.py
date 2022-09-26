@@ -458,7 +458,6 @@ class ReResNet(BaseModule):
             memory while slowing down the training speed. Defaults to False.
         zero_init_residual (bool): Whether to use zero init for last norm layer
             in resblocks to let them behave as identity. Defaults to True.
-        pretrained (str, optional): model pretrained path. Defaults to None
         init_cfg (:obj:`ConfigDict` or dict or list[:obj:`ConfigDict` or \
             dict], optional): Initialization config dict. Defaults to None.
     """
@@ -490,28 +489,9 @@ class ReResNet(BaseModule):
                  norm_eval: bool = False,
                  with_cp: bool = False,
                  zero_init_residual: bool = True,
-                 pretrained: Optional[str] = None,
                  init_cfg: OptMultiConfig = None) -> None:
         super().__init__(init_cfg=init_cfg)
         self.in_type = build_enn_trivial_feature(3)
-
-        assert not (init_cfg and pretrained), \
-            'init_cfg and pretrained cannot be setting at the same time'
-        if isinstance(pretrained, str):
-            warnings.warn('DeprecationWarning: pretrained is deprecated, '
-                          'please use "init_cfg" instead')
-            self.init_cfg = dict(type='Pretrained', checkpoint=pretrained)
-        elif pretrained is None:
-            if init_cfg is None:
-                self.init_cfg = [
-                    dict(type='Kaiming', layer='Conv2d'),
-                    dict(
-                        type='Constant',
-                        val=1,
-                        layer=['_BatchNorm', 'GroupNorm'])
-                ]
-        else:
-            raise TypeError('pretrained must be a str or None')
 
         if depth not in self.arch_settings:
             raise KeyError(f'invalid depth {depth} for resnet')
