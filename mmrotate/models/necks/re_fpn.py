@@ -1,10 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 # Modified from csuhan: https://github.com/csuhan/ReDet
 import warnings
+from typing import List, Optional, Sequence, Tuple, Union
 
 import e2cnn.nn as enn
 import torch.nn as nn
+from mmdet.utils import MultiConfig, OptConfigType
 from mmengine.model import BaseModule
+from torch import Tensor
 
 from mmrotate.registry import MODELS
 from ..utils import (build_enn_feature, build_enn_norm_layer, ennConv,
@@ -17,42 +20,45 @@ class ConvModule(enn.EquivariantModule):
     Args:
         in_channels (List[int]): Number of input channels per scale.
         out_channels (int): Number of output channels (used at each scale).
-        kernel_size (int, optional): The size of kernel.
-        stride (int, optional): Stride of the convolution. Default: 1.
+        kernel_size (int): The size of kernel.
+        stride (int): Stride of the convolution. Defaults to 1.
         padding (int or tuple): Zero-padding added to both sides of the input.
-            Default: 0.
-        dilation (int or tuple): Spacing between kernel elements. Default: 1.
+            Defaults to 0.
+        dilation (int or tuple): Spacing between kernel elements.
+            Defaults to 1.
         groups (int): Number of blocked connections from input.
-            channels to output channels. Default: 1.
+            channels to output channels. Defaults to 1.
         bias (bool): If True, adds a learnable bias to the output.
-            Default: False.
-        conv_cfg (dict, optional): Config dict for convolution layer.
-            Default: None.
-        norm_cfg (dict, optional): Config dict for normalization layer.
-            Default: None.
-        activation (str, optional): Activation layer in ConvModule.
-            Default: None.
+            Defaults to `auto`.
+        conv_cfg (:obj:`ConfigDict` or dict, optional): dictionary to
+            construct and config conv layer. Defaults to None
+        norm_cfg (:obj:`ConfigDict` or dict): dictionary to construct and
+            config norm layer. Defaults to None
+        activation (str): Activation layer in ConvModule.
+            Defaults to 'relu'.
         inplace (bool): can optionally do the operation in-place.
         order (tuple[str]): The order of conv/norm/activation layers. It is a
             sequence of "conv", "norm" and "act". Common examples are
             ("conv", "norm", "act") and ("act", "conv", "norm").
     """
 
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 kernel_size,
-                 stride=1,
-                 padding=0,
-                 dilation=1,
-                 groups=1,
-                 bias='auto',
-                 conv_cfg=None,
-                 norm_cfg=None,
-                 activation='relu',
-                 inplace=False,
-                 order=('conv', 'norm', 'act')):
-        super(ConvModule, self).__init__()
+    def __init__(
+        self,
+        in_channels: List[int],
+        out_channels: int,
+        kernel_size: int,
+        stride: int = 1,
+        padding: Union[int, tuple] = 0,
+        dilation: Union[int, tuple] = 1,
+        groups: int = 1,
+        bias: str = 'auto',
+        conv_cfg: OptConfigType = None,
+        norm_cfg: OptConfigType = None,
+        activation: str = 'relu',
+        inplace: bool = False,
+        order: Tuple[str] = ('conv', 'norm', 'act')
+    ) -> None:
+        super().__init__()
         assert conv_cfg is None or isinstance(conv_cfg, dict)
         assert norm_cfg is None or isinstance(norm_cfg, dict)
         self.in_type = build_enn_feature(in_channels)
@@ -120,16 +126,19 @@ class ConvModule(enn.EquivariantModule):
         self.init_weights()
 
     @property
-    def norm(self):
+    def norm(self) -> str:
         """Get normalizion layer's name."""
         return getattr(self, self.norm_name)
 
-    def init_weights(self):
+    def init_weights(self) -> None:
         """Initialize weights of the head."""
         nonlinearity = 'relu' if self.activation is None \
             else self.activation  # noqa: F841
 
-    def forward(self, x, activate=True, norm=True):
+    def forward(self,
+                x: Tensor,
+                activate: bool = True,
+                norm: bool = True) -> Tensor:
         """Forward function of ConvModule."""
         for layer in self.order:
             if layer == 'conv':
@@ -140,7 +149,7 @@ class ConvModule(enn.EquivariantModule):
                 x = self.activate(x)
         return x
 
-    def evaluate_output_shape(self, input_shape):
+    def evaluate_output_shape(self, input_shape: Sequence) -> Sequence:
         """Evaluate output shape."""
         return input_shape
 
@@ -153,45 +162,48 @@ class ReFPN(BaseModule):
         in_channels (List[int]): Number of input channels per scale.
         out_channels (int): Number of output channels (used at each scale)
         num_outs (int): Number of output scales.
-        start_level (int, optional): Index of the start input backbone level
-            used to build the feature pyramid. Default: 0.
-        end_level (int, optional): Index of the end input backbone level
-            (exclusive) to build the feature pyramid. Default: -1, which means
-            the last level.
-        add_extra_convs (bool, optional): It decides whether to add conv layers
+        start_level (int): Index of the start input backbone level
+            used to build the feature pyramid. Defaults to 0.
+        end_level (int): Index of the end input backbone level
+            (exclusive) to build the feature pyramid. Defaults to -1,
+            which means the last level.
+        add_extra_convs (bool): It decides whether to add conv layers
             on top of the original feature maps. Default to False.
-        extra_convs_on_inputs (bool, optional): It specifies the source feature
+        extra_convs_on_inputs (bool): It specifies the source feature
             map of the extra convs is the last feat map of neck inputs.
         relu_before_extra_convs (bool): Whether to apply relu before the extra
-            conv. Default: False.
+            conv. Defaults to False.
         no_norm_on_lateral (bool): Whether to apply norm on lateral.
-            Default: False.
-        conv_cfg (dict, optional): Config dict for convolution layer.
-            Default: None.
-        norm_cfg (dict, optional): Config dict for normalization layer.
-            Default: None.
+            Defaults to False.
+        conv_cfg (:obj:`ConfigDict` or dict, optional): dictionary to
+            construct and config conv layer. Defaults to None
+        norm_cfg (:obj:`ConfigDict` or dict): dictionary to construct and
+            config norm layer. Defaults to None
         activation (str, optional): Activation layer in ConvModule.
-            Default: None.
-        init_cfg (dict or list[dict], optional): Initialization config dict.
+            Defaults to None.
+        init_cfg (:obj:`ConfigDict` or dict or list[:obj:`ConfigDict` or \
+            dict], optional): Initialization config dict. Defaults to None.
     """
 
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 num_outs,
-                 start_level=0,
-                 end_level=-1,
-                 add_extra_convs=False,
-                 extra_convs_on_inputs=True,
-                 relu_before_extra_convs=False,
-                 no_norm_on_lateral=False,
-                 conv_cfg=None,
-                 norm_cfg=None,
-                 activation=None,
-                 init_cfg=dict(
-                     type='Xavier', layer='Conv2d', distribution='uniform')):
+    def __init__(
+        self,
+        in_channels: List[int],
+        out_channels: int,
+        num_outs: int,
+        start_level: int = 0,
+        end_level: int = -1,
+        add_extra_convs: bool = False,
+        extra_convs_on_inputs: bool = True,
+        relu_before_extra_convs: bool = False,
+        no_norm_on_lateral: bool = False,
+        conv_cfg: OptConfigType = None,
+        norm_cfg: OptConfigType = None,
+        activation: Optional[str] = None,
+        init_cfg: MultiConfig = dict(
+            type='Xavier', layer='Conv2d', distribution='uniform')
+    ) -> None:
 
-        super(ReFPN, self).__init__()
+        super().__init__(init_cfg=init_cfg)
         assert isinstance(in_channels, list)
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -278,7 +290,7 @@ class ReFPN(BaseModule):
                 for i in range(used_backbone_levels + 1, self.num_outs):
                     self.relus.append(ennReLU(out_channels))
 
-    def forward(self, inputs):
+    def forward(self, inputs: Tuple[Tensor]) -> Tuple[Tensor]:
         """Forward function of ReFPN."""
         assert len(inputs) == len(self.in_channels)
 
