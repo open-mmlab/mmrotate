@@ -5,7 +5,7 @@ _base_ = [
 norm_cfg = dict(type='GN', num_groups=32, requires_grad=True)
 
 model = dict(
-    type='mmdt.RepPoints',
+    type='mmdet.RepPointsDetector',
     data_preprocessor=dict(
         type='mmdet.DetDataPreprocessor',
         mean=[123.675, 116.28, 103.53],
