@@ -1,6 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 # Modified from csuhan: https://github.com/csuhan/ReDet
-import warnings
 from typing import Optional, Sequence, Tuple
 
 import e2cnn.nn as enn
