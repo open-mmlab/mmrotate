@@ -1,14 +1,16 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from unittest import TestCase
 
+import e2cnn.nn as enn
 import torch
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from mmrotate.models.necks import ReFPN
-import e2cnn.nn as enn
 from mmrotate.models.utils import build_enn_divide_feature
 
+
 class TestReFPN(TestCase):
+
     def test_refpn(self):
         """Tests fpn."""
         s = 64
@@ -17,12 +19,14 @@ class TestReFPN(TestCase):
         out_channels = 8
 
         # end_level=-1 is equal to end_level=3
-        ReFPN(in_channels=in_channels,
+        ReFPN(
+            in_channels=in_channels,
             out_channels=out_channels,
             start_level=0,
             end_level=-1,
             num_outs=5)
-        ReFPN(in_channels=in_channels,
+        ReFPN(
+            in_channels=in_channels,
             out_channels=out_channels,
             start_level=0,
             end_level=3,
@@ -30,7 +34,8 @@ class TestReFPN(TestCase):
 
         # `num_outs` is not equal to end_level - start_level + 1
         with self.assertRaises(AssertionError):
-            ReFPN(in_channels=in_channels,
+            ReFPN(
+                in_channels=in_channels,
                 out_channels=out_channels,
                 start_level=1,
                 end_level=2,
@@ -38,14 +43,16 @@ class TestReFPN(TestCase):
 
         # `num_outs` is not equal to len(in_channels) - start_level
         with self.assertRaises(AssertionError):
-            ReFPN(in_channels=in_channels,
+            ReFPN(
+                in_channels=in_channels,
                 out_channels=out_channels,
                 start_level=1,
                 num_outs=2)
 
         # `end_level` is larger than len(in_channels) - 1
         with self.assertRaises(AssertionError):
-            ReFPN(in_channels=in_channels,
+            ReFPN(
+                in_channels=in_channels,
                 out_channels=out_channels,
                 start_level=1,
                 end_level=4,
@@ -53,7 +60,8 @@ class TestReFPN(TestCase):
 
         # `num_outs` is not equal to end_level - start_level
         with self.assertRaises(AssertionError):
-            ReFPN(in_channels=in_channels,
+            ReFPN(
+                in_channels=in_channels,
                 out_channels=out_channels,
                 start_level=1,
                 end_level=3,
@@ -68,8 +76,9 @@ class TestReFPN(TestCase):
 
         # ReFPN expects a multiple levels of features per image
         feats = [
-            enn.GeometricTensor(torch.rand(1, in_channels[i], feat_sizes[i], feat_sizes[i]), 
-            build_enn_divide_feature(in_channels[i]))
+            enn.GeometricTensor(
+                torch.rand(1, in_channels[i], feat_sizes[i], feat_sizes[i]),
+                build_enn_divide_feature(in_channels[i]))
             for i in range(len(in_channels))
         ]
         outs = fpn_model(feats)

@@ -1,11 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from unittest import TestCase
 
+import e2cnn.nn as enn
 import torch
 from torch.nn.modules import GroupNorm
 from torch.nn.modules.batchnorm import _BatchNorm
-import e2cnn.nn as enn
-from mmrotate.models.backbones.re_resnet import BasicBlock, Bottleneck, ResLayer, ReResNet
+
+from mmrotate.models.backbones.re_resnet import (BasicBlock, Bottleneck,
+                                                 ReResNet, ResLayer)
 from mmrotate.models.utils import build_enn_divide_feature
 
 
@@ -33,6 +35,7 @@ def check_norm_state(modules, train_state):
 
 
 class TestReFPN(TestCase):
+
     def test_re_resnet_basic_block(self):
 
         # test BasicBlock structure and forward
@@ -65,7 +68,6 @@ class TestReFPN(TestCase):
         self.assertEqual(block.conv1.stride, 2)
         self.assertEqual(block.conv2.stride, 1)
 
-
     def test_re_resnet_res_layer(self):
         # Test ResLayer of 3 Bottleneck w\o downsample
         layer = ResLayer(Bottleneck, 3, 64, 64)
@@ -76,7 +78,6 @@ class TestReFPN(TestCase):
         x = enn.GeometricTensor(x, build_enn_divide_feature(64))
         x_out = layer(x)
         self.assertEqual(x_out.shape, torch.Size([1, 64, 56, 56]))
-
 
     def test_re_resnet_backbone(self):
         """Test reresnet backbone."""
