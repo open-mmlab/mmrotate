@@ -81,7 +81,7 @@ train_pipeline = [
         type='mmdet.LoadImageFromFile',
         file_client_args={{_base_.file_client_args}}),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
-    dict(type='mmdet.Resize', scale=(1024, 2014), keep_ratio=True),
+    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     dict(
         type='mmdet.RandomFlip',
         prob=0.75,
