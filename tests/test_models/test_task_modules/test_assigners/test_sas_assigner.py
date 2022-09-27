@@ -37,7 +37,8 @@ class TestSASAssigner(unittest.TestCase):
         gt_instances = InstanceData(bboxes=gt_bboxes, labels=gt_labels)
         num_level_bboxes = [4]
 
-        assign_result = assigner.assign(pred_instances, num_level_bboxes, gt_instances)
+        assign_result = assigner.assign(pred_instances, num_level_bboxes,
+                                        gt_instances)
         self.assertEqual(len(assign_result.gt_inds), 4)
         self.assertEqual(len(assign_result.labels), 4)
 
@@ -69,7 +70,8 @@ class TestSASAssigner(unittest.TestCase):
 
         num_level_bboxes = [4]
 
-        assign_result = assigner.assign(pred_instances, num_level_bboxes, gt_instances)
+        assign_result = assigner.assign(pred_instances, num_level_bboxes,
+                                        gt_instances)
         self.assertEqual(len(assign_result.gt_inds), 4)
         self.assertEqual(len(assign_result.labels), 4)
 
