@@ -1,38 +1,43 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Optional
+
 import torch
 from mmdet.models.task_modules.assigners.assign_result import AssignResult
 from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
+from mmengine.structures import InstanceData
+from torch import Tensor
 
 from mmrotate.registry import TASK_UTILS
 
 
 @TASK_UTILS.register_module()
 class ConvexAssigner(BaseAssigner):
-    """Assign a corresponding gt bbox or background to each bbox. Each
+    """Assign a corresponding qbbox gt or background to each convex. Each
     proposals will be assigned with `0` or a positive integer indicating the
     ground truth index.
 
     - 0: negative sample, no assigned gt
     - positive integer: positive sample, index (1-based) of assigned gt
 
+
     Args:
-        scale (float): IoU threshold for positive bboxes.
-        pos_num (float): find the nearest pos_num points to gt center in this
-        level.
+        scale (float): qbbox scale for assigning labels. Defaults to 4.0.
+        pos_num (int): find the nearest pos_num points to gt center in this
+        level. Defaults to 3.
     """
 
-    def __init__(self, scale=4, pos_num=3):
+    def __init__(self, scale: float = 4.0, pos_num: int = 3) -> None:
         self.scale = scale
         self.pos_num = pos_num
 
-    def get_horizontal_bboxes(self, gt_rbboxes):
+    def get_horizontal_bboxes(self, gt_rbboxes: Tensor) -> Tensor:
         """get_horizontal_bboxes from polygons.
 
         Args:
-            gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
+            gt_rbboxes (Tensor): Groundtruth polygons, shape (k, 8).
 
         Returns:
-            gt_rect_bboxes (torch.Tensor): The horizontal bboxes, shape (k, 4).
+            gt_rect_bboxes (Tensor): The horizontal bboxes, shape (k, 4).
         """
         gt_xs, gt_ys = gt_rbboxes[:, 0::2], gt_rbboxes[:, 1::2]
         gt_xmin, _ = gt_xs.min(1)
@@ -47,16 +52,15 @@ class ConvexAssigner(BaseAssigner):
 
         return gt_rect_bboxes
 
-    def assign(self,
-               points,
-               gt_rbboxes,
-               gt_rbboxes_ignore=None,
-               gt_labels=None,
-               overlaps=None):
+    def assign(
+            self,
+            pred_instances: InstanceData,
+            gt_instances: InstanceData,
+            gt_instances_ignore: Optional[InstanceData] = None
+    ) -> AssignResult:
         """Assign gt to bboxes.
 
         The assignment is done in following steps
-
         1. compute iou between all bbox (bbox of all pyramid levels) and gt
         2. compute center distance between all bbox and gt
         3. on each pyramid level, for each gt, select k bbox whose center
@@ -68,16 +72,26 @@ class ConvexAssigner(BaseAssigner):
            the threshold as positive
         6. limit the positive sample's center in gt
 
+
         Args:
-            points (torch.Tensor): Points to be assigned, shape(n, 18).
-            gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
-            gt_rbboxes_ignore (Tensor, optional): Ground truth polygons that
-                are labelled as `ignored`, e.g., crowd boxes in COCO.
-            gt_labels (Tensor, optional): Label of gt_bboxes, shape (k, ).
+            pred_instances (:obj:`InstaceData`): Instances of model
+                predictions. It includes ``priors``, and the priors are
+                convex predicted by the model, shape(n, 18)).
+            gt_instances (:obj:`InstaceData`): Ground truth of instance
+                annotations. It usually includes ``bboxes`` and ``labels``
+                attributes, and the bboxes are GT qboxes, shape (k, 8).
+            gt_instances_ignore (:obj:`InstaceData`, optional): Instances
+                to be ignored during training. It includes ``bboxes``
+                attribute data that is ignored during training and testing.
+                Defaults to None.
 
         Returns:
             :obj:`AssignResult`: The assign result.
         """
+        gt_rbboxes = gt_instances.bboxes
+        points = pred_instances.priors
+        gt_labels = gt_instances.labels
+
         num_points = points.shape[0]
         num_gts = gt_rbboxes.shape[0]
 
@@ -93,7 +107,10 @@ class ConvexAssigner(BaseAssigner):
                                                   -1,
                                                   dtype=torch.long)
             return AssignResult(
-                num_gts, assigned_gt_inds, None, labels=assigned_labels)
+                num_gts=num_gts,
+                gt_inds=assigned_gt_inds,
+                max_overlaps=None,
+                labels=assigned_labels)
 
         points_xy = points[:, :2]
         points_stride = points[:, 2]
@@ -167,4 +184,7 @@ class ConvexAssigner(BaseAssigner):
             assigned_labels = None
 
         return AssignResult(
-            num_gts, assigned_gt_inds, None, labels=assigned_labels)
+            num_gts=num_gts,
+            gt_inds=assigned_gt_inds,
+            max_overlaps=None,
+            labels=assigned_labels)

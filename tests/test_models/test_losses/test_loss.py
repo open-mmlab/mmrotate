@@ -4,7 +4,8 @@ import unittest
 import torch
 from parameterized import parameterized
 
-from mmrotate.models.losses import GDLoss, GDLoss_v1
+from mmrotate.models.losses import (BCConvexGIoULoss, ConvexGIoULoss, GDLoss,
+                                    GDLoss_v1)
 
 
 class TestGDLoss(unittest.TestCase):
@@ -107,3 +108,45 @@ class TestGDLoss_v1(unittest.TestCase):
             GDLoss_v1(loss_type)(
                 pred, target, reduction_override=reduction_override)
             self.assertIsInstance(loss, torch.Tensor)
+
+
+class TestConvexGIoULoss(unittest.TestCase):
+
+    @parameterized.expand([(ConvexGIoULoss, ), (BCConvexGIoULoss, )])
+    def test_loss_with_reduction_override(self, loss_class):
+        pred = torch.rand((10, 18))
+        target = torch.rand((10, 8)),
+        weight = None
+
+        with self.assertRaises(AssertionError):
+            # only reduction_override from [None, 'none', 'mean', 'sum']
+            # is not allowed
+            reduction_override = True
+            loss_class()(
+                pred, target, weight, reduction_override=reduction_override)
+
+    @parameterized.expand([(ConvexGIoULoss, ), (BCConvexGIoULoss, )])
+    def test_regression_losses(self, loss_class):
+
+        if not torch.cuda.is_available():
+            return unittest.skip('test requires GPU and torch+cuda')
+
+        pred = torch.rand((10, 18)).cuda()
+        target = torch.rand((10, 8)).cuda()
+        weight = torch.rand((10, )).cuda()
+
+        # Test loss forward
+        loss = loss_class()(pred, target)
+        assert isinstance(loss, torch.Tensor)
+
+        # Test loss forward with weight
+        loss = loss_class()(pred, target, weight)
+        assert isinstance(loss, torch.Tensor)
+
+        # Test loss forward with reduction_override
+        loss = loss_class()(pred, target, reduction_override='mean')
+        assert isinstance(loss, torch.Tensor)
+
+        # Test loss forward with avg_factor
+        loss = loss_class()(pred, target, avg_factor=10)
+        assert isinstance(loss, torch.Tensor)

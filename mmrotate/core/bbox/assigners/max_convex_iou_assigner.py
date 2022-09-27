@@ -1,8 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Optional, Union
+
 import torch
 from mmcv.ops import convex_iou
 from mmdet.models.task_modules.assigners.assign_result import AssignResult
 from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
+from mmengine.structures import InstanceData
+from torch import Tensor
 
 from mmrotate.registry import TASK_UTILS
 
@@ -15,6 +19,7 @@ class MaxConvexIoUAssigner(BaseAssigner):
 
     - -1: negative sample, no assigned gt
     - semi-positive integer: positive sample, index (0-based) of assigned gt
+
 
     Args:
         pos_iou_thr (float): IoU threshold for positive bboxes.
@@ -35,13 +40,13 @@ class MaxConvexIoUAssigner(BaseAssigner):
     """
 
     def __init__(self,
-                 pos_iou_thr,
-                 neg_iou_thr,
-                 min_pos_iou=.0,
-                 gt_max_assign_all=True,
-                 ignore_iof_thr=-1,
-                 ignore_wrt_candidates=True,
-                 gpu_assign_thr=-1):
+                 pos_iou_thr: float,
+                 neg_iou_thr: Union[float, tuple],
+                 min_pos_iou: float = .0,
+                 gt_max_assign_all: bool = True,
+                 ignore_iof_thr: float = -1,
+                 ignore_wrt_candidates: bool = True,
+                 gpu_assign_thr: float = -1):
 
         self.pos_iou_thr = pos_iou_thr
         self.neg_iou_thr = neg_iou_thr
@@ -51,18 +56,14 @@ class MaxConvexIoUAssigner(BaseAssigner):
         self.ignore_wrt_candidates = ignore_wrt_candidates
         self.gpu_assign_thr = gpu_assign_thr
 
-    def assign(
-        self,
-        points,
-        gt_rbboxes,
-        overlaps,
-        gt_rbboxes_ignore=None,
-        gt_labels=None,
-    ):
+    def assign(self,
+               pred_instances: InstanceData,
+               gt_instances: InstanceData,
+               gt_instances_ignore: Optional[InstanceData] = None,
+               **kwargs) -> AssignResult:
         """Assign gt to bboxes.
 
         The assignment is done in following steps
-
         1. compute iou between all bbox (bbox of all pyramid levels) and gt
         2. compute center distance between all bbox and gt
         3. on each pyramid level, for each gt, select k bbox whose center
@@ -73,19 +74,33 @@ class MaxConvexIoUAssigner(BaseAssigner):
         5. select these candidates whose iou are greater than or equal to
            the threshold as positive
         6. limit the positive sample's center in gt
-
         Args:
-            points (torch.Tensor): Points to be assigned, shape(n, 18).
-            gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
-            overlaps (torch.Tensor): Overlaps between k gt_bboxes and n bboxes,
-                shape(k, n).
-            gt_rbboxes_ignore (Tensor, optional): Ground truth polygons that
-                are labelled as `ignored`, e.g., crowd boxes in COCO.
-            gt_labels (Tensor, optional): Label of gt_bboxes, shape (k, ).
+            pred_instances (:obj:`InstanceData`): Instances of model
+                predictions. It includes ``priors``, and the priors can
+                be anchors or points, or the bboxes predicted by the
+                previous stage, has shape (n, 4). The bboxes predicted by
+                the current model or stage will be named ``bboxes``,
+                ``labels``, and ``scores``, the same as the ``InstanceData``
+                in other places.
+            gt_instances (:obj:`InstanceData`): Ground truth of instance
+                annotations. It usually includes ``bboxes``, with shape (k, 4),
+                and ``labels``, with shape (k, ).
+            gt_instances_ignore (:obj:`InstanceData`, optional): Instances
+                to be ignored during training. It includes ``bboxes``
+                attribute data that is ignored during training and testing.
+                Defaults to None.
 
         Returns:
             :obj:`AssignResult`: The assign result.
         """
+        gt_rbboxes = gt_instances.bboxes
+        points = pred_instances.priors
+        gt_labels = gt_instances.labels
+        if gt_instances_ignore is not None:
+            gt_rbboxes_ignore = gt_instances_ignore.bboxes
+        else:
+            gt_rbboxes_ignore = None
+
         assign_on_cpu = True if (self.gpu_assign_thr > 0) and (
             gt_rbboxes.shape[0] > self.gpu_assign_thr) else False
         # compute overlap and assign gt on CPU when number of GT is large
@@ -98,8 +113,7 @@ class MaxConvexIoUAssigner(BaseAssigner):
             if gt_labels is not None:
                 gt_labels = gt_labels.cpu()
 
-        if overlaps is None:
-            overlaps = self.convex_overlaps(gt_rbboxes, points)
+        overlaps = self.convex_overlaps(gt_rbboxes, points)
 
         if (self.ignore_iof_thr > 0 and gt_rbboxes_ignore is not None
                 and gt_rbboxes_ignore.numel() > 0 and bboxes.numel() > 0):
@@ -121,15 +135,16 @@ class MaxConvexIoUAssigner(BaseAssigner):
                 assign_result.labels = assign_result.labels.to(device)
         return assign_result
 
-    def assign_wrt_overlaps(self, overlaps, gt_labels=None):
+    def assign_wrt_overlaps(self, overlaps: Tensor,
+                            gt_labels: Tensor) -> AssignResult:
         """Assign w.r.t.
 
-        the overlaps of bboxes with gts.
+        the overlaps of priors with gts.
 
         Args:
-            overlaps (torch.Tensor): Overlaps between k gt_bboxes and n bboxes,
+            overlaps (Tensor): Overlaps between k gt_bboxes and n bboxes,
                 shape(k, n).
-            gt_labels (Tensor, optional): Labels of k gt_bboxes, shape (k, ).
+            gt_labels (Tensor): Labels of k gt_bboxes, shape (k, ).
 
         Returns:
             :obj:`AssignResult`: The assign result.
@@ -154,9 +169,9 @@ class MaxConvexIoUAssigner(BaseAssigner):
                                                     -1,
                                                     dtype=torch.long)
             return AssignResult(
-                num_gts,
-                assigned_gt_inds,
-                max_overlaps,
+                num_gts=num_gts,
+                gt_inds=assigned_gt_inds,
+                max_overlaps=max_overlaps,
                 labels=assigned_labels)
 
         # for each anchor, which gt best overlaps with it
@@ -199,17 +214,20 @@ class MaxConvexIoUAssigner(BaseAssigner):
             assigned_labels = None
 
         return AssignResult(
-            num_gts, assigned_gt_inds, max_overlaps, labels=assigned_labels)
+            num_gts=num_gts,
+            gt_inds=assigned_gt_inds,
+            max_overlaps=max_overlaps,
+            labels=assigned_labels)
 
-    def convex_overlaps(self, gt_rbboxes, points):
+    def convex_overlaps(self, gt_rbboxes: Tensor, points: Tensor) -> Tensor:
         """Compute overlaps between polygons and points.
 
         Args:
-            gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
-            points (torch.Tensor): Points to be assigned, shape(n, 18).
+            gt_rbboxes (Tensor): Groundtruth polygons, shape (k, 8).
+            points (Tensor): Points to be assigned, shape(n, 18).
 
         Returns:
-            overlaps (torch.Tensor): Overlaps between k gt_bboxes and n \
+            overlaps (Tensor): Overlaps between k gt_bboxes and n \
                 bboxes, shape(k, n).
         """
         overlaps = convex_iou(points, gt_rbboxes)

@@ -5,7 +5,7 @@ from mmcv.ops import convex_giou
 from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 
-from ..builder import ROTATED_LOSSES
+from mmrotate.registry import MODELS
 
 
 class ConvexGIoULossFuction(Function):
@@ -64,18 +64,16 @@ class ConvexGIoULossFuction(Function):
 convex_giou_loss = ConvexGIoULossFuction.apply
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class ConvexGIoULoss(nn.Module):
     """Convex GIoU loss.
 
     Computing the Convex GIoU loss between a set of predicted convexes and
     target convexes.
-
     Args:
         reduction (str, optional): The reduction method of the loss. Defaults
             to 'mean'.
         loss_weight (float, optional): The weight of loss. Defaults to 1.0.
-
     Return:
         torch.Tensor: Loss tensor.
     """
@@ -260,18 +258,16 @@ class BCConvexGIoULossFuction(Function):
 bc_convex_giou_loss = BCConvexGIoULossFuction.apply
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class BCConvexGIoULoss(nn.Module):
     """BCConvex GIoU loss.
 
     Computing the BCConvex GIoU loss between a set of predicted convexes and
     target convexes.
-
     Args:
         reduction (str, optional): The reduction method of the loss. Defaults
             to 'mean'.
         loss_weight (float, optional): The weight of loss. Defaults to 1.0.
-
     Return:
         torch.Tensor: Loss tensor.
     """
@@ -316,7 +312,6 @@ def AspectRatio(gt_rbboxes):
 
     Args:
         gt_rbboxes (torch.Tensor): Groundtruth polygons, shape (k, 8).
-
     Returns:
         ratios (torch.Tensor): The aspect ratio of gt_rbboxes, shape (k, 1).
     """
