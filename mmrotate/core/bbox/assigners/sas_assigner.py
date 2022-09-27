@@ -67,12 +67,13 @@ class SASAssigner(BaseAssigner):
     def __init__(self, topk):
         self.topk = topk
 
-    def assign(self,
-               pred_instances: InstanceData,
-               num_level_priors: List[int],
-               gt_instances: InstanceData,
-               gt_instances_ignore: Optional[InstanceData] = None,
-               **kwargs) -> AssignResult:
+    def assign(
+            self,
+            pred_instances: InstanceData,
+            num_level_priors: List[int],
+            gt_instances: InstanceData,
+            gt_instances_ignore: Optional[InstanceData] = None
+    ) -> AssignResult:
         """Assign gt to bboxes.
 
         The assignment is done in following steps

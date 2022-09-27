@@ -11,7 +11,7 @@ from mmrotate.core.bbox.structures import qbox2rbox
 from mmrotate.models.dense_heads.rotated_reppoints_head import \
     RotatedRepPointsHead
 from mmrotate.registry import MODELS
-from .utils import points_center_pts
+from .utils import get_num_level_anchors_inside, points_center_pts
 
 
 @MODELS.register_module()
@@ -21,6 +21,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
     def _get_targets_single(self,
                             flat_proposals: Tensor,
                             valid_flags: Tensor,
+                            num_level_proposals: List[int],
                             gt_instances: InstanceData,
                             gt_instances_ignore: InstanceData,
                             stage: str = 'init',
@@ -30,6 +31,8 @@ class SAMRepPointsHead(RotatedRepPointsHead):
         Args:
             flat_proposals (Tensor): Multi level points of a image.
             valid_flags (Tensor): Multi level valid flags of a image.
+            num_level_proposals (List[int]): Number of anchors of each scale
+                level.
             gt_instances (InstanceData): It usually includes ``bboxes`` and
                 ``labels`` attributes.
             gt_instances_ignore (InstanceData): It includes ``bboxes``
@@ -55,17 +58,29 @@ class SAMRepPointsHead(RotatedRepPointsHead):
                 'check the image size.')
         # assign gt and sample proposals
         proposals = flat_proposals[inside_flags, :]
+        num_level_proposals_inside = get_num_level_anchors_inside(
+            num_level_proposals, inside_flags)
         pred_instances = InstanceData(priors=proposals)
 
         if stage == 'init':
             assigner = self.init_assigner
             pos_weight = self.train_cfg.init.pos_weight
+            assign_result = assigner.assign(pred_instances, gt_instances,
+                                            gt_instances_ignore)
         else:
             assigner = self.refine_assigner
             pos_weight = self.train_cfg.refine.pos_weight
 
-        assign_result = assigner.assign(pred_instances, gt_instances,
-                                        gt_instances_ignore)
+            if self.train_cfg.refine.assigner['type'] not in (
+                    'ATSSAssigner', 'ATSSConvexAssigner', 'SASAssigner'):
+                assign_result = assigner.assign(pred_instances, gt_instances,
+                                                gt_instances_ignore)
+            else:
+                assign_result = assigner.assign(pred_instances,
+                                                num_level_proposals_inside,
+                                                gt_instances,
+                                                gt_instances_ignore)
+
         sampling_result = self.sampler.sample(assign_result, pred_instances,
                                               gt_instances)
 
@@ -210,6 +225,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
 
         # points number of multi levels
         num_level_proposals = [points.size(0) for points in proposals_list[0]]
+        num_level_proposals_list = [num_level_proposals] * num_imgs
 
         # concat all level points and flags to a single tensor
         for i in range(num_imgs):
@@ -226,6 +242,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
              self._get_targets_single,
              proposals_list,
              valid_flag_list,
+             num_level_proposals_list,
              batch_gt_instances,
              batch_gt_instances_ignore,
              stage=stage,
@@ -308,7 +325,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
         normalize_term = self.point_base_scale * stride
         loss_pts_init = self.loss_bbox_init(
             pos_pts_pred_init / normalize_term,
-            pos_bbox_gt_init / normalize_term, pos_bbox_weights_init,
+            pos_bbox_gt_init / normalize_term,
             pos_bbox_weights_init * sam_weights_pos_init)
 
         # refine loss
