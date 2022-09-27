@@ -18,6 +18,8 @@ class ConvexAssigner(BaseAssigner):
 
     - 0: negative sample, no assigned gt
     - positive integer: positive sample, index (1-based) of assigned gt
+
+
     Args:
         scale (float): qbbox scale for assigning labels. Defaults to 4.0.
         pos_num (int): find the nearest pos_num points to gt center in this
@@ -33,6 +35,7 @@ class ConvexAssigner(BaseAssigner):
 
         Args:
             gt_rbboxes (Tensor): Groundtruth polygons, shape (k, 8).
+
         Returns:
             gt_rect_bboxes (Tensor): The horizontal bboxes, shape (k, 4).
         """
@@ -68,6 +71,8 @@ class ConvexAssigner(BaseAssigner):
         5. select these candidates whose iou are greater than or equal to
            the threshold as positive
         6. limit the positive sample's center in gt
+
+
         Args:
             pred_instances (:obj:`InstaceData`): Instances of model
                 predictions. It includes ``priors``, and the priors are
@@ -79,6 +84,7 @@ class ConvexAssigner(BaseAssigner):
                 to be ignored during training. It includes ``bboxes``
                 attribute data that is ignored during training and testing.
                 Defaults to None.
+
         Returns:
             :obj:`AssignResult`: The assign result.
         """

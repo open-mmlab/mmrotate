@@ -19,6 +19,8 @@ class MaxConvexIoUAssigner(BaseAssigner):
 
     - -1: negative sample, no assigned gt
     - semi-positive integer: positive sample, index (0-based) of assigned gt
+
+
     Args:
         pos_iou_thr (float): IoU threshold for positive bboxes.
         neg_iou_thr (float or tuple): IoU threshold for negative bboxes.
@@ -87,6 +89,7 @@ class MaxConvexIoUAssigner(BaseAssigner):
                 to be ignored during training. It includes ``bboxes``
                 attribute data that is ignored during training and testing.
                 Defaults to None.
+
         Returns:
             :obj:`AssignResult`: The assign result.
         """
@@ -137,10 +140,12 @@ class MaxConvexIoUAssigner(BaseAssigner):
         """Assign w.r.t.
 
         the overlaps of priors with gts.
+
         Args:
             overlaps (Tensor): Overlaps between k gt_bboxes and n bboxes,
                 shape(k, n).
-            gt_labels (optional): Labels of k gt_bboxes, shape (k, ).
+            gt_labels (Tensor): Labels of k gt_bboxes, shape (k, ).
+
         Returns:
             :obj:`AssignResult`: The assign result.
         """
@@ -220,6 +225,7 @@ class MaxConvexIoUAssigner(BaseAssigner):
         Args:
             gt_rbboxes (Tensor): Groundtruth polygons, shape (k, 8).
             points (Tensor): Points to be assigned, shape(n, 18).
+
         Returns:
             overlaps (Tensor): Overlaps between k gt_bboxes and n \
                 bboxes, shape(k, n).
