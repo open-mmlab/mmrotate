@@ -28,6 +28,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
                             unmap_outputs: bool = True) -> tuple:
         """Compute corresponding GT box and classification targets for
         proposals.
+
         Args:
             flat_proposals (Tensor): Multi level points of a image.
             valid_flags (Tensor): Multi level valid flags of a image.
@@ -41,8 +42,10 @@ class SAMRepPointsHead(RotatedRepPointsHead):
                 init stage or refine stage. Defaults to 'init'.
             unmap_outputs (bool): Whether to map outputs back to
                 the original set of anchors. Defaults to True.
+
         Returns:
             tuple:
+
                 - labels (Tensor): Labels of each level.
                 - label_weights (Tensor): Label weights of each level.
                 - bbox_targets (Tensor): BBox targets of each level.
@@ -207,17 +210,17 @@ class SAMRepPointsHead(RotatedRepPointsHead):
 
                 - labels_list (list[Tensor]): Labels of each level.
                 - label_weights_list (list[Tensor]): Label weights of each
-                  level.
+                level.
                 - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
                 - proposals_list (list[Tensor]): Proposals(points/bboxes) of
-                  each level.
+                each level.
                 - proposal_weights_list (list[Tensor]): Proposal weights of
-                  each level.
+                each level.
                 - avg_factor (int): Average factor that is used to average
-                  the loss. When using sampling method, avg_factor is usually
-                  the sum of positive and negative priors. When using
-                  `PseudoSampler`, `avg_factor` is usually equal to the number
-                  of positive priors.
+                the loss. When using sampling method, avg_factor is usually
+                the sum of positive and negative priors. When using
+                `PseudoSampler`, `avg_factor` is usually equal to the number
+                of positive priors.
         """
         assert stage in ['init', 'refine']
         num_imgs = len(batch_img_metas)
@@ -275,6 +278,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
                             avg_factor_refine: int) -> Tuple[Tensor]:
         """Calculate the loss of a single scale level based on the features
         extracted by the detection head.
+
         Args:
             cls_score (Tensor): Box scores for each scale level
                 Has shape (N, num_classes, h_i, w_i).
@@ -299,6 +303,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
             stride (int): Point stride.
             avg_factor_refine (int): Average factor that is used to average
                 the loss in the refine stage.
+
         Returns:
             Tuple[Tensor]: loss components.
         """
@@ -356,6 +361,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
     ) -> Dict[str, Tensor]:
         """Calculate the loss based on the features extracted by the detection
         head.
+
         Args:
             cls_scores (list[Tensor]): Box scores for each scale level,
                 each is a 4D-tensor, of shape (batch_size, num_classes, h, w).
@@ -373,6 +379,7 @@ class SAMRepPointsHead(RotatedRepPointsHead):
                 Batch of gt_instances_ignore. It includes ``bboxes`` attribute
                 data that is ignored during training and testing.
                 Defaults to None.
+
         Returns:
             dict[str, Tensor]: A dictionary of loss components.
         """

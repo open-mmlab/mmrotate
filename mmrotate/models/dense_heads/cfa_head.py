@@ -33,6 +33,7 @@ class CFAHead(RotatedRepPointsHead):
                             avg_factor_init: int) -> Tuple[Tensor]:
         """Calculate the loss of a single scale level based on the features
         extracted by the detection head.
+
         Args:
             pts_pred_init (Tensor): Points of shape
                 (batch_size, h_i * w_i, num_points * 2).
@@ -43,6 +44,7 @@ class CFAHead(RotatedRepPointsHead):
             stride (int): Point stride.
             avg_factor_init (int): Average factor that is used to average
                 the loss in the init stage.
+
         Returns:
             Tuple[Tensor]: loss components.
         """
@@ -74,6 +76,7 @@ class CFAHead(RotatedRepPointsHead):
     ) -> Dict[str, Tensor]:
         """Calculate the loss based on the features extracted by the detection
         head.
+
         Args:
             cls_scores (list[Tensor]): Box scores for each scale level,
                 each is a 4D-tensor, of shape (batch_size, num_classes, h, w).
@@ -91,6 +94,7 @@ class CFAHead(RotatedRepPointsHead):
                 Batch of gt_instances_ignore. It includes ``bboxes`` attribute
                 data that is ignored during training and testing.
                 Defaults to None.
+
         Returns:
             dict[str, Tensor]: A dictionary of loss components.
         """
@@ -250,6 +254,7 @@ class CFAHead(RotatedRepPointsHead):
                         return_sampling_results: bool = False) -> tuple:
         """Compute corresponding GT box and classification targets for
         proposals.
+
         Args:
             proposals_list (list[Tensor]): Multi level points/bboxes of each
                 image.
@@ -273,6 +278,7 @@ class CFAHead(RotatedRepPointsHead):
 
         Returns:
             tuple:
+
                 - all_labels (list[Tensor]): Labels of each level.
                 - all_label_weights (list[Tensor]): Label weights of each
                 level.
@@ -339,6 +345,7 @@ class CFAHead(RotatedRepPointsHead):
                 (num_anchors, 4).
             pos_inds (Tensor): Index of all positive samples got from
                 first assign process.
+
         Returns:
             Tensor: Losses of all positive samples in single image.
         """
@@ -376,6 +383,7 @@ class CFAHead(RotatedRepPointsHead):
                  num_proposals_each_level=None,
                  num_level=None):
         """CFA reassign process.
+
         Args:
             pos_losses (Tensor): Losses of all positive samples in
                 single image.
@@ -396,16 +404,18 @@ class CFAHead(RotatedRepPointsHead):
             num_proposals_each_level (list, optional): Number of proposals
                 of each level.
             num_level (int, optional): Number of level.
+
         Returns:
             tuple: Usually returns a tuple containing learning targets.
-                - label (Tensor): classification target of each anchor after \
-                  paa assign, with shape (num_anchors,)
-                - label_weight (Tensor): Classification loss weight of each \
-                  anchor after paa assign, with shape (num_anchors).
-                - convex_weight (Tensor): Bbox weight of each anchor with \
-                    shape (num_anchors, 4).
-                - pos_normalize_term (list): pos normalize term for refine \
-                  points losses.
+
+                - label (Tensor): classification target of each anchor after
+                paa assign, with shape (num_anchors,)
+                - label_weight (Tensor): Classification loss weight of each
+                anchor after paa assign, with shape (num_anchors).
+                - convex_weight (Tensor): Bbox weight of each anchor with
+                shape (num_anchors, 4).
+                - pos_normalize_term (list): pos normalize term for refine
+                points losses.
         """
         if len(pos_inds) == 0:
             return label, label_weight, convex_weight, 0, torch.tensor(
