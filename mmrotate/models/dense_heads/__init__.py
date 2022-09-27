@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from .cfa_head import CFAHead
 from .csl_rotated_fcos_head import CSLRFCOSHead
 from .csl_rotated_retina_head import CSLRRetinaHead
 from .kfiou_odm_refine_head import KFIoUODMRefineHead
@@ -25,5 +26,5 @@ __all__ = [
     'SAMRepPointsHead', 'CSLRRetinaHead', 'RotatedATSSHead',
     'RotatedAnchorFreeHead', 'RotatedFCOSHead', 'CSLRFCOSHead',
     'OrientedRepPointsHead', 'R3Head', 'R3RefineHead', 'S2AHead',
-    'S2ARefineHead'
+    'S2ARefineHead', 'CFAHead'
 ]

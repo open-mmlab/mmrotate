@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/dota.py', '../_base_/schedules/schedule_40e.py',
+    '../_base_/datasets/dota.py', '../_base_/schedules/schedule_1x.py',
     '../_base_/default_runtime.py'
 ]
 norm_cfg = dict(type='GN', num_groups=32, requires_grad=True)
@@ -51,7 +51,9 @@ model = dict(
             loss_weight=1.0),
         loss_bbox_init=dict(type='ConvexGIoULoss', loss_weight=0.375),
         loss_bbox_refine=dict(type='ConvexGIoULoss', loss_weight=1.0),
-        transform_method='rotrect'),
+        transform_method='rotrect',
+        topk=6,
+        anti_factor=0.75),
     # training and testing settings
     train_cfg=dict(
         init=dict(
