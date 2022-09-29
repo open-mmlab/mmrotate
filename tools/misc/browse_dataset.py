@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import argparse
 import os
-from collections import Sequence
+import sys
 from pathlib import Path
 
 import mmcv
@@ -9,6 +9,11 @@ from mmcv import Config, DictAction
 from mmdet.datasets.builder import build_dataset
 
 from mmrotate.core.visualization import imshow_det_rbboxes
+
+if sys.version_info < (3, 3):
+    from collections import Sequence
+else:
+    from collections.abc import Sequence
 
 
 def parse_args():
