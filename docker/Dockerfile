@@ -1,8 +1,19 @@
-ARG PYTORCH="1.6.0"
-ARG CUDA="10.1"
-ARG CUDNN="7"
+# See available version combinations here:
+# https://mmcv.readthedocs.io/en/latest/get_started/installation.html
+# https://hub.docker.com/r/pytorch/pytorch/tags
+# The latest MMCV isn't always compatible. See here
+# https://mmdetection.readthedocs.io/en/latest/faq.html
+ARG PYTORCH="1.11.0"
+ARG CUDA="11.3"
+ARG CUDNN="8"
+ARG MMCV="1.6.0"
 
 FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
+
+ARG PYTORCH
+ARG CUDA
+ARG CUDNN
+ARG MMCV
 
 ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0+PTX"
 ENV TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
@@ -17,7 +28,8 @@ RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build 
     && rm -rf /var/lib/apt/lists/*
 
 # Install MMCV MMDetection
-RUN pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html
+RUN pip install mmcv-full==${MMCV} \
+    -f https://download.openmmlab.com/mmcv/dist/cu`echo ${CUDA} | tr --delete .`/torch${PYTORCH}/index.html
 RUN pip install mmdet
 # Install MMRotate
 RUN conda clean --all
