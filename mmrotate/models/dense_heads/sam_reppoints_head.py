@@ -46,13 +46,13 @@ class SAMRepPointsHead(RotatedRepPointsHead):
         Returns:
             tuple:
 
-                - labels (Tensor): Labels of each level.
-                - label_weights (Tensor): Label weights of each level.
-                - bbox_targets (Tensor): BBox targets of each level.
-                - bbox_weights (Tensor): BBox weights of each level.
-                - pos_inds (Tensor): positive samples indexes.
-                - neg_inds (Tensor): negative samples indexes.
-                - sampling_result (:obj:`SamplingResult`): Sampling results.
+            - labels (Tensor): Labels of each level.
+            - label_weights (Tensor): Label weights of each level.
+            - bbox_targets (Tensor): BBox targets of each level.
+            - bbox_weights (Tensor): BBox weights of each level.
+            - pos_inds (Tensor): positive samples indexes.
+            - neg_inds (Tensor): negative samples indexes.
+            - sampling_result (:obj:`SamplingResult`): Sampling results.
         """
         inside_flags = valid_flags
         if not inside_flags.any():
@@ -201,26 +201,26 @@ class SAMRepPointsHead(RotatedRepPointsHead):
                 data that is ignored during training and testing.
                 Defaults to None.
             stage (str): 'init' or 'refine'. Generate target for init stage or
-                refine stage.
+                refine stage. Defaults to 'init'.
             unmap_outputs (bool): Whether to map outputs back to the original
-                set of anchors.
+                set of anchors. Defaults to True.
 
         Returns:
             tuple:
 
-                - labels_list (list[Tensor]): Labels of each level.
-                - label_weights_list (list[Tensor]): Label weights of each
-                level.
-                - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
-                - proposals_list (list[Tensor]): Proposals(points/bboxes) of
-                each level.
-                - proposal_weights_list (list[Tensor]): Proposal weights of
-                each level.
-                - avg_factor (int): Average factor that is used to average
-                the loss. When using sampling method, avg_factor is usually
-                the sum of positive and negative priors. When using
-                `PseudoSampler`, `avg_factor` is usually equal to the number
-                of positive priors.
+            - labels_list (list[Tensor]): Labels of each level.
+            - label_weights_list (list[Tensor]): Label weights of each
+            level.
+            - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
+            - proposals_list (list[Tensor]): Proposals(points/bboxes) of
+            each level.
+            - proposal_weights_list (list[Tensor]): Proposal weights of
+            each level.
+            - avg_factor (int): Average factor that is used to average
+            the loss. When using sampling method, avg_factor is usually
+            the sum of positive and negative priors. When using
+            `PseudoSampler`, `avg_factor` is usually equal to the number
+            of positive priors.
         """
         assert stage in ['init', 'refine']
         num_imgs = len(batch_img_metas)

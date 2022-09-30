@@ -1,10 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
 from mmdet.models.utils import multi_apply
 from mmdet.utils import InstanceList, OptInstanceList
+from mmengine.structures import InstanceData
 from torch import Tensor
 
 from mmrotate.models.dense_heads.rotated_reppoints_head import \
@@ -23,7 +24,11 @@ class CFAHead(RotatedRepPointsHead):
             Defaults to 0.75.
     """  # noqa: W605
 
-    def __init__(self, *args, topk=6, anti_factor=0.75, **kwargs) -> None:
+    def __init__(self,
+                 *args,
+                 topk: int = 6,
+                 anti_factor: float = 0.75,
+                 **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.topk = topk
         self.anti_factor = anti_factor
@@ -270,27 +275,27 @@ class CFAHead(RotatedRepPointsHead):
                 data that is ignored during training and testing.
                 Defaults to None.
             stage (str): 'init' or 'refine'. Generate target for init stage or
-                refine stage.
+                refine stage. Defaults to 'init'.
             unmap_outputs (bool): Whether to map outputs back to the original
-                set of anchors.
+                set of anchors. Defaults to True.
             return_sampling_results (bool): Whether to return the sampling
                 results. Defaults to False.
 
         Returns:
             tuple:
 
-                - all_labels (list[Tensor]): Labels of each level.
-                - all_label_weights (list[Tensor]): Label weights of each
-                level.
-                - all_bbox_gt (list[Tensor]): Ground truth bbox of each level.
-                - all_proposals (list[Tensor]): Proposals(points/bboxes) of
-                each level.
-                - all_proposal_weights (list[Tensor]): Proposal weights of
-                each level.
-                - pos_inds (list[Tensor]): Index of positive samples in all
-                images.
-                - gt_inds (list[Tensor]): Index of ground truth bbox in all
-                images.
+            - all_labels (list[Tensor]): Labels of each level.
+            - all_label_weights (list[Tensor]): Label weights of each
+            level.
+            - all_bbox_gt (list[Tensor]): Ground truth bbox of each level.
+            - all_proposals (list[Tensor]): Proposals(points/bboxes) of
+            each level.
+            - all_proposal_weights (list[Tensor]): Proposal weights of
+            each level.
+            - pos_inds (list[Tensor]): Index of positive samples in all
+            images.
+            - gt_inds (list[Tensor]): Index of ground truth bbox in all
+            images.
         """
         assert stage in ['init', 'refine']
         num_imgs = len(batch_img_metas)
@@ -326,8 +331,9 @@ class CFAHead(RotatedRepPointsHead):
         return (all_labels, all_label_weights, all_bbox_gt, all_proposals,
                 all_proposal_weights, pos_inds, gt_inds)
 
-    def get_pos_loss(self, cls_score, pts_pred, label, bbox_gt, label_weight,
-                     convex_weight, pos_inds):
+    def get_pos_loss(self, cls_score: Tensor, pts_pred: Tensor, label: Tensor,
+                     bbox_gt: Tensor, label_weight: Tensor,
+                     convex_weight: Tensor, pos_inds: Tensor) -> Tensor:
         """Calculate loss of all potential positive samples obtained from first
         match process.
 
@@ -372,16 +378,16 @@ class CFAHead(RotatedRepPointsHead):
         return pos_loss,
 
     def reassign(self,
-                 pos_losses,
-                 label,
-                 label_weight,
-                 pts_pred_init,
-                 convex_weight,
-                 gt_instances,
-                 pos_inds,
-                 pos_gt_inds,
-                 num_proposals_each_level=None,
-                 num_level=None):
+                 pos_losses: Tensor,
+                 label: Tensor,
+                 label_weight: Tensor,
+                 pts_pred_init: Tensor,
+                 convex_weight: Tensor,
+                 gt_instances: InstanceData,
+                 pos_inds: Tensor,
+                 pos_gt_inds: Tensor,
+                 num_proposals_each_level: Optional[List] = None,
+                 num_level: Optional[int] = None) -> tuple:
         """CFA reassign process.
 
         Args:
@@ -408,14 +414,14 @@ class CFAHead(RotatedRepPointsHead):
         Returns:
             tuple: Usually returns a tuple containing learning targets.
 
-                - label (Tensor): classification target of each anchor after
-                paa assign, with shape (num_anchors,)
-                - label_weight (Tensor): Classification loss weight of each
-                anchor after paa assign, with shape (num_anchors).
-                - convex_weight (Tensor): Bbox weight of each anchor with
-                shape (num_anchors, 4).
-                - pos_normalize_term (list): pos normalize term for refine
-                points losses.
+            - label (Tensor): classification target of each anchor after
+            paa assign, with shape (num_anchors,)
+            - label_weight (Tensor): Classification loss weight of each
+            anchor after paa assign, with shape (num_anchors).
+            - convex_weight (Tensor): Bbox weight of each anchor with
+            shape (num_anchors, 4).
+            - pos_normalize_term (list): pos normalize term for refine
+            points losses.
         """
         if len(pos_inds) == 0:
             return label, label_weight, convex_weight, 0, torch.tensor(
