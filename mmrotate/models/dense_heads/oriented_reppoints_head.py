@@ -285,7 +285,6 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
         # points number of multi levels
         num_level_proposals = [points.size(0) for points in proposals_list[0]]
-        num_level_proposals_list = [num_level_proposals] * num_imgs
 
         # concat all level points and flags to a single tensor
         for i in range(num_imgs):
@@ -302,7 +301,6 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
              self._get_targets_single,
              proposals_list,
              valid_flag_list,
-             num_level_proposals_list,
              batch_gt_instances,
              batch_gt_instances_ignore,
              stage=stage,
