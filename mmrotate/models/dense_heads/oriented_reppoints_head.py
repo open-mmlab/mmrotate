@@ -13,7 +13,7 @@ from torch import Tensor
 
 from mmrotate.models.dense_heads.rotated_reppoints_head import \
     RotatedRepPointsHead
-from mmrotate.registry import MODELS, TASK_UTILS
+from mmrotate.registry import MODELS
 from .utils import levels_to_images
 
 
@@ -80,8 +80,8 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
                  poc_qua_weight=0.1,
                  **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.loss_spatial_init = TASK_UTILS.build(loss_spatial_init)
-        self.loss_spatial_refine = TASK_UTILS.build(loss_spatial_refine)
+        self.loss_spatial_init = MODELS.build(loss_spatial_init)
+        self.loss_spatial_refine = MODELS.build(loss_spatial_refine)
         self.top_ratio = top_ratio
         self.init_qua_weight = init_qua_weight
         self.ori_qua_weight = ori_qua_weight
