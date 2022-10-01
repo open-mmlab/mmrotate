@@ -132,7 +132,7 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
         if self.training:
             return cls_out, pts_out_init, pts_out_refine, base_feat
         else:
-            return cls_out, self.points2bbox(pts_out_refine)
+            return cls_out, pts_out_refine
 
     def _get_targets_single(self,
                             flat_proposals: Tensor,
