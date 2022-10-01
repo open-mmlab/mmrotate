@@ -1,12 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import torch
 import torch.nn as nn
-from mmcv.ops import points_in_polygons
 
-from ..builder import ROTATED_LOSSES
+from mmrotate.registry import MODELS
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class SpatialBorderLoss(nn.Module):
     """Spatial Border loss for learning points in Oriented RepPoints.
 
@@ -49,7 +48,8 @@ def spatial_border_loss(pts, gt_bboxes):
         for i in range(num_point):
             pt = pts[:, (2 * i):(2 * i + 2)].reshape(num_pointsets,
                                                      2).contiguous()
-            inside_pt_flag = points_in_polygons(pt, gt_bboxes)
+            # inside_pt_flag = points_in_polygons(pt, gt_bboxes)
+            inside_pt_flag = gt_bboxes.find_inside_points(pt)
             inside_pt_flag = torch.diag(inside_pt_flag)
             inside_flag_list.append(inside_pt_flag)
 
