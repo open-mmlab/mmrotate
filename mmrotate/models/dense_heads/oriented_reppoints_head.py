@@ -1,13 +1,13 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import math
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
 import torch.nn as nn
 from mmcv.ops import chamfer_distance, min_area_polygons
 from mmdet.models.utils import images_to_levels, multi_apply, unmap
-from mmdet.utils import InstanceList, OptInstanceList
+from mmdet.utils import ConfigType, InstanceList, OptInstanceList
 from mmengine.structures import InstanceData
 from torch import Tensor
 
@@ -19,8 +19,8 @@ from .utils import levels_to_images
 
 def ChamferDistance2D(point_set_1: Tensor,
                       point_set_2: Tensor,
-                      distance_weight=0.05,
-                      eps=1e-12):
+                      distance_weight: float = 0.05,
+                      eps: float = 1e-12):
     """Compute the Chamfer distance between two point sets.
 
     Args:
@@ -56,8 +56,10 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
     samples in the paper is employed in refined stage.
 
     Args:
-        loss_refine_init (dict): Config of initial spatial loss.
-        loss_refine_refine (dict): Config of refine spatial loss.
+        loss_refine_init  (:obj:`ConfigDict` or dict): Config of initial
+            spatial loss.
+        loss_refine_refine  (:obj:`ConfigDict` or dict): Config of refine
+            spatial loss.
         top_ratio (float): Ratio of top high-quality point sets.
             Defaults to 0.4.
         init_qua_weight (float): Quality weight of initial stage.
@@ -70,14 +72,14 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
     def __init__(self,
                  *args,
-                 loss_spatial_init=dict(
+                 loss_spatial_init: ConfigType = dict(
                      type='SpatialBorderLoss', loss_weight=0.05),
-                 loss_spatial_refine=dict(
+                 loss_spatial_refine: ConfigType = dict(
                      type='SpatialBorderLoss', loss_weight=0.1),
-                 top_ratio=0.4,
-                 init_qua_weight=0.2,
-                 ori_qua_weight=0.3,
-                 poc_qua_weight=0.1,
+                 top_ratio: float = 0.4,
+                 init_qua_weight: float = 0.2,
+                 ori_qua_weight: float = 0.3,
+                 poc_qua_weight: float = 0.1,
                  **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.loss_spatial_init = MODELS.build(loss_spatial_init)
@@ -143,6 +145,7 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
                             unmap_outputs: bool = True) -> tuple:
         """Compute corresponding GT box and classification targets for
         proposals.
+
         Args:
             flat_proposals (Tensor): Multi level points of a image.
             valid_flags (Tensor): Multi level valid flags of a image.
@@ -154,15 +157,17 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
                 init stage or refine stage. Defaults to 'init'.
             unmap_outputs (bool): Whether to map outputs back to
                 the original set of anchors. Defaults to True.
+
         Returns:
             tuple:
-                - labels (Tensor): Labels of each level.
-                - label_weights (Tensor): Label weights of each level.
-                - bbox_targets (Tensor): BBox targets of each level.
-                - bbox_weights (Tensor): BBox weights of each level.
-                - pos_inds (Tensor): positive samples indexes.
-                - neg_inds (Tensor): negative samples indexes.
-                - sampling_result (:obj:`SamplingResult`): Sampling results.
+
+            - labels (Tensor): Labels of each level.
+            - label_weights (Tensor): Label weights of each level.
+            - bbox_targets (Tensor): BBox targets of each level.
+            - bbox_weights (Tensor): BBox weights of each level.
+            - pos_inds (Tensor): positive samples indexes.
+            - neg_inds (Tensor): negative samples indexes.
+            - sampling_result (:obj:`SamplingResult`): Sampling results.
         """
         inside_flags = valid_flags
         if not inside_flags.any():
@@ -265,19 +270,19 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
         Returns:
             tuple:
 
-                - labels_list (list[Tensor]): Labels of each level.
-                - label_weights_list (list[Tensor]): Label weights of each
-                level.
-                - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
-                - proposals_list (list[Tensor]): Proposals(points/bboxes) of
-                each level.
-                - proposal_weights_list (list[Tensor]): Proposal weights of
-                each level.
-                - avg_factor (int): Average factor that is used to average
-                the loss. When using sampling method, avg_factor is usually
-                the sum of positive and negative priors. When using
-                `PseudoSampler`, `avg_factor` is usually equal to the number
-                of positive priors.
+            - labels_list (list[Tensor]): Labels of each level.
+            - label_weights_list (list[Tensor]): Label weights of each
+            level.
+            - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
+            - proposals_list (list[Tensor]): Proposals(points/bboxes) of
+            each level.
+            - proposal_weights_list (list[Tensor]): Proposal weights of
+            each level.
+            - avg_factor (int): Average factor that is used to average
+            the loss. When using sampling method, avg_factor is usually
+            the sum of positive and negative priors. When using
+            `PseudoSampler`, `avg_factor` is usually equal to the number
+            of positive priors.
         """
         assert stage in ['init', 'refine']
         num_imgs = len(batch_img_metas)
@@ -351,6 +356,7 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
                             avg_factor_refine: int) -> Tuple[Tensor]:
         """Calculate the loss of a single scale level based on the features
         extracted by the detection head.
+
         Args:
             cls_score (Tensor): Box scores for each scale level
                 Has shape (N, num_classes, h_i, w_i).
@@ -375,6 +381,7 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
                 the loss in the init stage.
             avg_factor_refine (int): Average factor that is used to average
                 the loss in the refine stage.
+
         Returns:
             Tuple[Tensor]: loss components.
         """
@@ -431,6 +438,7 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
     ) -> Dict[str, Tensor]:
         """Calculate the loss based on the features extracted by the detection
         head.
+
         Args:
             cls_scores (list[Tensor]): Box scores for each scale level,
                 each is a 4D-tensor, of shape (batch_size, num_classes, h, w).
@@ -448,6 +456,7 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
                 Batch of gt_instances_ignore. It includes ``bboxes`` attribute
                 data that is ignored during training and testing.
                 Defaults to None.
+
         Returns:
             dict[str, Tensor]: A dictionary of loss components.
         """
@@ -619,16 +628,20 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
         }
         return loss_dict_all
 
-    def sampling_points(self, polygons, points_num, device):
+    def sampling_points(self, polygons: Tensor, points_num: int,
+                        device: str) -> Tensor:
         """Sample edge points for polygon.
 
         Args:
-            polygons (torch.tensor): polygons with shape (N, 8)
+            polygons (Tensor): polygons with shape (N, 8)
             points_num (int): number of sampling points for each polygon edge.
-                              10 by default.
+                10 by default.
+            device (str): The device the tensor will be put on.
+                Defaults to ``cuda``.
+
         Returns:
-            sampling_points (torch.tensor): sampling points with shape (N,
-                             points_num*4, 2)
+            sampling_points (Tensor): sampling points with shape (N,
+                points_num*4, 2)
         """
         polygons_xs, polygons_ys = polygons[:, 0::2], polygons[:, 1::2]
         ratio = torch.linspace(0, 1, points_num).to(device).repeat(
@@ -658,16 +671,20 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
         return sampling_points
 
-    def get_adaptive_points_feature(self, features, pt_locations, stride):
+    def get_adaptive_points_feature(self, features: Tensor,
+                                    pt_locations: Tensor,
+                                    stride: int) -> Tensor:
         """Get the points features from the locations of predicted points.
 
         Args:
-            features (torch.tensor): base feature with shape (B,C,W,H)
-            pt_locations (torch.tensor): locations of points in each point set
-                     with shape (B, N_points_set(number of point set),
-                     N_points(number of points in each point set) *2)
+            features (Tensor): base feature with shape (B,C,W,H)
+            pt_locations (Tensor): locations of points in each point set
+                with shape (B, N_points_set(number of point set),
+                N_points(number of points in each point set) *2)
+            stride (int): points strdie
+
         Returns:
-            tensor: sampling features with (B, C, N_points_set, N_points)
+            Tensor: sampling features with (B, C, N_points_set, N_points)
         """
 
         h = features.shape[2] * stride
@@ -693,15 +710,16 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
         return sampled_features,
 
-    def feature_cosine_similarity(self, points_features):
+    def feature_cosine_similarity(self, points_features: Tensor) -> Tensor:
         """Compute the points features similarity for points-wise correlation.
 
         Args:
-            points_features (torch.tensor): sampling point feature with
-                     shape (N_pointsets, N_points, C)
+            points_features (Tensor): sampling point feature with
+                shape (N_pointsets, N_points, C)
+
         Returns:
-            max_correlation: max feature similarity in each point set with
-                     shape (N_points_set, N_points, C)
+            max_correlation (Tensor): max feature similarity in each point set
+            with shape (N_points_set, N_points, C)
         """
 
         mean_points_feats = torch.mean(points_features, dim=1, keepdim=True)
@@ -721,30 +739,33 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
         return max_correlation
 
-    def pointsets_quality_assessment(self, pts_features, cls_score,
-                                     pts_pred_init, pts_pred_refine, label,
-                                     bbox_gt, label_weight, bbox_weight,
-                                     pos_inds):
+    def pointsets_quality_assessment(self, pts_features: Tensor,
+                                     cls_score: Tensor, pts_pred_init: Tensor,
+                                     pts_pred_refine: Tensor, label: Tensor,
+                                     bbox_gt: Tensor, label_weight: Tensor,
+                                     bbox_weight: Tensor,
+                                     pos_inds: Tensor) -> Tensor:
         """Assess the quality of each point set from the classification,
         localization, orientation, and point-wise correlation based on the
         assigned point sets samples.
 
         Args:
-            pts_features (torch.tensor): points features with shape (N, 9, C)
-            cls_score (torch.tensor): classification scores with
-                        shape (N, class_num)
-            pts_pred_init (torch.tensor): initial point sets prediction with
-                        shape (N, 9*2)
-            pts_pred_refine (torch.tensor): refined point sets prediction with
-                        shape (N, 9*2)
-            label (torch.tensor): gt label with shape (N)
-            bbox_gt(torch.tensor): gt bbox of polygon with shape (N, 8)
-            label_weight (torch.tensor): label weight with shape (N)
-            bbox_weight (torch.tensor): box weight with shape (N)
-            pos_inds (torch.tensor): the  inds of  positive point set samples
+            pts_features (Tensor): points features with shape (N, 9, C)
+            cls_score (Tensor): classification scores with
+                shape (N, class_num)
+            pts_pred_init (Tensor): initial point sets prediction with
+                shape (N, 9*2)
+            pts_pred_refine (Tensor): refined point sets prediction with
+                shape (N, 9*2)
+            label (Tensor): gt label with shape (N)
+            bbox_gt(Tensor): gt bbox of polygon with shape (N, 8)
+            label_weight (Tensor): label weight with shape (N)
+            bbox_weight (Tensor): box weight with shape (N)
+            pos_inds (Tensor): the  inds of  positive point set samples
+
         Returns:
-            qua (torch.tensor) : weighted quality values for positive
-                                 point set samples.
+            qua (Tensor) : weighted quality values for positive
+            point set samples.
         """
         device = cls_score.device
 
@@ -817,41 +838,45 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
         return qua,
 
-    def dynamic_pointset_samples_selection(self,
-                                           quality,
-                                           label,
-                                           label_weight,
-                                           bbox_weight,
-                                           pos_inds,
-                                           pos_gt_inds,
-                                           num_proposals_each_level=None,
-                                           num_level=None):
+    def dynamic_pointset_samples_selection(
+            self,
+            quality: Tensor,
+            label: Tensor,
+            label_weight: Tensor,
+            bbox_weight: Tensor,
+            pos_inds: Tensor,
+            pos_gt_inds: Tensor,
+            num_proposals_each_level: Optional[List[int]] = None,
+            num_level: Optional[int] = None) -> tuple:
         """The dynamic top k selection of point set samples based on the
         quality assessment values.
 
         Args:
-            quality (torch.tensor): the quality values of positive
-                                    point set samples
-            label (torch.tensor): gt label with shape (N)
-            bbox_gt(torch.tensor): gt bbox of polygon with shape (N, 8)
-            label_weight (torch.tensor): label weight with shape (N)
-            bbox_weight (torch.tensor): box weight with shape (N)
-            pos_inds (torch.tensor): the inds of  positive point set samples
+            quality (Tensor): the quality values of positive
+                point set samples
+            label (Tensor): gt label with shape (N)
+            label_weight (Tensor): label weight with shape (N)
+            bbox_weight (Tensor): box weight with shape (N)
+            pos_inds (Tensor): the inds of  positive point set samples
+            pos_gt_inds (Tensor): the inds of  positive ground truth
             num_proposals_each_level (list[int]): proposals number of
-                                    each level
+                each level
             num_level (int): the level number
+
         Returns:
-            label: gt label with shape (N)
-            label_weight: label weight with shape (N)
-            bbox_weight: box weight with shape (N)
-            num_pos (int): the number of selected positive point samples
-                           with high-qualty
-            pos_normalize_term (torch.tensor): the corresponding positive
-                             normalize term
+            tuple:
+
+            - label: gt label with shape (N)
+            - label_weight: label weight with shape (N)
+            - bbox_weight: box weight with shape (N)
+            - num_pos (int): the number of selected positive point samples
+            with high-qualty
+            - pos_normalize_term (Tensor): the corresponding positive
+            normalize term
         """
 
         if len(pos_inds) == 0:
-            return label, label_weight, bbox_weight, 0, torch.tensor(
+            return label, label_weight, bbox_weight, 0, Tensor(
                 []).type_as(bbox_weight)
 
         num_gt = pos_gt_inds.max()
@@ -922,9 +947,26 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
         return label, label_weight, bbox_weight, num_pos, pos_normalize_term
 
-    def init_loss_single(self, pts_pred_init, bbox_gt_init, bbox_weights_init,
-                         stride):
-        """Single initial stage loss function."""
+    def init_loss_single(self, pts_pred_init: Tensor, bbox_gt_init: Tensor,
+                         bbox_weights_init: Tensor,
+                         stride: int) -> Tuple[Tensor, Tensor]:
+        """Single initial stage loss function.
+
+        Args:
+            pts_pred_init (Tensor): Initial point sets prediction with
+                shape (N, 9*2)
+            bbox_gt_init (Tensor): BBox regression targets in the init stage
+                of shape (batch_size, h_i * w_i, 8).
+            bbox_weights_init (Tensor): BBox regression loss weights in the
+                init stage of shape (batch_size, h_i * w_i, 8).
+            stride (int): Point stride.
+
+        Returns:
+            tuple:
+
+            - loss_pts_init (Tensor): Initial bbox loss.
+            - loss_border_init (Tensor): Initial spatial border loss.
+        """
         normalize_term = self.point_base_scale * stride
 
         bbox_gt_init = bbox_gt_init.reshape(-1, 8)
