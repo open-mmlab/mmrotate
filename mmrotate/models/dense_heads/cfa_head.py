@@ -355,12 +355,21 @@ class CFAHead(RotatedRepPointsHead):
         Returns:
             Tensor: Losses of all positive samples in single image.
         """
-        pos_scores = cls_score[pos_inds]
-        pos_pts_pred = pts_pred[pos_inds]
-        pos_bbox_gt = bbox_gt[pos_inds]
-        pos_label = label[pos_inds]
-        pos_label_weight = label_weight[pos_inds]
-        pos_convex_weight = convex_weight[pos_inds]
+        # avoid no positive samplers
+        if pos_inds.shape[0] == 0:
+            pos_scores = cls_score
+            pos_pts_pred = pts_pred
+            pos_bbox_gt = bbox_gt
+            pos_label = label
+            pos_label_weight = label_weight
+            pos_convex_weight = convex_weight
+        else:
+            pos_scores = cls_score[pos_inds]
+            pos_pts_pred = pts_pred[pos_inds]
+            pos_bbox_gt = bbox_gt[pos_inds]
+            pos_label = label[pos_inds]
+            pos_label_weight = label_weight[pos_inds]
+            pos_convex_weight = convex_weight[pos_inds]
         loss_cls = self.loss_cls(
             pos_scores,
             pos_label,

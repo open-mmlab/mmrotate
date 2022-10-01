@@ -28,7 +28,7 @@ class TestDOTADataset(unittest.TestCase):
 
     def test_dota_without_ann_file(self):
         dataset = DOTADataset(
-            data_root='tests/data/',
+            data_root='tests/data/dota/',
             data_prefix=dict(img_path='images/'),
             filter_cfg=dict(
                 filter_empty_gt=True, min_size=32, bbox_min_size=32),

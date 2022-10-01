@@ -86,9 +86,7 @@ class TestCFAHead(unittest.TestCase):
         one_gt_losses = reppoints_head.loss_by_feat(*forward_outputs,
                                                     [gt_instances], img_metas,
                                                     gt_bboxes_ignore)
-        # loss_cls should all be non-zero
-        self.assertTrue(
-            all([loss.item() > 0 for loss in one_gt_losses['loss_cls']]))
+
         # only one level loss_pts_init is non-zero
         cnt_non_zero = 0
         for loss in one_gt_losses['loss_pts_init']:

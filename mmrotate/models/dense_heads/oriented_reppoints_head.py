@@ -747,14 +747,26 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
                                  point set samples.
         """
         device = cls_score.device
-        pos_scores = cls_score[pos_inds]
-        pos_pts_pred_init = pts_pred_init[pos_inds]
-        pos_pts_pred_refine = pts_pred_refine[pos_inds]
-        pos_pts_refine_features = pts_features[pos_inds]
-        pos_bbox_gt = bbox_gt[pos_inds]
-        pos_label = label[pos_inds]
-        pos_label_weight = label_weight[pos_inds]
-        pos_bbox_weight = bbox_weight[pos_inds]
+
+        # avoid no positive samplers
+        if pos_inds.shape[0] == 0:
+            pos_scores = cls_score
+            pos_pts_pred_init = pts_pred_init
+            pos_pts_pred_refine = pts_pred_refine
+            pos_pts_refine_features = pts_features
+            pos_bbox_gt = bbox_gt
+            pos_label = label
+            pos_label_weight = label_weight
+            pos_bbox_weight = bbox_weight
+        else:
+            pos_scores = cls_score[pos_inds]
+            pos_pts_pred_init = pts_pred_init[pos_inds]
+            pos_pts_pred_refine = pts_pred_refine[pos_inds]
+            pos_pts_refine_features = pts_features[pos_inds]
+            pos_bbox_gt = bbox_gt[pos_inds]
+            pos_label = label[pos_inds]
+            pos_label_weight = label_weight[pos_inds]
+            pos_bbox_weight = bbox_weight[pos_inds]
 
         # quality of point-wise correlation
         qua_poc = self.poc_qua_weight * self.feature_cosine_similarity(
