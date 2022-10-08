@@ -322,7 +322,7 @@ class AngleBranchRetinaHead(RetinaHead):
             else self.bbox_coder.encode_size
         bbox_targets = anchors.new_zeros(num_valid_anchors, target_dim)
         bbox_weights = anchors.new_zeros(num_valid_anchors, target_dim)
-        angle_targets = anchors.new_zeros(num_valid_anchors, 1)
+        angle_targets = anchors.new_zeros(num_valid_anchors, self.coding_len)
         angle_weights = anchors.new_zeros(num_valid_anchors, 1)
 
         # TODO: Considering saving memory, is it necessary to be long?
@@ -352,6 +352,7 @@ class AngleBranchRetinaHead(RetinaHead):
             else:
                 label_weights[pos_inds] = self.train_cfg.pos_weight
 
+            angle_targets = anchors.new_zeros(num_valid_anchors, 1)
             if self.use_encoded_angle:
                 # Get encoded angle as target
                 angle_targets[pos_inds, :] = pos_bbox_targets[:, 4:5]
