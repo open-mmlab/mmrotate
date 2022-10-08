@@ -1,19 +1,21 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Union, Tuple, List, Optional
+import copy
+from typing import List, Optional, Tuple, Union
 
 import torch
 import torch.nn as nn
-from mmdet.models.utils import images_to_levels, multi_apply, unmap
-from mmdet.structures.bbox import BaseBoxes, cat_boxes, get_box_tensor
-from mmdet.utils import (ConfigType, InstanceList,
-                         OptInstanceList, MultiConfig)
-from mmengine.config import ConfigDict
-from mmrotate.registry import MODELS, TASK_UTILS
 from mmdet.models.dense_heads.retina_head import RetinaHead
-from torch import Tensor
-from mmengine.structures import InstanceData
 from mmdet.models.task_modules.prior_generators import anchor_inside_flags
-from mmdet.models.utils import (filter_scores_and_topk, select_single_mlvl)
+from mmdet.models.utils import (filter_scores_and_topk, images_to_levels,
+                                multi_apply, select_single_mlvl, unmap)
+from mmdet.structures.bbox import BaseBoxes, cat_boxes, get_box_tensor
+from mmdet.utils import ConfigType, InstanceList, MultiConfig, OptInstanceList
+from mmengine.config import ConfigDict
+from mmengine.structures import InstanceData
+from torch import Tensor
+
+from mmrotate.registry import MODELS, TASK_UTILS
+
 
 @MODELS.register_module()
 class AngleBranchRetinaHead(RetinaHead):
@@ -64,12 +66,13 @@ class AngleBranchRetinaHead(RetinaHead):
                              bias_prob=0.01),
                      ]),
                  **kwargs) -> None:
+        angle_range = 90 if angle_coder['angle_version'] == 'oc' else 180
+        self.coding_len = int(angle_range // angle_coder['omega'])
+        super().__init__(*args, init_cfg=init_cfg, **kwargs)
         self.angle_coder = TASK_UTILS.build(angle_coder)
         self.loss_angle = MODELS.build(loss_angle)
-        self.coding_len = self.angle_coder.coding_len
         self.shield_reg_angle = shield_reg_angle
         self.use_encoded_angle = use_encoded_angle
-        super().__init__(*args, init_cfg=init_cfg, **kwargs)
 
     def _init_layers(self) -> None:
         """Initialize layers of the head."""
@@ -108,10 +111,11 @@ class AngleBranchRetinaHead(RetinaHead):
         return cls_score, bbox_pred, angle_cls
 
     def loss_by_feat_single(self, cls_score: Tensor, bbox_pred: Tensor,
-                            angle_pred: Tensor,
-                            anchors: Tensor, labels: Tensor,
-                            label_weights: Tensor, bbox_targets: Tensor,
-                            bbox_weights: Tensor, avg_factor: int) -> tuple:
+                            angle_pred: Tensor, anchors: Tensor,
+                            labels: Tensor, label_weights: Tensor,
+                            bbox_targets: Tensor, bbox_weights: Tensor,
+                            angle_targets: Tensor, angle_weights: Tensor,
+                            avg_factor: int) -> tuple:
         """Calculate the loss of a single scale level based on the features
         extracted by the detection head.
 
@@ -132,6 +136,10 @@ class AngleBranchRetinaHead(RetinaHead):
                 weight shape (N, num_total_anchors, 5).
             bbox_weights (Tensor): BBox regression loss weights of each anchor
                 with shape (N, num_total_anchors, 5).
+            angle_targets (Tensor): Angle regression targets of each anchor
+                weight shape (N, num_total_anchors, 1).
+            angle_weights (Tensor): Angle regression loss weights of each
+                anchor with shape (N, num_total_anchors, 1).
             avg_factor (int): Average factor that is used to average the loss.
 
         Returns:
@@ -164,7 +172,8 @@ class AngleBranchRetinaHead(RetinaHead):
         loss_bbox = self.loss_bbox(
             bbox_pred, bbox_targets, bbox_weights, avg_factor=avg_factor)
 
-        angle_pred.permute(0, 2, 3, 1).reshape(-1, self.coding_len)
+        angle_pred = angle_pred.permute(0, 2, 3,
+                                        1).reshape(-1, self.coding_len)
         angle_targets = angle_targets.reshape(-1, self.coding_len)
         angle_weights = angle_weights.reshape(-1, 1)
 
@@ -245,7 +254,10 @@ class AngleBranchRetinaHead(RetinaHead):
             angel_target_list,
             angel_weight_list,
             avg_factor=avg_factor)
-        return dict(loss_cls=losses_cls, loss_bbox=losses_bbox, loss_angle=losses_angle)
+        return dict(
+            loss_cls=losses_cls,
+            loss_bbox=losses_bbox,
+            loss_angle=losses_angle)
 
     def _get_targets_single(self,
                             flat_anchors: Union[Tensor, BaseBoxes],
@@ -350,7 +362,7 @@ class AngleBranchRetinaHead(RetinaHead):
             # Angle encoder
             angle_targets = self.angle_coder.encode(angle_targets)
             angle_weights[pos_inds, :] = 1.0
-        
+
         if len(neg_inds) > 0:
             label_weights[neg_inds] = 1.0
 
@@ -369,10 +381,8 @@ class AngleBranchRetinaHead(RetinaHead):
             angle_weights = unmap(angle_weights, num_total_anchors,
                                   inside_flags)
 
-        return (labels, label_weights, bbox_targets, bbox_weights, 
-                pos_inds, neg_inds, sampling_result, angle_targets,
-                angle_weights)
-
+        return (labels, label_weights, bbox_targets, bbox_weights, pos_inds,
+                neg_inds, sampling_result, angle_targets, angle_weights)
 
     def predict_by_feat(self,
                         cls_scores: List[Tensor],
@@ -543,7 +553,7 @@ class AngleBranchRetinaHead(RetinaHead):
             mlvl_score_factors = []
         else:
             mlvl_score_factors = None
-        for level_idx, (cls_score, bbox_pred, angle_pred, score_factor, priors) in \
+        for idx, (cls_score, bbox_pred, angle_pred, score_factor, priors) in \
                 enumerate(zip(cls_score_list, bbox_pred_list, angle_pred_list,
                               score_factor_list, mlvl_priors)):
 
@@ -584,7 +594,7 @@ class AngleBranchRetinaHead(RetinaHead):
 
             if with_score_factors:
                 score_factor = score_factor[keep_idxs]
-            
+
             mlvl_bbox_preds.append(bbox_pred)
             mlvl_valid_priors.append(priors)
             mlvl_scores.append(scores)
