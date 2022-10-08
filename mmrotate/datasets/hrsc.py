@@ -174,7 +174,7 @@ class HRSCDataset(BaseDataset):
             ]],
                              dtype=np.float32)
 
-            # TODO: waitting for boxlist
+            # TODO: waiting for boxlist
             polygon = obb2poly_np(rbbox, 'le90')[0, :-1].tolist()
             head = [
                 int(obj.find('header_x').text),
