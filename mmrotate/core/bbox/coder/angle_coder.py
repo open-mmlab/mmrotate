@@ -3,6 +3,7 @@ import math
 
 import torch
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
+from torch import Tensor
 
 from mmrotate.registry import TASK_UTILS
 
@@ -37,7 +38,7 @@ class CSLCoder(BaseBBoxCoder):
         self.radius = radius
         self.coding_len = int(self.angle_range // omega)
 
-    def encode(self, angle_targets):
+    def encode(self, angle_targets: Tensor) -> Tensor:
         """Circular Smooth Label Encoder.
 
         Args:
@@ -45,8 +46,8 @@ class CSLCoder(BaseBBoxCoder):
                 Has shape (num_anchors * H * W, 1)
 
         Returns:
-            list[Tensor]: The csl encoding of angle offset for each
-                scale level. Has shape (num_anchors * H * W, coding_len)
+            Tensor: The csl encoding of angle offset for each scale
+            level. Has shape (num_anchors * H * W, coding_len)
         """
 
         # radius to degree
@@ -96,7 +97,7 @@ class CSLCoder(BaseBBoxCoder):
 
         return smooth_label.scatter(1, radius_range, smooth_value)
 
-    def decode(self, angle_preds):
+    def decode(self, angle_preds: Tensor) -> Tensor:
         """Circular Smooth Label Decoder.
 
         Args:
@@ -105,7 +106,7 @@ class CSLCoder(BaseBBoxCoder):
                 Has shape (num_anchors * H * W, coding_len)
 
         Returns:
-            list[Tensor]: Angle offset for each scale level.
+            Tensor: Angle offset for each scale level.
                 Has shape (num_anchors * H * W, 1)
         """
         angle_cls_inds = torch.argmax(angle_preds, dim=1)
