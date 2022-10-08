@@ -32,8 +32,8 @@ class TestAngleBranchRetinaHead(TestCase):
                     min_pos_iou=0,
                     ignore_iof_thr=-1,
                     iou_calculator=dict(type='RBboxOverlaps2D')),
-                sampler=dict(
-                    type='mmdet.PseudoSampler'),  # Focal loss should use PseudoSampler
+                sampler=dict(type='mmdet.PseudoSampler'
+                             ),  # Focal loss should use PseudoSampler
                 allowed_border=-1,
                 pos_weight=-1,
                 debug=False))
@@ -90,8 +90,9 @@ class TestAngleBranchRetinaHead(TestCase):
         gt_instances.bboxes = RotatedBoxes(torch.empty((0, 5)))
         gt_instances.labels = torch.LongTensor([])
 
-        empty_gt_losses = bbox_head.loss_by_feat(
-            cls_scores, bbox_preds, angle_preds, [gt_instances], img_metas)
+        empty_gt_losses = bbox_head.loss_by_feat(cls_scores, bbox_preds,
+                                                 angle_preds, [gt_instances],
+                                                 img_metas)
         # When there is no truth, the cls loss should be nonzero but
         # there should be no box loss.
         empty_cls_loss = sum(empty_gt_losses['loss_cls'])
@@ -113,8 +114,9 @@ class TestAngleBranchRetinaHead(TestCase):
             torch.Tensor([[130.6667, 86.8757, 100.6326, 70.8874, 0.2]]))
         gt_instances.labels = torch.LongTensor([2])
 
-        one_gt_losses = bbox_head.loss_by_feat(
-            cls_scores, bbox_preds, angle_preds, [gt_instances], img_metas)
+        one_gt_losses = bbox_head.loss_by_feat(cls_scores, bbox_preds,
+                                               angle_preds, [gt_instances],
+                                               img_metas)
         onegt_cls_loss = sum(one_gt_losses['loss_cls'])
         onegt_box_loss = sum(one_gt_losses['loss_bbox'])
         onegt_angle_loss = sum(one_gt_losses['loss_angle'])
