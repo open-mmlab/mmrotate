@@ -56,9 +56,9 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
     samples in the paper is employed in refined stage.
 
     Args:
-        loss_refine_init  (:obj:`ConfigDict` or dict): Config of initial
+        loss_spatial_init  (:obj:`ConfigDict` or dict): Config of initial
             spatial loss.
-        loss_refine_refine  (:obj:`ConfigDict` or dict): Config of refine
+        loss_spatial_refine  (:obj:`ConfigDict` or dict): Config of refine
             spatial loss.
         top_ratio (float): Ratio of top high-quality point sets.
             Defaults to 0.4.
