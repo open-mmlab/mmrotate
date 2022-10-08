@@ -869,9 +869,9 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
             - label_weight: label weight with shape (N)
             - bbox_weight: box weight with shape (N)
             - num_pos (int): the number of selected positive point samples
-            with high-qualty
+              with high-quality
             - pos_normalize_term (Tensor): the corresponding positive
-            normalize term
+              normalize term
         """
 
         if len(pos_inds) == 0:
