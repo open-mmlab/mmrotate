@@ -77,7 +77,8 @@ class DOTADataset(BaseDataset):
         else:
             txt_files = glob.glob(osp.join(self.ann_file, '*.txt'))
             if len(txt_files) == 0:
-                raise ValueError('There is no txt file in ' f'{self.ann_file}')
+                raise ValueError('There is no txt file in '
+                                 f'{self.ann_file}')
             for txt_file in txt_files:
                 data_info = {}
                 img_id = osp.split(txt_file)[1][:-4]

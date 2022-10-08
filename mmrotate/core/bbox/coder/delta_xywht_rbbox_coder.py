@@ -134,9 +134,9 @@ def bbox2delta(proposals: RotatedBoxes,
                norm_factor: Optional[float] = None,
                edge_swap: bool = False,
                proj_xy: bool = False) -> Tensor:
-    """We usually compute the deltas of cx, cy, w, h, t of proposals w.r.t ground
-    truth bboxes to get regression target. This is the inverse function of
-    :func:`delta2bbox`.
+    """We usually compute the deltas of cx, cy, w, h, t of proposals w.r.t
+    ground truth bboxes to get regression target. This is the inverse function
+    of :func:`delta2bbox`.
 
     Args:
         proposals (:obj:`RotatedBoxes`): Boxes to be transformed,
