@@ -96,7 +96,7 @@ class AngleBranchRetinaHead(RetinaHead):
             the channels number is num_anchors * num_classes.
             - bbox_pred (Tensor): Box energies / deltas for a single scale
             level, the channels number is num_anchors * 5.
-            - angle_cls (Tensor): Angle for a single scale level the channels
+            - angle_pred (Tensor): Angle for a single scale level the channels
             number is num_anchors * coding_len.
         """
         cls_feat = x
@@ -107,8 +107,8 @@ class AngleBranchRetinaHead(RetinaHead):
             reg_feat = reg_conv(reg_feat)
         cls_score = self.retina_cls(cls_feat)
         bbox_pred = self.retina_reg(reg_feat)
-        angle_cls = self.retina_angle_cls(reg_feat)
-        return cls_score, bbox_pred, angle_cls
+        angle_pred = self.retina_angle_cls(reg_feat)
+        return cls_score, bbox_pred, angle_pred
 
     def loss_by_feat_single(self, cls_score: Tensor, bbox_pred: Tensor,
                             angle_pred: Tensor, anchors: Tensor,
@@ -145,6 +145,11 @@ class AngleBranchRetinaHead(RetinaHead):
         Returns:
             tuple: loss components.
         """
+        # Equivalent substitution of ``@force_fp32()``
+        cls_score = cls_score.float()
+        bbox_pred = bbox_pred.float()
+        angle_pred = angle_pred.float()
+
         # classification loss
         labels = labels.reshape(-1)
         label_weights = label_weights.reshape(-1)
@@ -171,7 +176,6 @@ class AngleBranchRetinaHead(RetinaHead):
             bbox_pred = get_box_tensor(bbox_pred)
         loss_bbox = self.loss_bbox(
             bbox_pred, bbox_targets, bbox_weights, avg_factor=avg_factor)
-
         angle_pred = angle_pred.permute(0, 2, 3,
                                         1).reshape(-1, self.coding_len)
         angle_targets = angle_targets.reshape(-1, self.coding_len)
@@ -549,7 +553,6 @@ class AngleBranchRetinaHead(RetinaHead):
         mlvl_valid_priors = []
         mlvl_scores = []
         mlvl_labels = []
-        mlvl_angle_preds = []
         if with_score_factors:
             mlvl_score_factors = []
         else:
@@ -557,6 +560,11 @@ class AngleBranchRetinaHead(RetinaHead):
         for idx, (cls_score, bbox_pred, angle_pred, score_factor, priors) in \
                 enumerate(zip(cls_score_list, bbox_pred_list, angle_pred_list,
                               score_factor_list, mlvl_priors)):
+
+            # Equivalent substitution of ``@force_fp32()``
+            cls_score = cls_score.float()
+            bbox_pred = bbox_pred.float()
+            angle_pred = angle_pred.float()
 
             assert cls_score.size()[-2:] == bbox_pred.size()[-2:]
 
@@ -596,27 +604,28 @@ class AngleBranchRetinaHead(RetinaHead):
             if with_score_factors:
                 score_factor = score_factor[keep_idxs]
 
+            # Angle decoder
+            angle_pred = self.angle_coder.decode(angle_pred)
+
+            if self.use_encoded_angle:
+                bbox_pred[..., -1] = angle_pred
+                bbox_pred = self.bbox_coder.decode(
+                    priors, bbox_pred, max_shape=img_shape)
+            else:
+                bbox_pred = self.bbox_coder.decode(
+                    priors, bbox_pred, max_shape=img_shape)
+                bbox_pred[..., -1] = angle_pred
+
             mlvl_bbox_preds.append(bbox_pred)
             mlvl_valid_priors.append(priors)
             mlvl_scores.append(scores)
             mlvl_labels.append(labels)
-            mlvl_angle_preds.append(angle_pred)
 
             if with_score_factors:
                 mlvl_score_factors.append(score_factor)
 
-        bbox_pred = torch.cat(mlvl_bbox_preds)
+        bboxes = cat_boxes(mlvl_bbox_preds)
         priors = cat_boxes(mlvl_valid_priors)
-        angle_pred = torch.cat(mlvl_angle_preds)
-
-        if self.use_encoded_angle:
-            bbox_pred[..., -1] = angle_pred
-            bboxes = self.bbox_coder.decode(
-                priors, bbox_pred, max_shape=img_shape)
-        else:
-            bboxes = self.bbox_coder.decode(
-                priors, bbox_pred, max_shape=img_shape)
-            bboxes[..., -1] = angle_pred
 
         results = InstanceData()
         results.bboxes = bboxes

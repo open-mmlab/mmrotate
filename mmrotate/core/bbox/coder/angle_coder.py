@@ -109,6 +109,8 @@ class CSLCoder(BaseBBoxCoder):
             Tensor: Angle offset for each scale level.
                 Has shape (num_anchors * H * W, 1)
         """
+        if angle_preds.shape[0] == 0:
+            return angle_preds.new_zeros((0))
         angle_cls_inds = torch.argmax(angle_preds, dim=1)
         angle_pred = ((angle_cls_inds + 0.5) *
                       self.omega) % self.angle_range - self.angle_offset
