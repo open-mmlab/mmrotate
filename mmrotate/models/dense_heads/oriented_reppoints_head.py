@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from mmcv.ops import chamfer_distance, min_area_polygons
 from mmdet.models.utils import images_to_levels, multi_apply, unmap
 from mmdet.utils import ConfigType, InstanceList, OptInstanceList
@@ -272,17 +273,17 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
             - labels_list (list[Tensor]): Labels of each level.
             - label_weights_list (list[Tensor]): Label weights of each
-            level.
+              level.
             - bbox_gt_list (list[Tensor]): Ground truth bbox of each level.
             - proposals_list (list[Tensor]): Proposals(points/bboxes) of
-            each level.
+              each level.
             - proposal_weights_list (list[Tensor]): Proposal weights of
-            each level.
+              each level.
             - avg_factor (int): Average factor that is used to average
-            the loss. When using sampling method, avg_factor is usually
-            the sum of positive and negative priors. When using
-            `PseudoSampler`, `avg_factor` is usually equal to the number
-            of positive priors.
+              the loss. When using sampling method, avg_factor is usually
+              the sum of positive and negative priors. When using
+              `PseudoSampler`, `avg_factor` is usually equal to the number
+              of positive priors.
         """
         assert stage in ['init', 'refine']
         num_imgs = len(batch_img_metas)
@@ -641,7 +642,7 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
 
         Returns:
             sampling_points (Tensor): sampling points with shape (N,
-                points_num*4, 2)
+            points_num*4, 2)
         """
         polygons_xs, polygons_ys = polygons[:, 0::2], polygons[:, 1::2]
         ratio = torch.linspace(0, 1, points_num).to(device).repeat(
@@ -731,8 +732,8 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
         unity_points_features = points_features / norm_pts_feats
         unity_mean_points_feats = mean_points_feats / norm_mean_pts_feats
 
-        feats_similarity = 1.0 - F.cos_similarity(unity_points_features,
-                                                unity_mean_points_feats, dim=2, eps=1e-6)
+        feats_similarity = 1.0 - F.cos_similarity(
+            unity_points_features, unity_mean_points_feats, dim=2, eps=1e-6)
 
         max_correlation, _ = torch.max(feats_similarity, dim=1)
 
