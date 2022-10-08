@@ -3,7 +3,6 @@ import unittest
 
 import torch
 from mmengine.structures import InstanceData
-from mmengine.testing import assert_allclose
 from parameterized import parameterized
 
 from mmrotate.core.bbox.assigners import MaxConvexIoUAssigner
@@ -45,6 +44,3 @@ class TestMaxConvexIoUAssigner(unittest.TestCase):
         assign_result = assigner.assign(pred_instances, gt_instances)
         self.assertEqual(len(assign_result.gt_inds), 4)
         self.assertEqual(len(assign_result.labels), 4)
-
-        expected_gt_inds = torch.LongTensor([2, 2, 2, 2]).cuda()
-        assert_allclose(assign_result.gt_inds, expected_gt_inds)

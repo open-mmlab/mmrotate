@@ -6,7 +6,7 @@ from typing import List, Optional, Union
 import mmcv
 import numpy as np
 from mmengine.dataset import BaseDataset
-from mmengine.fileio import list_from_file
+from mmengine.fileio import FileClient, list_from_file
 
 from mmrotate.core import obb2poly_np
 from mmrotate.registry import DATASETS
@@ -28,6 +28,9 @@ class HRSCDataset(BaseDataset):
             Defaults to 'Annotations'.
         classwise (bool): Whether to use all 31 classes or only one class.
             Defaults to False.
+        file_client_args (dict): Arguments to instantiate a FileClient.
+            See :class:`mmengine.fileio.FileClient` for details.
+            Defaults to ``dict(backend='disk')``.
     """
 
     METAINFO = {
@@ -60,10 +63,19 @@ class HRSCDataset(BaseDataset):
                  img_subdir: str = 'AllImages',
                  ann_subdir: str = 'Annotations',
                  classwise: bool = False,
+                 file_client_args: dict = dict(backend='disk'),
                  **kwargs) -> None:
+        self.img_subdir = img_subdir
+        self.ann_subdir = ann_subdir
         self.classwise = classwise
-        super().__init__(
-            img_subdir=img_subdir, ann_subdir=ann_subdir, **kwargs)
+        self.file_client_args = file_client_args
+        self.file_client = FileClient(**self.file_client_args)
+        super().__init__(**kwargs)
+
+    @property
+    def sub_data_root(self) -> str:
+        """Return the sub data root."""
+        return self.data_prefix.get('sub_data_root', '')
 
     def load_data_list(self) -> List[dict]:
         """Load annotation from XML style ann_file.
@@ -162,7 +174,7 @@ class HRSCDataset(BaseDataset):
             ]],
                              dtype=np.float32)
 
-            # TODO: waitting for boxlist
+            # TODO: waiting for boxlist
             polygon = obb2poly_np(rbbox, 'le90')[0, :-1].tolist()
             head = [
                 int(obj.find('header_x').text),

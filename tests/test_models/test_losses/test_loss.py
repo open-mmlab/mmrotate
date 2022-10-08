@@ -5,7 +5,7 @@ import torch
 from parameterized import parameterized
 
 from mmrotate.models.losses import (BCConvexGIoULoss, ConvexGIoULoss, GDLoss,
-                                    GDLoss_v1)
+                                    GDLoss_v1, SpatialBorderLoss)
 
 
 class TestGDLoss(unittest.TestCase):
@@ -149,4 +149,24 @@ class TestConvexGIoULoss(unittest.TestCase):
 
         # Test loss forward with avg_factor
         loss = loss_class()(pred, target, avg_factor=10)
+        assert isinstance(loss, torch.Tensor)
+
+
+class TestSpatialBorderLoss(unittest.TestCase):
+
+    def test_regression_losses(self):
+
+        if not torch.cuda.is_available():
+            return unittest.skip('test requires GPU and torch+cuda')
+
+        pred = torch.rand((10, 18)).cuda()
+        target = torch.rand((10, 8)).cuda()
+        weight = torch.rand((10, )).cuda()
+
+        # Test loss forward with weight
+        loss = SpatialBorderLoss()(pred, target, weight)
+        assert isinstance(loss, torch.Tensor)
+
+        # Test loss forward with avg_factor
+        loss = SpatialBorderLoss()(pred, target, weight, avg_factor=10)
         assert isinstance(loss, torch.Tensor)

@@ -6,16 +6,16 @@ from mmdet.structures import DetDataSample
 from mmengine.config import ConfigDict
 from mmengine.structures import InstanceData
 
-from mmrotate.models.dense_heads import CFAHead
+from mmrotate.models.dense_heads import OrientedRepPointsHead
 from mmrotate.utils import register_all_modules
 
 
-class TestCFAHead(unittest.TestCase):
+class TestOrientedRepPointsHead(unittest.TestCase):
 
     def setUp(self):
         register_all_modules()
 
-    def test_cfa_head_loss(self):
+    def test_head_loss(self):
         cfg = ConfigDict(
             dict(
                 num_classes=2,
@@ -33,9 +33,12 @@ class TestCFAHead(unittest.TestCase):
                     loss_weight=1.0),
                 loss_bbox_init=dict(type='ConvexGIoULoss', loss_weight=0.375),
                 loss_bbox_refine=dict(type='ConvexGIoULoss', loss_weight=1.0),
-                transform_method='rotrect',
-                topk=6,
-                anti_factor=0.75),
+                loss_spatial_init=dict(
+                    type='SpatialBorderLoss', loss_weight=0.05),
+                loss_spatial_refine=dict(
+                    type='SpatialBorderLoss', loss_weight=0.1),
+                init_qua_weight=0.2,
+                top_ratio=0.4),
             train_cfg=dict(
                 init=dict(
                     assigner=dict(type='ConvexAssigner', scale=4, pos_num=1),
@@ -58,7 +61,7 @@ class TestCFAHead(unittest.TestCase):
                 score_thr=0.05,
                 nms=dict(type='nms_rotated', iou_threshold=0.4),
                 max_per_img=2000))
-        reppoints_head = CFAHead(**cfg).cuda()
+        reppoints_head = OrientedRepPointsHead(**cfg).cuda()
         s = 256
         img_metas = [{
             'img_shape': (s, s),
