@@ -67,7 +67,7 @@ class AngleBranchRetinaHead(RetinaHead):
                      ]),
                  **kwargs) -> None:
         angle_range = 90 if angle_coder['angle_version'] == 'oc' else 180
-        self.coding_len = int(angle_range // angle_coder['omega'])
+        self.encoded_size = int(angle_range // angle_coder['omega'])
         super().__init__(*args, init_cfg=init_cfg, **kwargs)
         self.angle_coder = TASK_UTILS.build(angle_coder)
         self.loss_angle = MODELS.build(loss_angle)
@@ -79,7 +79,7 @@ class AngleBranchRetinaHead(RetinaHead):
         super()._init_layers()
         self.retina_angle_cls = nn.Conv2d(
             self.feat_channels,
-            self.num_anchors * self.coding_len,
+            self.num_anchors * self.encoded_size,
             3,
             padding=1)
 
@@ -93,11 +93,11 @@ class AngleBranchRetinaHead(RetinaHead):
             tuple:
 
             - cls_score (Tensor): Cls scores for a single scale level
-            the channels number is num_anchors * num_classes.
+              the channels number is num_anchors * num_classes.
             - bbox_pred (Tensor): Box energies / deltas for a single scale
-            level, the channels number is num_anchors * 5.
+              level, the channels number is num_anchors * 5.
             - angle_pred (Tensor): Angle for a single scale level the channels
-            number is num_anchors * coding_len.
+              number is num_anchors * encoded_size.
         """
         cls_feat = x
         reg_feat = x
@@ -125,7 +125,7 @@ class AngleBranchRetinaHead(RetinaHead):
             bbox_pred (Tensor): Box energies / deltas for each scale
                 level with shape (N, num_anchors * 5, H, W).
             angle_pred (Tensor): Box angles for each scale
-                level with shape (N, num_anchors * coding_len, H, W).
+                level with shape (N, num_anchors * encoded_size, H, W).
             anchors (Tensor): Box reference for each scale level with shape
                 (N, num_total_anchors, 5).
             labels (Tensor): Labels of each anchors with shape
@@ -148,7 +148,6 @@ class AngleBranchRetinaHead(RetinaHead):
         # Equivalent substitution of ``@force_fp32()``
         cls_score = cls_score.float()
         bbox_pred = bbox_pred.float()
-        angle_pred = angle_pred.float()
 
         # classification loss
         labels = labels.reshape(-1)
@@ -177,8 +176,8 @@ class AngleBranchRetinaHead(RetinaHead):
         loss_bbox = self.loss_bbox(
             bbox_pred, bbox_targets, bbox_weights, avg_factor=avg_factor)
         angle_pred = angle_pred.permute(0, 2, 3,
-                                        1).reshape(-1, self.coding_len)
-        angle_targets = angle_targets.reshape(-1, self.coding_len)
+                                        1).reshape(-1, self.encoded_size)
+        angle_targets = angle_targets.reshape(-1, self.encoded_size)
         angle_weights = angle_weights.reshape(-1, 1)
 
         loss_angle = self.loss_angle(
@@ -206,7 +205,7 @@ class AngleBranchRetinaHead(RetinaHead):
             bbox_preds (list[Tensor]): Box energies / deltas for each scale
                 level with shape (N, num_anchors * 5, H, W).
             angle_preds (list[Tensor]): Box angles for each scale
-                level with shape (N, num_anchors * coding_len, H, W).
+                level with shape (N, num_anchors * encoded_size, H, W).
             batch_gt_instances (list[:obj:`InstanceData`]): Batch of
                 gt_instance. It usually includes ``bboxes`` and ``labels``
                 attributes.
@@ -326,7 +325,7 @@ class AngleBranchRetinaHead(RetinaHead):
             else self.bbox_coder.encode_size
         bbox_targets = anchors.new_zeros(num_valid_anchors, target_dim)
         bbox_weights = anchors.new_zeros(num_valid_anchors, target_dim)
-        angle_targets = anchors.new_zeros(num_valid_anchors, self.coding_len)
+        angle_targets = anchors.new_zeros(num_valid_anchors, self.encoded_size)
         angle_weights = anchors.new_zeros(num_valid_anchors, 1)
 
         # TODO: Considering saving memory, is it necessary to be long?
@@ -413,7 +412,7 @@ class AngleBranchRetinaHead(RetinaHead):
                 scale levels, each is a 4D-tensor, has shape
                 (batch_size, num_priors * 4, H, W).
             angle_preds (list[Tensor]): Box angles for each scale
-                level with shape (N, num_anchors * coding_len, H, W)
+                level with shape (N, num_anchors * encoded_size, H, W)
             score_factors (list[Tensor], optional): Score factor for
                 all scale level, each is a 4D-tensor, has shape
                 (batch_size, num_priors * 1, H, W). Defaults to None.
@@ -432,11 +431,11 @@ class AngleBranchRetinaHead(RetinaHead):
             after the post process. Each item usually contains following keys.
 
             - scores (Tensor): Classification scores, has a shape
-            (num_instance, )
+              (num_instance, )
             - labels (Tensor): Labels of bboxes, has a shape
-            (num_instances, ).
+              (num_instances, ).
             - bboxes (Tensor): Has a shape (num_instances, 4),
-            the last dimension 4 arrange as (x1, y1, x2, y2).
+              the last dimension 4 arrange as (x1, y1, x2, y2).
         """
         assert len(cls_scores) == len(bbox_preds)
 
@@ -507,7 +506,7 @@ class AngleBranchRetinaHead(RetinaHead):
                 (num_priors * 4, H, W).
             angle_pred_list (list[Tensor]): Box energies / deltas from
                 all scale levels of a single image, each item has shape
-                (num_priors * coding_len, H, W).
+                (num_priors * encoded_size, H, W).
             score_factor_list (list[Tensor]): Score factor from all scale
                 levels of a single image, each item has shape
                 (num_priors * 1, H, W).
@@ -531,11 +530,11 @@ class AngleBranchRetinaHead(RetinaHead):
             Each item usually contains following keys.
 
             - scores (Tensor): Classification scores, has a shape
-            (num_instance, )
+              (num_instance, )
             - labels (Tensor): Labels of bboxes, has a shape
-            (num_instances, ).
+              (num_instances, ).
             - bboxes (Tensor): Has a shape (num_instances, 4),
-            the last dimension 4 arrange as (x1, y1, x2, y2).
+              the last dimension 4 arrange as (x1, y1, x2, y2).
         """
         if score_factor_list[0] is None:
             # e.g. Retina, FreeAnchor, etc.
@@ -564,14 +563,13 @@ class AngleBranchRetinaHead(RetinaHead):
             # Equivalent substitution of ``@force_fp32()``
             cls_score = cls_score.float()
             bbox_pred = bbox_pred.float()
-            angle_pred = angle_pred.float()
 
             assert cls_score.size()[-2:] == bbox_pred.size()[-2:]
 
             dim = self.bbox_coder.encode_size
             bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, dim)
             angle_pred = angle_pred.permute(1, 2, 0).reshape(
-                -1, self.coding_len).sigmoid()
+                -1, self.encoded_size).sigmoid()
             if with_score_factors:
                 score_factor = score_factor.permute(1, 2,
                                                     0).reshape(-1).sigmoid()

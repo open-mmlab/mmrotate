@@ -36,7 +36,7 @@ class CSLCoder(BaseBBoxCoder):
         self.omega = omega
         self.window = window
         self.radius = radius
-        self.coding_len = int(self.angle_range // omega)
+        self.encoded_size = int(self.angle_range // omega)
 
     def encode(self, angle_targets: Tensor) -> Tensor:
         """Circular Smooth Label Encoder.
@@ -47,33 +47,33 @@ class CSLCoder(BaseBBoxCoder):
 
         Returns:
             Tensor: The csl encoding of angle offset for each scale
-            level. Has shape (num_anchors * H * W, coding_len)
+            level. Has shape (num_anchors * H * W, encoded_size)
         """
 
         # radius to degree
         angle_targets_deg = angle_targets * (180 / math.pi)
         # empty label
         smooth_label = torch.zeros_like(angle_targets).repeat(
-            1, self.coding_len)
+            1, self.encoded_size)
         angle_targets_deg = (angle_targets_deg +
                              self.angle_offset) / self.omega
         # Float to Int
         angle_targets_long = angle_targets_deg.long()
 
         if self.window == 'pulse':
-            radius_range = angle_targets_long % self.coding_len
+            radius_range = angle_targets_long % self.encoded_size
             smooth_value = 1.0
         elif self.window == 'rect':
             base_radius_range = torch.arange(
                 -self.radius, self.radius, device=angle_targets_long.device)
             radius_range = (base_radius_range +
-                            angle_targets_long) % self.coding_len
+                            angle_targets_long) % self.encoded_size
             smooth_value = 1.0
         elif self.window == 'triangle':
             base_radius_range = torch.arange(
                 -self.radius, self.radius, device=angle_targets_long.device)
             radius_range = (base_radius_range +
-                            angle_targets_long) % self.coding_len
+                            angle_targets_long) % self.encoded_size
             smooth_value = 1.0 - torch.abs(
                 (1 / self.radius) * base_radius_range)
 
@@ -84,7 +84,7 @@ class CSLCoder(BaseBBoxCoder):
                 device=angle_targets_long.device)
 
             radius_range = (base_radius_range +
-                            angle_targets_long) % self.coding_len
+                            angle_targets_long) % self.encoded_size
             smooth_value = torch.exp(-torch.pow(base_radius_range, 2) /
                                      (2 * self.radius**2))
 
@@ -97,21 +97,24 @@ class CSLCoder(BaseBBoxCoder):
 
         return smooth_label.scatter(1, radius_range, smooth_value)
 
-    def decode(self, angle_preds: Tensor) -> Tensor:
+    def decode(self, angle_preds: Tensor, keepdim: bool = False) -> Tensor:
         """Circular Smooth Label Decoder.
 
         Args:
-            angle_preds (Tensor): The csl encoding of angle offset
-                for each scale level.
-                Has shape (num_anchors * H * W, coding_len)
+            angle_preds (Tensor): The csl encoding of angle offset for each
+                scale level. Has shape (num_anchors * H * W, encoded_size) or
+                (B, num_anchors * H * W, encoded_size)
+            keepdim (bool): Whether the output tensor has dim retained or not.
+
 
         Returns:
-            Tensor: Angle offset for each scale level.
-                Has shape (num_anchors * H * W, 1)
+            Tensor: Angle offset for each scale level. When keepdim is true,
+            return (num_anchors * H * W, 1) or (B, num_anchors * H * W, 1),
+            otherwise (num_anchors * H * W,) or (B, num_anchors * H * W)
         """
         if angle_preds.shape[0] == 0:
             return angle_preds.new_zeros((0))
-        angle_cls_inds = torch.argmax(angle_preds, dim=1)
+        angle_cls_inds = torch.argmax(angle_preds, dim=-1, keepdim=keepdim)
         angle_pred = ((angle_cls_inds + 0.5) *
                       self.omega) % self.angle_range - self.angle_offset
         return angle_pred * (math.pi / 180)
