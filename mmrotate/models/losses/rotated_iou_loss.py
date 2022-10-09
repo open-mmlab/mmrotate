@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from mmdet.models.losses.utils import weighted_loss
 
-from ..builder import ROTATED_LOSSES
+from mmrotate.registry import MODELS
 
 try:
     from mmcv.ops import diff_iou_rotated_2d
@@ -58,7 +58,7 @@ def rotated_iou_loss(pred, target, linear=False, mode='log', eps=1e-6):
     return loss
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class RotatedIoULoss(nn.Module):
     """RotatedIoULoss.
 
