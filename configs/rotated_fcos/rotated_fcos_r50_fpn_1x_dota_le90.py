@@ -54,7 +54,7 @@ model = dict(
             alpha=0.25,
             loss_weight=1.0),
         loss_bbox=dict(type='RotatedIoULoss', loss_weight=1.0),
-        loss_angle=dict(type='mmdet.L1Loss', loss_weight=0.2),
+        loss_angle=None,
         loss_centerness=dict(
             type='mmdet.CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)),
     # training and testing settings
