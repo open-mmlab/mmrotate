@@ -20,4 +20,4 @@ model = dict(
             alpha=0.25,
             loss_weight=0.2),
         loss_bbox=dict(type='mmdet.IoULoss', loss_weight=1.0),
-    ), )
+    ))

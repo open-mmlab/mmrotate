@@ -8,4 +8,4 @@ model = dict(
             loss_type='kld',
             fun='log1p',
             tau=1,
-            loss_weight=1.0)), )
+            loss_weight=1.0)))
