@@ -34,13 +34,14 @@ class RotatedFCOSHead(FCOSHead):
         in_channels (int): Number of channels in the input feature map.
         angle_version (str): Angle representations. Defaults to 'le90'.
         use_hbbox_loss (bool): If true, use horizontal bbox loss and
-            loss_angle should not be None. Default: False.
-        scale_angle (bool): If true, add scale to angle pred branch. Default: True.
+            loss_angle should not be None. Default to False.
+        scale_angle (bool): If true, add scale to angle pred branch.
+            Default to True.
         angle_coder (:obj:`ConfigDict` or dict): Config of angle coder.
         h_bbox_coder (dict): Config of horzional bbox coder,
             only used when use_hbbox_loss is True.
         bbox_coder (:obj:`ConfigDict` or dict): Config of bbox coder. Defaults
-            'DistanceAnglePointCoder'.
+            to 'DistanceAnglePointCoder'.
         loss_cls (:obj:`ConfigDict` or dict): Config of classification loss.
         loss_bbox (:obj:`ConfigDict` or dict): Config of localization loss.
         loss_centerness (:obj:`ConfigDict`, or dict): Config of centerness loss.
