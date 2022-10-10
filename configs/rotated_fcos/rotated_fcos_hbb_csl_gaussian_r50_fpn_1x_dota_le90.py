@@ -14,6 +14,10 @@ model = dict(
             window='gaussian',
             radius=1),
         loss_angle=dict(
-            type='SmoothFocalLoss', gamma=2.0, alpha=0.25, loss_weight=0.2),
+            _delete_=True,
+            type='SmoothFocalLoss',
+            gamma=2.0,
+            alpha=0.25,
+            loss_weight=0.2),
         loss_bbox=dict(type='mmdet.IoULoss', loss_weight=1.0),
     ), )
