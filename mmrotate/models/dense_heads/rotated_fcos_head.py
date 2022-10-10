@@ -29,6 +29,9 @@ class RotatedFCOSHead(FCOSHead):
     support rotated object detection.
 
     Args:
+        num_classes (int): Number of categories excluding the background
+            category.
+        in_channels (int): Number of channels in the input feature map.
         angle_version (str): Angle representations. Defaults to 'le90'.
         use_hbbox_loss (bool): If true, use horizontal bbox loss and
             loss_angle should not be None. Default: False.
@@ -36,7 +39,12 @@ class RotatedFCOSHead(FCOSHead):
         angle_coder (:obj:`ConfigDict` or dict): Config of angle coder.
         h_bbox_coder (dict): Config of horzional bbox coder,
             only used when use_hbbox_loss is True.
-        loss_angle (:obj:`ConfigDict` or dict, Optional): Config of angle loss
+        bbox_coder (:obj:`ConfigDict` or dict): Config of bbox coder. Defaults
+            'DistanceAnglePointCoder'.
+        loss_cls (:obj:`ConfigDict` or dict): Config of classification loss.
+        loss_bbox (:obj:`ConfigDict` or dict): Config of localization loss.
+        loss_centerness (:obj:`ConfigDict`, or dict): Config of centerness loss.
+        loss_angle (:obj:`ConfigDict` or dict, Optional): Config of angle loss.
 
     Example:
         >>> self = RotatedFCOSHead(11, 7)
@@ -46,19 +54,41 @@ class RotatedFCOSHead(FCOSHead):
     """  # noqa: E501
 
     def __init__(self,
+                 num_classes: int,
+                 in_channels: int,
                  angle_version: str = 'le90',
                  use_hbbox_loss: bool = False,
                  scale_angle: bool = True,
                  angle_coder: ConfigType = dict(type='PseudoAngleCoder'),
                  h_bbox_coder: ConfigType = dict(
                      type='mmdet.DistancePointBBoxCoder'),
+                 bbox_coder: ConfigType = dict(type='DistanceAnglePointCoder'),
+                 loss_cls: ConfigType = dict(
+                     type='mmdet.FocalLoss',
+                     use_sigmoid=True,
+                     gamma=2.0,
+                     alpha=0.25,
+                     loss_weight=1.0),
+                 loss_bbox: ConfigType = dict(
+                     type='RotatedIoULoss', loss_weight=1.0),
+                 loss_centerness: ConfigType = dict(
+                     type='mmdet.CrossEntropyLoss',
+                     use_sigmoid=True,
+                     loss_weight=1.0),
                  loss_angle: OptConfigType = None,
                  **kwargs):
         self.angle_version = angle_version
         self.use_hbbox_loss = use_hbbox_loss
         self.is_scale_angle = scale_angle
         self.angle_coder = TASK_UTILS.build(angle_coder)
-        super(RotatedFCOSHead, self).__init__(**kwargs)
+        super().__init__(
+            num_classes=num_classes,
+            in_channels=in_channels,
+            bbox_coder=bbox_coder,
+            loss_cls=loss_cls,
+            loss_bbox=loss_bbox,
+            loss_centerness=loss_centerness,
+            **kwargs)
         if loss_angle is not None:
             self.loss_angle = MODELS.build(loss_angle)
         else:
@@ -272,9 +302,9 @@ class RotatedFCOSHead(FCOSHead):
             tuple: Targets of each level.
             - concat_lvl_labels (list[Tensor]): Labels of each level.
             - concat_lvl_bbox_targets (list[Tensor]): BBox targets of each \
-            level.
+                level.
             - concat_lvl_angle_targets (list[Tensor]): Angle targets of \
-            each level.
+                each level.
         """
         assert len(points) == len(self.regress_ranges)
         num_levels = len(points)
