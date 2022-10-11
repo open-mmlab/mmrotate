@@ -82,6 +82,7 @@ class RotatedRetinaHead(RetinaHead):
             bbox_pred_decode = self.bbox_coder.decode(anchors, bbox_pred)
             bbox_pred_decode = get_box_tensor(bbox_pred_decode)
             bbox_targets_decode = self.bbox_coder.decode(anchors, bbox_targets)
+            bbox_targets_decode = get_box_tensor(bbox_targets_decode)
             loss_bbox = self.loss_bbox(
                 bbox_pred,
                 bbox_targets,

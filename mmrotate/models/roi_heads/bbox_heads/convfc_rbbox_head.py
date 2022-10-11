@@ -119,8 +119,10 @@ class RotatedShared2FCBBoxHead(Shared2FCBBoxHead):
                     # is applied on both the delta and decoded boxes.
                     bbox_pred_decode = self.bbox_coder.decode(
                         rois[:, 1:], bbox_pred)
+                    bbox_pred_decode = get_box_tensor(bbox_pred_decode)
                     bbox_targets_decode = self.bbox_coder.decode(
                         rois[:, 1:], bbox_targets)
+                    bbox_targets_decode = get_box_tensor(bbox_targets_decode)
 
                     if self.reg_class_agnostic:
                         pos_bbox_pred_decode = bbox_pred_decode.view(
