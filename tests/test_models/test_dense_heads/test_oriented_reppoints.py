@@ -36,8 +36,10 @@ class TestOrientedRepPointsHead(unittest.TestCase):
                     loss_weight=1.0),
                 loss_bbox_init=dict(type='ConvexGIoULoss', loss_weight=0.375),
                 loss_bbox_refine=dict(type='ConvexGIoULoss', loss_weight=1.0),
-                loss_spatial_init=dict(type='SpatialBorderLoss', loss_weight=0.05),
-                loss_spatial_refine=dict(type='SpatialBorderLoss', loss_weight=0.1),
+                loss_spatial_init=dict(
+                    type='SpatialBorderLoss', loss_weight=0.05),
+                loss_spatial_refine=dict(
+                    type='SpatialBorderLoss', loss_weight=0.1),
                 init_qua_weight=0.2,
                 top_ratio=0.4),
             train_cfg=dict(
