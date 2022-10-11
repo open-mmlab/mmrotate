@@ -19,11 +19,8 @@ class TestOrientedRepPointsHead(unittest.TestCase):
         cfg = ConfigDict(
             dict(
                 num_classes=2,
-                # in_channels=32,
-                # point_feat_channels=10,
-                in_channels=256,
-                feat_channels=256,
-                point_feat_channels=256,
+                in_channels=32,
+                point_feat_channels=10,
                 num_points=9,
                 gradient_mul=0.3,
                 point_strides=[8, 16, 32, 64, 128],
@@ -92,9 +89,7 @@ class TestOrientedRepPointsHead(unittest.TestCase):
         one_gt_losses = reppoints_head.loss_by_feat(*forward_outputs,
                                                     [gt_instances], img_metas,
                                                     gt_bboxes_ignore)
-        # loss_cls should all be non-zero
-        self.assertTrue(
-            all([loss.item() > 0 for loss in one_gt_losses['loss_cls']]))
+
         # only one level loss_pts_init is non-zero
         cnt_non_zero = 0
         for loss in one_gt_losses['loss_pts_init']:
