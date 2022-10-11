@@ -5,7 +5,7 @@ import torch
 from parameterized import parameterized
 
 from mmrotate.models.losses import (BCConvexGIoULoss, ConvexGIoULoss, GDLoss,
-                                    GDLoss_v1, SpatialBorderLoss)
+                                    GDLoss_v1, KFLoss, SpatialBorderLoss)
 
 
 class TestGDLoss(unittest.TestCase):
@@ -169,4 +169,51 @@ class TestSpatialBorderLoss(unittest.TestCase):
 
         # Test loss forward with avg_factor
         loss = SpatialBorderLoss()(pred, target, weight, avg_factor=10)
+        assert isinstance(loss, torch.Tensor)
+
+
+class TestKFLoss(unittest.TestCase):
+
+    def test_regression_losses(self):
+
+        pred = torch.rand((10, 5))
+        target = torch.rand((10, 5))
+        weight = torch.rand((10, ))
+        pred_decode = torch.rand((10, 5))
+        targets_decode = torch.rand((10, 5))
+
+        # Test loss forward
+        loss = KFLoss()(
+            pred,
+            target,
+            pred_decode=pred_decode,
+            targets_decode=targets_decode)
+        assert isinstance(loss, torch.Tensor)
+
+        # Test loss forward with weight
+        loss = KFLoss()(
+            pred,
+            target,
+            weight,
+            pred_decode=pred_decode,
+            targets_decode=targets_decode)
+        assert isinstance(loss, torch.Tensor)
+
+        # Test loss forward with reduction_override
+        loss = KFLoss()(
+            pred,
+            target,
+            reduction_override='mean',
+            pred_decode=pred_decode,
+            targets_decode=targets_decode)
+        assert isinstance(loss, torch.Tensor)
+
+        # Test loss forward with avg_factor
+        loss = KFLoss()(
+            pred,
+            target,
+            weight,
+            avg_factor=10,
+            pred_decode=pred_decode,
+            targets_decode=targets_decode)
         assert isinstance(loss, torch.Tensor)
