@@ -31,8 +31,7 @@ class TestSAMRepPointsHead(unittest.TestCase):
                     gamma=2.0,
                     alpha=0.25,
                     loss_weight=1.0),
-                loss_bbox_init=dict(
-                    type='BCConvexGIoULoss', loss_weight=0.375),
+                loss_bbox_init=dict(type='BCConvexGIoULoss', loss_weight=0.375),
                 loss_bbox_refine=dict(type='ConvexGIoULoss', loss_weight=1.0),
                 transform_method='rotrect'),
             train_cfg=dict(
