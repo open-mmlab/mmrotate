@@ -117,10 +117,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
                                     self.angle_version, self.norm_factor,
                                     self.edge_swap, self.proj_xy)
 
-        if self.use_box_type:
-            assert decoded_bboxes.size(-1) == 5, \
-                ('Cannot warp decoded boxes with box type when decoded boxes'
-                 'have shape of (N, num_classes * 5)')
+        if self.use_box_type and decoded_bboxes.size(-1) == 5:
             decoded_bboxes = RotatedBoxes(decoded_bboxes)
 
         return decoded_bboxes
