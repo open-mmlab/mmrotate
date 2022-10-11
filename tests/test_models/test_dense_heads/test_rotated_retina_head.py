@@ -42,7 +42,7 @@ class TestRotatedRetinaHead(TestCase):
                 allowed_border=0,
                 pos_weight=-1,
                 debug=False))
-        anchor_head=RotatedRetinaHead(
+        anchor_head = RotatedRetinaHead(
             num_classes=4,
             in_channels=1,
             stacked_convs=1,
@@ -134,7 +134,7 @@ class TestRotatedRetinaHead(TestCase):
                 allowed_border=0,
                 pos_weight=-1,
                 debug=False))
-        anchor_head=RotatedRetinaHead(
+        anchor_head = RotatedRetinaHead(
             num_classes=4,
             in_channels=1,
             stacked_convs=1,

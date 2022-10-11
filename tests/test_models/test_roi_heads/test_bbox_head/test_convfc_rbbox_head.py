@@ -43,7 +43,7 @@ class TestRotatedShared2FCBBoxHead(TestCase):
                 use_sigmoid=False,
                 loss_weight=1.0),
             loss_bbox=dict(
-                    type='mmdet.SmoothL1Loss', beta=1.0, loss_weight=1.0))    
+                type='mmdet.SmoothL1Loss', beta=1.0, loss_weight=1.0))
         bbox_head = bbox_head.to(device=device)
 
         num_samples = 4
@@ -79,7 +79,7 @@ class TestRotatedShared2FCBBoxHead(TestCase):
                 use_sigmoid=False,
                 loss_weight=1.0),
             loss_bbox_type='kfiou',
-            loss_bbox=dict(type='KFLoss', fun='ln', loss_weight=5.0))    
+            loss_bbox=dict(type='KFLoss', fun='ln', loss_weight=5.0))
         bbox_head = bbox_head.to(device=device)
 
         num_samples = 4
