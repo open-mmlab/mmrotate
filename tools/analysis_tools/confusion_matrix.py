@@ -123,11 +123,8 @@ def analyze_per_img_dets(confusion_matrix,
     for det_label, det_bboxes in enumerate(result):
         det_bboxes = torch.from_numpy(det_bboxes).float()
         if nms_iou_thr:
-            det_bboxes, _ = nms_rotated(
-                det_bboxes[:, :5],
-                det_bboxes[:, -1],
-                nms_iou_thr,
-                score_threshold=score_thr)
+            det_bboxes, _ = nms_rotated(det_bboxes[:, :5], det_bboxes[:, -1],
+                                        nms_iou_thr)
         ious = rbbox_overlaps(det_bboxes[:, :5], gt_bboxes)
         for i, det_bbox in enumerate(det_bboxes):
             score = det_bbox[5]
@@ -261,6 +258,7 @@ def main():
         confusion_matrix,
         dataset.CLASSES + ('background', ),
         save_dir=args.save_dir,
+        color_theme=args.color_theme,
         show=args.show)
 
 
