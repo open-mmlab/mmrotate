@@ -2,16 +2,16 @@
 import torch
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
 
+from mmrotate.core.bbox.transforms import norm_angle
 from mmrotate.registry import TASK_UTILS
-from ..transforms import norm_angle
 
 
 @TASK_UTILS.register_module()
 class DistanceAnglePointCoder(BaseBBoxCoder):
     """Distance Angle Point BBox coder.
 
-    This coder encodes gt bboxes (x, y, w, h, angle) into (top, bottom, left,
-    right, angle) and decode it back to the original.
+    This coder encodes gt bboxes (x, y, w, h, theta) into (top, bottom, left,
+    right, theta) and decode it back to the original.
 
     Args:
         clip_border (bool, optional): Whether clip the objects outside the

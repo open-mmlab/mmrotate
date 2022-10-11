@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from mmdet.models import weight_reduce_loss
 
-from ..builder import ROTATED_LOSSES
+from mmrotate.registry import MODELS
 
 
 def smooth_focal_loss(pred,
@@ -59,7 +59,7 @@ def smooth_focal_loss(pred,
     return loss
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class SmoothFocalLoss(nn.Module):
     """Smooth Focal Loss. Implementation of `Circular Smooth Label (CSL).`__
 

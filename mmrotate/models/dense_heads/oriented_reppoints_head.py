@@ -732,7 +732,7 @@ class OrientedRepPointsHead(RotatedRepPointsHead):
         unity_points_features = points_features / norm_pts_feats
         unity_mean_points_feats = mean_points_feats / norm_mean_pts_feats
 
-        feats_similarity = 1.0 - F.cos_similarity(
+        feats_similarity = 1.0 - F.cosine_similarity(
             unity_points_features, unity_mean_points_feats, dim=2, eps=1e-6)
 
         max_correlation, _ = torch.max(feats_similarity, dim=1)
