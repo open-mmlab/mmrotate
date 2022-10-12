@@ -4,7 +4,6 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
-from mmdet.models.dense_heads.retina_head import RetinaHead
 from mmdet.models.utils import select_single_mlvl
 from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
@@ -13,10 +12,11 @@ from torch import Tensor
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import MODELS, TASK_UTILS
 from ..utils import ORConv2d, RotationInvariantPooling
+from .rotated_retina_head import RotatedRetinaHead
 
 
 @MODELS.register_module()
-class S2AHead(RetinaHead):
+class S2AHead(RotatedRetinaHead):
     r"""An anchor-based head used in `S2A-Net
     <https://ieeexplore.ieee.org/document/9377550>`_.
     """  # noqa: W605
@@ -62,7 +62,7 @@ class S2AHead(RetinaHead):
 
 
 @MODELS.register_module()
-class S2ARefineHead(RetinaHead):
+class S2ARefineHead(RotatedRetinaHead):
     r"""Rotated Anchor-based refine head. It's a part of the Oriented Detection
     Module (ODM), which produces orientation-sensitive features for
     classification and orientation-invariant features for localization.
@@ -181,7 +181,7 @@ class S2ARefineHead(RetinaHead):
         """
         assert rois is not None
         self.bboxes_as_anchors = rois
-        return super(RetinaHead, self).loss_by_feat(
+        return super(RotatedRetinaHead, self).loss_by_feat(
             cls_scores=cls_scores,
             bbox_preds=bbox_preds,
             batch_gt_instances=batch_gt_instances,

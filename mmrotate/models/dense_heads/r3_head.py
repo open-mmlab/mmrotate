@@ -2,7 +2,6 @@
 from typing import List, Optional, Tuple, Union
 
 import torch
-from mmdet.models.dense_heads.retina_head import RetinaHead
 from mmdet.models.utils import select_single_mlvl
 from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
@@ -10,10 +9,11 @@ from torch import Tensor
 
 from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import MODELS, TASK_UTILS
+from .rotated_retina_head import RotatedRetinaHead
 
 
 @MODELS.register_module()
-class R3Head(RetinaHead):
+class R3Head(RotatedRetinaHead):
     r"""An anchor-based head used in `R3Det
     <https://arxiv.org/pdf/1908.05612.pdf>`_.
     """  # noqa: W605
@@ -84,7 +84,7 @@ class R3Head(RetinaHead):
 
 
 @MODELS.register_module()
-class R3RefineHead(RetinaHead):
+class R3RefineHead(RotatedRetinaHead):
     r"""An anchor-based head used in `R3Det
     <https://arxiv.org/pdf/1908.05612.pdf>`_.
 
@@ -136,7 +136,7 @@ class R3RefineHead(RetinaHead):
         """
         assert rois is not None
         self.bboxes_as_anchors = rois
-        return super(RetinaHead, self).loss_by_feat(
+        return super(RotatedRetinaHead, self).loss_by_feat(
             cls_scores=cls_scores,
             bbox_preds=bbox_preds,
             batch_gt_instances=batch_gt_instances,
