@@ -62,7 +62,8 @@ val_dataloader = dict(
         pipeline=val_pipeline))
 test_dataloader = val_dataloader
 
-val_evaluator = dict(type='DOTAMetric', metric='mAP', predict_box_type='qbox')
+val_evaluator = dict(
+    type='DOTAMetric', metric='mAP', iou_thrs=0.2, predict_box_type='qbox')
 test_evaluator = val_evaluator
 
 # inference on test dataset and format the output results

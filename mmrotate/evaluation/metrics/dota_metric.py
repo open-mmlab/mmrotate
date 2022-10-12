@@ -134,8 +134,14 @@ class DOTAMetric(BaseMetric):
             bboxes = result['bboxes']
             scores = result['scores']
             ori_bboxes = bboxes.copy()
-            ori_bboxes[..., :2] = ori_bboxes[..., :2] + np.array(
-                [x, y], dtype=np.float32)
+            if self.predict_box_type == 'rbox':
+                ori_bboxes[..., :2] = ori_bboxes[..., :2] + np.array(
+                    [x, y], dtype=np.float32)
+            elif self.predict_box_type == 'qbox':
+                ori_bboxes[..., :] = ori_bboxes[..., :] + np.array(
+                    [x, y, x, y, x, y, x, y], dtype=np.float32)
+            else:
+                raise NotImplementedError
             label_dets = np.concatenate(
                 [labels[:, np.newaxis], ori_bboxes, scores[:, np.newaxis]],
                 axis=1)
