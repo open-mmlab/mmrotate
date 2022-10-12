@@ -45,7 +45,9 @@ model = dict(
         loss_cls=dict(
             type='mmdet.CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(
-            type='mmdet.SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+            type='mmdet.SmoothL1Loss',
+            beta=0.1111111111111111,
+            loss_weight=1.0)),
     roi_head=dict(
         type='GVRatioRoIHead',
         bbox_roi_extractor=dict(
@@ -69,8 +71,11 @@ model = dict(
             ratio_coder=dict(type='GVRatioCoder'),
             reg_class_agnostic=True,
             loss_cls=dict(
-                type='mmdet.CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='mmdet.SmoothL1Loss', beta=1.0, loss_weight=1.0),
+                type='mmdet.CrossEntropyLoss',
+                use_sigmoid=False,
+                loss_weight=1.0),
+            loss_bbox=dict(
+                type='mmdet.SmoothL1Loss', beta=1.0, loss_weight=1.0),
             loss_fix=dict(
                 type='mmdet.SmoothL1Loss', beta=1.0 / 3.0, loss_weight=1.0),
             loss_ratio=dict(
