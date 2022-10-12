@@ -140,15 +140,3 @@ class GVRatioCoder(BaseBBoxCoder):
 
         ratios = areas / h_areas
         return ratios[:, None]
-
-    def decode(self, bboxes, bboxes_pred):
-        """Apply transformation `fix_deltas` to `boxes`.
-
-        Args:
-            bboxes (Tensor)
-            bboxes_pred (Tensor)
-
-        Returns:
-            NotImplementedError
-        """
-        raise NotImplementedError

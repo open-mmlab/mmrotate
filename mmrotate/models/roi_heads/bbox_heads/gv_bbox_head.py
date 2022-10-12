@@ -195,18 +195,18 @@ class GVBBoxHead(BaseModule):
         Returns:
             tuple: A tuple of classification scores and bbox prediction.
 
-                - cls_score (Tensor): Classification scores for all
-                  scale levels, each is a 4D-tensor, the channels number
-                  is num_base_priors * num_classes.
-                - bbox_pred (Tensor): Box energies / deltas for all
-                  scale levels, each is a 4D-tensor, the channels number
-                  is num_base_priors * 4.
-                - fix_pred (Tensor): Fix / deltas for all
-                  scale levels, each is a 4D-tensor, the channels number
-                  is num_base_priors * 4.
-                - ratio_pred (Tensor): Ratio / deltas for all
-                  scale levels, each is a 4D-tensor, the channels number
-                  is num_base_priors * 4.
+            - cls_score (Tensor): Classification scores for all
+              scale levels, each is a 4D-tensor, the channels number
+              is num_base_priors * num_classes.
+            - bbox_pred (Tensor): Box energies / deltas for all
+              scale levels, each is a 4D-tensor, the channels number
+              is num_base_priors * 4.
+            - fix_pred (Tensor): Fix / deltas for all
+              scale levels, each is a 4D-tensor, the channels number
+              is num_base_priors * 4.
+            - ratio_pred (Tensor): Ratio / deltas for all
+              scale levels, each is a 4D-tensor, the channels number
+              is num_base_priors * 4.
         """
         if self.with_avg_pool:
             if x.numel() > 0:
@@ -255,23 +255,23 @@ class GVBBoxHead(BaseModule):
             Tuple[Tensor]: Ground truth for proposals
             in a single image. Containing the following Tensors:
 
-                - labels(Tensor): Gt_labels for all proposals, has
-                  shape (num_proposals,).
-                - label_weights(Tensor): Labels_weights for all
-                  proposals, has shape (num_proposals,).
-                - bbox_targets(Tensor):Regression target for all
-                  proposals, has shape (num_proposals, 4), the
-                  last dimension 4 represents [tl_x, tl_y, br_x, br_y].
-                - bbox_weights(Tensor):Regression weights for all
-                  proposals, has shape (num_proposals, 4).
-                - fix_targets(Tensor):Fix target for all
-                  proposals, has shape (num_proposals, 4).
-                - fix_weights(Tensor):Fix weights for all
-                  proposals, has shape (num_proposals, 4).
-                - ratio_targets(Tensor):Ratio target for all
-                  proposals, has shape (num_proposals, 1).
-                - ratio_weights(Tensor):Ratio weights for all
-                  proposals, has shape (num_proposals, 1).
+            - labels(Tensor): Gt_labels for all proposals, has
+              shape (num_proposals,).
+            - label_weights(Tensor): Labels_weights for all
+              proposals, has shape (num_proposals,).
+            - bbox_targets(Tensor):Regression target for all
+              proposals, has shape (num_proposals, 4), the
+              last dimension 4 represents [tl_x, tl_y, br_x, br_y].
+            - bbox_weights(Tensor):Regression weights for all
+              proposals, has shape (num_proposals, 4).
+            - fix_targets(Tensor):Fix target for all
+              proposals, has shape (num_proposals, 4).
+            - fix_weights(Tensor):Fix weights for all
+              proposals, has shape (num_proposals, 4).
+            - ratio_targets(Tensor):Ratio target for all
+              proposals, has shape (num_proposals, 1).
+            - ratio_weights(Tensor):Ratio weights for all
+              proposals, has shape (num_proposals, 1).
         """
         num_pos = pos_priors.size(0)
         num_neg = neg_priors.size(0)
@@ -344,23 +344,23 @@ class GVBBoxHead(BaseModule):
             Containing the following list of Tensors:
 
             - labels (list[Tensor],Tensor): Gt_labels for all
-                proposals in a batch, each tensor in list has
-                shape (num_proposals,) when `concat=False`, otherwise
-                just a single tensor has shape (num_all_proposals,).
+              proposals in a batch, each tensor in list has
+              shape (num_proposals,) when `concat=False`, otherwise
+              just a single tensor has shape (num_all_proposals,).
             - label_weights (list[Tensor]): Labels_weights for
-                all proposals in a batch, each tensor in list has
-                shape (num_proposals,) when `concat=False`, otherwise
-                just a single tensor has shape (num_all_proposals,).
+              all proposals in a batch, each tensor in list has
+              shape (num_proposals,) when `concat=False`, otherwise
+              just a single tensor has shape (num_all_proposals,).
             - bbox_targets (list[Tensor],Tensor): Regression target
-                for all proposals in a batch, each tensor in list
-                has shape (num_proposals, 4) when `concat=False`,
-                otherwise just a single tensor has shape
-                (num_all_proposals, 4), the last dimension 4 represents
-                [tl_x, tl_y, br_x, br_y].
+              for all proposals in a batch, each tensor in list
+              has shape (num_proposals, 4) when `concat=False`,
+              otherwise just a single tensor has shape
+              (num_all_proposals, 4), the last dimension 4 represents
+              [tl_x, tl_y, br_x, br_y].
             - bbox_weights (list[tensor],Tensor): Regression weights for
-                all proposals in a batch, each tensor in list has shape
-                (num_proposals, 4) when `concat=False`, otherwise just a
-                single tensor has shape (num_all_proposals, 4).
+              all proposals in a batch, each tensor in list has shape
+              (num_proposals, 4) when `concat=False`, otherwise just a
+              single tensor has shape (num_all_proposals, 4).
         """
         pos_priors_list = [res.pos_priors for res in sampling_results]
         neg_priors_list = [res.neg_priors for res in sampling_results]
@@ -426,7 +426,7 @@ class GVBBoxHead(BaseModule):
 
         Returns:
             dict: A dictionary of loss and targets components.
-                The targets are only used for cascade rcnn.
+            The targets are only used for cascade rcnn.
         """
 
         cls_reg_targets = self.get_targets(
@@ -617,12 +617,12 @@ class GVBBoxHead(BaseModule):
             results of each image after the post process.
             Each item usually contains following keys.
 
-                - scores (Tensor): Classification scores, has a shape
-                  (num_instance, )
-                - labels (Tensor): Labels of bboxes, has a shape
-                  (num_instances, ).
-                - bboxes (Tensor): Has a shape (num_instances, 8),
-                  the last dimension 4 arrange as (x1, y1, ..., x4, y4).
+            - scores (Tensor): Classification scores, has a shape
+              (num_instance, )
+            - labels (Tensor): Labels of bboxes, has a shape
+              (num_instances, ).
+            - bboxes (Tensor): Has a shape (num_instances, 8),
+              the last dimension 4 arrange as (x1, y1, ..., x4, y4).
         """
         assert len(cls_scores) == len(bbox_preds)
         result_list = []
@@ -675,12 +675,12 @@ class GVBBoxHead(BaseModule):
             :obj:`InstanceData`: Detection results of each image\
             Each item usually contains following keys.
 
-                - scores (Tensor): Classification scores, has a shape
-                  (num_instance, )
-                - labels (Tensor): Labels of bboxes, has a shape
-                  (num_instances, ).
-                - bboxes (Tensor): Has a shape (num_instances, 8),
-                  the last dimension 4 arrange as (x1, y1, ..., x4, y4).
+            - scores (Tensor): Classification scores, has a shape
+              (num_instance, )
+            - labels (Tensor): Labels of bboxes, has a shape
+              (num_instances, ).
+            - bboxes (Tensor): Has a shape (num_instances, 8),
+              the last dimension 4 arrange as (x1, y1, ..., x4, y4).
         """
         results = InstanceData()
         if roi.shape[0] == 0:

@@ -58,13 +58,13 @@ class GVRatioRoIHead(StandardRoIHead):
                 column indicates batch id of each RoI.
 
         Returns:
-             dict[str, Tensor]: Usually returns a dictionary with keys:
+            dict[str, Tensor]: Usually returns a dictionary with keys:
 
-                - `cls_score` (Tensor): Classification scores.
-                - `bbox_pred` (Tensor): Box energies / deltas.
-                - `fix_pred` (Tensor): fix / deltas.
-                - `ratio_pred` (Tensor): ratio / deltas.
-                - `bbox_feats` (Tensor): Extract bbox RoI features.
+            - `cls_score` (Tensor): Classification scores.
+            - `bbox_pred` (Tensor): Box energies / deltas.
+            - `fix_pred` (Tensor): fix / deltas.
+            - `ratio_pred` (Tensor): ratio / deltas.
+            - `bbox_feats` (Tensor): Extract bbox RoI features.
         """
         # TODO: a more flexible way to decide which feature maps to use
         bbox_feats = self.bbox_roi_extractor(
@@ -93,12 +93,12 @@ class GVRatioRoIHead(StandardRoIHead):
         Returns:
             dict[str, Tensor]: Usually returns a dictionary with keys:
 
-                - `cls_score` (Tensor): Classification scores.
-                - `bbox_pred` (Tensor): Box energies / deltas.
-                - `fix_pred` (Tensor): fix / deltas.
-                - `ratio_pred` (Tensor): ratio / deltas.
-                - `bbox_feats` (Tensor): Extract bbox RoI features.
-                - `loss_bbox` (dict): A dictionary of bbox loss components.
+            - `cls_score` (Tensor): Classification scores.
+            - `bbox_pred` (Tensor): Box energies / deltas.
+            - `fix_pred` (Tensor): fix / deltas.
+            - `ratio_pred` (Tensor): ratio / deltas.
+            - `bbox_feats` (Tensor): Extract bbox RoI features.
+            - `loss_bbox` (dict): A dictionary of bbox loss components.
         """
         rois = bbox2roi([res.priors for res in sampling_results])
         bbox_results = self._bbox_forward(x, rois)
@@ -134,16 +134,15 @@ class GVRatioRoIHead(StandardRoIHead):
                 Defaults to False.
 
         Returns:
-            list[:obj:`InstanceData`]: Detection results of each image
-            after the post process.
-            Each item usually contains following keys.
+            list[:obj:`InstanceData`]: Detection results of each image after
+            the post process. Each item usually contains following keys.
 
-                - scores (Tensor): Classification scores, has a shape
-                  (num_instance, )
-                - labels (Tensor): Labels of bboxes, has a shape
-                  (num_instances, ).
-                - bboxes (Tensor): Has a shape (num_instances, 4),
-                  the last dimension 4 arrange as (x1, y1, x2, y2).
+            - scores (Tensor): Classification scores, has a shape
+              (num_instance, )
+            - labels (Tensor): Labels of bboxes, has a shape
+              (num_instances, ).
+            - bboxes (Tensor): Has a shape (num_instances, 4),
+              the last dimension 4 arrange as (x1, y1, x2, y2).
         """
         proposals = [res.bboxes for res in rpn_results_list]
         rois = bbox2roi(proposals)

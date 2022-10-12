@@ -32,7 +32,7 @@ def tpfp_default(det_bboxes,
 
     Returns:
         tuple[np.ndarray]: (tp, fp) whose elements are 0 and 1. The shape of
-            each array is (num_scales, m).
+        each array is (num_scales, m).
     """
     # an indicator of ignored gts
     det_bboxes = np.array(det_bboxes)
