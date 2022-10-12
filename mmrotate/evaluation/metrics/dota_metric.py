@@ -10,7 +10,7 @@ from typing import List, Optional, Sequence, Union
 
 import numpy as np
 import torch
-from mmcv.ops import nms_rotated
+from mmcv.ops import nms_qbox, nms_rotated
 from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
@@ -37,6 +37,8 @@ class DOTAMetric(BaseMetric):
         metric (str | list[str]): Metrics to be evaluated. Only support
             'mAP' now. If is list, the first setting in the list will
              be used to evaluate metric.
+        predict_box_type (str): Box type of model results. If the QuadriBoxes
+            is used, you need to specify 'qbox'. Defaults to 'rbox'.
         format_only (bool): Format the output results without perform
             evaluation. It is useful when you want to format the result
             to a specific format. Defaults to False.
@@ -68,6 +70,7 @@ class DOTAMetric(BaseMetric):
                  iou_thrs: Union[float, List[float]] = 0.5,
                  scale_ranges: Optional[List[tuple]] = None,
                  metric: Union[str, List[str]] = 'mAP',
+                 predict_box_type: str = 'rbox',
                  format_only: bool = False,
                  outfile_prefix: Optional[str] = None,
                  merge_patches: bool = False,
@@ -88,6 +91,7 @@ class DOTAMetric(BaseMetric):
         if metric not in allowed_metrics:
             raise KeyError(f"metric should be one of 'mAP', but got {metric}.")
         self.metric = metric
+        self.predict_box_type = predict_box_type
 
         self.format_only = format_only
         if self.format_only:
@@ -150,9 +154,15 @@ class DOTAMetric(BaseMetric):
                         cls_dets = torch.from_numpy(dets[labels == i]).cuda()
                     except:  # noqa: E722
                         cls_dets = torch.from_numpy(dets[labels == i])
-                    nms_dets, keep_inds = nms_rotated(cls_dets[:, :5],
-                                                      cls_dets[:, -1],
-                                                      self.iou_thr)
+                    if self.predict_box_type == 'rbox':
+                        nms_dets, _ = nms_rotated(cls_dets[:, :5],
+                                                  cls_dets[:,
+                                                           -1], self.iou_thr)
+                    elif self.predict_box_type == 'qbox':
+                        nms_dets, _ = nms_qbox(cls_dets[:, :8], cls_dets[:, -1],
+                                              self.iou_thr)
+                    else:
+                        raise NotImplementedError
                     big_img_results.append(nms_dets.cpu().numpy())
             id_list.append(oriname)
             dets_list.append(big_img_results)
@@ -173,8 +183,13 @@ class DOTAMetric(BaseMetric):
                 if dets.size == 0:
                     continue
                 th_dets = torch.from_numpy(dets)
-                rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
-                qboxes = rbox2qbox(rboxes)
+                if self.predict_box_type == 'rbox':
+                    rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
+                    qboxes = rbox2qbox(rboxes)
+                elif self.predict_box_type == 'qbox':
+                    qboxes, scores = torch.split(th_dets, (8, 1), dim=-1)
+                else:
+                    raise NotImplementedError
                 for qbox, score in zip(qboxes, scores):
                     txt_element = [img_id, str(round(float(score), 2))
                                    ] + [f'{p:.2f}' for p in qbox]
@@ -320,6 +335,7 @@ class DOTAMetric(BaseMetric):
                     scale_ranges=self.scale_ranges,
                     iou_thr=iou_thr,
                     use_07_metric=self.use_07_metric,
+                    box_type=self.predict_box_type,
                     dataset=dataset_name,
                     logger=logger)
                 mean_aps.append(mean_ap)
