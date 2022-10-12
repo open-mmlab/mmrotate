@@ -42,7 +42,7 @@ class GVBBoxHead(BaseModule):
                      target_stds=[0.1, 0.1, 0.2, 0.2]),
                  fix_coder: ConfigType = dict(type='GVFixCoder'),
                  ratio_coder: ConfigType = dict(type='GVRatioCoder'),
-                 predict_box_type: str = 'hbox',
+                 predict_box_type: str = 'qbox',
                  reg_class_agnostic: bool = False,
                  reg_decoded_bbox: bool = False,
                  reg_predictor_cfg: ConfigType = dict(type='mmdet.Linear'),
@@ -721,6 +721,9 @@ class GVBBoxHead(BaseModule):
         qboxes[ratio_pred > self.ratio_thr] = \
             hbox2qbox(bboxes[ratio_pred > self.ratio_thr])
         bboxes = QuadriBoxes(qboxes)
+
+        if self.predict_box_type == 'rbox':
+            bboxes = bboxes.convert_to('rbox')
 
         if rescale and qboxes.size(0) > 0:
             assert img_meta.get('scale_factor') is not None
