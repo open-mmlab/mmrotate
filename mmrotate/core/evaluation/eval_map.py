@@ -3,7 +3,7 @@ from multiprocessing import get_context
 
 import numpy as np
 import torch
-from mmcv.ops import box_iou_qbox, box_iou_rotated
+from mmcv.ops import box_iou_quadri, box_iou_rotated
 from mmdet.evaluation.functional import average_precision
 from mmengine.logging import print_log
 from terminaltables import AsciiTable
@@ -66,7 +66,7 @@ def tpfp_default(det_bboxes,
             torch.from_numpy(det_bboxes).float(),
             torch.from_numpy(gt_bboxes).float()).numpy()
     elif box_type == 'qbox':
-        ious = box_iou_qbox(
+        ious = box_iou_quadri(
             torch.from_numpy(det_bboxes).float(),
             torch.from_numpy(gt_bboxes).float()).numpy()
     else:

@@ -1,5 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-# Modified from jbwang1997: https://github.com/jbwang1997/OBBDetection
 from typing import Union
 
 import torch
@@ -146,8 +145,8 @@ class GVRatioCoder(BaseBBoxCoder):
         """Apply transformation `fix_deltas` to `boxes`.
 
         Args:
-            bboxes (torch.Tensor)
-            bboxes_pred (torch.Tensor)
+            bboxes (Tensor)
+            bboxes_pred (Tensor)
 
         Returns:
             NotImplementedError

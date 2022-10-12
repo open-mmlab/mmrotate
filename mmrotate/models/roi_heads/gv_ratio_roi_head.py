@@ -172,8 +172,8 @@ class GVRatioRoIHead(StandardRoIHead):
             # the bbox prediction of some detectors like SABL is not Tensor
             if isinstance(bbox_preds, torch.Tensor):
                 bbox_preds = bbox_preds.split(num_proposals_per_img, 0)
-                fix_preds = fix_preds[0].split(num_proposals_per_img, 0)
-                ratio_preds = ratio_preds[0].split(num_proposals_per_img, 0)
+                fix_preds = fix_preds.split(num_proposals_per_img, 0)
+                ratio_preds = ratio_preds.split(num_proposals_per_img, 0)
             else:
                 bbox_preds = self.bbox_head.bbox_pred_split(
                     bbox_preds, num_proposals_per_img)

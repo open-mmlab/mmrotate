@@ -132,7 +132,7 @@ model = dict(
             nms_pre=2000,
             min_bbox_size=0,
             score_thr=0.05,
-            nms=dict(type='nms_qbb', iou_threshold=0.1),
+            nms=dict(type='nms_quadri', iou_threshold=0.1),
             max_per_img=2000)))
 
 optim_wrapper = dict(optimizer=dict(lr=0.005))

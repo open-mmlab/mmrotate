@@ -621,8 +621,8 @@ class GVBBoxHead(BaseModule):
                   (num_instance, )
                 - labels (Tensor): Labels of bboxes, has a shape
                   (num_instances, ).
-                - bboxes (Tensor): Has a shape (num_instances, 4),
-                  the last dimension 4 arrange as (x1, y1, x2, y2).
+                - bboxes (Tensor): Has a shape (num_instances, 8),
+                  the last dimension 4 arrange as (x1, y1, ..., x4, y4).
         """
         assert len(cls_scores) == len(bbox_preds)
         result_list = []
@@ -632,8 +632,8 @@ class GVBBoxHead(BaseModule):
                 roi=rois[img_id],
                 cls_score=cls_scores[img_id],
                 bbox_pred=bbox_preds[img_id],
-                fix_preds=fix_preds[img_id],
-                ratio_preds=ratio_preds[img_id],
+                fix_pred=fix_preds[img_id],
+                ratio_pred=ratio_preds[img_id],
                 img_meta=img_meta,
                 rescale=rescale,
                 rcnn_test_cfg=rcnn_test_cfg)
@@ -662,7 +662,7 @@ class GVBBoxHead(BaseModule):
             bbox_pred (Tensor): Box energies / deltas.
                 has shape (num_boxes, num_classes * 4).
             fix_pred (Tensor): Fix / deltas.
-                has shape (num_boxes, num_classes * 8).
+                has shape (num_boxes, num_classes * 4).
             ratio_pred (Tensor): Ratio / deltas.
                 has shape (num_boxes, num_classes * 1).
             img_meta (dict): image information.
@@ -718,12 +718,8 @@ class GVBBoxHead(BaseModule):
         bboxes = bboxes.view(*ratio_pred.size(), 4)
         qboxes = qboxes.view(*ratio_pred.size(), 8)
 
-        try:
-            qboxes[ratio_pred > self.ratio_thr] = \
-                hbox2qbox(bboxes[ratio_pred > self.ratio_thr])
-        except:  # noqa: E722
-            pass
-
+        qboxes[ratio_pred > self.ratio_thr] = \
+            hbox2qbox(bboxes[ratio_pred > self.ratio_thr])
         bboxes = QuadriBoxes(qboxes)
 
         if rescale and qboxes.size(0) > 0:
