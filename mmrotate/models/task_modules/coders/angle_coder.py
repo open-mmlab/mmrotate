@@ -1,7 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import math
 
+import numpy as np
 import torch
+import torch.nn.functional as F
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
 from torch import Tensor
 
@@ -139,3 +141,31 @@ class PseudoAngleCoder(BaseBBoxCoder):
             return angle_preds
         else:
             return angle_preds.squeeze(-1)
+
+
+@TASK_UTILS.register_module()
+class DistributionAngleCoder(BaseBBoxCoder):
+
+    def __init__(self, angle_version='le90', reg_max=16):
+        super().__init__()
+        self.angle_range = 0.5 * np.pi if angle_version == 'oc' else np.pi
+        self.angle_offset_dict = {
+            'oc': 0,
+            'le90': 0.5 * np.pi,
+            'le135': 0.25 * np.pi
+        }
+        self.angle_offset = self.angle_offset_dict[angle_version]
+        self.reg_max = reg_max
+        self.encode_size = reg_max + 1
+        self.project = torch.linspace(0, self.reg_max, self.reg_max + 1)
+
+    def encode(self, angle):
+        # Norm to (0~1)*reg_max
+        dfl_target = self.reg_max * (self.angle_offset +
+                                     angle) / self.angle_range
+        return dfl_target.flatten()
+
+    def decode(self, angle, keepdim=True):
+        angle = F.softmax(angle.reshape(-1, self.reg_max + 1), dim=-1)
+        angle = F.linear(angle, self.project.type_as(angle)).reshape(-1, 1)
+        return self.angle_range * angle / self.reg_max - self.angle_offset
