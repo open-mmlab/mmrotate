@@ -87,12 +87,12 @@ class S2ARefineHead(RotatedRetinaHead):
     def _init_layers(self) -> None:
         """Initialize layers of the head."""
         self.or_conv = ORConv2d(
-            self.feat_channels,
+            self.in_channels,
             int(self.feat_channels / 8),
             kernel_size=3,
             padding=1,
             arf_config=(1, 8))
-        self.or_pool = RotationInvariantPooling(256, 8)
+        self.or_pool = RotationInvariantPooling(self.feat_channels, 8)
         self.relu = nn.ReLU(inplace=True)
         self.cls_convs = nn.ModuleList()
         self.reg_convs = nn.ModuleList()
