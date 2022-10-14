@@ -4,9 +4,11 @@ from unittest import TestCase
 
 import torch
 from mmengine.config import Config
+
+from mmrotate.registry import MODELS
 from mmrotate.testing import demo_mm_inputs, demo_mm_proposals
 from mmrotate.utils import register_all_modules
-from mmrotate.registry import MODELS
+
 
 def _fake_roi_head():
     """Set a fake roi head config."""
@@ -15,7 +17,8 @@ def _fake_roi_head():
             type='GVRatioRoIHead',
             bbox_roi_extractor=dict(
                 type='mmdet.SingleRoIExtractor',
-                roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+                roi_layer=dict(
+                    type='RoIAlign', output_size=7, sampling_ratio=0),
                 out_channels=256,
                 featmap_strides=[4, 8, 16, 32]),
             bbox_head=dict(
@@ -41,9 +44,12 @@ def _fake_roi_head():
                 loss_bbox=dict(
                     type='mmdet.SmoothL1Loss', beta=1.0, loss_weight=1.0),
                 loss_fix=dict(
-                    type='mmdet.SmoothL1Loss', beta=1.0 / 3.0, loss_weight=1.0),
+                    type='mmdet.SmoothL1Loss', beta=1.0 / 3.0,
+                    loss_weight=1.0),
                 loss_ratio=dict(
-                    type='mmdet.SmoothL1Loss', beta=1.0 / 3.0, loss_weight=16.0)),
+                    type='mmdet.SmoothL1Loss',
+                    beta=1.0 / 3.0,
+                    loss_weight=16.0)),
             train_cfg=dict(
                 assigner=dict(
                     type='mmdet.MaxIoUAssigner',
@@ -69,6 +75,7 @@ def _fake_roi_head():
                 max_per_img=2000)))
     return roi_head
 
+
 class TestGVRatioRoIHead(TestCase):
 
     def setUp(self):
@@ -93,7 +100,7 @@ class TestGVRatioRoIHead(TestCase):
         for i in range(len(roi_head.bbox_roi_extractor.featmap_strides)):
             feats.append(
                 torch.rand(1, 1, s // (2**(i + 2)),
-                            s // (2**(i + 2))).to(device='cuda'))
+                           s // (2**(i + 2))).to(device='cuda'))
         feats = tuple(feats)
 
         # When truth is non-empty then both cls, and box loss
@@ -108,7 +115,10 @@ class TestGVRatioRoIHead(TestCase):
             use_qbox=True,
             device='cuda')['data_samples']
         proposals_list = demo_mm_proposals(
-            image_shapes=image_shapes, num_proposals=100, use_box_type=True, device='cuda')
+            image_shapes=image_shapes,
+            num_proposals=100,
+            use_box_type=True,
+            device='cuda')
 
         out = roi_head.loss(feats, proposals_list, batch_data_samples)
         loss_cls = out['loss_cls']
@@ -127,7 +137,10 @@ class TestGVRatioRoIHead(TestCase):
             use_qbox=True,
             device='cuda')['data_samples']
         proposals_list = demo_mm_proposals(
-            image_shapes=image_shapes, num_proposals=100, use_box_type=True, device='cuda')
+            image_shapes=image_shapes,
+            num_proposals=100,
+            use_box_type=True,
+            device='cuda')
         out = roi_head.loss(feats, proposals_list, batch_data_samples)
         empty_cls_loss = out['loss_cls']
         empty_bbox_loss = out['loss_bbox']
