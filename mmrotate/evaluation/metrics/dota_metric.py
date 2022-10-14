@@ -10,13 +10,13 @@ from typing import List, Optional, Sequence, Union
 
 import numpy as np
 import torch
-from mmcv.ops import nms_rotated
+from mmcv.ops import nms_quadri, nms_rotated
 from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
 
 from mmrotate.core import eval_rbbox_map
-from mmrotate.core.bbox.structures import RotatedBoxes
+from mmrotate.core.bbox.structures import rbox2qbox
 from mmrotate.registry import METRICS
 
 
@@ -37,6 +37,8 @@ class DOTAMetric(BaseMetric):
         metric (str | list[str]): Metrics to be evaluated. Only support
             'mAP' now. If is list, the first setting in the list will
              be used to evaluate metric.
+        predict_box_type (str): Box type of model results. If the QuadriBoxes
+            is used, you need to specify 'qbox'. Defaults to 'rbox'.
         format_only (bool): Format the output results without perform
             evaluation. It is useful when you want to format the result
             to a specific format. Defaults to False.
@@ -68,6 +70,7 @@ class DOTAMetric(BaseMetric):
                  iou_thrs: Union[float, List[float]] = 0.5,
                  scale_ranges: Optional[List[tuple]] = None,
                  metric: Union[str, List[str]] = 'mAP',
+                 predict_box_type: str = 'rbox',
                  format_only: bool = False,
                  outfile_prefix: Optional[str] = None,
                  merge_patches: bool = False,
@@ -88,6 +91,7 @@ class DOTAMetric(BaseMetric):
         if metric not in allowed_metrics:
             raise KeyError(f"metric should be one of 'mAP', but got {metric}.")
         self.metric = metric
+        self.predict_box_type = predict_box_type
 
         self.format_only = format_only
         if self.format_only:
@@ -117,6 +121,7 @@ class DOTAMetric(BaseMetric):
                 "somepath/xxx/xxx.zip".
         """
         collector = defaultdict(list)
+
         for idx, result in enumerate(results):
             img_id = result.get('img_id', idx)
             splitname = img_id.split('__')
@@ -129,8 +134,14 @@ class DOTAMetric(BaseMetric):
             bboxes = result['bboxes']
             scores = result['scores']
             ori_bboxes = bboxes.copy()
-            ori_bboxes[..., :2] = ori_bboxes[..., :2] + np.array(
-                [x, y], dtype=np.float32)
+            if self.predict_box_type == 'rbox':
+                ori_bboxes[..., :2] = ori_bboxes[..., :2] + np.array(
+                    [x, y], dtype=np.float32)
+            elif self.predict_box_type == 'qbox':
+                ori_bboxes[..., :] = ori_bboxes[..., :] + np.array(
+                    [x, y, x, y, x, y, x, y], dtype=np.float32)
+            else:
+                raise NotImplementedError
             label_dets = np.concatenate(
                 [labels[:, np.newaxis], ori_bboxes, scores[:, np.newaxis]],
                 axis=1)
@@ -149,9 +160,15 @@ class DOTAMetric(BaseMetric):
                         cls_dets = torch.from_numpy(dets[labels == i]).cuda()
                     except:  # noqa: E722
                         cls_dets = torch.from_numpy(dets[labels == i])
-                    nms_dets, keep_inds = nms_rotated(cls_dets[:, :5],
-                                                      cls_dets[:, -1],
-                                                      self.iou_thr)
+                    if self.predict_box_type == 'rbox':
+                        nms_dets, _ = nms_rotated(cls_dets[:, :5],
+                                                  cls_dets[:,
+                                                           -1], self.iou_thr)
+                    elif self.predict_box_type == 'qbox':
+                        nms_dets, _ = nms_quadri(cls_dets[:, :8],
+                                                 cls_dets[:, -1], self.iou_thr)
+                    else:
+                        raise NotImplementedError
                     big_img_results.append(nms_dets.cpu().numpy())
             id_list.append(oriname)
             dets_list.append(big_img_results)
@@ -172,10 +189,15 @@ class DOTAMetric(BaseMetric):
                 if dets.size == 0:
                     continue
                 th_dets = torch.from_numpy(dets)
-                rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
-                qboxes = RotatedBoxes(rboxes).convert_to('qbox').tensor
+                if self.predict_box_type == 'rbox':
+                    rboxes, scores = torch.split(th_dets, (5, 1), dim=-1)
+                    qboxes = rbox2qbox(rboxes)
+                elif self.predict_box_type == 'qbox':
+                    qboxes, scores = torch.split(th_dets, (8, 1), dim=-1)
+                else:
+                    raise NotImplementedError
                 for qbox, score in zip(qboxes, scores):
-                    txt_element = [img_id, str(float(score))
+                    txt_element = [img_id, str(round(float(score), 2))
                                    ] + [f'{p:.2f}' for p in qbox]
                     f.writelines(' '.join(txt_element) + '\n')
 
@@ -232,20 +254,18 @@ class DOTAMetric(BaseMetric):
         return result_files
 
     def process(self, data_batch: Sequence[dict],
-                predictions: Sequence[dict]) -> None:
-        """Process one batch of data samples and predictions.
-
-        The processed
+                data_samples: Sequence[dict]) -> None:
+        """Process one batch of data samples and predictions. The processed
         results should be stored in ``self.results``, which will be used to
         compute the metrics when all batches have been processed.
+
         Args:
-            data_batch (Sequence[dict]): A batch of data
-                from the dataloader.
-            predictions (Sequence[dict]): A batch of outputs from
-                the model.
+            data_batch (dict): A batch of data from the dataloader.
+            data_samples (Sequence[dict]): A batch of data samples that
+                contain annotations and predictions.
         """
-        for data, pred in zip(data_batch, predictions):
-            gt = copy.deepcopy(data['data_sample'])
+        for data_sample in data_samples:
+            gt = copy.deepcopy(data_sample)
             gt_instances = gt['gt_instances']
             gt_ignore_instances = gt['ignored_instances']
             if gt_instances == {}:
@@ -257,8 +277,8 @@ class DOTAMetric(BaseMetric):
                     bboxes_ignore=gt_ignore_instances['bboxes'].cpu().numpy(),
                     labels_ignore=gt_ignore_instances['labels'].cpu().numpy())
             result = dict()
-            pred = pred['pred_instances']
-            result['img_id'] = data['data_sample']['img_id']
+            pred = data_sample['pred_instances']
+            result['img_id'] = data_sample['img_id']
             result['bboxes'] = pred['bboxes'].cpu().numpy()
             result['scores'] = pred['scores'].cpu().numpy()
             result['labels'] = pred['labels'].cpu().numpy()
@@ -321,6 +341,7 @@ class DOTAMetric(BaseMetric):
                     scale_ranges=self.scale_ranges,
                     iou_thr=iou_thr,
                     use_07_metric=self.use_07_metric,
+                    box_type=self.predict_box_type,
                     dataset=dataset_name,
                     logger=logger)
                 mean_aps.append(mean_ap)

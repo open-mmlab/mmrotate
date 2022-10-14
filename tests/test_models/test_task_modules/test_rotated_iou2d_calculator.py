@@ -3,12 +3,14 @@ from unittest import TestCase
 
 import numpy as np
 import torch
+from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.testing import assert_allclose
 
 from mmrotate.core.bbox.iou_calculators import (FakeRBboxOverlaps2D,
+                                                QBbox2HBboxOverlaps2D,
                                                 RBboxOverlaps2D,
                                                 rbbox_overlaps)
-from mmrotate.core.bbox.structures import RotatedBoxes
+from mmrotate.core.bbox.structures import QuadriBoxes, RotatedBoxes, rbox2qbox
 
 
 class TestRBoxOverlaps2D(TestCase):
@@ -20,6 +22,18 @@ class TestRBoxOverlaps2D(TestCase):
             num_bbox = np.random.randint(1, 10)
         cx, cy, bw, bh, angle = torch.rand(num_bbox, 5).T
         bboxes = torch.stack([cx * w, cy * h, w * bw, h * bh, angle], dim=-1)
+        return bboxes, num_bbox
+
+    def _construct_bbox(self, num_bbox=None):
+        img_h = int(np.random.randint(3, 1000))
+        img_w = int(np.random.randint(3, 1000))
+        if num_bbox is None:
+            num_bbox = np.random.randint(1, 10)
+        x1y1 = torch.rand((num_bbox, 2))
+        x2y2 = torch.max(torch.rand((num_bbox, 2)), x1y1)
+        bboxes = torch.cat((x1y1, x2y2), -1)
+        bboxes[:, 0::2] *= img_w
+        bboxes[:, 1::2] *= img_h
         return bboxes, num_bbox
 
     def test_rbbox_overlaps_2d(self):
@@ -102,7 +116,7 @@ class TestRBoxOverlaps2D(TestCase):
         self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
 
         # is_aligned is True, bboxes.size(-1) == 6 (include score)
-        overlap = RBboxOverlaps2D()
+        overlap = FakeRBboxOverlaps2D()
         bboxes1, num_bbox = self._construct_rbbox()
         bboxes2, _ = self._construct_rbbox(num_bbox)
         bboxes1 = torch.cat((bboxes1, torch.rand((num_bbox, 1))), dim=-1)
@@ -111,17 +125,52 @@ class TestRBoxOverlaps2D(TestCase):
         self.assertEqual(ious.size(), (num_bbox, ), ious.size())
         self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
 
-        # is_aligned is True, bboxes1.size(-2) == 0
-        bboxes1 = torch.empty((0, 5))
-        bboxes2 = torch.empty((0, 5))
+        # is_aligned is False
+        bboxes1, num_bbox1 = self._construct_rbbox()
+        bboxes2, num_bbox2 = self._construct_rbbox()
+        ious = overlap(bboxes1, bboxes2, 'iou')
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
+        self.assertEqual(ious.size(), (num_bbox1, num_bbox2))
+
+    def test_qbbox2hbbox_overlaps_2d(self):
+        overlap = QBbox2HBboxOverlaps2D()
+        bboxes1, num_bbox = self._construct_rbbox()
+        bboxes1 = rbox2qbox(bboxes1)
+        bboxes2, _ = self._construct_bbox(num_bbox)
         ious = overlap(bboxes1, bboxes2, 'iou', True)
-        self.assertEqual(ious.size(), torch.Size([0, 1]))
+        self.assertEqual(ious.size(), (num_bbox, ), ious.size())
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
+
+        # use QuadriBoxes
+        bboxes1 = QuadriBoxes(bboxes1)
+        bboxes2 = HorizontalBoxes(bboxes2)
+        ious = overlap(bboxes1, bboxes2, 'iou', True)
+        self.assertEqual(ious.size(), (num_bbox, ), ious.size())
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
+
+        # is_aligned is True, bboxes.size(-1) == 6 (include score)
+        overlap = QBbox2HBboxOverlaps2D()
+        bboxes1, num_bbox = self._construct_rbbox()
+        bboxes1 = rbox2qbox(bboxes1)
+        bboxes2, _ = self._construct_bbox(num_bbox)
+        bboxes1 = torch.cat((bboxes1, torch.rand((num_bbox, 1))), dim=-1)
+        bboxes2 = torch.cat((bboxes2, torch.rand((num_bbox, 1))), dim=-1)
+        ious = overlap(bboxes1, bboxes2, 'iou', True)
+        self.assertEqual(ious.size(), (num_bbox, ), ious.size())
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
+
+        # is_aligned is True, bboxes1.size(-2) == 0
+        bboxes1 = torch.empty((0, 8))
+        bboxes2 = torch.empty((0, 4))
+        ious = overlap(bboxes1, bboxes2, 'iou', True)
+        self.assertEqual(ious.size(), torch.Size([0]))
         self.assertTrue(torch.all(ious == torch.empty((0, ))))
         self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
 
         # is_aligned is False
         bboxes1, num_bbox1 = self._construct_rbbox()
-        bboxes2, num_bbox2 = self._construct_rbbox()
+        bboxes1 = rbox2qbox(bboxes1)
+        bboxes2, num_bbox2 = self._construct_bbox()
         ious = overlap(bboxes1, bboxes2, 'iou')
         self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
         self.assertEqual(ious.size(), (num_bbox1, num_bbox2))

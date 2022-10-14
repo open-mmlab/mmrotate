@@ -3,9 +3,9 @@ from multiprocessing import get_context
 
 import numpy as np
 import torch
-from mmcv.ops import box_iou_rotated
-from mmcv.utils import print_log
+from mmcv.ops import box_iou_quadri, box_iou_rotated
 from mmdet.evaluation.functional import average_precision
+from mmengine.logging import print_log
 from terminaltables import AsciiTable
 
 
@@ -13,6 +13,7 @@ def tpfp_default(det_bboxes,
                  gt_bboxes,
                  gt_bboxes_ignore=None,
                  iou_thr=0.5,
+                 box_type='rbox',
                  area_ranges=None):
     """Check if detected bboxes are true positive or false positive.
 
@@ -20,15 +21,18 @@ def tpfp_default(det_bboxes,
         det_bboxes (ndarray): Detected bboxes of this image, of shape (m, 6).
         gt_bboxes (ndarray): GT bboxes of this image, of shape (n, 5).
         gt_bboxes_ignore (ndarray): Ignored gt bboxes of this image,
-            of shape (k, 5). Default: None
+            of shape (k, 5). Defaults to None
         iou_thr (float): IoU threshold to be considered as matched.
-            Default: 0.5.
-        area_ranges (list[tuple] | None): Range of bbox areas to be evaluated,
-            in the format [(min1, max1), (min2, max2), ...]. Default: None.
+            Defaults to 0.5.
+        box_type (str): Box type. If the QuadriBoxes is used, you need to
+            specify 'qbox'. Defaults to 'rbox'.
+        area_ranges (list[tuple], optional): Range of bbox areas to be
+            evaluated, in the format [(min1, max1), (min2, max2), ...].
+            Defaults to None.
 
     Returns:
         tuple[np.ndarray]: (tp, fp) whose elements are 0 and 1. The shape of
-            each array is (num_scales, m).
+        each array is (num_scales, m).
     """
     # an indicator of ignored gts
     det_bboxes = np.array(det_bboxes)
@@ -57,9 +61,16 @@ def tpfp_default(det_bboxes,
             raise NotImplementedError
         return tp, fp
 
-    ious = box_iou_rotated(
-        torch.from_numpy(det_bboxes).float(),
-        torch.from_numpy(gt_bboxes).float()).numpy()
+    if box_type == 'rbox':
+        ious = box_iou_rotated(
+            torch.from_numpy(det_bboxes).float(),
+            torch.from_numpy(gt_bboxes).float()).numpy()
+    elif box_type == 'qbox':
+        ious = box_iou_quadri(
+            torch.from_numpy(det_bboxes).float(),
+            torch.from_numpy(gt_bboxes).float()).numpy()
+    else:
+        raise NotImplementedError
     # for each det, the max iou with all gts
     ious_max = ious.max(axis=1)
     # for each det, which gt overlaps most with it
@@ -87,20 +98,34 @@ def tpfp_default(det_bboxes,
             elif min_area is None:
                 fp[k, i] = 1
             else:
-                bbox = det_bboxes[i, :5]
-                area = bbox[2] * bbox[3]
+                if box_type == 'rbox':
+                    bbox = det_bboxes[i, :5]
+                    area = bbox[2] * bbox[3]
+                elif box_type == 'qbox':
+                    bbox = det_bboxes[i, :8]
+                    pts = bbox.reshape(*bbox.shape[:-1], 4, 2)
+                    roll_pts = torch.roll(pts, 1, dims=-2)
+                    xyxy = torch.sum(
+                        pts[..., 0] * roll_pts[..., 1] -
+                        roll_pts[..., 0] * pts[..., 1],
+                        dim=-1)
+                    area = 0.5 * torch.abs(xyxy)
+                else:
+                    raise NotImplementedError
                 if area >= min_area and area < max_area:
                     fp[k, i] = 1
     return tp, fp
 
 
-def get_cls_results(det_results, annotations, class_id):
+def get_cls_results(det_results, annotations, class_id, box_type):
     """Get det results and gt information of a certain class.
 
     Args:
         det_results (list[list]): Same as `eval_map()`.
         annotations (list[dict]): Same as `eval_map()`.
         class_id (int): ID of a specific class.
+        box_type (str): Box type. If the QuadriBoxes is used, you need to
+            specify 'qbox'. Defaults to 'rbox'.
 
     Returns:
         tuple[list[np.ndarray]]: detected bboxes, gt bboxes, ignored gt bboxes
@@ -116,8 +141,14 @@ def get_cls_results(det_results, annotations, class_id):
             ignore_inds = ann['labels_ignore'] == class_id
             cls_gts_ignore.append(ann['bboxes_ignore'][ignore_inds, :])
         else:
-            cls_gts.append(torch.zeros((0, 5), dtype=torch.float64))
-            cls_gts_ignore.append(torch.zeros((0, 5), dtype=torch.float64))
+            if box_type == 'rbox':
+                cls_gts.append(torch.zeros((0, 5), dtype=torch.float64))
+                cls_gts_ignore.append(torch.zeros((0, 5), dtype=torch.float64))
+            elif box_type == 'qbox':
+                cls_gts.append(torch.zeros((0, 8), dtype=torch.float64))
+                cls_gts_ignore.append(torch.zeros((0, 8), dtype=torch.float64))
+            else:
+                raise NotImplementedError
 
     return cls_dets, cls_gts, cls_gts_ignore
 
@@ -127,6 +158,7 @@ def eval_rbbox_map(det_results,
                    scale_ranges=None,
                    iou_thr=0.5,
                    use_07_metric=True,
+                   box_type='rbox',
                    dataset=None,
                    logger=None,
                    nproc=4):
@@ -143,20 +175,23 @@ def eval_rbbox_map(det_results,
             - `labels`: numpy array of shape (n, )
             - `bboxes_ignore` (optional): numpy array of shape (k, 5)
             - `labels_ignore` (optional): numpy array of shape (k, )
-        scale_ranges (list[tuple] | None): Range of scales to be evaluated,
+        scale_ranges (list[tuple], optional): Range of scales to be evaluated,
             in the format [(min1, max1), (min2, max2), ...]. A range of
             (32, 64) means the area range between (32**2, 64**2).
-            Default: None.
+            Defaults to None.
         iou_thr (float): IoU threshold to be considered as matched.
-            Default: 0.5.
+            Defaults to 0.5.
         use_07_metric (bool): Whether to use the voc07 metric.
-        dataset (list[str] | str | None): Dataset name or dataset classes,
+        box_type (str): Box type. If the QuadriBoxes is used, you need to
+            specify 'qbox'. Defaults to 'rbox'.
+        dataset (list[str] | str, optional): Dataset name or dataset classes,
             there are minor differences in metrics for different datasets, e.g.
-            "voc07", "imagenet_det", etc. Default: None.
-        logger (logging.Logger | str | None): The way to print the mAP
-            summary. See `mmcv.utils.print_log()` for details. Default: None.
+            "voc07", "imagenet_det", etc. Defaults to None.
+        logger (logging.Logger | str, optional): The way to print the mAP
+            summary. See `mmcv.utils.print_log()` for details.
+            Defaults to None.
         nproc (int): Processes used for computing TP and FP.
-            Default: 4.
+            Defaults to 4.
 
     Returns:
         tuple: (mAP, [dict, dict, ...])
@@ -174,13 +209,14 @@ def eval_rbbox_map(det_results,
     for i in range(num_classes):
         # get gt and det bboxes of this class
         cls_dets, cls_gts, cls_gts_ignore = get_cls_results(
-            det_results, annotations, i)
+            det_results, annotations, i, box_type)
 
         # compute tp and fp for each image with multiple processes
         tpfp = pool.starmap(
             tpfp_default,
             zip(cls_dets, cls_gts, cls_gts_ignore,
                 [iou_thr for _ in range(num_imgs)],
+                [box_type for _ in range(num_imgs)],
                 [area_ranges for _ in range(num_imgs)]))
         tp, fp = tuple(zip(*tpfp))
         # calculate gt number of each scale
@@ -190,7 +226,18 @@ def eval_rbbox_map(det_results,
             if area_ranges is None:
                 num_gts[0] += bbox.shape[0]
             else:
-                gt_areas = bbox[:, 2] * bbox[:, 3]
+                if box_type == 'rbox':
+                    gt_areas = bbox[:, 2] * bbox[:, 3]
+                elif box_type == 'qbox':
+                    pts = bbox.reshape(*bbox.shape[:-1], 4, 2)
+                    roll_pts = torch.roll(pts, 1, dims=-2)
+                    xyxy = torch.sum(
+                        pts[..., 0] * roll_pts[..., 1] -
+                        roll_pts[..., 0] * pts[..., 1],
+                        dim=-1)
+                    gt_areas = 0.5 * torch.abs(xyxy)
+                else:
+                    raise NotImplementedError
                 for k, (min_area, max_area) in enumerate(area_ranges):
                     num_gts[k] += np.sum((gt_areas >= min_area)
                                          & (gt_areas < max_area))
@@ -258,10 +305,11 @@ def print_map_summary(mean_ap,
     Args:
         mean_ap (float): Calculated from `eval_map()`.
         results (list[dict]): Calculated from `eval_map()`.
-        dataset (list[str] | str | None): Dataset name or dataset classes.
-        scale_ranges (list[tuple] | None): Range of scales to be evaluated.
-        logger (logging.Logger | str | None): The way to print the mAP
-            summary. See `mmcv.utils.print_log()` for details. Default: None.
+        dataset (list[str] | str, optional): Dataset name or dataset classes.
+        scale_ranges (list[tuple], optional): Range of scales to be evaluated.
+        logger (logging.Logger | str, optional): The way to print the mAP
+            summary. See `mmcv.utils.print_log()` for details.
+            Defaults to None.
     """
 
     if logger == 'silent':
