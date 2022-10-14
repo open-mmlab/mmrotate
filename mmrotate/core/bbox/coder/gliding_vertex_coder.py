@@ -140,3 +140,7 @@ class GVRatioCoder(BaseBBoxCoder):
 
         ratios = areas / h_areas
         return ratios[:, None]
+
+    def decode(self):
+        """NotImplementedError."""
+        raise NotImplementedError
