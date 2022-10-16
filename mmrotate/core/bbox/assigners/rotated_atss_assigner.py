@@ -14,6 +14,7 @@ from mmrotate.registry import TASK_UTILS
 
 def bbox_center_distance(bboxes: Tensor, priors: Tensor) -> Tensor:
     """Compute the center distance between bboxes and priors.
+
     Args:
         bboxes (Tensor): Shape (n, 4) for , "xyxy" format.
         priors (Tensor): Shape (n, 4) for priors, "xyxy" format.
@@ -30,9 +31,10 @@ def bbox_center_distance(bboxes: Tensor, priors: Tensor) -> Tensor:
 
 @TASK_UTILS.register_module()
 class RotatedATSSAssigner(BaseAssigner):
-    """Assign a corresponding gt bbox or background to each prior.
-    Each proposals will be assigned with `0` or a positive integer
-    indicating the ground truth index.
+    """Assign a corresponding gt bbox or background to each prior. Each
+    proposals will be assigned with `0` or a positive integer indicating the
+    ground truth index.
+
     - 0: negative sample, no assigned gt
     - positive integer: positive sample, index (1-based) of assigned gt
     If ``alpha`` is not None, it means that the dynamic cost
@@ -67,6 +69,7 @@ class RotatedATSSAssigner(BaseAssigner):
             gt_instances_ignore: Optional[InstanceData] = None
     ) -> AssignResult:
         """Assign gt to priors.
+
         The assignment is done in following steps
         1. compute iou between all prior (prior of all pyramid levels) and gt
         2. compute center distance between all prior and gt
