@@ -5,14 +5,14 @@ _base_ = [
 angle_version = 'le90'
 
 model = dict(
-    type='RotatedRetinaNet',
+    type='mmdet.RetinaNet',
     data_preprocessor=dict(
         type='mmdet.DetDataPreprocessor',
         mean=[123.675, 116.28, 103.53],
         std=[58.395, 57.12, 57.375],
         bgr_to_rgb=True,
         pad_size_divisor=32,
-        with_box_wrapped=True),
+        boxlist2tensor=False),
     backbone=dict(
         type='mmdet.ResNet',
         depth=50,
@@ -57,10 +57,12 @@ model = dict(
             gamma=2.0,
             alpha=0.25,
             loss_weight=1.0),
-        loss_bbox=dict(type='mmdet.L1Loss', loss_weight=1.0)),
+        loss_bbox=dict(type='RotatedIoULoss', mode='linear', loss_weight=2.0),
+        loss_centerness=dict(
+            type='mmdet.CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)),
     train_cfg=dict(
         assigner=dict(
-            type='mmdet.ATSSAssigner',
+            type='RotatedATSSAssigner',
             topk=9,
             iou_calculator=dict(type='RBboxOverlaps2D')),
         sampler=dict(
