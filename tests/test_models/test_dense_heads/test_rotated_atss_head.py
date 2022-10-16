@@ -60,11 +60,14 @@ class TestRotatedATSSHead(TestCase):
                 gamma=2.0,
                 alpha=0.25,
                 loss_weight=1.0),
-            loss_bbox=dict(type='RotatedIoULoss', mode='linear', loss_weight=2.0),
+            loss_bbox=dict(
+                type='RotatedIoULoss', mode='linear', loss_weight=2.0),
             loss_centerness=dict(
-                type='mmdet.CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0))
+                type='mmdet.CrossEntropyLoss',
+                use_sigmoid=True,
+                loss_weight=1.0)).cuda()
         feat = [
-            torch.rand(1, 1, s // feat_size, s // feat_size)
+            torch.rand(1, 1, s // feat_size, s // feat_size).cuda()
             for feat_size in [8, 16, 32, 64, 128]
         ]
         cls_scores, bbox_preds, centernesses = atss_head.forward(feat)
@@ -72,8 +75,8 @@ class TestRotatedATSSHead(TestCase):
         # Test that empty ground truth encourages the network to predict
         # background
         gt_instances = InstanceData()
-        gt_instances.bboxes = torch.empty((0, 5))
-        gt_instances.labels = torch.LongTensor([])
+        gt_instances.bboxes = torch.empty((0, 5)).cuda()
+        gt_instances.labels = torch.LongTensor([]).cuda()
 
         empty_gt_losses = atss_head.loss_by_feat(cls_scores, bbox_preds,
                                                  centernesses, [gt_instances],
