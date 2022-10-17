@@ -167,9 +167,12 @@ class RotatedATSSHead(ATSSHead):
         """Calculate the centerness between anchors and gts.
 
         Only calculate pos centerness targets, otherwise there may be nan.
+
         Args:
-            anchors (Tensor): Anchors with shape (N, 4), "xyxy" format.
-            gts (Tensor): Ground truth bboxes with shape (N, 4), "xyxy" format.
+            anchors (Tensor): Anchors with shape (N, 5),
+                <cx, cy, w, h, t> format.
+            gts (Tensor): Ground truth bboxes with shape (N, 5),
+                <cx, cy, w, h, t> format.
         Returns:
             Tensor: Centerness between anchors and gts.
         """

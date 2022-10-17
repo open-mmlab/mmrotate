@@ -16,8 +16,9 @@ def bbox_center_distance(bboxes: Tensor, priors: Tensor) -> Tensor:
     """Compute the center distance between bboxes and priors.
 
     Args:
-        bboxes (Tensor): Shape (n, 4) for , "xyxy" format.
-        priors (Tensor): Shape (n, 4) for priors, "xyxy" format.
+        bboxes (Tensor): Shape (n, 5) for , <cx, cy, w, h, t> format.
+        priors (Tensor): Shape (n, 5) for priors,
+            <cx, cy, w, h, t> format.
     Returns:
         Tensor: Center distances between bboxes and priors.
     """
@@ -198,13 +199,6 @@ class RotatedATSSAssigner(BaseAssigner):
         is_pos = candidate_overlaps >= overlaps_thr_per_gt[None, :]
 
         # limit the positive sample's center in gt
-        # priors_points = priors.centers
-        # inside_flag = gt_bboxes.find_inside_points(priors_points)
-        # is_in_gts = inside_flag[candidate_idxs,
-        #                         torch.arange(num_gt)].to(is_pos.dtype)
-        # for gt_idx in range(num_gt):
-        #     candidate_idxs[:, gt_idx] += gt_idx * num_priors
-        # candidate_idxs = candidate_idxs.view(-1)
         for gt_idx in range(num_gt):
             candidate_idxs[:, gt_idx] += gt_idx * num_priors
         candidate_idxs = candidate_idxs.view(-1)
