@@ -156,7 +156,7 @@ thus we only need to install MMCV and MMDetection with the following commands.
 **Step 2.** Install MMRotate from the source.
 
 ```shell
-!git clone https://github.com/open-mmlab/mmrotate.git
+!git clone https://github.com/open-mmlab/mmrotate.git -b dev-1.x
 %cd mmrotate
 !pip install -e .
 ```
