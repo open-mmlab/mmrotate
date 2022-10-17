@@ -95,9 +95,12 @@ html_theme_options = {
             'Upstream',
             'children': [
                 {
-                    'name': 'MMEngine',
-                    'url': 'https://github.com/open-mmlab/mmengine',
-                    'description': 'Foundational library for training deep learning models'
+                    'name':
+                    'MMEngine',
+                    'url':
+                    'https://github.com/open-mmlab/mmengine',
+                    'description':
+                    'Foundational library for training deep learning models'
                 },
                 {
                     'name': 'MMCV',
@@ -131,6 +134,7 @@ copybutton_prompt_is_regexp = True
 myst_enable_extensions = ['colon_fence']
 myst_heading_anchors = 3
 language = 'en'
+
 
 def builder_inited_handler(app):
     subprocess.run(['./stat.py'])
