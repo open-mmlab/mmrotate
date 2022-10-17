@@ -11,7 +11,6 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import subprocess
 import sys
 
 import pytorch_sphinx_theme
@@ -55,6 +54,10 @@ myst_heading_anchors = 3
 autodoc_mock_imports = [
     'matplotlib', 'pycocotools', 'terminaltables', 'mmdet.version', 'mmcv.ops'
 ]
+
+# Ignore >>> when copying code
+copybutton_prompt_text = r'>>> |\.\.\. '
+copybutton_prompt_is_regexp = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -120,25 +123,14 @@ html_theme_options = {
     'en'
 }
 
+language = 'en'
+
+master_doc = 'index'
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_css_files = ['css/readthedocs.css']
 
-# -- Extension configuration -------------------------------------------------
-# Ignore >>> when copying code
-copybutton_prompt_text = r'>>> |\.\.\. '
-copybutton_prompt_is_regexp = True
-
-myst_enable_extensions = ['colon_fence']
-myst_heading_anchors = 3
-language = 'en'
-
-
-def builder_inited_handler(app):
-    subprocess.run(['./stat.py'])
-
-
-def setup(app):
-    app.connect('builder-inited', builder_inited_handler)
+myst_heading_anchors = 4
