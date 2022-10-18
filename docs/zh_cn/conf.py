@@ -98,12 +98,9 @@ html_theme_options = {
             '上游库',
             'children': [
                 {
-                    'name':
-                    'MMEngine',
-                    'url':
-                    'https://github.com/open-mmlab/mmengine',
-                    'description':
-                    '基础深度学习库'
+                    'name': 'MMEngine',
+                    'url': 'https://github.com/open-mmlab/mmengine',
+                    'description': '基础深度学习库'
                 },
                 {
                     'name': 'MMCV',

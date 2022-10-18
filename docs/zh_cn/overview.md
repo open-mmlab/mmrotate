@@ -1,57 +1,42 @@
-# OVERVIEW
+# 学习基础知识
 
-This chapter introduces the basic conception of rotated object detection and the framework of MMRotate, and provides
-links to detailed tutorials about MMRotate.
+本章将向您介绍旋转目标检测的基本概念，以及旋转目标检测的框架 MMRotate，并提供了详细教程的链接。
 
-## What is rotated object detection
+## 什么是旋转目标检测
 
-### Problem definition
+### 问题定义
 
-Benefiting from the vigorous development of general object detection, most current
-rotated object detection models are based on classic general object detector.
-With the development of detection tasks, horizontal boxes have been unable to
-meet the needs of researchers in some subdivisions. We call it rotating object
-detection by redefining the object representation and increasing the number of
-regression degrees of freedom to achieve rotated rectangle, quadrilateral, and
-even arbitrary shape detection. Performing high-precision rotated object detection
-more efficiently has become a current research hotspot. The following areas are
-where rotated object detection has been applied or has great potential: face
-recognition, scene text, remote sensing, self-driving, medical,
-robotic grasping, etc.
+受益于通用检测的蓬勃发展，目前绝大多数的旋转检测模型都是基于经典的通用检测器。随着检测任务的发展，
+水平框在一些细分领域上已经无法满足研究人员的需求。通过重新定义目标表示形式以及增加回归自由度数量
+的操作来实现旋转矩形框、四边形甚至任意形状检测，我们称之为旋转目标检测。如何更加高效地进行高精度
+的旋转目标检测已成为当下的研究热点。下面列举一些旋转目标检测已经被应用或者有巨大潜力的领域：
+人脸识别、场景文字、遥感影像、自动驾驶、医学图像、机器人抓取等。
 
-### What is rotated box
+### 什么是旋转框
 
-The most notable difference between rotated object detection and generic detection is
-the replacement of horizontal box annotations with rotated box annotations.
-They are defined as follows:
+旋转目标检测与通用目标检测最大的不同就是用旋转框标注来代替水平框标注，它们的定义如下：
 
-- Horizontal box: A rectangle with the `width` along the `x-axis` and `height` along
-  the `y-axis`. Usually, it can be represented by the coordinates of 2 diagonal
-  vertices `(x_i, y_i)`  (i = 1, 2), or it can be represented by the coordinates
-  of the center point and the `width` and `height`, `(x_center, y_center, width, height)`.
-- Rotated box: It is obtained by rotating the horizontal box around the center
-  point by an `angle`, and the definition method of its rotated box is
-  obtained by adding a radian parameter `(x_center, y_center, width, height, theta)`,
-  where `theta = angle * pi / 180`. The unit of `theta` is `rad`. When the rotation
-  angle is a multiple of 90°, the rotated box degenerates into a horizontal box.
-  The rotated box annotations exported by the annotation software are usually polygons,
-  which need to be converted to the rotated box definition method before training.
+- 水平框: 宽沿 `x` 轴方向，高沿 `y` 轴方向的矩形。通常可以用2个对角顶点的坐标表示
+  `(x_i, y_i)`  (i = 1, 2)，也可以用中心点坐标以及宽和高表示
+  `(x_center, y_center, width, height)`。
+- 旋转框: 由水平框绕中心点旋转一个角度 `angle` 得到，通过添加一个弧度参数得到其旋转框定义法
+  `(x_center, y_center, width, height, theta)`。其中，`theta = angle * pi / 180`，
+  单位为 `rad`。当旋转的角度为90°的倍数时，旋转框退化为水平框。标注软件导出的旋转框标注通常为多边形
+  `(xr_i, yr_i)` (i = 1, 2, 3, 4)，在训练时需要转换为旋转框定义法。
 
 ```{note}
-In MMRotate, angle parameters are in radians.
+在 MMRotate 中，角度参数的单位均为弧度。
 ```
 
-### Rotation direction
+### 旋转方向
 
-A rotated box can be obtained by rotating a horizontal box clockwise or
-counterclockwise around its center point. The rotation direction is closely
-related to the choice of the coordinate system. The image space adopts the
-right-handed coordinate system `(y, x)`, where y is `up->down` and x is `left->right`.
-There are two opposite directions of rotation:
+旋转框可以由水平框绕其中心点顺时针旋转或逆时针旋转得到。旋转方向和坐标系的选择密切相关。
+图像空间采用右手坐标系 `(y，x)`，其中 y 是`上->下`，x 是`左->右`。
+此时存在2种相反的旋转方向：
 
-- Clockwise（CW）
+- 顺时针 (`CW`)
 
-Schematic of `CW`
+`CW` 的示意图
 
 ```
 0-------------------> x (0 rad)
@@ -65,7 +50,7 @@ y (pi/2 rad)
 
 ```
 
-Rotation matrix of `CW`
+`CW` 的旋转矩阵
 
 ```{math}
 \begin{pmatrix}
@@ -74,7 +59,7 @@ Rotation matrix of `CW`
 \end{pmatrix}
 ```
 
-Rotation transformation of `CW`
+`CW` 的旋转变换
 
 ```{math}
 P_A=
@@ -90,9 +75,9 @@ P_A=
 y_{center}-0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
 ```
 
-- Counterclockwise（CCW）
+- 逆时针 (`CCW`)
 
-Schematic of `CCW`
+`CCW` 的示意图
 
 ```
 0-------------------> x (0 rad)
@@ -106,7 +91,7 @@ y (-pi/2 rad)
 
 ```
 
-Rotation matrix of `CCW`
+`CCW` 的旋转矩阵
 
 ```{math}
 \begin{pmatrix}
@@ -115,7 +100,7 @@ Rotation matrix of `CCW`
 \end{pmatrix}
 ```
 
-Rotation transformation of `CCW`
+`CCW` 的旋转变换
 
 ```{math}
 P_A=
@@ -131,57 +116,48 @@ P_A=
 y_{center}+0.5w\sin\alpha-0.5h\cos\alpha\end{pmatrix}
 ```
 
-The operators that can set the rotation direction in MMCV are:
+在MMCV中可以设置旋转方向的算子有：
 
-- box_iou_rotated (Defaults to `CW`)
-- nms_rotated (Defaults to `CW`)
-- RoIAlignRotated (Defaults to `CCW`)
-- RiRoIAlignRotated (Defaults to `CCW`).
+- box_iou_rotated (默认为 `CW`)
+- nms_rotated (默认为 `CW`)
+- RoIAlignRotated (默认为 `CCW`)
+- RiRoIAlignRotated (默认为 `CCW`)。
 
 ```{note}
-In MMRotate, the rotation direction of the rotated boxes is `CW`.
+在MMRotate 中，旋转框的旋转方向均为 `CW`。
 ```
 
-### Definition of rotated box
+### 旋转框定义法
 
-Due to the difference in the definition range of `theta`, the following three
-definitions of the rotated box gradually emerge in rotated object detection:
+由于 `theta` 定义范围的不同，在旋转目标检测中逐渐派生出如下3种旋转框定义法：
 
-- {math}`D_{oc^{\prime}}`: OpenCV Definition, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`,
-  The angle between the `width` of the rectangle and the positive semi-axis of x is
-  a positive acute angle. This definition comes from the `cv2.minAreaRect` function
-  in OpenCV, which returns an angle in the range `(0, 90°]`.
-- {math}`D_{le135}`: Long Edge Definition (135°)，`angle∈[-45°, 135°)`,
-  `theta∈[-pi / 4, 3 * pi / 4)` and `width > height`.
-- {math}`D_{le90}`: Long Edge Definition (90°)，`angle∈[-90°, 90°)`,
-  `theta∈[-pi / 2, pi / 2)` and `width > height`.
+- {math}`D_{oc^{\prime}}` : OpenCV 定义法，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`， `width` 与 `x` 正半轴之间的夹角为正的锐角。该定义法源于 OpenCV 中的 `cv2.minAreaRect` 函数，
+  其返回值为 `(0, 90°]`。
+- {math}`D_{le135}` : 长边 135° 定义法，`angle∈[-45°, 135°)`，`theta∈[-pi / 4, 3 * pi / 4)` 并且 `width > height`。
+- {math}`D_{le90}` : 长边 90° 定义法，`angle∈[-90°, 90°)`，`theta∈[-pi / 2, pi / 2)` 并且 `width > height`。
 
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/angle_def.png" width=100%/>
 </div>
 
-The conversion relationship between the three definitions is not involved in
-MMRotate, so we will not introduce it much more. Refer to the below
-[blog](https://zhuanlan.zhihu.com/p/459018810) to dive deeper.
+三种定义法之间的转换关系在 MMRotate 内部并不涉及，因此不多做介绍。如果想了解更多的细节，可以参考这篇[博客](https://zhuanlan.zhihu.com/p/459018810)。
 
 ```{note}
-MMRotate supports the above three definitions of rotated box simultaneously,
-which can be flexibly switched through the configuration file.
+MMRotate 同时支持上述三种旋转框定义法，可以通过配置文件灵活切换。
 ```
 
-It should be noted that if the OpenCV version is less than 4.5.1, the angle range
-of `cv2.minAreaRect` is between `[-90°, 0°)`. [Reference](https://github.com/opencv/opencv/issues/19749)
-In order to facilitate the distinction, the old version of the OpenCV definition
-is denoted as {math}`D_{oc}`.
+需要注意的是，在 4.5.1 之前的版本中，`cv2.minAreaRect` 的返回值为 `[-90°, 0°)`
+（[参考资料](https://github.com/opencv/opencv/issues/19749)）。为了便于区分，
+将老版本的 OpenCV 定义法记作 {math}`D_{oc}`。
 
-- {math}`D_{oc^{\prime}}` : OpenCV definition, `opencv>=4.5.1`, `angle∈(0, 90°]`, `theta∈(0, pi / 2]`.
-- {math}`D_{oc}` : Old OpenCV definition, `opencv<4.5.1`, `angle∈[-90°, 0°)`, `theta∈[-pi / 2, 0)`.
+- {math}`D_{oc^{\prime}}`: OpenCV 定义法，`opencv>=4.5.1`，`angle∈(0, 90°]`，`theta∈(0, pi / 2]`。
+- {math}`D_{oc}`: 老版的 OpenCV 定义法，`opencv<4.5.1`，`angle∈[-90°, 0°)`，`theta∈[-pi / 2, 0)`。
 
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/opencv.png" width=50%/>
 </div>
 
-The conversion relationship between the two OpenCV definitions is as follows:
+两种 OpenCV 定义法的转换关系如下：
 
 ```{math}
 D_{oc^{\prime}}\left( w_{oc^{\prime}},h_{oc^{\prime}},\theta _{oc^{\prime}} \right) =\begin{cases}
@@ -196,62 +172,56 @@ D_{oc}\left( w_{oc},h_{oc},\theta _{oc} \right) =\begin{cases}
 ```
 
 ```{note}
-Regardless of the OpenCV version you are using, MMRotate will convert the theta
-of the OpenCV definition to (0, pi / 2].
+不管您使用的 OpenCV 版本是多少, MMRotate 都会将 OpenCV 定义法的 theta 转换为 (0, pi / 2]。
 ```
 
-### Evaluation
+### 评估
 
-The code for evaluating mAP involves the calculation of IoU. We can directly
-calculate the IoU of the rotated boxes or convert the rotated boxes to a polygons
-and then calculate the polygons IoU (DOTA online evaluation uses the calculation
-of polygons IoU).
+评估 mAP 的代码中涉及 IoU 的计算，可以直接计算旋转框 IoU，也可以将旋转框转换为多边形，然后
+计算多边形 IoU (DOTA 在线评估使用的是计算多边形 IoU)。
 
-## What is MMRotate
+## 什么是 MMRotate
 
-MMRotate is a toolbox that provides a framework for unified implementation and evaluation of rotated object detection,
-and below is its whole framework:
+MMRotate 是一个为旋转目标检测方法提供统一训练和评估框架的工具箱，以下是其整体框架：:
 
 <div align=center>
-<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/mmrotate-arch.png" width=80%/>
+<img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/mmrotate-arch.png" width=50%/>
 </div>
 
-MMRotate consists of 4 main parts, `datasets`, `models`, `core` and `apis`.
+MMRotate 包括四个部分, `datasets`, `models`, `core` and `apis`.
 
-- `datasets` is for data loading and data augmentation. In this part,
-  we support various datasets for rotated object detection algorithms,
-  useful data augmentation transforms in `pipelines` for pre-processing image.
+- `datasets` 用于数据加载和数据增强。 在这部分,我们支持了各种旋转目标检测数据集和数据增强预处理。
 
-- `models` contains models and loss functions.
+- `models` 包括模型和损失函数。
 
-- `core` provides evaluation tools for model training and evaluation.
+- `core` 为模型训练和评估提供工具。
 
-- `apis` provides high-level APIs for models training, testing, and inference.
+- `apis` 为模型训练、测试和推理提供高级 API。
 
-The module design of MMRotate is as follows:
+MMRotate 的模块设计如下图所示：
 
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/framework.png" width=100%/>
 </div>
 
-The following points need to be noted due to different definitions of rotated box:
+其中由于旋转框定义法不同而需要注意的地方有如下几个：
 
-- Loading annotations
-- Data augmentation
-- Assigning samples
-- Evaluation
+- 读取标注
+- 数据增强
+- 指派样本
+- 评估指标
 
-## How to Use this Guide
+## 如何使用教程
 
-Here is a detailed step-by-step guide to learn more about MMRotate:
+下面是 MMRotate 详细的分步指南:
 
-1. For installation instructions, please see [install](install.md).
+1. 关于安装说明, 请参阅 [安装](install.md).
 
-2. [get_started](get_started.md) is for the basic usage of MMRotate.
+2. [开始](get_started.md) 介绍了 MMRotate 的基本用法.
 
-3. Refer to the below tutorials to dive deeper:
+3. 如果想要更加深入了解 MMRotate，请参阅以下教程:
 
-- [Config](tutorials/customize_config.md)
-- [Customize Dataset](tutorials/customize_dataset.md)
-- [Customize Model](tutorials/customize_models.md)
-- [Customize Runtime](tutorials/customize_runtime.md)
+- [配置](tutorials/customize_config.md)
+- [自定义数据集](tutorials/customize_dataset.md)
+- [自定义模型](tutorials/customize_models.md)
+- [自定义运行时](tutorials/customize_runtime.md)

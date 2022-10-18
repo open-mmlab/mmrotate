@@ -1,4 +1,4 @@
-# GET STARTED （待翻译）
+# 开始你的第一步（待翻译）
 
 ## Prerequisites
 
