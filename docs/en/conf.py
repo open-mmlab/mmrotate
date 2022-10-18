@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'MMDetection'
+project = 'MMRotate'
 copyright = '2022, OpenMMLab'
 author = 'MMRotate Authors'
 version_file = '../../mmrotate/version.py'
