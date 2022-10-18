@@ -1,93 +1,267 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import torch
-from mmdet.models.utils import images_to_levels, multi_apply, unmap
+from typing import List, Optional
 
-from mmrotate.core import obb2hbb, rotated_anchor_inside_flags
+import torch
+import torch.nn as nn
+from mmcv.cnn import ConvModule, Scale
+from mmdet.models.dense_heads.atss_head import ATSSHead
+from mmdet.models.task_modules.prior_generators import anchor_inside_flags
+from mmdet.models.utils import get_box_tensor, unmap
+from mmengine.structures import InstanceData
+from torch import Tensor
+
+from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import MODELS
-from .rotated_retina_head import RotatedRetinaHead
-from .utils import get_num_level_anchors_inside
 
 
 @MODELS.register_module()
-class RotatedATSSHead(RotatedRetinaHead):
-    r"""An anchor-based head used in `ATSS
-    <https://arxiv.org/abs/1912.02424>`_.
+class RotatedATSSHead(ATSSHead):
+    """Detection Head of `ATSS <https://arxiv.org/abs/1912.02424>`_.
 
-    The head contains two subnetworks. The first classifies anchor boxes and
-    the second regresses deltas for the anchors.
+    ATSS head structure is similar with FCOS, however ATSS use anchor boxes
+    and assign label by Adaptive Training Sample Selection instead max-iou.
+    Args:
+        num_classes (int): Number of categories excluding the background
+            category.
+        in_channels (int): Number of channels in the input feature map.
+        pred_kernel_size (int): Kernel size of ``nn.Conv2d``
+        stacked_convs (int): Number of stacking convs of the head.
+        conv_cfg (:obj:`ConfigDict` or dict, optional): Config dict for
+            convolution layer. Defaults to None.
+        norm_cfg (:obj:`ConfigDict` or dict): Config dict for normalization
+            layer. Defaults to ``dict(type='GN', num_groups=32,
+            requires_grad=True)``.
+        reg_decoded_bbox (bool): If true, the regression loss would be
+            applied directly on decoded bounding boxes, converting both
+            the predicted boxes and regression targets to absolute
+            coordinates format. Defaults to False. It should be `True` when
+            using `IoULoss`, `GIoULoss`, or `DIoULoss` in the bbox head.
+        loss_centerness (:obj:`ConfigDict` or dict): Config of centerness loss.
+            Defaults to ``dict(type='CrossEntropyLoss', use_sigmoid=True,
+            loss_weight=1.0)``.
+        init_cfg (:obj:`ConfigDict` or dict or list[dict] or
+            list[:obj:`ConfigDict`]): Initialization config dict.
+    """
 
-    """  # noqa: W605
+    def _init_layers(self) -> None:
+        """Initialize layers of the head."""
+        self.relu = nn.ReLU(inplace=True)
+        self.cls_convs = nn.ModuleList()
+        self.reg_convs = nn.ModuleList()
+        for i in range(self.stacked_convs):
+            chn = self.in_channels if i == 0 else self.feat_channels
+            self.cls_convs.append(
+                ConvModule(
+                    chn,
+                    self.feat_channels,
+                    3,
+                    stride=1,
+                    padding=1,
+                    conv_cfg=self.conv_cfg,
+                    norm_cfg=self.norm_cfg))
+            self.reg_convs.append(
+                ConvModule(
+                    chn,
+                    self.feat_channels,
+                    3,
+                    stride=1,
+                    padding=1,
+                    conv_cfg=self.conv_cfg,
+                    norm_cfg=self.norm_cfg))
+        pred_pad_size = self.pred_kernel_size // 2
+        self.atss_cls = nn.Conv2d(
+            self.feat_channels,
+            self.num_anchors * self.cls_out_channels,
+            self.pred_kernel_size,
+            padding=pred_pad_size)
+        reg_dim = self.bbox_coder.encode_size
+        self.atss_reg = nn.Conv2d(
+            self.feat_channels,
+            self.num_base_priors * reg_dim,
+            self.pred_kernel_size,
+            padding=pred_pad_size)
+        self.atss_centerness = nn.Conv2d(
+            self.feat_channels,
+            self.num_base_priors * 1,
+            self.pred_kernel_size,
+            padding=pred_pad_size)
+        self.scales = nn.ModuleList(
+            [Scale(1.0) for _ in self.prior_generator.strides])
 
-    def _get_targets_single(self,
-                            flat_anchors,
-                            valid_flags,
-                            num_level_anchors,
-                            gt_bboxes,
-                            gt_bboxes_ignore,
-                            gt_labels,
-                            img_meta,
-                            label_channels=1,
-                            unmap_outputs=True):
-        """Compute regression and classification targets for anchors in a
-        single image.
+    def loss_by_feat_single(self, anchors: Tensor, cls_score: Tensor,
+                            bbox_pred: Tensor, centerness: Tensor,
+                            labels: Tensor, label_weights: Tensor,
+                            bbox_targets: Tensor, avg_factor: float) -> dict:
+        """Calculate the loss of a single scale level based on the features
+        extracted by the detection head.
+        Args:
+            cls_score (Tensor): Box scores for each scale level
+                Has shape (N, num_anchors * num_classes, H, W).
+            bbox_pred (Tensor): Box energies / deltas for each scale
+                level with shape (N, num_anchors * 4, H, W).
+            anchors (Tensor): Box reference for each scale level with shape
+                (N, num_total_anchors, 4).
+            labels (Tensor): Labels of each anchors with shape
+                (N, num_total_anchors).
+            label_weights (Tensor): Label weights of each anchor with shape
+                (N, num_total_anchors)
+            bbox_targets (Tensor): BBox regression targets of each anchor
+                weight shape (N, num_total_anchors, 4).
+            avg_factor (float): Average factor that is used to average
+                the loss. When using sampling method, avg_factor is usually
+                the sum of positive and negative priors. When using
+                `PseudoSampler`, `avg_factor` is usually equal to the number
+                of positive priors.
+        Returns:
+            dict[str, Tensor]: A dictionary of loss components.
+        """
+        dim = self.bbox_coder.encode_size
+        anchors = anchors.reshape(-1, dim)
+        cls_score = cls_score.permute(0, 2, 3, 1).reshape(
+            -1, self.cls_out_channels).contiguous()
+        bbox_pred = bbox_pred.permute(0, 2, 3, 1).reshape(-1, dim)
+        centerness = centerness.permute(0, 2, 3, 1).reshape(-1)
+        bbox_targets = bbox_targets.reshape(-1, dim)
+        labels = labels.reshape(-1)
+        label_weights = label_weights.reshape(-1)
+
+        # classification loss
+        loss_cls = self.loss_cls(
+            cls_score, labels, label_weights, avg_factor=avg_factor)
+
+        # FG cat_id: [0, num_classes -1], BG cat_id: num_classes
+        bg_class_ind = self.num_classes
+        pos_inds = ((labels >= 0)
+                    & (labels < bg_class_ind)).nonzero().squeeze(1)
+
+        if len(pos_inds) > 0:
+            pos_bbox_targets = bbox_targets[pos_inds]
+            pos_bbox_pred = bbox_pred[pos_inds]
+            pos_anchors = anchors[pos_inds]
+            pos_centerness = centerness[pos_inds]
+
+            centerness_targets = self.centerness_target(
+                pos_anchors, pos_bbox_targets)
+            pos_decode_bbox_pred = self.bbox_coder.decode(
+                pos_anchors, pos_bbox_pred)
+            pos_decode_bbox_pred = get_box_tensor(pos_decode_bbox_pred)
+            # regression loss
+            loss_bbox = self.loss_bbox(
+                pos_decode_bbox_pred,
+                pos_bbox_targets,
+                weight=centerness_targets,
+                avg_factor=1.0)
+
+            # centerness loss
+            loss_centerness = self.loss_centerness(
+                pos_centerness, centerness_targets, avg_factor=avg_factor)
+
+        else:
+            loss_bbox = bbox_pred.sum() * 0
+            loss_centerness = centerness.sum() * 0
+            centerness_targets = bbox_targets.new_tensor(0.)
+
+        return loss_cls, loss_bbox, loss_centerness, centerness_targets.sum()
+
+    def centerness_target(self, anchors: Tensor, gts: Tensor) -> Tensor:
+        """Calculate the centerness between anchors and gts.
+
+        Only calculate pos centerness targets, otherwise there may be nan.
 
         Args:
-            flat_anchors (torch.Tensor): Multi-level anchors of the image,
-                which are concatenated into a single tensor of shape \
-                (num_anchors, 5)
-            valid_flags (torch.Tensor): Multi level valid flags of the image,
-                which are concatenated into a single tensor of \
-                shape (num_anchors,).
-            num_level_anchors (torch.Tensor): Number of anchors of each \
-                scale level
-            gt_bboxes (torch.Tensor): Ground truth bboxes of the image,
-                shape (num_gts, 5).
-            img_meta (dict): Meta info of the image.
-            gt_bboxes_ignore (torch.Tensor): Ground truth bboxes to be \
-                ignored, shape (num_ignored_gts, 5).
-            img_meta (dict): Meta info of the image.
-            gt_labels (torch.Tensor): Ground truth labels of each box,
-                shape (num_gts,).
-            label_channels (int): Channel of label.
-            unmap_outputs (bool): Whether to map outputs back to the original \
-                set of anchors.
-
+            anchors (Tensor): Anchors with shape (N, 5),
+                <cx, cy, w, h, t> format.
+            gts (Tensor): Ground truth bboxes with shape (N, 5),
+                <cx, cy, w, h, t> format.
         Returns:
-            tuple:
-                labels_list (list[Tensor]): Labels of all anchor
-                label_weights_list (list[Tensor]): Label weights of all anchor
-                bbox_targets_list (list[Tensor]): BBox targets of all anchor
-                bbox_weights_list (list[Tensor]): BBox weights of all anchor
-                pos_inds (int): Indices of positive anchor
-                neg_inds (int): Indices of negative anchor
-                sampling_result: object `SamplingResult`, sampling result.
+            Tensor: Centerness between anchors and gts.
         """
-        inside_flags = rotated_anchor_inside_flags(
-            flat_anchors, valid_flags, img_meta['img_shape'][:2],
-            self.train_cfg.allowed_border)
+        gts = RotatedBoxes(gts).convert_to('hbox').tensor
+        anchors_cx, anchors_cy = RotatedBoxes(anchors).centers.unbind(dim=-1)
+        l_ = anchors_cx - gts[:, 0]
+        t_ = anchors_cy - gts[:, 1]
+        r_ = gts[:, 2] - anchors_cx
+        b_ = gts[:, 3] - anchors_cy
+
+        left_right = torch.stack([l_, r_], dim=1)
+        top_bottom = torch.stack([t_, b_], dim=1)
+        centerness = torch.sqrt(
+            (left_right.min(dim=-1)[0] / left_right.max(dim=-1)[0]) *
+            (top_bottom.min(dim=-1)[0] / top_bottom.max(dim=-1)[0]))
+        assert not torch.isnan(centerness).any()
+        return centerness
+
+    def _get_targets_single(self,
+                            flat_anchors: Tensor,
+                            valid_flags: Tensor,
+                            num_level_anchors: List[int],
+                            gt_instances: InstanceData,
+                            img_meta: dict,
+                            gt_instances_ignore: Optional[InstanceData] = None,
+                            unmap_outputs: bool = True) -> tuple:
+        """Compute regression, classification targets for anchors in a single
+        image.
+
+        Args:
+            flat_anchors (Tensor): Multi-level anchors of the image, which are
+                concatenated into a single tensor of shape (num_anchors ,4)
+            valid_flags (Tensor): Multi level valid flags of the image,
+                which are concatenated into a single tensor of
+                    shape (num_anchors,).
+            num_level_anchors (List[int]): Number of anchors of each scale
+                level.
+            gt_instances (:obj:`InstanceData`): Ground truth of instance
+                annotations. It usually includes ``bboxes`` and ``labels``
+                attributes.
+            img_meta (dict): Meta information for current image.
+            gt_instances_ignore (:obj:`InstanceData`, optional): Instances
+                to be ignored during training. It includes ``bboxes`` attribute
+                data that is ignored during training and testing.
+                Defaults to None.
+            unmap_outputs (bool): Whether to map outputs back to the original
+                set of anchors.
+        Returns:
+            tuple: N is the number of total anchors in the image.
+                labels (Tensor): Labels of all anchors in the image with shape
+                    (N,).
+                label_weights (Tensor): Label weights of all anchor in the
+                    image with shape (N,).
+                bbox_targets (Tensor): BBox targets of all anchors in the
+                    image with shape (N, 4).
+                bbox_weights (Tensor): BBox weights of all anchors in the
+                    image with shape (N, 4)
+                pos_inds (Tensor): Indices of positive anchor with shape
+                    (num_pos,).
+                neg_inds (Tensor): Indices of negative anchor with shape
+                    (num_neg,).
+                sampling_result (:obj:`SamplingResult`): Sampling results.
+        """
+        inside_flags = anchor_inside_flags(flat_anchors, valid_flags,
+                                           img_meta['img_shape'][:2],
+                                           self.train_cfg['allowed_border'])
         if not inside_flags.any():
-            return (None, ) * 7
+            raise ValueError(
+                'There is no valid anchor inside the image boundary. Please '
+                'check the image size and anchor sizes, or set '
+                '``allowed_border`` to -1 to skip the condition.')
         # assign gt and sample anchors
-        anchors = flat_anchors[inside_flags, :]
+        anchors = flat_anchors[inside_flags]
 
-        num_level_anchors_inside = get_num_level_anchors_inside(
+        num_level_anchors_inside = self.get_num_level_anchors_inside(
             num_level_anchors, inside_flags)
-        if self.assign_by_circumhbbox is not None:
-            gt_bboxes_assign = obb2hbb(gt_bboxes, self.assign_by_circumhbbox)
-            assign_result = self.assigner.assign(
-                anchors, num_level_anchors_inside, gt_bboxes_assign,
-                gt_bboxes_ignore, None if self.sampling else gt_labels)
-        else:
-            assign_result = self.assigner.assign(
-                anchors, num_level_anchors_inside, gt_bboxes, gt_bboxes_ignore,
-                None if self.sampling else gt_labels)
+        pred_instances = InstanceData(priors=anchors)
+        assign_result = self.assigner.assign(pred_instances,
+                                             num_level_anchors_inside,
+                                             gt_instances, gt_instances_ignore)
 
-        sampling_result = self.sampler.sample(assign_result, anchors,
-                                              gt_bboxes)
+        sampling_result = self.sampler.sample(assign_result, pred_instances,
+                                              gt_instances)
 
         num_valid_anchors = anchors.shape[0]
-        bbox_targets = torch.zeros_like(anchors)
-        bbox_weights = torch.zeros_like(anchors)
+        target_dim = gt_instances.bboxes.size(-1) if self.reg_decoded_bbox \
+            else self.bbox_coder.encode_size
+        bbox_targets = anchors.new_zeros(num_valid_anchors, target_dim)
+        bbox_weights = anchors.new_zeros(num_valid_anchors, target_dim)
         labels = anchors.new_full((num_valid_anchors, ),
                                   self.num_classes,
                                   dtype=torch.long)
@@ -96,139 +270,34 @@ class RotatedATSSHead(RotatedRetinaHead):
         pos_inds = sampling_result.pos_inds
         neg_inds = sampling_result.neg_inds
         if len(pos_inds) > 0:
-            if not self.reg_decoded_bbox:
-                pos_bbox_targets = self.bbox_coder.encode(
-                    sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes)
-            else:
+            if self.reg_decoded_bbox:
                 pos_bbox_targets = sampling_result.pos_gt_bboxes
-            bbox_targets[pos_inds, :] = pos_bbox_targets
-            bbox_weights[pos_inds, :] = 1.0
-            if gt_labels is None:
-                # Only rpn gives gt_labels as None
-                # Foreground is the first class since v2.5.0
-                labels[pos_inds] = 0
+                pos_bbox_targets = get_box_tensor(pos_bbox_targets)
             else:
-                labels[pos_inds] = gt_labels[
-                    sampling_result.pos_assigned_gt_inds]
-            if self.train_cfg.pos_weight <= 0:
+                pos_bbox_targets = self.bbox_coder.encode(
+                    sampling_result.pos_priors, sampling_result.pos_gt_bboxes)
+
+            bbox_targets[pos_inds] = pos_bbox_targets
+            bbox_weights[pos_inds, :] = 1.0
+
+            labels[pos_inds] = sampling_result.pos_gt_labels
+            if self.train_cfg['pos_weight'] <= 0:
                 label_weights[pos_inds] = 1.0
             else:
-                label_weights[pos_inds] = self.train_cfg.pos_weight
+                label_weights[pos_inds] = self.train_cfg['pos_weight']
         if len(neg_inds) > 0:
             label_weights[neg_inds] = 1.0
 
         # map up to original set of anchors
         if unmap_outputs:
             num_total_anchors = flat_anchors.size(0)
+            anchors = unmap(anchors.tensor, num_total_anchors, inside_flags)
             labels = unmap(
-                labels, num_total_anchors, inside_flags,
-                fill=self.num_classes)  # fill bg label
+                labels, num_total_anchors, inside_flags, fill=self.num_classes)
             label_weights = unmap(label_weights, num_total_anchors,
                                   inside_flags)
             bbox_targets = unmap(bbox_targets, num_total_anchors, inside_flags)
             bbox_weights = unmap(bbox_weights, num_total_anchors, inside_flags)
 
-        return (labels, label_weights, bbox_targets, bbox_weights, pos_inds,
-                neg_inds, sampling_result)
-
-    def get_targets(self,
-                    anchor_list,
-                    valid_flag_list,
-                    gt_bboxes_list,
-                    img_metas,
-                    gt_bboxes_ignore_list=None,
-                    gt_labels_list=None,
-                    label_channels=1,
-                    unmap_outputs=True,
-                    return_sampling_results=False):
-        """Compute regression and classification targets for anchors in
-        multiple images.
-
-        Args:
-            anchor_list (list[list[Tensor]]): Multi level anchors of each \
-                image. The outer list indicates images, and the inner list \
-                corresponds to feature levels of the image. Each element of \
-                the inner list is a tensor of shape (num_anchors, 5).
-            valid_flag_list (list[list[Tensor]]): Multi level valid flags of \
-                each image. The outer list indicates images, and the inner \
-                list corresponds to feature levels of the image. Each element \
-                of the inner list is a tensor of shape (num_anchors, )
-            gt_bboxes_list (list[Tensor]): Ground truth bboxes of each image.
-            img_metas (list[dict]): Meta info of each image.
-            gt_bboxes_ignore_list (list[Tensor]): Ground truth bboxes to be \
-                ignored.
-            gt_labels_list (list[Tensor]): Ground truth labels of each box.
-            label_channels (int): Channel of label.
-            unmap_outputs (bool): Whether to map outputs back to the original \
-                set of anchors.
-
-        Returns:
-            tuple: Usually returns a tuple containing learning targets.
-
-                - labels_list (list[Tensor]): Labels of each level.
-                - label_weights_list (list[Tensor]): Label weights of \
-                    each level
-                - bbox_targets_list (list[Tensor]): BBox targets of each level
-                - bbox_weights_list (list[Tensor]): BBox weights of each level
-                - num_total_pos (int): Number of positive samples in all images
-                - num_total_neg (int): Number of negative samples in all images
-            additional_returns: This function enables user-defined returns \
-                from self._get_targets_single`. These returns are currently \
-                refined to properties at each feature map (HxW dimension).
-                The results will be concatenated after the end
-        """
-        num_imgs = len(img_metas)
-        assert len(anchor_list) == len(valid_flag_list) == num_imgs
-
-        # anchor number of multi levels
-        num_level_anchors = [anchors.size(0) for anchors in anchor_list[0]]
-        num_level_anchors_list = [num_level_anchors] * num_imgs
-        # concat all level anchors to a single tensor
-        concat_anchor_list = []
-        concat_valid_flag_list = []
-        for i in range(num_imgs):
-            assert len(anchor_list[i]) == len(valid_flag_list[i])
-            concat_anchor_list.append(torch.cat(anchor_list[i]))
-            concat_valid_flag_list.append(torch.cat(valid_flag_list[i]))
-
-        # compute targets for each image
-        if gt_bboxes_ignore_list is None:
-            gt_bboxes_ignore_list = [None for _ in range(num_imgs)]
-        if gt_labels_list is None:
-            gt_labels_list = [None for _ in range(num_imgs)]
-        results = multi_apply(
-            self._get_targets_single,
-            concat_anchor_list,
-            concat_valid_flag_list,
-            num_level_anchors_list,
-            gt_bboxes_list,
-            gt_bboxes_ignore_list,
-            gt_labels_list,
-            img_metas,
-            label_channels=label_channels,
-            unmap_outputs=unmap_outputs)
-        (all_labels, all_label_weights, all_bbox_targets, all_bbox_weights,
-         pos_inds_list, neg_inds_list, sampling_results_list) = results[:7]
-        rest_results = list(results[7:])  # user-added return values
-        # no valid anchors
-        if any([labels is None for labels in all_labels]):
-            return None
-        # sampled anchors of all images
-        num_total_pos = sum([max(inds.numel(), 1) for inds in pos_inds_list])
-        num_total_neg = sum([max(inds.numel(), 1) for inds in neg_inds_list])
-        # split targets to a list w.r.t. multiple levels
-        labels_list = images_to_levels(all_labels, num_level_anchors)
-        label_weights_list = images_to_levels(all_label_weights,
-                                              num_level_anchors)
-        bbox_targets_list = images_to_levels(all_bbox_targets,
-                                             num_level_anchors)
-        bbox_weights_list = images_to_levels(all_bbox_weights,
-                                             num_level_anchors)
-        res = (labels_list, label_weights_list, bbox_targets_list,
-               bbox_weights_list, num_total_pos, num_total_neg)
-        if return_sampling_results:
-            res = res + (sampling_results_list, )
-        for i, r in enumerate(rest_results):  # user-added return values
-            rest_results[i] = images_to_levels(r, num_level_anchors)
-
-        return res + tuple(rest_results)
+        return (anchors, labels, label_weights, bbox_targets, bbox_weights,
+                pos_inds, neg_inds, sampling_result)
