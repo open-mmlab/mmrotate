@@ -95,7 +95,7 @@ html_theme_options = {
         },
         {
             'name':
-            'Upstream',
+            '上游库',
             'children': [
                 {
                     'name':
