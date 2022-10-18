@@ -1,4 +1,4 @@
-## Benchmark and Model Zoo
+# Benchmark and Model Zoo
 
 - [Rotated RetinaNet-OBB/HBB](https://github.com/open-mmlab/mmrotate/tree/main/configs/rotated_retinanet/README.md) (ICCV'2017)
 - [Rotated FasterRCNN-OBB](https://github.com/open-mmlab/mmrotate/tree/main/configs/rotated_faster_rcnn/README.md) (TPAMI'2017)
@@ -20,7 +20,7 @@
 - [KFIoU](https://github.com/open-mmlab/mmrotate/tree/main/configs/kfiou/README.md) (arXiv)
 - [G-Rep](https://github.com/open-mmlab/mmrotate/tree/main/configs/g_reppoints/README.md) (stay tuned)
 
-### Results on DOTA v1.0
+## Results on DOTA v1.0
 
 |          Backbone          |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) |  Aug  | Batch Size |                                                                      Configs                                                                      |                                                                                                                                                                                                      Download                                                                                                                                                                                                      |
 | :------------------------: | :---: | :---: | :-----: | :------: | :------------: | :---: | :--------: | :-----------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |

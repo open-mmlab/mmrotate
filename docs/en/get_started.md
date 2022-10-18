@@ -1,156 +1,195 @@
-## Dataset Preparation
+# GET STARTED
 
-Please refer to [data preparation](https://github.com/open-mmlab/mmrotate/tree/main/tools/data) for dataset preparation.
+## Prerequisites
 
-## Test a model
+In this section we demonstrate how to prepare an environment with PyTorch.
 
-- single GPU
-- single node multiple GPU
-- multiple node
+MMRotate works on Linux and Windows. It requires Python 3.7+, CUDA 9.2+ and PyTorch 1.6+.
 
-You can use the following commands to infer a dataset.
-
-```shell
-# single-gpu
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments]
-
-# multi-gpu
-./tools/dist_test.sh ${CONFIG_FILE} ${CHECKPOINT_FILE} ${GPU_NUM} [optional arguments]
-
-# multi-node in slurm environment
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments] --launcher slurm
+```{note}
+If you are experienced with PyTorch and have already installed it, just skip this part and jump to the [next section](#installation). Otherwise, you can follow these steps for the preparation.
 ```
 
-Examples:
+**Step 0.** Download and install Miniconda from the [official website](https://docs.conda.io/en/latest/miniconda.html).
 
-Inference RotatedRetinaNet on DOTA-1.0 dataset, which can generate compressed files for online [submission](https://captain-whu.github.io/DOTA/evaluation.html). (Please change the [data_root](https://github.com/open-mmlab/mmrotate/tree/main/configs/_base_/datasets/dotav1.py) firstly.)
-
-```shell
-python ./tools/test.py  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
-  checkpoints/SOME_CHECKPOINT.pth --format-only \
-  --eval-options submission_dir=work_dirs/Task1_results
-```
-
-or
+**Step 1.** Create a conda environment and activate it.
 
 ```shell
-./tools/dist_test.sh  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
-  checkpoints/SOME_CHECKPOINT.pth 1 --format-only \
-  --eval-options submission_dir=work_dirs/Task1_results
+conda create --name openmmlab python=3.8 -y
+conda activate openmmlab
 ```
 
-You can change the test set path in the [data_root](https://github.com/open-mmlab/mmrotate/tree/main/configs/_base_/datasets/dotav1.py) to the val set or trainval set for the offline evaluation.
+**Step 2.** Install PyTorch following [official instructions](https://pytorch.org/get-started/locally/), e.g.
 
 ```shell
-python ./tools/test.py \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
-  checkpoints/SOME_CHECKPOINT.pth --eval mAP
+conda install pytorch==1.8.0 torchvision==0.9.0 cudatoolkit=10.2 -c pytorch
 ```
 
-or
+## Installation
+
+We recommend that users follow our best practices to install MMRotate. However, the whole process is highly customizable. See [Customize Installation](#customize-installation) section for more information.
+
+### Best Practices
+
+**Step 0.** Install [MMEngine](https://github.com/open-mmlab/mmengine) and [MMCV](https://github.com/open-mmlab/mmcv) using [MIM](https://github.com/open-mmlab/mim).
 
 ```shell
-./tools/dist_test.sh  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
-  checkpoints/SOME_CHECKPOINT.pth 1 --eval mAP
+pip install -U openmim
+mim install mmengine
+mim install "mmcv>=2.0.0rc1"
 ```
 
-You can also visualize the results.
+**Step 1.** Install [MMDetection](https://github.com/open-mmlab/mmdetection) as a dependency.
 
 ```shell
-python ./tools/test.py \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
-  checkpoints/SOME_CHECKPOINT.pth \
-  --show-dir work_dirs/vis
+mim install 'mmdet>=3.0.0rc0'
 ```
 
-## Train a model
-
-### Train with a single GPU
+Optionally, you could also build MMDetection from source in case you want to modify the code:
 
 ```shell
-python tools/train.py ${CONFIG_FILE} [optional arguments]
+git clone https://github.com/open-mmlab/mmdetection.git -b dev-3.x
+# "-b dev-3.x" means checkout to the `dev-3.x` branch.
+cd mmdetection
+pip install -v -e .
+# "-v" means verbose, or more output
+# "-e" means installing a project in editable mode,
+# thus any local modifications made to the code will take effect without reinstallation.
 ```
 
-If you want to specify the working directory in the command, you can add an argument `--work_dir ${YOUR_WORK_DIR}`.
+**Step 2.** Install MMRotate.
 
-### Train with multiple GPUs
+Case a: If you develop and run mmrotate directly, install it from source:
 
 ```shell
-./tools/dist_train.sh ${CONFIG_FILE} ${GPU_NUM} [optional arguments]
+git clone https://github.com/open-mmlab/mmrotate.git -b dev-1.x
+# "-b dev-1.x" means checkout to the `dev-1.x` branch.
+cd mmrotate
+pip install -v -e .
+# "-v" means verbose, or more output
+# "-e" means installing a project in editable mode,
+# thus any local modifications made to the code will take effect without reinstallation.
 ```
 
-Optional arguments are:
-
-- `--no-validate` (**not suggested**): By default, the codebase will perform evaluation during the training. To disable this behavior, use `--no-validate`.
-- `--work-dir ${WORK_DIR}`: Override the working directory specified in the config file.
-- `--resume-from ${CHECKPOINT_FILE}`: Resume from a previous checkpoint file.
-
-Difference between `resume-from` and `load-from`:
-`resume-from` loads both the model weights and optimizer status, and the epoch is also inherited from the specified checkpoint. It is usually used for resuming the training process that is interrupted accidentally.
-`load-from` only loads the model weights and the training epoch starts from 0. It is usually used for finetuning.
-
-### Train with multiple machines
-
-If you launch with multiple machines simply connected with ethernet, you can simply run following commands:
-
-On the first machine:
+Case b: If you use mmrotate as a dependency or third-party package, install it with pip:
 
 ```shell
-NNODES=2 NODE_RANK=0 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_train.sh $CONFIG $GPUS
+pip install mmrotate
 ```
 
-On the second machine:
+### Verify the installation
+
+To verify whether MMRotate is installed correctly, we provide some sample codes to run an inference demo.
+
+**Step 1.** We need to download config and checkpoint files.
 
 ```shell
-NNODES=2 NODE_RANK=1 PORT=$MASTER_PORT MASTER_ADDR=$MASTER_ADDR sh tools/dist_train.sh $CONFIG $GPUS
+mim download mmrotate --config oriented_rcnn_r50_fpn_1x_dota_le90 --dest .
 ```
 
-Usually it is slow if you do not have high speed networking like InfiniBand.
+The downloading will take several seconds or more, depending on your network environment. When it is done, you will find two files `oriented_rcnn_r50_fpn_1x_dota_le90.py` and `oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth` in your current folder.
 
-### Manage jobs with Slurm
+**Step 2.** Verify the inference demo.
 
-If you run MMRotate on a cluster managed with [slurm](https://slurm.schedmd.com/), you can use the script `slurm_train.sh`. (This script also supports single machine training.)
+Option (a). If you install mmrotate from source, just run the following command.
 
 ```shell
-[GPUS=${GPUS}] ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} ${CONFIG_FILE} ${WORK_DIR}
+python demo/image_demo.py demo/demo.jpg oriented_rcnn_r50_fpn_1x_dota_le90.py oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth --out-file result.jpg
 ```
 
-If you have just multiple machines connected with ethernet, you can refer to
-PyTorch [launch utility](https://pytorch.org/docs/stable/distributed_deprecated.html#launch-utility).
-Usually it is slow if you do not have high speed networking like InfiniBand.
+You will see a new image `result.jpg` on your current folder, where rotated bounding boxes are plotted on cars, buses, etc.
 
-### Launch multiple jobs on a single machine
-
-If you launch multiple jobs on a single machine, e.g., 2 jobs of 4-GPU training on a machine with 8 GPUs,
-you need to specify different ports (29500 by default) for each job to avoid communication conflict.
-
-If you use `dist_train.sh` to launch training jobs, you can set the port in commands.
-
-```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 PORT=29500 ./tools/dist_train.sh ${CONFIG_FILE} 4
-CUDA_VISIBLE_DEVICES=4,5,6,7 PORT=29501 ./tools/dist_train.sh ${CONFIG_FILE} 4
-```
-
-If you use launch training jobs with Slurm, you need to modify the config files (usually the 6th line from the bottom in config files) to set different communication ports.
-
-In `config1.py`,
+Option (b). If you install mmrotate with pip, open you python interpreter and copy&paste the following codes.
 
 ```python
-dist_params = dict(backend='nccl', port=29500)
+from mmdet.apis import init_detector, inference_detector
+import mmrotate
+
+config_file = 'oriented_rcnn_r50_fpn_1x_dota_le90.py'
+checkpoint_file = 'oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth'
+model = init_detector(config_file, checkpoint_file, device='cuda:0')
+inference_detector(model, 'demo/demo.jpg')
 ```
 
-In `config2.py`,
+You will see a list of arrays printed, indicating the detected rotated bounding boxes.
 
-```python
-dist_params = dict(backend='nccl', port=29501)
+### Customize Installation
+
+#### CUDA versions
+
+When installing PyTorch, you need to specify the version of CUDA. If you are not clear on which to choose, follow our recommendations:
+
+- For Ampere-based NVIDIA GPUs, such as GeForce 30 series and NVIDIA A100, CUDA 11 is a must.
+- For older NVIDIA GPUs, CUDA 11 is backward compatible, but CUDA 10.2 offers better compatibility and is more lightweight.
+
+Please make sure the GPU driver satisfies the minimum version requirements. See [this table](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html#cuda-major-component-versions__table-cuda-toolkit-driver-versions) for more information.
+
+```{note}
+Installing CUDA runtime libraries is enough if you follow our best practices, because no CUDA code will be compiled locally. However if you hope to compile MMCV from source or develop other CUDA operators, you need to install the complete CUDA toolkit from NVIDIA's [website](https://developer.nvidia.com/cuda-downloads), and its version should match the CUDA version of PyTorch. i.e., the specified version of cudatoolkit in `conda install` command.
 ```
 
-Then you can launch two jobs with `config1.py` and `config2.py`.
+#### Install MMCV without MIM
+
+MMCV contains C++ and CUDA extensions, thus depending on PyTorch in a complex way. MIM solves such dependencies automatically and makes the installation easier. However, it is not a must.
+
+To install MMCV with pip instead of MIM, please follow [MMCV installation guides](https://mmcv.readthedocs.io/en/latest/get_started/installation.html). This requires manually specifying a find-url based on PyTorch version and its CUDA version.
+
+For example, the following command install mmcv built for PyTorch 1.9.x and CUDA 10.2.
 
 ```shell
-CUDA_VISIBLE_DEVICES=0,1,2,3 GPUS=4 ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config1.py ${WORK_DIR}
-CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 ./tools/slurm_train.sh ${PARTITION} ${JOB_NAME} config2.py ${WORK_DIR}
+pip install mmcv -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.8/index.html
 ```
+
+#### Install on Google Colab
+
+[Google Colab](https://research.google.com/) usually has PyTorch installed,
+thus we only need to install MMCV and MMDetection with the following commands.
+
+**Step 1.** Install [MMCV](https://github.com/open-mmlab/mmcv) and [MMDetection](https://github.com/open-mmlab/mmdetection) using [MIM](https://github.com/open-mmlab/mim).
+
+```shell
+!pip3 install -U openmim
+!mim install "mmcv>=2.0.0rc1"
+!mim install 'mmdet>=3.0.0rc0'
+```
+
+**Step 2.** Install MMRotate from the source.
+
+```shell
+!git clone https://github.com/open-mmlab/mmrotate.git -b dev-1.x
+%cd mmrotate
+!pip install -e .
+```
+
+**Step 3.** Verification.
+
+```python
+import mmrotate
+print(mmrotate.__version__)
+# Example output: 1.x
+```
+
+```{note}
+Within Jupyter, the exclamation mark `!` is used to call external executables and `%cd` is a [magic command](https://ipython.readthedocs.io/en/stable/interactive/magics.html#magic-cd) to change the current working directory of Python.
+```
+
+#### Using MMRotate with Docker
+
+We provide a [Dockerfile](https://github.com/open-mmlab/mmrotate/tree/main/docker/Dockerfile) to build an image. Ensure that your [docker version](https://docs.docker.com/engine/install/) >=19.03.
+
+```shell
+# build an image with PyTorch 1.6, CUDA 10.1
+# If you prefer other versions, just modified the Dockerfile
+docker build -t mmrotate docker/
+```
+
+Run it with
+
+```shell
+docker run --gpus all --shm-size=8g -it -v {DATA_DIR}:/mmrotate/data mmrotate
+```
+
+### Trouble shooting
+
+If you have some issues during the installation, please first view the [FAQ](faq.md) page.
+You may [open an issue](https://github.com/open-mmlab/mmrotate/issues/new/choose) on GitHub if no solution is found.

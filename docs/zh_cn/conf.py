@@ -19,9 +19,9 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'mmrotate'
-copyright = '2018-2022, OpenMMLab'
-author = 'MMRotate Author'
+project = 'MMRotate'
+copyright = '2022, OpenMMLab'
+author = 'MMRotate Authors'
 version_file = '../../mmrotate/version.py'
 
 
@@ -31,18 +31,33 @@ def get_version():
     return locals()['__version__']
 
 
+# The full version, including alpha/beta/rc tags
+release = get_version()
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'sphinx.ext.viewcode',
-    'sphinx.ext.autosectionlabel', 'sphinx_copybutton',
-    'sphinx_markdown_tables', 'myst_parser'
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
+    'myst_parser',
+    'sphinx_markdown_tables',
+    'sphinx_copybutton',
 ]
 
-autodoc_mock_imports = ['matplotlib', 'mmrotate.version', 'mmcv.ops']
+myst_enable_extensions = ['colon_fence']
+myst_heading_anchors = 3
+
+autodoc_mock_imports = [
+    'matplotlib', 'pycocotools', 'terminaltables', 'mmdet.version', 'mmcv.ops'
+]
+
+# Ignore >>> when copying code
+copybutton_prompt_text = r'>>> |\.\.\. '
+copybutton_prompt_is_regexp = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -68,12 +83,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+# html_theme = 'sphinx_rtd_theme'
 html_theme = 'pytorch_sphinx_theme'
 html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#
+
 html_theme_options = {
     'menu': [
         {
@@ -84,6 +97,11 @@ html_theme_options = {
             'name':
             '上游库',
             'children': [
+                {
+                    'name': 'MMEngine',
+                    'url': 'https://github.com/open-mmlab/mmengine',
+                    'description': '基础深度学习库'
+                },
                 {
                     'name': 'MMCV',
                     'url': 'https://github.com/open-mmlab/mmcv',
@@ -99,8 +117,12 @@ html_theme_options = {
     ],
     # Specify the language of shared menu
     'menu_lang':
-    'cn',
+    'cn'
 }
+
+language = 'zh_CN'
+
+master_doc = 'index'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -108,8 +130,4 @@ html_theme_options = {
 html_static_path = ['_static']
 html_css_files = ['css/readthedocs.css']
 
-# Enable ::: for my_st
-myst_enable_extensions = ['colon_fence']
-myst_heading_anchors = 3
-
-language = 'zh_CN'
+myst_heading_anchors = 4

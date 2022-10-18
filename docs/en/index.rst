@@ -3,48 +3,57 @@ Welcome to MMRotate's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: Learn the Basics
-
-   intro.md
-
-
-.. toctree::
-   :maxdepth: 2
    :caption: Get Started
 
-   install.md
+   overview.md
    get_started.md
+
+.. toctree::
+   :maxdepth: 2
+   :caption: User Guides
+
+   user_guides/index.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Advanced Guides
+
+   advanced_guides/index.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Migration
+
+   migration.md
+
+.. toctree::
+   :maxdepth: 1
+   :caption: API Reference
+
+   api.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Model Zoo
+
    model_zoo.md
 
-
 .. toctree::
-   :maxdepth: 2
-   :caption: Tutorials
-
-   tutorials/index.rst
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Useful Tools and Scripts
-
-   useful_tools.md
-
-.. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Notes
 
-   changelog.md
-   faq.md
+   notes/contribution_guide.md
+   notes/projects.md
+   notes/changelog.md
+   notes/changelog_v0.x.md
+   notes/faq.md
 
 .. toctree::
    :caption: Switch Language
 
    switch_language.md
 
-.. toctree::
-   :caption: API Reference
 
-   api.rst
 
 Indices and tables
 ==================
