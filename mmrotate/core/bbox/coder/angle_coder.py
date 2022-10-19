@@ -145,8 +145,14 @@ class PseudoAngleCoder(BaseBBoxCoder):
 
 @TASK_UTILS.register_module()
 class DistributionAngleCoder(BaseBBoxCoder):
+    """Distribution representation for angle.
 
-    def __init__(self, angle_version='le90', reg_max=16):
+    Args:
+        angle_version (str): Angle definition.
+        reg_max (int): Max value of integral. Defaults to 16.
+    """
+
+    def __init__(self, angle_version: str = 'le90', reg_max: int = 16):
         super().__init__()
         self.angle_range = 0.5 * np.pi if angle_version == 'oc' else np.pi
         self.angle_offset_dict = {
@@ -159,13 +165,17 @@ class DistributionAngleCoder(BaseBBoxCoder):
         self.encode_size = reg_max + 1
         self.project = torch.linspace(0, self.reg_max, self.reg_max + 1)
 
-    def encode(self, angle):
+    def encode(self, angle: Tensor) -> Tensor:
         # Norm to (0~1)*reg_max
         dfl_target = self.reg_max * (self.angle_offset +
                                      angle) / self.angle_range
         return dfl_target.flatten()
 
-    def decode(self, angle, keepdim=True):
+    def decode(self, angle: Tensor, keepdim: bool = False) -> Tensor:
         angle = F.softmax(angle.reshape(-1, self.reg_max + 1), dim=-1)
-        angle = F.linear(angle, self.project.type_as(angle)).reshape(-1, 1)
+        angle = F.linear(angle, self.project.type_as(angle))
+        if keepdim:
+            angle = angle.reshape(-1, 1)
+        else:
+            angle = angle.reshape(-1)
         return self.angle_range * angle / self.reg_max - self.angle_offset
