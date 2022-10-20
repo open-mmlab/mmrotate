@@ -11,7 +11,7 @@ from mmcv import Config, DictAction
 from mmcv.ops import nms_rotated
 from mmdet.datasets import build_dataset
 
-from mmrotate.core.bbox import rbbox_overlaps
+from mmrotate.evaluation import rbbox_overlaps
 
 
 def parse_args():

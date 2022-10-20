@@ -30,7 +30,7 @@ class TestFakeRotatedAnchorGenerator(TestCase):
         self.assertIsNotNone(anchor_generator)
 
     def test_strides(self):
-        from mmrotate.core.anchor.anchor_generator import \
+        from mmrotate.models.task_modules.prior_generators import \
             FakeRotatedAnchorGenerator
 
         # Square strides

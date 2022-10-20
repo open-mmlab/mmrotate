@@ -5,7 +5,7 @@ import torch
 from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.testing import assert_allclose
 
-from mmrotate.core.bbox.coder import DeltaXYWHTHBBoxCoder
+from mmrotate.models.task_modules.coders import DeltaXYWHTHBBoxCoder
 from mmrotate.structures.bbox import RotatedBoxes
 
 

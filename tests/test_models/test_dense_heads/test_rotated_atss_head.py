@@ -5,8 +5,8 @@ import torch
 from mmengine import Config
 from mmengine.structures import InstanceData
 
-from mmrotate.core import RotatedBoxes
 from mmrotate.models.dense_heads import RotatedATSSHead
+from mmrotate.structures import RotatedBoxes
 from mmrotate.utils import register_all_modules
 
 

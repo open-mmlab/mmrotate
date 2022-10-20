@@ -4,7 +4,7 @@ from unittest import TestCase
 import torch
 from mmengine.structures import InstanceData
 
-from mmrotate.core.bbox.assigners import RotatedATSSAssigner
+from mmrotate.models.task_modules.assigners import RotatedATSSAssigner
 from mmrotate.structures.bbox import RotatedBoxes
 
 

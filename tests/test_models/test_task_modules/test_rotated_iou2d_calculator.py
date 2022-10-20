@@ -6,10 +6,10 @@ import torch
 from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.testing import assert_allclose
 
-from mmrotate.core.bbox.iou_calculators import (FakeRBboxOverlaps2D,
-                                                QBbox2HBboxOverlaps2D,
-                                                RBboxOverlaps2D,
-                                                rbbox_overlaps)
+from mmrotate.evaluation import rbbox_overlaps
+from mmrotate.models.task_modules import (FakeRBboxOverlaps2D,
+                                          QBbox2HBboxOverlaps2D,
+                                          RBboxOverlaps2D)
 from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes, rbox2qbox
 
 
