@@ -66,12 +66,10 @@ def register_all_modules(init_default_scope: bool = True) -> None:
             to https://github.com/open-mmlab/mmengine/blob/main/docs/en/tutorials/registry.md
             Defaults to True.
     """  # noqa
-    # TODO remove #
     import mmrotate.datasets  # noqa: F401,F403
-    # import mmrotate.engine  # noqa: F401,F403
     import mmrotate.evaluation  # noqa: F401,F403
     import mmrotate.models  # noqa: F401,F403
-    # import mmrotate.visualization  # noqa: F401,F403
+    import mmrotate.visualization  # noqa: F401,F403
 
     if init_default_scope:
         never_created = DefaultScope.get_current_instance() is None \

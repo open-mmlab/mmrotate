@@ -2,7 +2,4 @@
 from .anchor_generator import (FakeRotatedAnchorGenerator,
                                PseudoRotatedAnchorGenerator)
 
-__all__ = [
-    'PseudoRotatedAnchorGenerator',
-    'FakeRotatedAnchorGenerator'
-]
+__all__ = ['PseudoRotatedAnchorGenerator', 'FakeRotatedAnchorGenerator']

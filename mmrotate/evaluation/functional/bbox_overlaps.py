@@ -1,6 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from torch import Tensor
 from mmcv.ops import box_iou_rotated
+from torch import Tensor
+
 from mmrotate.structures.bbox import RotatedBoxes
 
 

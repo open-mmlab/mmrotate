@@ -4,9 +4,9 @@ from mmdet.structures.bbox import (HorizontalBoxes, bbox_overlaps,
                                    get_box_tensor)
 from torch import Tensor
 
+from mmrotate.evaluation import fake_rbbox_overlaps, rbbox_overlaps
 from mmrotate.registry import TASK_UTILS
 from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes
-from mmrotate.evaluation import rbbox_overlaps, fake_rbbox_overlaps
 
 
 @TASK_UTILS.register_module()
