@@ -8,6 +8,7 @@ from typing import Dict, Optional, Sequence
 
 import cv2
 import numpy as np
+import pycocotools.mask as maskUtils
 from mmcv.ops import box_iou_rotated
 from mmdet.datasets.api_wrappers import COCO
 from mmdet.evaluation import CocoMetric
@@ -27,7 +28,7 @@ def qbox2rbox_list(boxes: list) -> list:
         boxes (list): Quadrilateral box list with shape of (8).
 
     Returns:
-        Tensor: Rotated box list with shape of (5).
+        List: Rotated box list with shape of (5).
     """
     pts = np.array(boxes, dtype=np.float32).reshape(4, 2)
     (x, y), (w, h), angle = cv2.minAreaRect(pts)
@@ -52,16 +53,24 @@ class RotatedCocoEval(COCOeval):
         if len(dt) > p.maxDets[-1]:
             dt = dt[0:p.maxDets[-1]]
 
-        # TODO add support for segm
-        assert p.iouType == 'bbox', 'unsupported iouType for iou computation'
+        if p.iouType == 'segm':
+            # For segm, its same with original COCOeval
+            g = [g['segmentation'] for g in gt]
+            d = [d['segmentation'] for d in dt]
+            # compute iou between each dt and gt region
+            iscrowd = [int(o['iscrowd']) for o in gt]
+            ious = maskUtils.iou(d, g, iscrowd)
+        elif p.iouType == 'bbox':
+            # Modified for Rotated Box
+            g = [g['bbox'] for g in gt]
+            d = [d['bbox'] for d in dt]
+            # Convert List[List[float]] to Tensor for iou compute
+            g = RotatedBoxes(g).tensor
+            d = RotatedBoxes(d).tensor
+            ious = box_iou_rotated(d, g)
+        else:
+            raise Exception('unknown iouType for iou computation')
 
-        g = [g['bbox'] for g in gt]
-        d = [d['bbox'] for d in dt]
-
-        g = RotatedBoxes(g).tensor
-        d = RotatedBoxes(d).tensor
-
-        ious = box_iou_rotated(d, g)
         return ious
 
 
@@ -165,13 +174,6 @@ class RotatedCocoMetric(CocoMetric):
             for ann in gt_dict['anns']:
                 label = ann['bbox_label']
                 bbox = ann['bbox']
-                # coco_bbox = [
-                #     bbox[0],
-                #     bbox[1],
-                #     bbox[2] - bbox[0],
-                #     bbox[3] - bbox[1],
-                # ]
-
                 coco_bbox = qbox2rbox_list(bbox)
 
                 annotation = dict(
