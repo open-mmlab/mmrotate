@@ -72,9 +72,7 @@ class TestAngleBranchRetinaHead(TestCase):
             loss_bbox=dict(
                 type='mmdet.SmoothL1Loss', beta=0.11, loss_weight=1.0),
             loss_angle=dict(
-                type='mmdet.SmoothFocalLoss',
-                gamma=2.0,
-                alpha=0.25,
+                type='SmoothFocalLoss', gamma=2.0, alpha=0.25,
                 loss_weight=0.8),
             train_cfg=cfg)
 

@@ -6,7 +6,8 @@ import torch.nn as nn
 from mmcv.cnn import ConvModule, Scale
 from mmdet.models.dense_heads.atss_head import ATSSHead
 from mmdet.models.task_modules.prior_generators import anchor_inside_flags
-from mmdet.models.utils import get_box_tensor, unmap
+from mmdet.models.utils import unmap
+from mmdet.structures.bbox import get_box_tensor
 from mmengine.structures import InstanceData
 from torch import Tensor
 
