@@ -5,7 +5,7 @@ import torch
 from mmengine.structures import InstanceData
 
 from mmrotate.core.bbox.assigners import RotatedATSSAssigner
-from mmrotate.core.bbox.structures import RotatedBoxes
+from mmrotate.structures.bbox import RotatedBoxes
 
 
 class TestATSSAssigner(TestCase):

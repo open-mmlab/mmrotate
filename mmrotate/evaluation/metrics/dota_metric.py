@@ -15,9 +15,9 @@ from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
 
-from mmrotate.core import eval_rbbox_map
-from mmrotate.core.bbox.structures import rbox2qbox
+from mmrotate.evaluation import eval_rbbox_map
 from mmrotate.registry import METRICS
+from mmrotate.structures.bbox import rbox2qbox
 
 
 @METRICS.register_module()

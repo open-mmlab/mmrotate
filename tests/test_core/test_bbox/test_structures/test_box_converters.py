@@ -7,7 +7,7 @@ import torch
 from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.testing import assert_allclose
 
-from mmrotate.core.bbox.structures import QuadriBoxes, RotatedBoxes
+from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes
 
 
 class TestboxModeConverters(TestCase):

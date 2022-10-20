@@ -9,7 +9,7 @@ from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.dataset import pseudo_collate
 from mmengine.structures import InstanceData, PixelData
 
-from mmrotate.core.bbox.structures import RotatedBoxes, rbox2qbox
+from mmrotate.structures.bbox import RotatedBoxes, rbox2qbox
 
 
 def _get_config_directory():

@@ -9,7 +9,7 @@ import torch
 from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from mmengine.testing import assert_allclose
 
-from mmrotate.core.bbox.structures import RotatedBoxes
+from mmrotate.structures.bbox import RotatedBoxes
 
 
 class TestRotatedBoxes(TestCase):

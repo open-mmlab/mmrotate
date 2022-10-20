@@ -3,8 +3,9 @@ import torch
 import torch.nn as nn
 from mmdet.models.losses.utils import weighted_loss
 
-from mmrotate.core import GaussianMixture, gt2gaussian
-from ..builder import ROTATED_LOSSES
+from mmrotate.models.utils import GaussianMixture
+from mmrotate.registry import MODELS
+from mmrotate.structures.bbox import gt2gaussian
 
 
 def kld_single2single(g1, g2):
@@ -61,7 +62,7 @@ def kld_loss(pred, target, eps=1e-6):
     return loss
 
 
-@ROTATED_LOSSES.register_module()
+@MODELS.register_module()
 class KLDRepPointsLoss(nn.Module):
     """Kullback-Leibler Divergence loss for RepPoints.
 

@@ -10,8 +10,8 @@ from mmdet.models.utils import get_box_tensor, unmap
 from mmengine.structures import InstanceData
 from torch import Tensor
 
-from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import MODELS
+from mmrotate.structures.bbox import RotatedBoxes
 
 
 @MODELS.register_module()

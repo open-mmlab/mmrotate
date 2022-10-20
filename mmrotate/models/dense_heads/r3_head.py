@@ -7,8 +7,8 @@ from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
 from torch import Tensor
 
-from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import MODELS, TASK_UTILS
+from mmrotate.structures.bbox import RotatedBoxes
 from .rotated_retina_head import RotatedRetinaHead
 
 

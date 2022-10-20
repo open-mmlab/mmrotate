@@ -2,8 +2,8 @@
 import torch
 import torch.nn as nn
 
-from mmrotate.core.bbox.structures import QuadriBoxes
 from mmrotate.registry import MODELS
+from mmrotate.structures.bbox import QuadriBoxes
 
 
 @MODELS.register_module()

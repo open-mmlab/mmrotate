@@ -5,11 +5,12 @@ from typing import List, Optional, Union
 
 import mmcv
 import numpy as np
+import torch
 from mmengine.dataset import BaseDataset
 from mmengine.fileio import FileClient, list_from_file
 
-from mmrotate.core import obb2poly_np
 from mmrotate.registry import DATASETS
+from mmrotate.structures.bbox import rbox2qbox
 
 
 @DATASETS.register_module()
@@ -170,12 +171,12 @@ class HRSCDataset(BaseDataset):
                 float(obj.find('mbox_cy').text),
                 float(obj.find('mbox_w').text),
                 float(obj.find('mbox_h').text),
-                float(obj.find('mbox_ang').text), 0
+                float(obj.find('mbox_ang').text)
             ]],
                              dtype=np.float32)
 
-            # TODO: waiting for boxlist
-            polygon = obb2poly_np(rbbox, 'le90')[0, :-1].tolist()
+            polygon = rbox2qbox(torch.from_numpy(rbbox)).numpy().tolist()
+
             head = [
                 int(obj.find('header_x').text),
                 int(obj.find('header_y').text)

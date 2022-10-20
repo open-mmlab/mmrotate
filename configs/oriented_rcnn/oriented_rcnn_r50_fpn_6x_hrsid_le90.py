@@ -102,7 +102,7 @@ model = dict(
                 iou_calculator=dict(type='RBboxOverlaps2D'),
                 ignore_iof_thr=-1),
             sampler=dict(
-                type='RRandomSampler',
+                type='mmdet.RandomSampler',
                 num=512,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,

@@ -10,7 +10,7 @@ from mmrotate.core.bbox.iou_calculators import (FakeRBboxOverlaps2D,
                                                 QBbox2HBboxOverlaps2D,
                                                 RBboxOverlaps2D,
                                                 rbbox_overlaps)
-from mmrotate.core.bbox.structures import QuadriBoxes, RotatedBoxes, rbox2qbox
+from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes, rbox2qbox
 
 
 class TestRBoxOverlaps2D(TestCase):

@@ -11,7 +11,7 @@ from torch import Tensor
 from mmrotate.models.dense_heads.rotated_reppoints_head import \
     RotatedRepPointsHead
 from mmrotate.registry import MODELS
-from .utils import convex_overlaps, levels_to_images
+from ..utils import convex_overlaps, levels_to_images
 
 
 @MODELS.register_module()

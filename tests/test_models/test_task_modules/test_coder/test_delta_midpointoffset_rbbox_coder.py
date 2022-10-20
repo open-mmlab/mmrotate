@@ -6,7 +6,7 @@ from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.testing import assert_allclose
 
 from mmrotate.core.bbox.coder import MidpointOffsetCoder
-from mmrotate.core.bbox.structures import RotatedBoxes
+from mmrotate.structures.bbox import RotatedBoxes
 
 
 class TestDeltaBboxCoder(TestCase):

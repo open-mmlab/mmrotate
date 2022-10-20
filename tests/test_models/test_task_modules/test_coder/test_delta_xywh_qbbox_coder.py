@@ -6,7 +6,7 @@ from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.testing import assert_allclose
 
 from mmrotate.core.bbox.coder import DeltaXYWHQBBoxCoder
-from mmrotate.core.bbox.structures import QuadriBoxes
+from mmrotate.structures.bbox import QuadriBoxes
 
 
 class TestDeltaXYWHQBBoxCoder(TestCase):

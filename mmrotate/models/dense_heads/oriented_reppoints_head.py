@@ -15,7 +15,7 @@ from torch import Tensor
 from mmrotate.models.dense_heads.rotated_reppoints_head import \
     RotatedRepPointsHead
 from mmrotate.registry import MODELS
-from .utils import levels_to_images
+from ..utils import levels_to_images
 
 
 def ChamferDistance2D(point_set_1: Tensor,

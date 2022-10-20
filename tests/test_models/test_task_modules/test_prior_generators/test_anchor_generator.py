@@ -4,8 +4,8 @@ from unittest import TestCase
 import torch
 from mmengine.testing import assert_allclose
 
-from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import TASK_UTILS
+from mmrotate.structures.bbox import RotatedBoxes
 from mmrotate.utils import register_all_modules
 
 
