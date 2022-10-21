@@ -5,8 +5,8 @@ import torch
 from mmengine import Config
 from mmengine.structures import InstanceData
 
-from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.models.dense_heads import S2AHead, S2ARefineHead
+from mmrotate.structures.bbox import RotatedBoxes
 from mmrotate.utils import register_all_modules
 
 
@@ -117,7 +117,7 @@ class TestS2AHead(TestCase):
 
         # test loss_by_feat of S2ARefineHead
         feats = (
-            torch.rand(1, 256, s // (2**(i + 2)), s // (2**(i + 2)))
+            torch.rand(1, 1, s // (2**(i + 2)), s // (2**(i + 2)))
             for i in range(len(refine_head.prior_generator.strides)))
         cls_scores, bbox_preds = refine_head.forward(feats)
 

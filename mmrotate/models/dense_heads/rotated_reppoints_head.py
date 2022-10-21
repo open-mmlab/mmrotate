@@ -10,8 +10,8 @@ from mmengine.config import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
 
-from mmrotate.core.bbox.structures import RotatedBoxes, qbox2rbox
 from mmrotate.registry import MODELS
+from mmrotate.structures.bbox import RotatedBoxes, qbox2rbox
 
 
 @MODELS.register_module()

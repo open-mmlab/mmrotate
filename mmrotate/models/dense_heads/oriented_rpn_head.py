@@ -9,8 +9,8 @@ from mmdet.structures.bbox import (BaseBoxes, get_box_tensor, get_box_wh,
 from mmengine.config import ConfigDict
 from mmengine.structures import InstanceData
 
-from mmrotate.core.bbox.structures import rbox2hbox
 from mmrotate.registry import MODELS
+from mmrotate.structures.bbox import rbox2hbox
 
 
 @MODELS.register_module()

@@ -7,8 +7,8 @@ from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
 from torch import Tensor
 
-from mmrotate.core.bbox.structures import RotatedBoxes
-from mmrotate.registry import MODELS, TASK_UTILS
+from mmrotate.registry import MODELS
+from mmrotate.structures.bbox import RotatedBoxes
 from .rotated_retina_head import RotatedRetinaHead
 
 
@@ -102,7 +102,7 @@ class R3RefineHead(RotatedRetinaHead):
                  **kwargs) -> None:
         super().__init__(
             num_classes=num_classes, in_channels=in_channels, **kwargs)
-        self.feat_refine_module = TASK_UTILS.build(frm_cfg)
+        self.feat_refine_module = MODELS.build(frm_cfg)
         self.bboxes_as_anchors = None
 
     def loss_by_feat(self,

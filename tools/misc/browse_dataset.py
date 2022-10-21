@@ -1,30 +1,20 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import argparse
-import os
-import sys
-from pathlib import Path
+import os.path as osp
 
 import mmcv
+import numpy as np
 from mmcv import Config, DictAction
-from mmdet.datasets.builder import build_dataset
+from mmdet.models.utils import mask2ndarray
+from mmdet.registry import DATASETS, VISUALIZERS
+from mmdet.structures.bbox import BaseBoxes
 
-from mmrotate.core.visualization import imshow_det_rbboxes
-
-if sys.version_info < (3, 3):
-    from collections import Sequence
-else:
-    from collections.abc import Sequence
+from mmrotate.utils import register_all_modules
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Browse a dataset')
     parser.add_argument('config', help='train config file path')
-    parser.add_argument(
-        '--skip-type',
-        type=str,
-        nargs='+',
-        default=['DefaultFormatBundle', 'Normalize', 'Collect'],
-        help='skip some useless pipeline')
     parser.add_argument(
         '--output-dir',
         default=None,
@@ -50,63 +40,47 @@ def parse_args():
     return args
 
 
-def retrieve_data_cfg(config_path, skip_type, cfg_options):
-    """Retrieve the dataset config file.
-
-    Args:
-        config_path (str): Path of the config file.
-        skip_type (list[str]): List of the useless pipeline to skip.
-        cfg_options (dict): dict of configs to merge from.
-    """
-
-    def skip_pipeline_steps(config):
-        config['pipeline'] = [
-            x for x in config.pipeline if x['type'] not in skip_type
-        ]
-
-    cfg = Config.fromfile(config_path)
-    if cfg_options is not None:
-        cfg.merge_from_dict(cfg_options)
-    train_data_cfg = cfg.data.train
-    while 'dataset' in train_data_cfg and train_data_cfg[
-            'type'] != 'MultiImageMixDataset':
-        train_data_cfg = train_data_cfg['dataset']
-
-    if isinstance(train_data_cfg, Sequence):
-        [skip_pipeline_steps(c) for c in train_data_cfg]
-    else:
-        skip_pipeline_steps(train_data_cfg)
-
-    return cfg
-
-
 def main():
     args = parse_args()
-    cfg = retrieve_data_cfg(args.config, args.skip_type, args.cfg_options)
+    cfg = Config.fromfile(args.config)
+    if args.cfg_options is not None:
+        cfg.merge_from_dict(args.cfg_options)
 
-    dataset = build_dataset(cfg.data.train)
+    # register all modules in mmdet into the registries
+    register_all_modules()
+
+    dataset = DATASETS.build(cfg.train_dataloader.dataset)
+    visualizer = VISUALIZERS.build(cfg.visualizer)
+    visualizer.dataset_meta = dataset.metainfo
 
     progress_bar = mmcv.ProgressBar(len(dataset))
-
     for item in dataset:
-        filename = os.path.join(args.output_dir,
-                                Path(item['filename']).name
-                                ) if args.output_dir is not None else None
+        img = item['inputs'].permute(1, 2, 0).numpy()
+        data_sample = item['data_sample'].numpy()
+        gt_instances = data_sample.gt_instances
+        img_path = osp.basename(item['data_sample'].img_path)
 
-        gt_bboxes = item['gt_bboxes']
-        gt_labels = item['gt_labels']
+        out_file = osp.join(
+            args.output_dir,
+            osp.basename(img_path)) if args.output_dir is not None else None
 
-        imshow_det_rbboxes(
-            item['img'],
-            gt_bboxes,
-            gt_labels,
-            class_names=dataset.CLASSES,
-            score_thr=0,
+        img = img[..., [2, 1, 0]]  # bgr to rgb
+        gt_bboxes = gt_instances.get('bboxes', None)
+        if gt_bboxes is not None and isinstance(gt_bboxes, BaseBoxes):
+            gt_instances.bboxes = gt_bboxes.tensor
+        gt_masks = gt_instances.get('masks', None)
+        if gt_masks is not None:
+            masks = mask2ndarray(gt_masks)
+            gt_instances.masks = masks.astype(np.bool)
+        data_sample.gt_instances = gt_instances
+
+        visualizer.add_datasample(
+            osp.basename(img_path),
+            img,
+            data_sample,
             show=not args.not_show,
             wait_time=args.show_interval,
-            out_file=filename,
-            bbox_color=dataset.PALETTE,
-            text_color=(200, 200, 200))
+            out_file=out_file)
 
         progress_bar.update()
 
