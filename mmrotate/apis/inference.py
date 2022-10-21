@@ -1,22 +1,29 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Optional, Sequence, Union
+
 import mmcv
 import numpy as np
 import torch
 from mmcv.ops import RoIPool
-from mmcv.parallel import collate, scatter
-from mmdet.datasets import replace_ImageToTensor
-from mmdet.datasets.pipelines import Compose
+from mmcv.transforms import Compose
+from mmdet.structures import DetDataSample, SampleList
+from torch import nn
 
-from mmrotate.apis import get_multiscale_patch, merge_results, slide_window
+from mmrotate.apis import (get_multiscale_patch, merge_results_by_nms,
+                           slide_window)
+
+ImagesType = Union[str, np.ndarray, Sequence[str], Sequence[np.ndarray]]
 
 
-def inference_detector_by_patches(model,
-                                  img,
-                                  sizes,
-                                  steps,
-                                  ratios,
-                                  merge_iou_thr,
-                                  bs=1):
+def inference_detector_by_patches(
+        model: nn.Module,
+        imgs: ImagesType,
+        sizes: list[int],
+        steps: list[int],
+        ratios: list[float],
+        nms_cfg: dict,
+        test_pipeline: Optional[Compose] = None,
+        bs: int = 1) -> Union[DetDataSample, SampleList]:
     """inference patches with the detector.
 
     Split huge image(s) into patches and inference them with the detector.
@@ -24,71 +31,82 @@ def inference_detector_by_patches(model,
 
     Args:
         model (nn.Module): The loaded detector.
-        img (str | ndarray or): Either an image file or loaded image.
-        sizes (list): The sizes of patches.
-        steps (list): The steps between two patches.
-        ratios (list): Image resizing ratios for multi-scale detecting.
-        merge_iou_thr (float): IoU threshold for merging results.
+        imgs (str, ndarray, Sequence[str/ndarray]): Either image files or
+            loaded images.
+        sizes (list[int]): The sizes of patches.
+        steps (list[int]): The steps between two patches.
+        ratios (list[float]): Image resizing ratios for multi-scale detecting.
+        nms_cfg (dict): nms config.
         bs (int): Batch size, must greater than or equal to 1.
 
     Returns:
         list[np.ndarray]: Detection results.
     """
     assert bs >= 1, 'The batch size must greater than or equal to 1'
+    if isinstance(imgs, (list, tuple)):
+        is_batch = True
+    else:
+        imgs = [imgs]
+        is_batch = False
     cfg = model.cfg
-    device = next(model.parameters()).device  # model device
-    cfg = cfg.copy()
-    # set loading pipeline type
-    cfg.data.test.pipeline[0].type = 'LoadPatchFromImage'
-    cfg.data.test.pipeline = replace_ImageToTensor(cfg.data.test.pipeline)
-    test_pipeline = Compose(cfg.data.test.pipeline)
 
-    if not isinstance(img, np.ndarray):
-        img = mmcv.imread(img)
-    height, width = img.shape[:2]
-    sizes, steps = get_multiscale_patch(sizes, steps, ratios)
-    windows = slide_window(width, height, sizes, steps)
+    if test_pipeline is None:
+        cfg = cfg.copy()
+        test_pipeline = cfg.test_dataloader.dataset.pipeline
+        new_test_pipeline, pipeline_types = [], []
+        for pipeline in test_pipeline:
+            if pipeline['type'] != 'LoadAnnotations' and pipeline[
+                    'type'] != 'LoadPanopticAnnotations':
+                new_test_pipeline.append(pipeline)
+                pipeline_types.append(pipeline['type'])
+        # set loading pipeline type
+        test_pipeline[0].type = 'LoadPatchFromNDArray'
+        test_pipeline = Compose(new_test_pipeline)
 
-    results = []
-    start = 0
-    while True:
-        # prepare patch data
-        patch_datas = []
-        if (start + bs) > len(windows):
-            end = len(windows)
-        else:
-            end = start + bs
-        for window in windows[start:end]:
-            data = dict(img=img, win=window.tolist())
-            data = test_pipeline(data)
-            patch_datas.append(data)
-        data = collate(patch_datas, samples_per_gpu=len(patch_datas))
-        # just get the actual data from DataContainer
-        data['img_metas'] = [
-            img_metas.data[0] for img_metas in data['img_metas']
-        ]
-        data['img'] = [img.data[0] for img in data['img']]
-        if next(model.parameters()).is_cuda:
-            # scatter to specified GPU
-            data = scatter(data, [device])[0]
-        else:
-            for m in model.modules():
-                assert not isinstance(
-                    m, RoIPool
-                ), 'CPU inference with RoIPool is not supported currently.'
+    if model.data_preprocessor.device.type == 'cpu':
+        for m in model.modules():
+            assert not isinstance(
+                m, RoIPool
+            ), 'CPU inference with RoIPool is not supported currently.'
 
-        # forward the model
-        with torch.no_grad():
-            results.extend(model(return_loss=False, rescale=True, **data))
+    result_list = []
+    for img in imgs:
+        if not isinstance(img, np.ndarray):
+            img = mmcv.imread(img)
+        height, width = img.shape[:2]
+        sizes, steps = get_multiscale_patch(sizes, steps, ratios)
+        patches = slide_window(width, height, sizes, steps)
 
-        if end >= len(windows):
-            break
-        start += bs
+        results = []
+        start = 0
+        while True:
+            # prepare patch data
+            patch_datas = dict(inputs=[], data_samples=[])
+            end = min(start + bs, len(patches))
+            for patch in patches[start:end]:
+                data_ = dict(
+                    img=img, img_id=0, img_path=None, patch=patch.tolist())
+                data = test_pipeline(data_)
+                patch_datas['inputs'].append(data['inputs'])
+                patch_datas['data_samples'].append(data['data_samples'])
 
-    results = merge_results(
-        results,
-        windows[:, :2],
-        img_shape=(width, height),
-        iou_thr=merge_iou_thr,
-        device=device)
-    return results
+            # forward the model
+            with torch.no_grad():
+                results.extend(model.test_step(patch_datas))
+
+            if end >= len(patches):
+                break
+            start += bs
+
+        result_list.append(
+            merge_results_by_nms(
+                results,
+                patches[:, :2],
+                img_shape=(width, height),
+                nms_cfg=nms_cfg,
+            ))
+
+    if is_batch:
+        return result_list
+    else:
+        return result_list[0]

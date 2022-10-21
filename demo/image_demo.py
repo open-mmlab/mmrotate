@@ -1,9 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from argparse import ArgumentParser
 
-from mmdet.apis import inference_detector, init_detector, show_result_pyplot
+import mmcv
+from mmdet.apis import inference_detector, init_detector
 
-import mmrotate  # noqa: F401
+from mmrotate.registry import VISUALIZERS
+from mmrotate.utils import register_all_modules
 
 
 def parse_args():
@@ -26,18 +28,34 @@ def parse_args():
 
 
 def main(args):
+    # register all modules in mmdet into the registries
+    register_all_modules()
+
     # build the model from a config file and a checkpoint file
-    model = init_detector(args.config, args.checkpoint, device=args.device)
+    model = init_detector(
+        args.config, args.checkpoint, palette=args.palette, device=args.device)
+
+    # init visualizer
+    visualizer = VISUALIZERS.build(model.cfg.visualizer)
+    # the dataset_meta is loaded from the checkpoint and
+    # then pass to the model in init_detector
+    visualizer.dataset_meta = model.dataset_meta
+
     # test a single image
     result = inference_detector(model, args.img)
+
     # show the results
-    show_result_pyplot(
-        model,
-        args.img,
-        result,
-        palette=args.palette,
-        score_thr=args.score_thr,
-        out_file=args.out_file)
+    img = mmcv.imread(args.img)
+    img = mmcv.imconvert(img, 'bgr', 'rgb')
+    visualizer.add_datasample(
+        'result',
+        img,
+        data_sample=result,
+        draw_gt=False,
+        show=args.out_file is None,
+        wait_time=0,
+        out_file=args.out_file,
+        pred_score_thr=args.score_thr)
 
 
 if __name__ == '__main__':
