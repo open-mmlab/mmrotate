@@ -6,10 +6,10 @@ from mmcv.ops import DeformConv2d, DeformConv2dPack, rotated_feature_align
 from mmengine.model import BaseModule, normal_init
 from torch import Tensor, nn
 
-from mmrotate.registry import TASK_UTILS
+from mmrotate.registry import MODELS
 
 
-@TASK_UTILS.register_module()
+@MODELS.register_module()
 class AlignConv(BaseModule):
     """AlignConv."""
 
@@ -96,7 +96,7 @@ class AlignConv(BaseModule):
         return out
 
 
-@TASK_UTILS.register_module()
+@MODELS.register_module()
 class PseudoAlignModule(BaseModule):
     """Pseudo Align Module."""
 
@@ -106,7 +106,7 @@ class PseudoAlignModule(BaseModule):
         return x
 
 
-@TASK_UTILS.register_module()
+@MODELS.register_module()
 class DCNAlignModule(DeformConv2dPack):
     """DCN Align Module.
 
@@ -120,7 +120,7 @@ class DCNAlignModule(DeformConv2dPack):
         return [super(DCNAlignModule, self).forward(xi) for xi in x]
 
 
-@TASK_UTILS.register_module()
+@MODELS.register_module()
 class FRM(BaseModule):
     """Feature refine module for `R3Det`.
 

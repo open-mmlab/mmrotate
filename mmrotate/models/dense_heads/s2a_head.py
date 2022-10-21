@@ -9,7 +9,7 @@ from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
 from torch import Tensor
 
-from mmrotate.registry import MODELS, TASK_UTILS
+from mmrotate.registry import MODELS
 from mmrotate.structures.bbox import RotatedBoxes
 from ..utils import ORConv2d, RotationInvariantPooling
 from .rotated_retina_head import RotatedRetinaHead
@@ -81,7 +81,7 @@ class S2ARefineHead(RotatedRetinaHead):
                  **kwargs) -> None:
         super().__init__(
             num_classes=num_classes, in_channels=in_channels, **kwargs)
-        self.feat_refine_module = TASK_UTILS.build(frm_cfg)
+        self.feat_refine_module = MODELS.build(frm_cfg)
         self.bboxes_as_anchors = None
 
     def _init_layers(self) -> None:
