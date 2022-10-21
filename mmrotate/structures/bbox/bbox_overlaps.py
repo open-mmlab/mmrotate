@@ -2,7 +2,7 @@
 from mmcv.ops import box_iou_rotated
 from torch import Tensor
 
-from mmrotate.structures.bbox import RotatedBoxes
+from .rotated_boxes import RotatedBoxes
 
 
 def rbbox_overlaps(bboxes1: Tensor,
