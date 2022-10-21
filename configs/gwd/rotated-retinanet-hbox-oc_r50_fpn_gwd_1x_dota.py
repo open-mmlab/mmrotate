@@ -1,4 +1,4 @@
-_base_ = '../rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc.py'
+_base_ = '../rotated_retinanet/rotated-retinanet-hbox-oc_r50_fpn_1x_dota.py'
 
 model = dict(
     bbox_head=dict(

@@ -1,5 +1,5 @@
 _base_ = [
-    '../kld/rotated_retinanet_obb_kld_stable_r50_adamw_fpn_1x_dota_le90.py'
+    '../kld/retinanet-rbox-le90_r50_fpn_kld-stable_adamw-1x_dota.py'
 ]
 
 # please install mmcls>=0.22.0

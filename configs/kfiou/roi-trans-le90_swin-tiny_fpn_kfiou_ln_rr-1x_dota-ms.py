@@ -1,4 +1,4 @@
-_base_ = ['./roi_trans_kfiou_ln_swin_tiny_fpn_1x_dota_le90.py']
+_base_ = ['./roi-trans-le90_swin-tiny_fpn_kfiou-ln_1x_dota.py']
 
 data_root = 'data/split_ms_dota1_0/'
 angle_version = 'le90'

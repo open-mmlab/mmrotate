@@ -1,4 +1,4 @@
-_base_ = ['../rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc.py']
+_base_ = ['../rotated_reppoints/rotated-reppoints-qbox_r50_fpn_1x_dota.py']
 
 angle_version = 'le135'
 

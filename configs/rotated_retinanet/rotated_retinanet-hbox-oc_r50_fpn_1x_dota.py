@@ -1,4 +1,4 @@
-_base_ = 'rotated_retinanet_obb_r50_fpn_1x_dota_oc.py'
+_base_ = 'rotated_retinanet-rbox-oc_r50_fpn_1x_dota.py'
 
 model = dict(
     train_cfg=dict(
