@@ -84,17 +84,17 @@ To verify whether MMRotate is installed correctly, we provide some sample codes 
 **Step 1.** We need to download config and checkpoint files.
 
 ```shell
-mim download mmrotate --config oriented_rcnn_r50_fpn_1x_dota_le90 --dest .
+mim download mmrotate --config oriented-rcnn-le90_r50_fpn_1x_dota --dest .
 ```
 
-The downloading will take several seconds or more, depending on your network environment. When it is done, you will find two files `oriented_rcnn_r50_fpn_1x_dota_le90.py` and `oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth` in your current folder.
+The downloading will take several seconds or more, depending on your network environment. When it is done, you will find two files `oriented-rcnn-le90_r50_fpn_1x_dota.py` and `oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth` in your current folder.
 
 **Step 2.** Verify the inference demo.
 
 Option (a). If you install mmrotate from source, just run the following command.
 
 ```shell
-python demo/image_demo.py demo/demo.jpg oriented_rcnn_r50_fpn_1x_dota_le90.py oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth --out-file result.jpg
+python demo/image_demo.py demo/demo.jpg oriented-rcnn-le90_r50_fpn_1x_dota.py oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth --out-file result.jpg
 ```
 
 You will see a new image `result.jpg` on your current folder, where rotated bounding boxes are plotted on cars, buses, etc.
@@ -105,7 +105,7 @@ Option (b). If you install mmrotate with pip, open you python interpreter and co
 from mmdet.apis import init_detector, inference_detector
 import mmrotate
 
-config_file = 'oriented_rcnn_r50_fpn_1x_dota_le90.py'
+config_file = 'oriented-rcnn-le90_r50_fpn_1x_dota.py'
 checkpoint_file = 'oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth'
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 inference_detector(model, 'demo/demo.jpg')

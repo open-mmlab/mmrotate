@@ -16,8 +16,8 @@ class TestTwoStageBBox(TestCase):
         register_all_modules()
 
     @parameterized.expand([
-        'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
-        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
+        'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
+        'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
     ])
     def test_init(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -40,8 +40,8 @@ class TestTwoStageBBox(TestCase):
             self.assertEqual(detector.rpn_head.num_classes, 1)
 
     @parameterized.expand([
-        'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
-        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
+        'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
+        'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
     ])
     def test_two_stage_forward_loss_mode(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -66,8 +66,8 @@ class TestTwoStageBBox(TestCase):
         self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
-        'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
-        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
+        'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
+        'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
     ])
     def test_two_stage_forward_predict_mode(self, cfg_file):
         model = get_detector_cfg(cfg_file)

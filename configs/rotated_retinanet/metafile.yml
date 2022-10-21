@@ -14,9 +14,9 @@ Collections:
   README: configs/rotated_retinanet/README.md
 
 Models:
-  - Name: rotated_retinanet_hbb_r50_fpn_1x_dota_oc
+  - Name: rotated-retinanet-hbox-oc_r50_fpn_1x_dota
     In Collection: rotated_retinanet
-    Config: configs/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc.py
+    Config: configs/rotated_retinanet/rotated-retinanet-hbox-oc_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -26,9 +26,9 @@ Models:
           mAP: 64.55
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc-e8a7c7df.pth
 
-  - Name: rotated_retinanet_obb_r50_fpn_1x_dota_le90
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_1x_dota
     In Collection: rotated_retinanet
-    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -38,9 +38,9 @@ Models:
           mAP: 68.42
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90/rotated_retinanet_obb_r50_fpn_1x_dota_le90-c0097bc4.pth
 
-  - Name: rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_amp-1x_dota
     In Collection: rotated_retinanet
-    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90.py
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_amp-1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -50,9 +50,9 @@ Models:
           mAP: 68.79
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90-01de71b5.pth
 
-  - Name: rotated_retinanet_obb_r50_fpn_1x_dota_le135
+  - Name: rotated-retinanet-rbox-le135_r50_fpn_1x_dota
     In Collection: rotated_retinanet
-    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135.py
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le135_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -62,9 +62,9 @@ Models:
           mAP: 69.79
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135-e4131166.pth
 
-  - Name: rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_rr-1x_dota-ms
     In Collection: rotated_retinanet
-    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90.py
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_rr-1x_dota-ms.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -74,9 +74,9 @@ Models:
           mAP: 76.50
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90-1da1ec9c.pth
 
-  - Name: rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc
+  - Name: rotated-retinanet-hbox-oc_r50_fpn_rr-6x_hrsc
     In Collection: rotated_retinanet
-    Config: configs/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc.py
+    Config: configs/rotated_retinanet/rotated-retinanet-hbox-oc_r50_fpn_rr-6x_hrsc.py
     Metadata:
       Training Data: HRSC2016
     Results:
@@ -86,9 +86,9 @@ Models:
           mAP: 45.09/79.30/46.90
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc-f37eada6.pth
 
-  - Name: rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_rr-6x_hrsc
     In Collection: rotated_retinanet
-    Config: configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90.py
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_rr-6x_hrsc.py
     Metadata:
       Training Data: HRSC2016
     Results:

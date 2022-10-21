@@ -14,9 +14,9 @@ Collections:
   README: configs/convnext/README.md
 
 Models:
-  - Name: rotated_retinanet_obb_kld_stable_convnext_adamw_fpn_1x_dota_le90
+  - Name: rotated-retinanet-rbox-le90_convnext-tiny_fpn_kld-stable_adamw-1x_dota
     In Collection: convnext
-    Config: configs/convnext/rotated_retinanet_obb_kld_stable_convnext_adamw_fpn_1x_dota_le90.py
+    Config: configs/convnext/rotated-retinanet-rbox-le90_convnext-tiny_fpn_kld-stable_adamw-1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:

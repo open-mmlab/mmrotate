@@ -14,9 +14,9 @@ Collections:
   README: configs/r3det/README.md
 
 Models:
-  - Name: r3det_r50_fpn_1x_dota_oc
+  - Name: r3det-oc_r50_fpn_1x_dota
     In Collection: r3det
-    Config: configs/r3det/r3det_r50_fpn_1x_dota_oc.py
+    Config: configs/r3det/r3det-oc_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -26,9 +26,9 @@ Models:
           mAP: 69.80
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/r3det/r3det_r50_fpn_1x_dota_oc/r3det_r50_fpn_1x_dota_oc-b1fb045c.pth
 
-  - Name: r3det_tiny_r50_fpn_1x_dota_oc
+  - Name: r3det-tiny-oc_r50_fpn_1x_dota
     In Collection: r3det
-    Config: configs/r3det/r3det_tiny_r50_fpn_1x_dota_oc.py
+    Config: configs/r3det/r3det-tiny-oc_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:

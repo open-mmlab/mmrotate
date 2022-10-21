@@ -16,9 +16,9 @@ Collections:
   README: configs/roi_trans/README.md
 
 Models:
-  - Name: roi_trans_r50_fpn_fp16_1x_dota_le90
+  - Name: roi-trans-le90_r50_fpn_amp-1x_dota
     In Collection: roi_trans
-    Config: configs/roi_trans/roi_trans_r50_fpn_fp16_1x_dota_le90.py
+    Config: configs/roi_trans/roi-trans-le90_r50_fpn_amp-1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -28,9 +28,9 @@ Models:
           mAP: 75.75
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_fp16_1x_dota_le90/roi_trans_r50_fpn_fp16_1x_dota_le90-62eb88b1.pth
 
-  - Name: roi_trans_r50_fpn_1x_dota_le90
+  - Name: roi-trans-le90_r50_fpn_1x_dota
     In Collection: roi_trans
-    Config: configs/roi_trans/roi_trans_r50_fpn_1x_dota_le90.py
+    Config: configs/roi_trans/roi-trans-le90_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -40,9 +40,9 @@ Models:
           mAP: 76.08
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_1x_dota_le90/roi_trans_r50_fpn_1x_dota_le90-d1f0b77a.pth
 
-  - Name: roi_trans_swin_tiny_fpn_1x_dota_le90
+  - Name: roi-trans-le90_swin-tiny_fpn_1x_dota
     In Collection: roi_trans
-    Config: configs/roi_trans/roi_trans_swin_tiny_fpn_1x_dota_le90.py
+    Config: configs/roi_trans/roi-trans-le90_swin-tiny_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -52,9 +52,9 @@ Models:
           mAP: 77.51
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_swin_tiny_fpn_1x_dota_le90/roi_trans_swin_tiny_fpn_1x_dota_le90-ddeee9ae.pth
 
-  - Name: roi_trans_r50_fpn_1x_dota_ms_le90
+  - Name: roi-trans-le90_r50_fpn_1x_dota-ms
     In Collection: roi_trans
-    Config: configs/roi_trans/roi_trans_r50_fpn_1x_dota_ms_le90.py
+    Config: configs/roi_trans/roi-trans-le90_r50_fpn_1x_dota-ms.py
     Metadata:
       Training Data: DOTAv1.0
     Results:

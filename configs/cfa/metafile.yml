@@ -14,9 +14,9 @@ Collections:
   README: configs/cfa/README.md
 
 Models:
-  - Name: cfa_r50_fpn_1x_dota_le135
+  - Name: cfa-qbox_r50_fpn_1x_dota
     In Collection: cfa
-    Config: configs/cfa/cfa_r50_fpn_1x_dota_le135.py
+    Config: configs/cfa/cfa-qbox_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -26,9 +26,9 @@ Models:
           mAP: 69.63
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/cfa/cfa_r50_fpn_1x_dota_le135/cfa_r50_fpn_1x_dota_le135-aed1cbc6.pth
 
-  - Name: cfa_r50_fpn_40e_dota_oc
+  - Name: cfa-qbox_r50_fpn_40e_dota
     In Collection: cfa
-    Config: configs/cfa/cfa_r50_fpn_40e_dota_oc.py
+    Config: configs/cfa/cfa-qbox_r50_fpn_40e_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:

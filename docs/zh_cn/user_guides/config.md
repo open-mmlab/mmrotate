@@ -284,7 +284,7 @@ work_dir = './work_dirs/rotated_retinanet_hbb_r50_fpn_1x_dota_oc'  # 用于保�
 例如，我们想使用离线多尺度策略 (multi scale strategy)来训练 RoI-Trans。 `train_pipeline` 是我们想要修改的中间变量。
 
 ```python
-_base_ = ['./roi_trans_r50_fpn_1x_dota_le90.py']
+_base_ = ['./roi-trans-le90_r50_fpn_1x_dota.py']
 
 data_root = '../datasets/split_ms_dota1_0/'
 angle_version = 'le90'
@@ -328,7 +328,7 @@ data = dict(
 同样的，如果我们想从 `SyncBN` 切换到 `BN` 或者 `MMSyncBN`，我们需要修改配置文件里的每一个 `norm_cfg`。
 
 ```python
-_base_ = './roi_trans_r50_fpn_1x_dota_le90.py'
+_base_ = './roi-trans-le90_r50_fpn_1x_dota.py'
 norm_cfg = dict(type='BN', requires_grad=True)
 model = dict(
     backbone=dict(norm_cfg=norm_cfg),

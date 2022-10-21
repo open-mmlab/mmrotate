@@ -18,7 +18,7 @@ class TestSingleStageDetector(TestCase):
         register_all_modules()
 
     @parameterized.expand([
-        'rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+        'rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
     ])
     def test_init(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -31,7 +31,7 @@ class TestSingleStageDetector(TestCase):
         self.assertTrue(detector.bbox_head)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+        ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
          ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_loss_mode(self, cfg_file, devices):
@@ -60,7 +60,7 @@ class TestSingleStageDetector(TestCase):
             self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+        ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
          ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_predict_mode(self, cfg_file, devices):
@@ -89,7 +89,7 @@ class TestSingleStageDetector(TestCase):
                 self.assertIsInstance(batch_results[0], DetDataSample)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+        ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
          ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_tensor_mode(self, cfg_file, devices):

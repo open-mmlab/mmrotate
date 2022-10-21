@@ -14,9 +14,9 @@ Collections:
   README: configs/csl/README.md
 
 Models:
-  - Name: rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota
     In Collection: csl
-    Config: configs/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90.py
+    Config: configs/csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
