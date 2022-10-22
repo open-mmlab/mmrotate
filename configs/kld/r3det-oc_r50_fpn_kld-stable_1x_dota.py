@@ -2,7 +2,7 @@ _base_ = ['../r3det/r3det-oc_r50_fpn_1x_dota.py']
 
 angle_version = 'oc'
 model = dict(
-    bbox_head=dict(
+    bbox_head_init=dict(
         reg_decoded_bbox=True,
         loss_bbox=dict(
             _delete_=True,
@@ -12,26 +12,28 @@ model = dict(
             tau=1.0,
             sqrt=False,
             loss_weight=5.0)),
-    refine_heads=[
+    bbox_head_refine=[
         dict(
-            type='RotatedRetinaRefineHead',
+            type='R3RefineHead',
             num_classes=15,
             in_channels=256,
             stacked_convs=4,
             feat_channels=256,
-            assign_by_circumhbbox=None,
+            frm_cfg=dict(
+                type='FRM', feat_channels=256, strides=[8, 16, 32, 64, 128]),
             anchor_generator=dict(
-                type='PseudoAnchorGenerator', strides=[8, 16, 32, 64, 128]),
+                type='PseudoRotatedAnchorGenerator',
+                strides=[8, 16, 32, 64, 128]),
             bbox_coder=dict(
-                type='DeltaXYWHAOBBoxCoder',
-                angle_range=angle_version,
+                type='DeltaXYWHTRBBoxCoder',
+                angle_version=angle_version,
                 norm_factor=None,
                 edge_swap=False,
                 proj_xy=False,
                 target_means=(0.0, 0.0, 0.0, 0.0, 0.0),
                 target_stds=(1.0, 1.0, 1.0, 1.0, 1.0)),
             loss_cls=dict(
-                type='FocalLoss',
+                type='mmdet.FocalLoss',
                 use_sigmoid=True,
                 gamma=2.0,
                 alpha=0.25,

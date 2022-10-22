@@ -1,4 +1,4 @@
-_base_ = './rotated_retinanet-rbox-le90_r50_fpn_kld-stable_1x_dota.py'
+_base_ = './rotated-retinanet-rbox-le90_r50_fpn_kld-stable_1x_dota.py'
 
 optim_wrapper = dict(
     optimizer=dict(

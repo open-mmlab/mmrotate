@@ -34,6 +34,7 @@ Notes:
 - `MS` means multiple scale image split.
 - `RR` means random rotation.
 - Please download pretrained weight of ReResNet from [ReDet](https://github.com/csuhan/ReDet), and put it on `work_dirs/pretrain`. BTW, it is normal for `missing keys in source state_dict: xxx.filter ` to appear in the log. Don't worry!
+- Please use distributed training, there are some bug when use `train.py`.
 
 ## Citation
 

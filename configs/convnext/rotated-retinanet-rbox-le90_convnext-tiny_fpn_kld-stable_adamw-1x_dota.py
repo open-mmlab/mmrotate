@@ -2,7 +2,7 @@ _base_ = [
     '../kld/rotated-retinanet-rbox-le90_r50_fpn_kld-stable_adamw-1x_dota.py'
 ]
 
-# please install mmcls>=0.22.0
+# please install mmcls>=1.0.0rc0
 # import mmcls.models to trigger register_module in mmcls
 custom_imports = dict(imports=['mmcls.models'], allow_failed_imports=False)
 checkpoint_file = 'https://download.openmmlab.com/mmclassification/v0/convnext/downstream/convnext-tiny_3rdparty_32xb128-noema_in1k_20220301-795e9634.pth'  # noqa
