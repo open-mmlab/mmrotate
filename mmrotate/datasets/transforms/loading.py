@@ -38,7 +38,7 @@ class LoadPatchFromNDArray(BaseTransform):
 
         Args:
             results (dict): Result dict with image array in ``results['img']``
-                and patch positioni n ``results['patch']``.
+                and patch position in ``results['patch']``.
 
         Returns:
             dict: The dict contains loaded patch and meta information.

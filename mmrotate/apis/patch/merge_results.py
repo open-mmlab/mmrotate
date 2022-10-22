@@ -44,7 +44,8 @@ def translate_bboxes(bboxes: Tensor, offset: Sequence[int]):
     return bboxes
 
 
-def map_masks(masks: np.ndarray, offset, new_shape):
+def map_masks(masks: np.ndarray, offset: Sequence[int],
+              new_shape: Sequence[int]) -> np.ndarray:
     """Map masks to the huge image.
 
     Args:
