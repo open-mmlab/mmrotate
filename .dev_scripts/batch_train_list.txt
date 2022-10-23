@@ -31,7 +31,7 @@ configs/rotated_fcos/rotated-fcos-hbox-le90_r50_fpn_1x_dota.py
 configs/rotated_fcos/rotated-fcos-le90_r50_fpn_1x_dota.py
 configs/rotated_fcos/rotated-fcos-hbox-le90_r50_fpn_csl-gaussian_1x_dota.py
 configs/rotated_fcos/rotated-fcos-le90_r50_fpn_kld_1x_dota.py
-configs/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc.py
+configs/rotated_reppoints/rotated-reppoints-qbox_r50_fpn_1x_dota.py
 configs/rotated_retinanet/rotated-retinanet-hbox-oc_r50_fpn_1x_dota.py
 configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py
 configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_amp-1x_dota.py

@@ -6,8 +6,8 @@ echo 'configs/convnext/rotated-retinanet-rbox-le90_convnext-tiny_fpn_kld-stable_
 python ./tools/train.py configs/convnext/rotated-retinanet-rbox-le90_convnext-tiny_fpn_kld-stable_adamw-1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py' &
 python ./tools/train.py configs/csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
-echo 'configs/gliding_vertex/gliding-vertex-rbox_r50_fpn_1x_dota.py' &
-python ./tools/train.py configs/gliding_vertex/gliding-vertex-rbox_r50_fpn_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
+# echo 'configs/gliding_vertex/gliding-vertex-rbox_r50_fpn_1x_dota.py' &
+# python ./tools/train.py configs/gliding_vertex/gliding-vertex-rbox_r50_fpn_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/gwd/rotated-retinanet-hbox-oc_r50_fpn_gwd_1x_dota.py' &
 python ./tools/train.py configs/gwd/rotated-retinanet-hbox-oc_r50_fpn_gwd_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/kfiou/rotated-retinanet-hbox-le90_r50_fpn_kfiou_1x_dota.py' &
@@ -43,9 +43,9 @@ python ./tools/train.py configs/r3det/r3det-oc_r50_fpn_1x_dota.py --cfg-options 
 echo 'configs/r3det/r3det-tiny-oc_r50_fpn_1x_dota.py' &
 python ./tools/train.py configs/r3det/r3det-tiny-oc_r50_fpn_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/redet/redet-le90_re50_refpn_amp-1x_dota.py' &
-python ./tools/train.py configs/redet/redet-le90_re50_refpn_amp-1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
+./tools/dist_train.sh configs/redet/redet-le90_re50_refpn_amp-1x_dota.py 1 --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/redet/redet-le90_re50_refpn_1x_dota.py' &
-python ./tools/train.py configs/redet/redet-le90_re50_refpn_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
+./tools/dist_train.sh configs/redet/redet-le90_re50_refpn_1x_dota.py 1 --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/roi_trans/roi-trans-le90_r50_fpn_amp-1x_dota.py' &
 python ./tools/train.py configs/roi_trans/roi-trans-le90_r50_fpn_amp-1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/roi_trans/roi-trans-le90_r50_fpn_1x_dota.py' &
@@ -64,8 +64,8 @@ echo 'configs/rotated_fcos/rotated-fcos-hbox-le90_r50_fpn_csl-gaussian_1x_dota.p
 python ./tools/train.py configs/rotated_fcos/rotated-fcos-hbox-le90_r50_fpn_csl-gaussian_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/rotated_fcos/rotated-fcos-le90_r50_fpn_kld_1x_dota.py' &
 python ./tools/train.py configs/rotated_fcos/rotated-fcos-le90_r50_fpn_kld_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
-echo 'configs/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc.py' &
-python ./tools/train.py configs/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
+echo 'configs/rotated_reppoints/rotated-reppoints-qbox_r50_fpn_1x_dota.py' &
+python ./tools/train.py configs/rotated_reppoints/rotated-reppoints-qbox_r50_fpn_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/rotated_retinanet/rotated-retinanet-hbox-oc_r50_fpn_1x_dota.py' &
 python ./tools/train.py configs/rotated_retinanet/rotated-retinanet-hbox-oc_r50_fpn_1x_dota.py --cfg-options default_hooks.checkpoint.max_keep_ckpts=1 &
 echo 'configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py' &
