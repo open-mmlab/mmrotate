@@ -175,7 +175,7 @@ class HRSCDataset(BaseDataset):
             ]],
                              dtype=np.float32)
 
-            polygon = rbox2qbox(torch.from_numpy(rbbox)).numpy().tolist()
+            polygon = rbox2qbox(torch.from_numpy(rbbox)).numpy().tolist()[0]
 
             head = [
                 int(obj.find('header_x').text),
