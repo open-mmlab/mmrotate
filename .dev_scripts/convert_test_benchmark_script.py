@@ -23,9 +23,7 @@ def parse_args():
 def process_model_info(model_info):
     config = model_info['config'].strip()
     checkpoint = model_info['checkpoint'].strip()
-    return dict(
-        config=config,
-        checkpoint=checkpoint)
+    return dict(config=config, checkpoint=checkpoint)
 
 
 def create_test_bash_info(commands, model_test_dict, port, script_name):
