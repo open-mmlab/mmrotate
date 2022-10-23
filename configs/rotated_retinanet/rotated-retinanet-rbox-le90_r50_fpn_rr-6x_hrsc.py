@@ -79,7 +79,9 @@ model = dict(
         max_per_img=2000))
 
 train_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args={{_base_.file_client_args}}),
+    dict(
+        type='mmdet.LoadImageFromFile',
+        file_client_args={{_base_.file_client_args}}),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
     dict(type='mmdet.Resize', scale=(800, 512), keep_ratio=True),
@@ -87,10 +89,7 @@ train_pipeline = [
         type='mmdet.RandomFlip',
         prob=0.75,
         direction=['horizontal', 'vertical', 'diagonal']),
-    dict(
-        type='RandomRotate',
-        prob=0.5,
-        angle_range=180),
+    dict(type='RandomRotate', prob=0.5, angle_range=180),
     dict(type='mmdet.PackDetInputs')
 ]
 
