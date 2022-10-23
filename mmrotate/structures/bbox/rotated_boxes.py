@@ -413,10 +413,10 @@ class RotatedBoxes(BaseBoxes):
         Returns:
             Tensor: shape (m, n) if ``is_aligned`` is False else shape (m,)
         """
-        from ..iou_calculators import rbox_overlaps
+        from mmrotate.structures.bbox import rbbox_overlaps
         boxes1 = boxes1.convert_to('rbox')
         boxes2 = boxes2.convert_to('rbox')
-        return rbox_overlaps(
+        return rbbox_overlaps(
             boxes1.tensor,
             boxes2.tensor,
             mode=mode,

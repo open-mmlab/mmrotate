@@ -14,9 +14,9 @@ Collections:
   README: configs/sasm_reppoints/README.md
 
 Models:
-  - Name: sasm_reppoints_r50_fpn_1x_dota_oc
+  - Name: sasm-reppoints-qbox_r50_fpn_1x_dota
     In Collection: sasm
-    Config: configs/sasm_reppoints/sasm_reppoints_r50_fpn_1x_dota_oc.py
+    Config: configs/sasm_reppoints/sasm-reppoints-qbox_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:

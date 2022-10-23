@@ -14,9 +14,9 @@ Collections:
   README: configs/oriented_reppoints/README.md
 
 Models:
-  - Name: oriented_reppoints_r50_fpn_1x_dota_le135
+  - Name: oriented-reppoints-qbox_r50_fpn_1x_dota
     In Collection: oriented_reppoints
-    Config: configs/oriented_reppoints/oriented_reppoints_r50_fpn_1x_dota_le135.py
+    Config: configs/oriented_reppoints/oriented-reppoints-qbox_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
@@ -26,9 +26,9 @@ Models:
           mAP: 71.94
     Weights: https://download.openmmlab.com/mmrotate/v0.1.0/oriented_reppoints/oriented_reppoints_r50_fpn_1x_dota_le135/oriented_reppoints_r50_fpn_1x_dota_le135-ef072de9.pth
 
-  - Name: oriented_reppoints_r50_fpn_40e_dota_ms_le135
+  - Name: oriented-reppoints-qbox_r50_fpn_40e_dota-ms
     In Collection: oriented_reppoints
-    Config: configs/oriented_reppoints/oriented_reppoints_r50_fpn_40e_dota_ms_le135.py
+    Config: configs/oriented_reppoints/oriented-reppoints-qbox_r50_fpn_40e_dota-ms.py
     Metadata:
       Training Data: DOTAv1.0
     Results:
