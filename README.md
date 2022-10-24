@@ -173,6 +173,8 @@ If you use this toolbox or benchmark in your research, please cite this project.
              Hou, Liping and Jiang, Xue and Liu, Xingzhao and Yan, Junchi and Lyu, Chengqi and
              Zhang, Wenwei and Chen, Kai},
   booktitle={Proceedings of the 30th ACM International Conference on Multimedia},
+  pages = {7331–7334},
+  numpages = {4},
   year={2022}
 }
 ```
