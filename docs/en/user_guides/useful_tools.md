@@ -76,9 +76,9 @@ Example:
 
 ```shell
 wget -P checkpoint  \
-https://download.openmmlab.com/mmrotate/v0.1.0/rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90/rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth
+https://download.openmmlab.com/mmrotate/v0.1.0/rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota/rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth
 
-python tools/deployment/mmrotate2torchserve.py configs/rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py checkpoint/rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth \
+python tools/deployment/mmrotate2torchserve.py configs/rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py checkpoint/rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth \
 --output-folder ${MODEL_STORE} \
 --model-name rotated_faster_rcnn
 ```
@@ -180,7 +180,7 @@ Example:
 ```shell
 python tools/deployment/test_torchserver.py \
 demo/demo.jpg \
-configs/rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py \
+configs/rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py \
 rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth \
 rotated_fater_rcnn
 ```
@@ -256,7 +256,7 @@ Examples: Assuming that you have already downloaded the `Rotated Faster R-CNN` m
 
 ```shell
 python -m torch.distributed.launch --nproc_per_node=1 --master_port=29500 tools/analysis_tools/benchmark.py \
-       configs/rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py \
+       configs/rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py \
        checkpoints/rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth \
        --launcher pytorch
 ```

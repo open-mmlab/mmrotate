@@ -25,7 +25,7 @@ python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments] --la
 
 ```shell
 python ./tools/test.py  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth --format-only \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
@@ -34,7 +34,7 @@ python ./tools/test.py  \
 
 ```shell
 ./tools/dist_test.sh  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth 1 --format-only \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
@@ -43,7 +43,7 @@ python ./tools/test.py  \
 
 ```shell
 python ./tools/test.py \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth --eval mAP
 ```
 
@@ -51,7 +51,7 @@ python ./tools/test.py \
 
 ```shell
 ./tools/dist_test.sh  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth 1 --eval mAP
 ```
 
@@ -59,7 +59,7 @@ python ./tools/test.py \
 
 ```shell
 python ./tools/test.py \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth \
   --show-dir work_dirs/vis
 ```

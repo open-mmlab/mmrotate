@@ -1,56 +1,66 @@
 # dataset settings
 dataset_type = 'HRSCDataset'
 data_root = 'data/hrsc/'
-img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+file_client_args = dict(backend='disk')
+
 train_pipeline = [
-    dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='RResize', img_scale=(800, 800)),
-    dict(type='RRandomFlip', flip_ratio=0.5),
-    dict(type='Normalize', **img_norm_cfg),
-    dict(type='Pad', size_divisor=32),
-    dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
+    dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
+    dict(type='mmdet.Resize', scale=(800, 512), keep_ratio=True),
+    dict(
+        type='mmdet.RandomFlip',
+        prob=0.75,
+        direction=['horizontal', 'vertical', 'diagonal']),
+    dict(type='mmdet.PackDetInputs')
+]
+val_pipeline = [
+    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.Resize', scale=(800, 512), keep_ratio=True),
+    # avoid bboxes being resized
+    dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
+    dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
+    dict(
+        type='mmdet.PackDetInputs',
+        meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
+                   'scale_factor'))
 ]
 test_pipeline = [
-    dict(type='LoadImageFromFile'),
+    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.Resize', scale=(800, 512), keep_ratio=True),
+    # avoid bboxes being resized
     dict(
-        type='MultiScaleFlipAug',
-        img_scale=(800, 800),
-        flip=False,
-        transforms=[
-            dict(type='RResize'),
-            dict(type='Normalize', **img_norm_cfg),
-            dict(type='Pad', size_divisor=32),
-            dict(type='DefaultFormatBundle'),
-            dict(type='Collect', keys=['img'])
-        ])
+        type='mmdet.PackDetInputs',
+        meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
+                   'scale_factor'))
 ]
-data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
-    train=dict(
+train_dataloader = dict(
+    batch_size=2,
+    num_workers=2,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=True),
+    batch_sampler=None,
+    dataset=dict(
         type=dataset_type,
-        classwise=False,
-        ann_file=data_root + 'ImageSets/trainval.txt',
-        ann_subdir=data_root + 'FullDataSet/Annotations/',
-        img_subdir=data_root + 'FullDataSet/AllImages/',
-        img_prefix=data_root + 'FullDataSet/AllImages/',
-        pipeline=train_pipeline),
-    val=dict(
+        data_root=data_root,
+        ann_file='ImageSets/trainval.txt',
+        data_prefix=dict(sub_data_root='FullDataSet/'),
+        filter_cfg=dict(filter_empty_gt=True),
+        pipeline=train_pipeline))
+val_dataloader = dict(
+    batch_size=1,
+    num_workers=2,
+    persistent_workers=True,
+    drop_last=False,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
         type=dataset_type,
-        classwise=False,
-        ann_file=data_root + 'ImageSets/test.txt',
-        ann_subdir=data_root + 'FullDataSet/Annotations/',
-        img_subdir=data_root + 'FullDataSet/AllImages/',
-        img_prefix=data_root + 'FullDataSet/AllImages/',
-        pipeline=test_pipeline),
-    test=dict(
-        type=dataset_type,
-        classwise=False,
-        ann_file=data_root + 'ImageSets/test.txt',
-        ann_subdir=data_root + 'FullDataSet/Annotations/',
-        img_subdir=data_root + 'FullDataSet/AllImages/',
-        img_prefix=data_root + 'FullDataSet/AllImages/',
-        pipeline=test_pipeline))
+        data_root=data_root,
+        ann_file='ImageSets/test.txt',
+        data_prefix=dict(sub_data_root='FullDataSet/'),
+        test_mode=True,
+        pipeline=val_pipeline))
+test_dataloader = val_dataloader
+
+val_evaluator = dict(type='DOTAMetric', metric='mAP')
+test_evaluator = val_evaluator

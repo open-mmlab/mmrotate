@@ -490,7 +490,7 @@ class ReResNet(BaseModule):
                  zero_init_residual: bool = True,
                  init_cfg: OptMultiConfig = None) -> None:
         super().__init__(init_cfg=init_cfg)
-        self.in_type = build_enn_trivial_feature(3)
+        self.in_type = build_enn_trivial_feature(in_channels)
 
         if depth not in self.arch_settings:
             raise KeyError(f'invalid depth {depth} for resnet')
