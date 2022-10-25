@@ -52,8 +52,59 @@ python tools/data/dota/split/img_split.py --base-json \
   tools/data/dota/split/split_configs/ms_test.json
 ```
 
-Please change the `img_dirs` and `ann_dirs` in json. (Forked from [BboxToolkit](https://github.com/jbwang1997/BboxToolkit), which is faster then DOTA_Devkit.)
+Please update the `img_dirs` and `ann_dirs` in json. 
 
-## change root path in base config
 
-Please change `data_root` in `configs/_base_/datasets/dotav1.py` to split DOTA dataset.
+The new data structure is as follows:
+
+```none
+mmrotate
+├── mmrotate
+├── tools
+├── configs
+├── data
+│   ├── split_ss_dota
+│   │   ├── trainval
+│   │   │   ├── images
+│   │   │   ├── annfiles
+│   │   ├── test
+│   │   │   ├── images
+│   │   │   ├── annfiles
+```
+
+Please change `data_root` in `configs/_base_/datasets/dota.py` to `data/split_ss_dota`.
+
+## Generating COCO style annotations
+
+Please convert the annotations from txt to json by run
+
+```shell
+python tools/data/dota/txt2json.py \
+  data/split_ss_dota/trainval/ \
+  data/split_ss_dota/trainval.json
+
+python tools/data/dota/txt2json.py \
+  data/split_ss_dota/test/ \
+  data/split_ss_dota/test.json
+```
+
+The new data structure is as follows:
+
+```none
+mmrotate
+├── mmrotate
+├── tools
+├── configs
+├── data
+│   ├── split_ss_dota
+│   │   ├── trainval
+│   │   │   ├── images
+│   │   │   ├── annfiles
+│   │   │   ├── trainval.json
+│   │   ├── test
+│   │   │   ├── images
+│   │   │   ├── annfiles
+│   │   │   ├── test.json
+```
+
+Please change `data_root` in `configs/_base_/datasets/coco_rbox.py` to `data/split_ss_dota`.
