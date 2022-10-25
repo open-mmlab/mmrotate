@@ -6,6 +6,7 @@ import os
 from argparse import ArgumentParser
 
 import cv2
+from mmengine.utils import ProgressBar
 
 try:
     import shapely.geometry as shgeo
@@ -107,13 +108,13 @@ def main(args):
 
     inst_count = 1
     image_id = 1
-    with open(args.destfile, 'w') as f_out:
+    with open(args.destpath, 'w') as f_out:
         filenames = []
         for root, dirs, files in os.walk(labelparent):
             for filespath in files:
                 filepath = os.path.join(root, filespath)
                 filenames.append(filepath)
-
+        prog_bar = ProgressBar(len(filenames))
         for file in filenames:
             basename = os.path.basename(os.path.splitext(file)[0])
             imagepath = os.path.join(imageparent, basename + '.png')
@@ -148,6 +149,7 @@ def main(args):
                 single_obj['id'] = inst_count
                 inst_count = inst_count + 1
             image_id = image_id + 1
+            prog_bar.update()
         json.dump(data_dict, f_out)
 
 

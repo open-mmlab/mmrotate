@@ -10,6 +10,7 @@ from matplotlib.ticker import MultipleLocator
 from mmcv import Config, DictAction
 from mmcv.ops import nms_rotated
 from mmdet.datasets import build_dataset
+from mmengine.utils import ProgressBar
 
 from mmrotate.structures.bbox import rbbox_overlaps
 
@@ -79,7 +80,7 @@ def calculate_confusion_matrix(dataset,
     num_classes = len(dataset.CLASSES)
     confusion_matrix = np.zeros(shape=[num_classes + 1, num_classes + 1])
     assert len(dataset) == len(results)
-    prog_bar = mmcv.ProgressBar(len(results))
+    prog_bar = ProgressBar(len(results))
     for idx, per_img_res in enumerate(results):
         if isinstance(per_img_res, tuple):
             res_bboxes, _ = per_img_res
