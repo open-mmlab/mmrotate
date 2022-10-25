@@ -69,7 +69,14 @@ class CocoRboxDataset(CocoDataset):
             if ann['category_id'] not in self.cat_ids:
                 continue
 
-            bbox = [float(i) for i in ann['segmentation'][0]]
+            if ann.get('segmentation', False):
+                assert len(ann['segmentation'][0]) == 8, 'The `segmentation`' \
+                    'only supports qbox format.'
+                bbox = [float(i) for i in ann['segmentation'][0]]
+            else:
+                # if `ann` don't have `segmentation` key,
+                # hbox will be converted to qbox.
+                bbox = [x1, y1, x1 + w, y1, x1 + w, y1 + h, x1, y1 + h]
 
             if ann.get('iscrowd', False):
                 instance['ignore_flag'] = 1
@@ -77,7 +84,9 @@ class CocoRboxDataset(CocoDataset):
                 instance['ignore_flag'] = 0
             instance['bbox'] = bbox
             instance['bbox_label'] = self.cat2label[ann['category_id']]
-            instance['mask'] = ann['segmentation']
+
+            if ann.get('segmentation', False):
+                instance['mask'] = ann['segmentation']
 
             instances.append(instance)
         data_info['instances'] = instances

@@ -1,16 +1,23 @@
-
 # Copyright (c) OpenMMLab. All rights reserved.
+import json
+import os
 # Written by dingjiansw101
 # Reference: https://github.com/CAPTAIN-WHU/DOTA_devkit/blob/master/DOTA2COCO.py
 from argparse import ArgumentParser
 
-import os
 import cv2
-import json
-import shapely.geometry as shgeo
 
-wordname_15 = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
-               'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter']
+try:
+    import shapely.geometry as shgeo
+except ImportError:
+    shgeo = None
+
+wordname_15 = [
+    'plane', 'baseball-diamond', 'bridge', 'ground-track-field',
+    'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
+    'basketball-court', 'storage-tank', 'soccer-ball-field', 'roundabout',
+    'harbor', 'swimming-pool', 'helicopter'
+]
 
 
 def parse_args():
@@ -20,10 +27,11 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-def GetFileFromThisRootDir(dir,ext = None):
+
+def GetFileFromThisRootDir(dir, ext=None):
     allfiles = []
     needExtFilter = (ext != None)
-    for root,dirs,files in os.walk(dir):
+    for root, dirs, files in os.walk(dir):
         for filespath in files:
             filepath = os.path.join(root, filespath)
             extension = os.path.splitext(filepath)[1][1:]
@@ -33,10 +41,11 @@ def GetFileFromThisRootDir(dir,ext = None):
                 allfiles.append(filepath)
     return allfiles
 
+
 def parse_dota_poly(filename):
-    """
-        parse the dota ground truth in the format:
-        [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
+    """parse the dota ground truth in the format:
+
+    [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
     """
     objects = []
     f = []
@@ -51,16 +60,20 @@ def parse_dota_poly(filename):
             if (len(splitlines) < 9):
                 continue
             if (len(splitlines) >= 9):
-                    object_struct['name'] = splitlines[8]
+                object_struct['name'] = splitlines[8]
             if (len(splitlines) == 9):
                 object_struct['difficult'] = '0'
             elif (len(splitlines) >= 10):
                 object_struct['difficult'] = splitlines[9]
-            object_struct['poly'] = [(float(splitlines[0]), float(splitlines[1])),
-                                     (float(splitlines[2]), float(splitlines[3])),
-                                     (float(splitlines[4]), float(splitlines[5])),
-                                     (float(splitlines[6]), float(splitlines[7]))
-                                     ]
+            object_struct['poly'] = [
+                (float(splitlines[0]), float(splitlines[1])),
+                (float(splitlines[2]), float(splitlines[3])),
+                (float(splitlines[4]), float(splitlines[5])),
+                (float(splitlines[6]), float(splitlines[7]))
+            ]
+            if shgeo is None:
+                raise ImportError('Please run "pip install shapely" '
+                                  'to install shapely first.')
             gtpoly = shgeo.Polygon(object_struct['poly'])
             object_struct['area'] = gtpoly.area
             objects.append(object_struct)
@@ -68,33 +81,36 @@ def parse_dota_poly(filename):
             break
     return objects
 
+
 def parse_dota_poly2(filename):
-    """
-        parse the dota ground truth in the format:
-        [x1, y1, x2, y2, x3, y3, x4, y4]
+    """parse the dota ground truth in the format:
+
+    [x1, y1, x2, y2, x3, y3, x4, y4]
     """
     objects = parse_dota_poly(filename)
     for obj in objects:
         poly = obj['poly']
-        obj['poly'] = [poly[0][0], poly[0][1],
-                       poly[1][0], poly[1][1],
-                       poly[2][0], poly[2][1],
-                       poly[3][0], poly[3][1]
-                       ]
+        obj['poly'] = [
+            poly[0][0], poly[0][1], poly[1][0], poly[1][1], poly[2][0],
+            poly[2][1], poly[3][0], poly[3][1]
+        ]
         obj['poly'] = list(map(int, obj['poly']))
     return objects
+
 
 def main(args):
     imageparent = os.path.join(args.srcpath, 'images')
     labelparent = os.path.join(args.srcpath, 'annfiles')
 
     data_dict = {}
-    info = {'contributor': 'captain group',
-           'data_created': '2018',
-           'description': 'This is 1.0 version of DOTA dataset.',
-           'url': 'http://captain.whu.edu.cn/DOTAweb/',
-           'version': '1.0',
-           'year': 2018}
+    info = {
+        'contributor': 'captain group',
+        'data_created': '2018',
+        'description': 'This is 1.0 version of DOTA dataset.',
+        'url': 'http://captain.whu.edu.cn/DOTAweb/',
+        'version': '1.0',
+        'year': 2018
+    }
     data_dict['info'] = info
     data_dict['images'] = []
     data_dict['categories'] = []
@@ -140,6 +156,7 @@ def main(args):
                 inst_count = inst_count + 1
             image_id = image_id + 1
         json.dump(data_dict, f_out)
+
 
 if __name__ == '__main__':
     args = parse_args()
