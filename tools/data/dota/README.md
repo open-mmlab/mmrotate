@@ -52,8 +52,7 @@ python tools/data/dota/split/img_split.py --base-json \
   tools/data/dota/split/split_configs/ms_test.json
 ```
 
-Please update the `img_dirs` and `ann_dirs` in json. 
-
+Please update the `img_dirs` and `ann_dirs` in json.
 
 The new data structure is as follows:
 
@@ -79,11 +78,11 @@ Please change `data_root` in `configs/_base_/datasets/dota.py` to `data/split_ss
 Please convert the annotations from txt to json by run
 
 ```shell
-python tools/data/dota/txt2json.py \
+python tools/data/dota/dota2coco.py \
   data/split_ss_dota/trainval/ \
   data/split_ss_dota/trainval.json
 
-python tools/data/dota/txt2json.py \
+python tools/data/dota/dota2coco.py \
   data/split_ss_dota/test/ \
   data/split_ss_dota/test.json
 ```
