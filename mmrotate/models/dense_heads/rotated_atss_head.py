@@ -6,12 +6,14 @@ import torch.nn as nn
 from mmcv.cnn import ConvModule, Scale
 from mmdet.models.dense_heads.atss_head import ATSSHead
 from mmdet.models.task_modules.prior_generators import anchor_inside_flags
-from mmdet.models.utils import get_box_tensor, unmap
+from mmdet.models.utils import images_to_levels, multi_apply, unmap
+from mmdet.structures.bbox import cat_boxes, get_box_tensor
+from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.structures import InstanceData
 from torch import Tensor
 
-from mmrotate.core.bbox.structures import RotatedBoxes
 from mmrotate.registry import MODELS
+from mmrotate.structures.bbox import RotatedBoxes
 
 
 @MODELS.register_module()
@@ -301,3 +303,61 @@ class RotatedATSSHead(ATSSHead):
 
         return (anchors, labels, label_weights, bbox_targets, bbox_weights,
                 pos_inds, neg_inds, sampling_result)
+
+    def get_targets(self,
+                    anchor_list: List[List[Tensor]],
+                    valid_flag_list: List[List[Tensor]],
+                    batch_gt_instances: InstanceList,
+                    batch_img_metas: List[dict],
+                    batch_gt_instances_ignore: OptInstanceList = None,
+                    unmap_outputs: bool = True) -> tuple:
+        """Get targets for ATSS head.
+
+        This method is almost the same as `AnchorHead.get_targets()`. Besides
+        returning the targets as the parent method does, it also returns the
+        anchors as the first element of the returned tuple.
+        """
+        num_imgs = len(batch_img_metas)
+        assert len(anchor_list) == len(valid_flag_list) == num_imgs
+
+        # anchor number of multi levels
+        num_level_anchors = [anchors.size(0) for anchors in anchor_list[0]]
+        num_level_anchors_list = [num_level_anchors] * num_imgs
+
+        # concat all level anchors and flags to a single tensor
+        for i in range(num_imgs):
+            assert len(anchor_list[i]) == len(valid_flag_list[i])
+            anchor_list[i] = cat_boxes(anchor_list[i])
+            valid_flag_list[i] = cat_boxes(valid_flag_list[i])
+
+        # compute targets for each image
+        if batch_gt_instances_ignore is None:
+            batch_gt_instances_ignore = [None] * num_imgs
+        (all_anchors, all_labels, all_label_weights, all_bbox_targets,
+         all_bbox_weights, pos_inds_list, neg_inds_list,
+         sampling_results_list) = multi_apply(
+             self._get_targets_single,
+             anchor_list,
+             valid_flag_list,
+             num_level_anchors_list,
+             batch_gt_instances,
+             batch_img_metas,
+             batch_gt_instances_ignore,
+             unmap_outputs=unmap_outputs)
+        # Get `avg_factor` of all images, which calculate in `SamplingResult`.
+        # When using sampling method, avg_factor is usually the sum of
+        # positive and negative priors. When using `PseudoSampler`,
+        # `avg_factor` is usually equal to the number of positive priors.
+        avg_factor = sum(
+            [results.avg_factor for results in sampling_results_list])
+        # split targets to a list w.r.t. multiple levels
+        anchors_list = images_to_levels(all_anchors, num_level_anchors)
+        labels_list = images_to_levels(all_labels, num_level_anchors)
+        label_weights_list = images_to_levels(all_label_weights,
+                                              num_level_anchors)
+        bbox_targets_list = images_to_levels(all_bbox_targets,
+                                             num_level_anchors)
+        bbox_weights_list = images_to_levels(all_bbox_weights,
+                                             num_level_anchors)
+        return (anchors_list, labels_list, label_weights_list,
+                bbox_targets_list, bbox_weights_list, avg_factor)

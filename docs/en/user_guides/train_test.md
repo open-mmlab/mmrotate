@@ -23,7 +23,7 @@ Inference RotatedRetinaNet on DOTA-1.0 dataset, which can generate compressed fi
 
 ```shell
 python ./tools/test.py  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth --format-only \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
@@ -32,7 +32,7 @@ or
 
 ```shell
 ./tools/dist_test.sh  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth 1 --format-only \
   --eval-options submission_dir=work_dirs/Task1_results
 ```
@@ -41,7 +41,7 @@ You can change the test set path in the [data_root](https://github.com/open-mmla
 
 ```shell
 python ./tools/test.py \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth --eval mAP
 ```
 
@@ -49,7 +49,7 @@ or
 
 ```shell
 ./tools/dist_test.sh  \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth 1 --eval mAP
 ```
 
@@ -57,7 +57,7 @@ You can also visualize the results.
 
 ```shell
 python ./tools/test.py \
-  configs/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py \
+  configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py \
   checkpoints/SOME_CHECKPOINT.pth \
   --show-dir work_dirs/vis
 ```

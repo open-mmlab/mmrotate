@@ -18,20 +18,20 @@ class TestSingleStageDetector(TestCase):
         register_all_modules()
 
     @parameterized.expand([
-        'rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+        'rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
     ])
     def test_init(self, cfg_file):
         model = get_detector_cfg(cfg_file)
         model.backbone.init_cfg = None
 
-        from mmrotate.models import build_detector
-        detector = build_detector(model)
+        from mmrotate.registry import MODELS
+        detector = MODELS.build(model)
         self.assertTrue(detector.backbone)
         self.assertTrue(detector.neck)
         self.assertTrue(detector.bbox_head)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+        ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
          ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_loss_mode(self, cfg_file, devices):
@@ -42,11 +42,11 @@ class TestSingleStageDetector(TestCase):
         model = get_detector_cfg(cfg_file)
         model.backbone.init_cfg = None
 
-        from mmrotate.models import build_detector
+        from mmrotate.registry import MODELS
         assert all([device in ['cpu', 'cuda'] for device in devices])
 
         for device in devices:
-            detector = build_detector(model)
+            detector = MODELS.build(model)
             detector.init_weights()
 
             if device == 'cuda':
@@ -60,18 +60,18 @@ class TestSingleStageDetector(TestCase):
             self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+        ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
          ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_predict_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
         model.backbone.init_cfg = None
 
-        from mmrotate.models import build_detector
+        from mmrotate.registry import MODELS
         assert all([device in ['cpu', 'cuda'] for device in devices])
 
         for device in devices:
-            detector = build_detector(model)
+            detector = MODELS.build(model)
 
             if device == 'cuda':
                 if not torch.cuda.is_available():
@@ -89,18 +89,18 @@ class TestSingleStageDetector(TestCase):
                 self.assertIsInstance(batch_results[0], DetDataSample)
 
     @parameterized.expand([
-        ('rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90.py',
+        ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
          ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_tensor_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
         model.backbone.init_cfg = None
 
-        from mmrotate.models import build_detector
+        from mmrotate.registry import MODELS
         assert all([device in ['cpu', 'cuda'] for device in devices])
 
         for device in devices:
-            detector = build_detector(model)
+            detector = MODELS.build(model)
 
             if device == 'cuda':
                 if not torch.cuda.is_available():

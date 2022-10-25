@@ -14,9 +14,9 @@ Collections:
   README: configs/cfa/README.md
 
 Models:
-  - Name: gliding_vertex_r50_fpn_1x_dota_le90
+  - Name: gliding-vertex-rbox_r50_fpn_1x_dota
     In Collection: gliding_vertex
-    Config: configs/gliding_vertex/gliding_vertex_r50_fpn_1x_dota_le90.py
+    Config: configs/gliding_vertex/gliding-vertex-rbox_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:

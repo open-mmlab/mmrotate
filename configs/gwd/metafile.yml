@@ -14,9 +14,9 @@ Collections:
   README: configs/gwd/README.md
 
 Models:
-  - Name: rotated_retinanet_hbb_gwd_r50_fpn_1x_dota_oc
+  - Name: rotated-retinanet-hbox-oc_r50_fpn_gwd_1x_dota
     In Collection: gwd
-    Config: configs/gwd/rotated_retinanet_hbb_gwd_r50_fpn_1x_dota_oc.py
+    Config: configs/gwd/rotated-retinanet-hbox-oc_r50_fpn_gwd_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:

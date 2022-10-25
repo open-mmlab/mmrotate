@@ -16,8 +16,8 @@ class TestTwoStageBBox(TestCase):
         register_all_modules()
 
     @parameterized.expand([
-        'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
-        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
+        'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
+        'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
     ])
     def test_init(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -26,8 +26,8 @@ class TestTwoStageBBox(TestCase):
         model.neck.in_channels = [64, 128, 256, 512]
         model.backbone.init_cfg = None
 
-        from mmdet.models import build_detector
-        detector = build_detector(model)
+        from mmdet.registry import MODELS
+        detector = MODELS.build(model)
         self.assertTrue(detector.backbone)
         self.assertTrue(detector.neck)
         self.assertTrue(detector.rpn_head)
@@ -36,12 +36,12 @@ class TestTwoStageBBox(TestCase):
         # if rpn.num_classes > 1, force set rpn.num_classes = 1
         if hasattr(model.rpn_head, 'num_classes'):
             model.rpn_head.num_classes = 2
-            detector = build_detector(model)
+            detector = MODELS.build(model)
             self.assertEqual(detector.rpn_head.num_classes, 1)
 
     @parameterized.expand([
-        'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
-        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
+        'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
+        'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
     ])
     def test_two_stage_forward_loss_mode(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -50,8 +50,8 @@ class TestTwoStageBBox(TestCase):
         model.neck.in_channels = [64, 128, 256, 512]
         model.backbone.init_cfg = None
 
-        from mmdet.models import build_detector
-        detector = build_detector(model)
+        from mmdet.registry import MODELS
+        detector = MODELS.build(model)
 
         if not torch.cuda.is_available():
             return unittest.skip('test requires GPU and torch+cuda')
@@ -66,8 +66,8 @@ class TestTwoStageBBox(TestCase):
         self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
-        'rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90.py',
-        'oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90.py',
+        'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
+        'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
     ])
     def test_two_stage_forward_predict_mode(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -76,8 +76,8 @@ class TestTwoStageBBox(TestCase):
         model.neck.in_channels = [64, 128, 256, 512]
         model.backbone.init_cfg = None
 
-        from mmdet.models import build_detector
-        detector = build_detector(model)
+        from mmdet.registry import MODELS
+        detector = MODELS.build(model)
 
         if not torch.cuda.is_available():
             return unittest.skip('test requires GPU and torch+cuda')

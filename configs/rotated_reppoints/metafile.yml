@@ -14,9 +14,9 @@ Collections:
   README: configs/cfa/README.md
 
 Models:
-  - Name: rotated_reppoints_r50_fpn_1x_dota_oc
+  - Name: rotated-reppoints-qbox_r50_fpn_1x_dota
     In Collection: rotated_reppoints
-    Config: configs/rotated_reppoints/rotated_reppoints_r50_fpn_1x_dota_oc.py
+    Config: configs/rotated_reppoints/rotated-reppoints-qbox_r50_fpn_1x_dota.py
     Metadata:
       Training Data: DOTAv1.0
     Results:

@@ -16,8 +16,8 @@ from mmengine.structures import InstanceData
 from torch import Tensor
 from torch.nn.modules.utils import _pair
 
-from mmrotate.core.bbox.structures import QuadriBoxes, hbox2qbox
 from mmrotate.registry import MODELS, TASK_UTILS
+from mmrotate.structures.bbox import QuadriBoxes, hbox2qbox
 
 
 @MODELS.register_module()

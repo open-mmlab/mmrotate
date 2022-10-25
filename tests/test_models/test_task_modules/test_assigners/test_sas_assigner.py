@@ -5,7 +5,7 @@ import torch
 from mmengine.structures import InstanceData
 from mmengine.testing import assert_allclose
 
-from mmrotate.core.bbox.assigners import SASAssigner
+from mmrotate.models.task_modules.assigners import SASAssigner
 
 
 class TestSASAssigner(unittest.TestCase):

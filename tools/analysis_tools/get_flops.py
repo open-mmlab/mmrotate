@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from mmcv import Config, DictAction
 
-from mmrotate.models import build_detector
+from mmrotate.registry import MODELS
 
 try:
     from mmcv.cnn import get_model_complexity_info
@@ -64,7 +64,7 @@ def main():
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
 
-    model = build_detector(
+    model = MODELS.build(
         cfg.model,
         train_cfg=cfg.get('train_cfg'),
         test_cfg=cfg.get('test_cfg'))

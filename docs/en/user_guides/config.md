@@ -290,7 +290,7 @@ It's worth noting that when modifying intermediate variables in the children con
 For example, we would like to use an offline multi-scale strategy to train an RoI-Trans. `train_pipeline` are intermediate variables we would like to modify.
 
 ```python
-_base_ = ['./roi_trans_r50_fpn_1x_dota_le90.py']
+_base_ = ['./roi-trans-le90_r50_fpn_1x_dota.py']
 
 data_root = '../datasets/split_ms_dota1_0/'
 angle_version = 'le90'
@@ -334,7 +334,7 @@ We first define the new `train_pipeline`/`test_pipeline` and pass them into `dat
 Similarly, if we would like to switch from `SyncBN` to `BN` or `MMSyncBN`, we need to substitute every `norm_cfg` in the config.
 
 ```python
-_base_ = './roi_trans_r50_fpn_1x_dota_le90.py'
+_base_ = './roi-trans-le90_r50_fpn_1x_dota.py'
 norm_cfg = dict(type='BN', requires_grad=True)
 model = dict(
     backbone=dict(norm_cfg=norm_cfg),

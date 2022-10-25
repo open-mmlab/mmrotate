@@ -5,7 +5,7 @@ import torch
 from mmengine.structures import InstanceData
 from parameterized import parameterized
 
-from mmrotate.core.bbox.assigners import MaxConvexIoUAssigner
+from mmrotate.models.task_modules.assigners import MaxConvexIoUAssigner
 
 
 class TestMaxConvexIoUAssigner(unittest.TestCase):

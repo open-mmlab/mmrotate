@@ -7,11 +7,11 @@ from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.structures import InstanceData
 from torch import Tensor
 
-from mmrotate.core.bbox.structures import qbox2rbox
 from mmrotate.models.dense_heads.rotated_reppoints_head import \
     RotatedRepPointsHead
 from mmrotate.registry import MODELS
-from .utils import get_num_level_anchors_inside, points_center_pts
+from mmrotate.structures.bbox import qbox2rbox
+from ..utils import get_num_level_anchors_inside, points_center_pts
 
 
 @MODELS.register_module()
