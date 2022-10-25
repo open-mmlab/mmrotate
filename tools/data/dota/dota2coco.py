@@ -2,7 +2,7 @@
 import json
 import os
 # Written by dingjiansw101
-# Reference: https://github.com/CAPTAIN-WHU/DOTA_devkit/blob/master/DOTA2COCO.py
+# Reference: https://github.com/CAPTAIN-WHU/DOTA_devkit
 from argparse import ArgumentParser
 
 import cv2
@@ -28,20 +28,6 @@ def parse_args():
     return args
 
 
-def GetFileFromThisRootDir(dir, ext=None):
-    allfiles = []
-    needExtFilter = (ext != None)
-    for root, dirs, files in os.walk(dir):
-        for filespath in files:
-            filepath = os.path.join(root, filespath)
-            extension = os.path.splitext(filepath)[1][1:]
-            if needExtFilter and extension in ext:
-                allfiles.append(filepath)
-            elif not needExtFilter:
-                allfiles.append(filepath)
-    return allfiles
-
-
 def parse_dota_poly(filename):
     """parse the dota ground truth in the format:
 
@@ -56,7 +42,7 @@ def parse_dota_poly(filename):
         if line:
             splitlines = line.strip().split(' ')
             object_struct = {}
-            ### clear the wrong name after check all the data
+            # clear the wrong name after check all the data
             if (len(splitlines) < 9):
                 continue
             if (len(splitlines) >= 9):
@@ -122,7 +108,12 @@ def main(args):
     inst_count = 1
     image_id = 1
     with open(args.destfile, 'w') as f_out:
-        filenames = GetFileFromThisRootDir(labelparent)
+        filenames = []
+        for root, dirs, files in os.walk(labelparent):
+            for filespath in files:
+                filepath = os.path.join(root, filespath)
+                filenames.append(filepath)
+
         for file in filenames:
             basename = os.path.basename(os.path.splitext(file)[0])
             imagepath = os.path.join(imageparent, basename + '.png')
@@ -145,8 +136,10 @@ def main(args):
                 single_obj['segmentation'] = []
                 single_obj['segmentation'].append(obj['poly'])
                 single_obj['iscrowd'] = 0
-                xmin, ymin, xmax, ymax = min(obj['poly'][0::2]), min(obj['poly'][1::2]), \
-                                         max(obj['poly'][0::2]), max(obj['poly'][1::2])
+                xmin, ymin, xmax, ymax = (min(obj['poly'][0::2]),
+                                          min(obj['poly'][1::2]),
+                                          max(obj['poly'][0::2]),
+                                          max(obj['poly'][1::2]))
 
                 width, height = xmax - xmin, ymax - ymin
                 single_obj['bbox'] = xmin, ymin, width, height
