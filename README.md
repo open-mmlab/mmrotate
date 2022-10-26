@@ -75,7 +75,6 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 **v1.0.0rc0** was released in 11/11/2022:
 
 - Unifies interfaces of all components based on [MMEngine](https://github.com/open-mmlab/mmengine).
-- Faster training and testing speed with complete support of mixed precision training.
 
 ## Installation
 

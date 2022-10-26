@@ -71,7 +71,6 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 最新的 **v1.0.0rc0** 版本已经在 2022.11.11 发布:
 
 - 基于 [MMEngine](https://github.com/open-mmlab/mmengine) 统一了各组件接口。
-- 全面支持混合精度，训练测试速度更快。
 
 ## 安装
 
