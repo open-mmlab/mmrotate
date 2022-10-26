@@ -9,9 +9,8 @@ from mmcv.transforms import Compose
 from mmdet.structures import DetDataSample, SampleList
 from torch import nn
 
-from mmrotate.apis import (get_multiscale_patch, merge_results_by_nms,
-                           slide_window)
 from mmrotate.utils import get_test_pipeline_cfg
+from .patch import get_multiscale_patch, merge_results_by_nms, slide_window
 
 ImagesType = Union[str, np.ndarray, Sequence[str], Sequence[np.ndarray]]
 

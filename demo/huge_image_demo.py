@@ -39,6 +39,11 @@ def parse_args():
         default=0.1,
         help='IoU threshould for merging results')
     parser.add_argument(
+        '--merge_nms_type',
+        default='nms_rotated',
+        choices=['nms', 'nms_rotated', 'nms_quadri'],
+        help='NMS type for merging results')
+    parser.add_argument(
         '--device', default='cuda:0', help='Device used for inference')
     parser.add_argument(
         '--palette',
@@ -66,7 +71,7 @@ def main(args):
     visualizer.dataset_meta = model.dataset_meta
 
     # test a huge image by patches
-    nms_cfg = dict(type='nms_rotated', iou_threshold=args.merge_iou_thr)
+    nms_cfg = dict(type=args.merge_nms_type, iou_threshold=args.merge_iou_thr)
     result = inference_detector_by_patches(model, args.img, args.patch_sizes,
                                            args.patch_steps, args.img_ratios,
                                            nms_cfg)
