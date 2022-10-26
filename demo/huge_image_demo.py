@@ -57,7 +57,7 @@ def parse_args():
 
 
 def main(args):
-    # register all modules in mmdet into the registries
+    # register all modules in mmrotate into the registries
     register_all_modules()
 
     # build the model from a config file and a checkpoint file
