@@ -69,7 +69,7 @@ def kfiou_loss(pred,
     Vb_t = 4 * Sigma_t.det().sqrt()
     K = Sigma_p.bmm((Sigma_p + Sigma_t).inverse())
     Sigma = Sigma_p - K.bmm(Sigma_p)
-    Vb = 4 * Sigma.det().clamp(1e-7).sqrt()
+    Vb = 4 * Sigma.det().clamp(eps).sqrt()
     Vb = torch.where(torch.isnan(Vb), torch.full_like(Vb, 0), Vb)
     KFIoU = Vb / (Vb_p + Vb_t - Vb + eps)
 
