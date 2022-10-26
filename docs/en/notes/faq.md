@@ -11,8 +11,8 @@ Compatible MMCV, MMDetection and MMRotate versions are shown as below. Please in
 | MMRotate version |       MMCV version        | MMDetection version |
 | :--------------: | :-----------------------: | :-----------------: |
 |     dev-1.x      |    mmcv-full>=2.0.0rc1    |  mmdet >= 3.0.0rc0  |
-|       main       | mmcv-full>=1.5.0, \<1.6.0 |   mmdet >= 2.22.0   |
-|      0.3.2       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
+|       main       | mmcv-full>=1.5.3, \<1.7.0 |   mmdet >= 2.25.1   |
+|      0.3.2       | mmcv-full>=1.5.3, \<1.7.0 |   mmdet >= 2.25.1   |
 |      0.3.1       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
 |      0.3.0       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
 |      0.2.0       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
