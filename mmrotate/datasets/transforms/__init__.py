@@ -1,9 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from .loading import LoadPatchfromNDArray
+from .loading import LoadPatchFromNDArray
 from .transforms import (ConvertBoxType, RandomChoiceRotate, RandomRotate,
                          Rotate)
 
 __all__ = [
-    'LoadPatchfromNDArray', 'Rotate', 'RandomRotate', 'RandomChoiceRotate',
+    'LoadPatchFromNDArray', 'Rotate', 'RandomRotate', 'RandomChoiceRotate',
     'ConvertBoxType'
 ]

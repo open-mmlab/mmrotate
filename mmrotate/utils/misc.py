@@ -3,6 +3,8 @@ import glob
 import os.path as osp
 import warnings
 
+from mmengine.config import Config
+
 
 def find_latest_checkpoint(path, suffix='pth'):
     """Find the latest checkpoint from the working directory.
@@ -37,3 +39,30 @@ def find_latest_checkpoint(path, suffix='pth'):
             latest = count
             latest_path = checkpoint
     return latest_path
+
+
+def get_test_pipeline_cfg(cfg):
+    """Get the test dataset pipeline from entire config.
+
+    Args:
+        cfg (str or :obj:`ConfigDict`): the entire config. Can be a config
+            file or a ``ConfigDict``.
+
+    Returns:
+        :obj:`ConfigDict`: the config of test dataset.
+    """
+    if isinstance(cfg, str):
+        cfg = Config.fromfile(cfg)
+
+    dataset_cfg = cfg.test_dataloader.dataset
+    test_pipeline = dataset_cfg.get('pipeline', None)
+    # handle dataset wrapper
+    if test_pipeline is None:
+        if 'dataset' in dataset_cfg:
+            test_pipeline = dataset_cfg.dataset.pipeline
+        # handle dataset wrappers like ConcatDataset
+        elif 'datasets' in dataset_cfg:
+            test_pipeline = dataset_cfg.datasets[0].pipeline
+        else:
+            raise RuntimeError('Cannot find `pipeline` in `test_dataloader`')
+    return test_pipeline

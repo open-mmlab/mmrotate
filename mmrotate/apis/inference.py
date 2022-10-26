@@ -11,6 +11,7 @@ from torch import nn
 
 from mmrotate.apis import (get_multiscale_patch, merge_results_by_nms,
                            slide_window)
+from mmrotate.utils import get_test_pipeline_cfg
 
 ImagesType = Union[str, np.ndarray, Sequence[str], Sequence[np.ndarray]]
 
@@ -52,13 +53,13 @@ def inference_detector_by_patches(
 
     if test_pipeline is None:
         cfg = cfg.copy()
-        test_pipeline = cfg.test_dataloader.dataset.pipeline
-        new_test_pipeline, pipeline_types = [], []
+        test_pipeline = get_test_pipeline_cfg(cfg)
+
+        new_test_pipeline = []
         for pipeline in test_pipeline:
             if pipeline['type'] != 'LoadAnnotations' and pipeline[
                     'type'] != 'LoadPanopticAnnotations':
                 new_test_pipeline.append(pipeline)
-                pipeline_types.append(pipeline['type'])
         # set loading pipeline type
         test_pipeline[0].type = 'LoadPatchFromNDArray'
         test_pipeline = Compose(new_test_pipeline)
