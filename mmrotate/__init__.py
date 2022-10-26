@@ -16,7 +16,7 @@ assert (mmcv_version >= digit_version(mmcv_minimum_version)
     f'Please use MMCV >= {mmcv_minimum_version}, ' \
     f'<= {mmcv_maximum_version} instead.'
 
-mmengine_minimum_version = '0.0.0'
+mmengine_minimum_version = '0.1.0'
 mmengine_maximum_version = '1.0.0'
 mmengine_version = digit_version(mmengine.__version__)
 
@@ -26,7 +26,7 @@ assert (mmengine_version >= digit_version(mmengine_minimum_version)
     f'Please install mmengine>={mmengine_minimum_version}, ' \
     f'<{mmengine_maximum_version}.'
 
-mmdet_minimum_version = '3.0.0rc0'
+mmdet_minimum_version = '3.0.0rc1'
 mmdet_maximum_version = '3.1.0'
 mmdet_version = digit_version(mmdet.__version__)
 
