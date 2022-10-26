@@ -2,8 +2,9 @@
 import glob
 import os.path as osp
 import warnings
+from typing import Union
 
-from mmengine.config import Config
+from mmengine.config import Config, ConfigDict
 
 
 def find_latest_checkpoint(path, suffix='pth'):
@@ -41,7 +42,7 @@ def find_latest_checkpoint(path, suffix='pth'):
     return latest_path
 
 
-def get_test_pipeline_cfg(cfg):
+def get_test_pipeline_cfg(cfg: Union[str, ConfigDict]) -> ConfigDict:
     """Get the test dataset pipeline from entire config.
 
     Args:
@@ -54,15 +55,16 @@ def get_test_pipeline_cfg(cfg):
     if isinstance(cfg, str):
         cfg = Config.fromfile(cfg)
 
-    dataset_cfg = cfg.test_dataloader.dataset
-    test_pipeline = dataset_cfg.get('pipeline', None)
-    # handle dataset wrapper
-    if test_pipeline is None:
-        if 'dataset' in dataset_cfg:
-            test_pipeline = dataset_cfg.dataset.pipeline
+    def _get_test_pipeline_cfg(dataset_cfg):
+        if 'pipeline' in dataset_cfg:
+            return dataset_cfg.pipeline
+        # handle dataset wrapper
+        elif 'dataset' in dataset_cfg:
+            return _get_test_pipeline_cfg(dataset_cfg.dataset)
         # handle dataset wrappers like ConcatDataset
         elif 'datasets' in dataset_cfg:
-            test_pipeline = dataset_cfg.datasets[0].pipeline
-        else:
-            raise RuntimeError('Cannot find `pipeline` in `test_dataloader`')
-    return test_pipeline
+            return _get_test_pipeline_cfg(dataset_cfg.datasets[0])
+
+        raise RuntimeError('Cannot find `pipeline` in `test_dataloader`')
+
+    return _get_test_pipeline_cfg(cfg.test_dataloader.dataset)
