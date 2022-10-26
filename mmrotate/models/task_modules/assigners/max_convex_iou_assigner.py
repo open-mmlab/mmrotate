@@ -230,6 +230,8 @@ class MaxConvexIoUAssigner(BaseAssigner):
             overlaps (Tensor): Overlaps between k gt_bboxes and n \
                 bboxes, shape(k, n).
         """
+        if gt_rbboxes.size(0) == 0:
+            return gt_rbboxes.new_zeros((0, points.size(0)))
         overlaps = convex_iou(points, gt_rbboxes)
         overlaps = overlaps.transpose(1, 0)
         return overlaps
