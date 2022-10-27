@@ -1,21 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-"""Inference on huge images.
-
-Example:
-```
-wget -P checkpoint https://download.openmmlab.com/mmrotate/v0.1.0/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90/oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth  # noqa: E501, E261.
-python demo/huge_image_demo.py \
-    demo/dota_demo.jpg \
-    configs/oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py \
-    checkpoint/oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth \
-```
-"""  # nowq
-
 from argparse import ArgumentParser
 
-from mmdet.apis import init_detector, show_result_pyplot
+import mmcv
+from mmdet.apis import init_detector
 
 from mmrotate.apis import inference_detector_by_patches
+from mmrotate.registry import VISUALIZERS
+from mmrotate.utils import register_all_modules
 
 
 def parse_args():
@@ -23,6 +14,7 @@ def parse_args():
     parser.add_argument('img', help='Image file')
     parser.add_argument('config', help='Config file')
     parser.add_argument('checkpoint', help='Checkpoint file')
+    parser.add_argument('--out-file', default=None, help='Path to output file')
     parser.add_argument(
         '--patch_sizes',
         type=int,
@@ -47,6 +39,11 @@ def parse_args():
         default=0.1,
         help='IoU threshould for merging results')
     parser.add_argument(
+        '--merge_nms_type',
+        default='nms_rotated',
+        choices=['nms', 'nms_rotated', 'nms_quadri'],
+        help='NMS type for merging results')
+    parser.add_argument(
         '--device', default='cuda:0', help='Device used for inference')
     parser.add_argument(
         '--palette',
@@ -60,19 +57,37 @@ def parse_args():
 
 
 def main(args):
+    # register all modules in mmrotate into the registries
+    register_all_modules()
+
     # build the model from a config file and a checkpoint file
-    model = init_detector(args.config, args.checkpoint, device=args.device)
+    model = init_detector(
+        args.config, args.checkpoint, palette=args.palette, device=args.device)
+
+    # init visualizer
+    visualizer = VISUALIZERS.build(model.cfg.visualizer)
+    # the dataset_meta is loaded from the checkpoint and
+    # then pass to the model in init_detector
+    visualizer.dataset_meta = model.dataset_meta
+
     # test a huge image by patches
+    nms_cfg = dict(type=args.merge_nms_type, iou_threshold=args.merge_iou_thr)
     result = inference_detector_by_patches(model, args.img, args.patch_sizes,
                                            args.patch_steps, args.img_ratios,
-                                           args.merge_iou_thr)
+                                           nms_cfg)
+
     # show the results
-    show_result_pyplot(
-        model,
-        args.img,
-        result,
-        palette=args.palette,
-        score_thr=args.score_thr)
+    img = mmcv.imread(args.img)
+    img = mmcv.imconvert(img, 'bgr', 'rgb')
+    visualizer.add_datasample(
+        'result',
+        img,
+        data_sample=result,
+        draw_gt=False,
+        show=args.out_file is None,
+        wait_time=0,
+        out_file=args.out_file,
+        pred_score_thr=args.score_thr)
 
 
 if __name__ == '__main__':

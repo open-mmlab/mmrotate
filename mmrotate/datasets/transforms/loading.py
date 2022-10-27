@@ -2,50 +2,44 @@
 from typing import Sequence, Union
 
 import mmcv
-import numpy as np
-from mmcv.transforms import LoadImageFromFile
+from mmcv.transforms import BaseTransform
 
 from mmrotate.registry import TRANSFORMS
 
 
 @TRANSFORMS.register_module()
-class LoadPatchfromNDArray(LoadImageFromFile):
-    """Load a patch from the huge image w.r.t ``results['patch']``. Similar
-    with :obj:`LoadImageFromFile`, but only extract a patch from the original
-    huge image w.r.t ``results['win']``. Requaired Keys:
+class LoadPatchFromNDArray(BaseTransform):
+    """Load a patch from the huge image w.r.t ``results['patch']``.
+
+    Requaired Keys:
 
     - img
-    - win
+    - patch
+
     Modified Keys:
+
     - img
     - img_path
     - img_shape
     - ori_shape
+
     Args:
-        to_float32 (bool): Whether to convert the loaded image to a float32
-            numpy array. If set to False, the loaded image is an uint8 array.
-            Defaults to False.
         pad_val (float or Sequence[float]): Values to be filled in padding
-            areas when padding_mode is 'constant'. Defaults to 0.
-        padding_mode (str): Type of padding. Should be: constant, edge,
-            reflect or symmetric. Defaults to `constant`.
+            areas. Defaults to 0.
     """
 
     def __init__(self,
-                 *args,
                  pad_val: Union[float, Sequence[float]] = 0,
-                 padding_mode: str = 'constant',
                  **kwargs) -> None:
-        super().__init__(*args, **kwargs)
         self.pad_val = pad_val
-        self.padding_mode = padding_mode
 
     def transform(self, results: dict) -> dict:
         """Transform function to add image meta information.
 
         Args:
             results (dict): Result dict with image array in ``results['img']``
-                and patch positioni n ``results['patch']``.
+                and patch position in ``results['patch']``.
+
         Returns:
             dict: The dict contains loaded patch and meta information.
         """
@@ -64,13 +58,7 @@ class LoadPatchfromNDArray(LoadImageFromFile):
 
         patch = image[y1:y2, x1:x2]
         if any(padding):
-            patch = mmcv.impad(
-                patch,
-                padding=padding,
-                pad_val=self.pad_val,
-                padding_mode=self.padding_mode)
-        if self.to_float32:
-            patch = patch.astype(np.float32)
+            patch = mmcv.impad(patch, padding=padding, pad_val=self.pad_val)
 
         results['img_path'] = None
         results['img'] = patch
