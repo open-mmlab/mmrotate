@@ -10,6 +10,7 @@ from mmcv.transforms.utils import cache_randomness
 from mmdet.structures.bbox import BaseBoxes
 
 from mmrotate.registry import TRANSFORMS
+from mmrotate.structures.bbox import get_box_type
 
 
 @TRANSFORMS.register_module()
@@ -376,4 +377,46 @@ class RandomChoiceRotate(BaseTransform):
         repr_str += f'prob={self.prob}, '
         repr_str += f'rect_obj_labels={self.rect_obj_labels}, '
         repr_str += f'rotate_cfg={self.rotate_cfg})'
+        return repr_str
+
+
+@TRANSFORMS.register_module()
+class ConvertMask2BoxType(BaseTransform):
+    """Convert masks in results to a certain box type.
+
+    Required Keys:
+
+    - img
+    - gt_bboxes (BaseBoxes[torch.float32])
+    - gt_masks (BitmapMasks | PolygonMasks)
+    Modified Keys:
+    - gt_bboxes
+    - gt_masks
+
+    Args:
+        box_type (str): The destination box type.
+        keep_mask (bool): Whether to keep the ``gt_masks``.
+            Defaults to False.
+    """
+
+    def __init__(self, box_type: str, keep_mask: bool = False) -> None:
+        _, self.box_type_cls = get_box_type(box_type)
+        assert hasattr(self.box_type_cls, 'from_instance_masks')
+        self.keep_mask = keep_mask
+
+    def transform(self, results: dict) -> dict:
+        """The transform function."""
+        assert 'gt_masks' in results.keys()
+        masks = results['gt_masks']
+        results['gt_bboxes'] = self.box_type_cls.from_instance_masks(masks)
+
+        if not self.keep_mask:
+            results.pop('gt_masks')
+
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(box_type_cls={self.box_type_cls}, '
+        repr_str += f'keep_mask={self.keep_mask})'
         return repr_str
