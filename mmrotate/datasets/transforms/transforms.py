@@ -7,10 +7,9 @@ import mmcv
 import numpy as np
 from mmcv.transforms import BaseTransform
 from mmcv.transforms.utils import cache_randomness
-from mmdet.structures.bbox import BaseBoxes
+from mmdet.structures.bbox import BaseBoxes, get_box_type
 
 from mmrotate.registry import TRANSFORMS
-from mmrotate.structures.bbox import get_box_type
 
 
 @TRANSFORMS.register_module()
