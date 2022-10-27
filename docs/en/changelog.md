@@ -1,5 +1,28 @@
 ## Changelog
 
+### v0.3.3 (27/10/2022)
+
+#### Bug Fixes
+
+- Fix reppoint bug fix when negative image training (#396)
+- Fix bug in oriented_reppoints_head.py (#424)
+- Fix mmcv-full version (#423)
+
+#### Improvements
+
+- Update issue templates to main branch (#579)
+- Fix lint of dev branch (#578)
+
+#### Documentations
+
+- Update citation (#425)
+- Fix markdown version when building docs (#414)
+
+#### Contributors
+
+A total of 5 developers contributed to this release.
+Thanks @yangxue0827, @ZwwWayne, @MinkiSong, @zytx121, @RangiLyu
+
 ### v0.3.2 (6/7/2022)
 
 #### Highlight
