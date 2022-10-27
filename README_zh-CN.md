@@ -68,10 +68,9 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## 最新进展
 
-最新的 **0.3.2** 版本已经在 2022.07.06 发布:
+最新的 **0.3.3** 版本已经在 2022.10.27 发布:
 
-- 支持了 Oriented Reppoints 模型 (CVPR'22) (#286)
-- 支持了 ConvNeXt 骨干网络 (CVPR'22) (#343)
+- 修复了 Reppoints 的一些 bug
 
 如果想了解更多版本更新细节和历史信息，请阅读[更新日志](docs/en/changelog.md)。
 
