@@ -35,11 +35,11 @@ test_pipeline = [
                    'scale_factor'))
 ]
 
-metainfo=dict(
+metainfo = dict(
     CLASSES=('plane', 'baseball-diamond', 'bridge', 'ground-track-field',
-    'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
-    'basketball-court', 'storage-tank', 'soccer-ball-field', 'roundabout',
-    'harbor', 'swimming-pool', 'helicopter'))
+             'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
+             'basketball-court', 'storage-tank', 'soccer-ball-field',
+             'roundabout', 'harbor', 'swimming-pool', 'helicopter'))
 
 train_dataloader = dict(
     batch_size=1,
