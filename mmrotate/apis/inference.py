@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union
 
 import mmcv
 import numpy as np
@@ -18,9 +18,9 @@ ImagesType = Union[str, np.ndarray, Sequence[str], Sequence[np.ndarray]]
 def inference_detector_by_patches(
         model: nn.Module,
         imgs: ImagesType,
-        sizes: list[int],
-        steps: list[int],
-        ratios: list[float],
+        sizes: List[int],
+        steps: List[int],
+        ratios: List[float],
         nms_cfg: dict,
         test_pipeline: Optional[Compose] = None,
         bs: int = 1) -> Union[DetDataSample, SampleList]:

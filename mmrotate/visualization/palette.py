@@ -1,15 +1,18 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import List, Tuple, Union
+
 import mmcv
 import numpy as np
+from mmengine.utils import is_str
 
 
-def get_palette(palette, num_classes):
+def get_palette(palette: Union[List[tuple], str, tuple],
+                num_classes: int) -> List[Tuple[int]]:
     """Get palette from various inputs.
 
     Args:
-        palette (list[tuple] | str | tuple | :obj:`Color`): palette inputs.
+        palette (list[tuple] | str | tuple): palette inputs.
         num_classes (int): the number of classes.
-
     Returns:
         list[tuple[int]]: A list of color tuples.
     """
@@ -28,17 +31,14 @@ def get_palette(palette, num_classes):
         dataset_palette = [tuple(c) for c in palette]
     elif palette == 'dota':
         from mmrotate.datasets import DOTADataset
-        dataset_palette = DOTADataset.PALETTE
+        dataset_palette = DOTADataset.METAINFO['PALETTE']
     elif palette == 'sar':
         from mmrotate.datasets import SARDataset
-        dataset_palette = SARDataset.PALETTE
+        dataset_palette = SARDataset.METAINFO['PALETTE']
     elif palette == 'hrsc':
         from mmrotate.datasets import HRSCDataset
-        dataset_palette = HRSCDataset.PALETTE
-    elif palette == 'hrsc_classwise':
-        from mmrotate.datasets import HRSCDataset
-        dataset_palette = HRSCDataset.CLASSWISE_PALETTE
-    elif mmcv.is_str(palette):
+        dataset_palette = HRSCDataset.METAINFO['PALETTE']
+    elif is_str(palette):
         dataset_palette = [mmcv.color_val(palette)[::-1]] * num_classes
     else:
         raise TypeError(f'Invalid type for palette: {type(palette)}')
