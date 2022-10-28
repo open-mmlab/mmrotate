@@ -3,12 +3,12 @@ import argparse
 import os.path as osp
 
 import numpy as np
-from mmengine.config import Config, DictAction
-from mmengine.utils import ProgressBar
-
 from mmdet.models.utils import mask2ndarray
 from mmdet.registry import DATASETS, VISUALIZERS
 from mmdet.structures.bbox import BaseBoxes
+from mmengine.config import Config, DictAction
+from mmengine.utils import ProgressBar
+
 from mmrotate.utils import register_all_modules
 
 

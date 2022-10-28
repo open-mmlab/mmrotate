@@ -1,18 +1,22 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List, Optional
 
 import cv2
 import numpy as np
 import torch
-from mmrotate.registry import VISUALIZERS
 from mmdet.structures.mask import BitmapMasks, PolygonMasks, bitmap_to_polygon
 from mmdet.visualization import DetLocalVisualizer, jitter_color
 from mmdet.visualization.palette import _get_adaptive_scales
+from mmengine.structures import InstanceData
+
+from mmrotate.registry import VISUALIZERS
 from .palette import get_palette
+
 
 @VISUALIZERS.register_module()
 class RotLocalVisualizer(DetLocalVisualizer):
     """MMRotate Local Visualizer.
+
     Args:
         name (str): Name of the instance. Defaults to 'visualizer'.
         image (np.ndarray, optional): the origin image to draw. The format
@@ -34,10 +38,12 @@ class RotLocalVisualizer(DetLocalVisualizer):
         alpha (int, float): The transparency of bboxes or mask.
             Defaults to 0.8.
     """
+
     def _draw_instances(self, image: np.ndarray, instances: ['InstanceData'],
                         classes: Optional[List[str]],
                         palette: Optional[List[tuple]]) -> np.ndarray:
         """Draw instances of GT or prediction.
+
         Args:
             image (np.ndarray): The image to draw.
             instances (:obj:`InstanceData`): Data structure for
