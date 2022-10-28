@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from mmrotate.datasets import DotaDataset
+from mmrotate.datasets import DOTADataset
 from mmrotate.visualization import get_palette
 
 
@@ -24,8 +24,8 @@ def test_palette():
         assert color == (255, 0, 0)
 
     # test dataset str
-    palette = get_palette('dota', len(DotaDataset.METAINFO['CLASSES']))
-    assert len(palette) == len(DotaDataset.METAINFO['CLASSES'])
+    palette = get_palette('dota', len(DOTADataset.METAINFO['CLASSES']))
+    assert len(palette) == len(DOTADataset.METAINFO['CLASSES'])
     assert palette[0] == (165, 42, 42)
 
     # test random

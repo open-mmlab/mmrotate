@@ -32,15 +32,19 @@ class TestRotLocalVisualizer(TestCase):
         gt_instances = InstanceData()
         gt_instances.bboxes = _rand_rbboxes(num_bboxes, h, w)
         gt_instances.labels = torch.randint(0, num_class, (num_bboxes, ))
-        gt_rot_data_sample = DetDataSample()
-        gt_rot_data_sample.gt_instances = gt_instances
+        det_data_sample = DetDataSample()
+        det_data_sample.gt_instances = gt_instances
 
         rot_local_visualizer = RotLocalVisualizer()
-        rot_local_visualizer.add_datasample('image', image, gt_rot_data_sample)
+        rot_local_visualizer.add_datasample('image', image, det_data_sample)
 
         # test out_file
         rot_local_visualizer.add_datasample(
-            'image', image, gt_rot_data_sample, out_file=out_file)
+            'image',
+            image,
+            det_data_sample,
+            draw_pred=False,
+            out_file=out_file)
         assert os.path.exists(out_file)
         drawn_img = cv2.imread(out_file)
         assert drawn_img.shape == (h, w, 3)
@@ -51,31 +55,21 @@ class TestRotLocalVisualizer(TestCase):
         pred_instances.bboxes = _rand_rbboxes(num_bboxes, h, w)
         pred_instances.labels = torch.randint(0, num_class, (num_bboxes, ))
         pred_instances.scores = torch.rand((num_bboxes, ))
-        pred_rot_data_sample = DetDataSample()
-        pred_rot_data_sample.pred_instances = pred_instances
+        det_data_sample = DetDataSample()
+        det_data_sample.pred_instances = pred_instances
 
         rot_local_visualizer.add_datasample(
-            'image',
-            image,
-            gt_rot_data_sample,
-            pred_rot_data_sample,
-            out_file=out_file)
+            'image', image, det_data_sample, out_file=out_file)
         self._assert_image_and_shape(out_file, (h, w * 2, 3))
 
         rot_local_visualizer.add_datasample(
-            'image',
-            image,
-            gt_rot_data_sample,
-            pred_rot_data_sample,
-            draw_gt=False,
-            out_file=out_file)
+            'image', image, det_data_sample, draw_gt=False, out_file=out_file)
         self._assert_image_and_shape(out_file, (h, w, 3))
 
         rot_local_visualizer.add_datasample(
             'image',
             image,
-            gt_rot_data_sample,
-            pred_rot_data_sample,
+            det_data_sample,
             draw_pred=False,
             out_file=out_file)
         self._assert_image_and_shape(out_file, (h, w, 3))
