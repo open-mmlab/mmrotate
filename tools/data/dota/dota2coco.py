@@ -3,7 +3,6 @@
 # Reference: https://github.com/CAPTAIN-WHU/DOTA_devkit
 import json
 import os
-
 from argparse import ArgumentParser
 
 import cv2
@@ -32,6 +31,7 @@ def parse_args():
 
 def parse_dota_poly(filename):
     """parse the dota ground truth in the format:
+
     [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
     """
     objects = []
@@ -71,6 +71,7 @@ def parse_dota_poly(filename):
 
 def parse_dota_poly2(filename):
     """parse the dota ground truth in the format:
+
     [x1, y1, x2, y2, x3, y3, x4, y4]
     """
     objects = parse_dota_poly(filename)

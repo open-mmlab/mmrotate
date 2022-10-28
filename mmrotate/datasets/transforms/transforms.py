@@ -390,12 +390,14 @@ class ConvertMask2BoxType(BaseTransform):
 
     Required Keys:
 
-    - img
+    - ori_shape
     - gt_bboxes (BaseBoxes[torch.float32])
     - gt_masks (BitmapMasks | PolygonMasks)
+    - instances (List[dict]) (optional)
     Modified Keys:
     - gt_bboxes
     - gt_masks
+    - instances
 
     Args:
         box_type (str): The destination box type.
@@ -416,7 +418,7 @@ class ConvertMask2BoxType(BaseTransform):
         if not self.keep_mask:
             results.pop('gt_masks')
 
-        # for RotatedCocoMetric
+        # Modify results['instances'] for RotatedCocoMetric
         converted_instances = []
         for instance in results['instances']:
             m = np.array(instance['mask'][0])
