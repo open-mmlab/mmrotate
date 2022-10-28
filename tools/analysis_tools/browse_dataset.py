@@ -2,13 +2,13 @@
 import argparse
 import os.path as osp
 
-import mmcv
 import numpy as np
-from mmcv import Config, DictAction
+from mmengine.config import Config, DictAction
+from mmengine.utils import ProgressBar
+
 from mmdet.models.utils import mask2ndarray
 from mmdet.registry import DATASETS, VISUALIZERS
 from mmdet.structures.bbox import BaseBoxes
-
 from mmrotate.utils import register_all_modules
 
 
@@ -53,12 +53,12 @@ def main():
     visualizer = VISUALIZERS.build(cfg.visualizer)
     visualizer.dataset_meta = dataset.metainfo
 
-    progress_bar = mmcv.ProgressBar(len(dataset))
+    progress_bar = ProgressBar(len(dataset))
     for item in dataset:
         img = item['inputs'].permute(1, 2, 0).numpy()
-        data_sample = item['data_sample'].numpy()
+        data_sample = item['data_samples'].numpy()
         gt_instances = data_sample.gt_instances
-        img_path = osp.basename(item['data_sample'].img_path)
+        img_path = osp.basename(item['data_samples'].img_path)
 
         out_file = osp.join(
             args.output_dir,
