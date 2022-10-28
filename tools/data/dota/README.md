@@ -106,4 +106,4 @@ mmrotate
 │   │   │   ├── test.json
 ```
 
-Please change `data_root` in `configs/_base_/datasets/coco_rbox.py` to `data/split_ss_dota`.
+Please change `data_root` in `configs/_base_/datasets/dota_coco.py` to `data/split_ss_dota`.
