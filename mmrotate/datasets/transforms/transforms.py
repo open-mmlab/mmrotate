@@ -8,6 +8,7 @@ import numpy as np
 from mmcv.transforms import BaseTransform
 from mmcv.transforms.utils import cache_randomness
 from mmdet.structures.bbox import BaseBoxes, get_box_type
+from mmdet.structures.mask import PolygonMasks
 
 from mmrotate.registry import TRANSFORMS
 
@@ -140,6 +141,8 @@ class Rotate(BaseTransform):
 
     def _transform_bboxes(self, results: dict) -> None:
         """Rotate the bboxes."""
+        if len(results['gt_bboxes']) == 0:
+            return
         img_shape = results['img_shape']
         center = (img_shape[1] * 0.5, img_shape[0] * 0.5)
         results['gt_bboxes'].rotate_(center, self.rotate_angle)
@@ -149,6 +152,8 @@ class Rotate(BaseTransform):
         """Filter invalid data w.r.t `gt_bboxes`"""
         height, width = results['img_shape']
         if 'gt_bboxes' in results:
+            if len(results['gt_bboxes']) == 0:
+                return
             bboxes = results['gt_bboxes']
             valid_index = results['gt_bboxes'].is_inside([height,
                                                           width]).numpy()
@@ -408,9 +413,21 @@ class ConvertMask2BoxType(BaseTransform):
         assert 'gt_masks' in results.keys()
         masks = results['gt_masks']
         results['gt_bboxes'] = self.box_type_cls.from_instance_masks(masks)
-
         if not self.keep_mask:
             results.pop('gt_masks')
+
+        # for RotatedCocoMetric
+        converted_instances = []
+        for instance in results['instances']:
+            m = np.array(instance['mask'][0])
+            m = PolygonMasks([[m]], results['ori_shape'][1],
+                             results['ori_shape'][0])
+            instance['bbox'] = self.box_type_cls.from_instance_masks(
+                m).tensor[0].numpy().tolist()
+            if not self.keep_mask:
+                instance.pop('mask')
+            converted_instances.append(instance)
+        results['instances'] = converted_instances
 
         return results
 
