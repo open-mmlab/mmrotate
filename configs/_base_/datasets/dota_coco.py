@@ -5,7 +5,11 @@ file_client_args = dict(backend='disk')
 
 train_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
-    dict(type='mmdet.LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(
+        type='mmdet.LoadAnnotations',
+        with_bbox=True,
+        with_mask=True,
+        poly2mask=False),
     dict(type='ConvertMask2BoxType', box_type='rbox'),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     dict(
@@ -18,7 +22,11 @@ val_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     # avoid bboxes being resized
-    dict(type='mmdet.LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(
+        type='mmdet.LoadAnnotations',
+        with_bbox=True,
+        with_mask=True,
+        poly2mask=False),
     dict(type='ConvertMask2BoxType', box_type='rbox'),
     dict(
         type='mmdet.PackDetInputs',
@@ -42,7 +50,7 @@ metainfo = dict(
              'roundabout', 'harbor', 'swimming-pool', 'helicopter'))
 
 train_dataloader = dict(
-    batch_size=1,
+    batch_size=2,
     num_workers=2,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
