@@ -132,8 +132,7 @@ def analyze_per_img_dets(confusion_matrix,
         det_scores = result['scores'][mask].numpy()
 
         if nms_iou_thr:
-            det_bboxes, _ = nms_rotated(det_bboxes[:, :5], det_bboxes[:, -1],
-                                        nms_iou_thr)
+            det_bboxes, _ = nms_rotated(det_bboxes, det_scores, nms_iou_thr)
         ious = rbbox_overlaps(det_bboxes[:, :5], gt_bboxes)
         for i, det_bbox in enumerate(det_bboxes):
             score = det_bbox[5]
