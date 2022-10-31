@@ -27,7 +27,7 @@ val_pipeline = [
         with_bbox=True,
         with_mask=True,
         poly2mask=False),
-    dict(type='ConvertMask2BoxType', box_type='rbox'),
+    dict(type='ConvertMask2BoxType', box_type='qbox'),
     dict(
         type='mmdet.PackDetInputs',
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
