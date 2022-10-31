@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import argparse
 
-from mmengine import Config, DictAction
-
 from mmdet.utils import replace_cfg_vals, update_data_root
+from mmengine import Config, DictAction
 
 
 def parse_args():

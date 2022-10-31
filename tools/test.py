@@ -3,6 +3,7 @@ import argparse
 import os
 import os.path as osp
 
+from mmdet.utils import add_dump_metric
 from mmdet.utils import register_all_modules as register_all_modules_mmdet
 from mmengine.config import Config, DictAction
 from mmengine.registry import RUNNERS
@@ -19,6 +20,10 @@ def parse_args():
     parser.add_argument(
         '--work-dir',
         help='the directory to save the file containing evaluation metrics')
+    parser.add_argument(
+        '--out',
+        type=str,
+        help='dump predictions to a pickle file for offline evaluation')
     parser.add_argument(
         '--show', action='store_true', help='show prediction results')
     parser.add_argument(
@@ -97,6 +102,12 @@ def main():
 
     if args.show or args.show_dir:
         cfg = trigger_visualization_hook(cfg, args)
+
+    # Dump predictions
+    if args.out is not None:
+        assert args.out.endswith(('.pkl', '.pickle')), \
+            'The dump file must be a pkl file.'
+        add_dump_metric(args, cfg)
 
     # build the runner from config
     if 'runner_type' not in cfg:
