@@ -22,6 +22,10 @@ def cal_train_time(log_dicts, args):
                 all_times.append(log_dict[epoch]['time'])
             else:
                 all_times.append(log_dict[epoch]['time'][1:])
+        if not all_times:
+            raise KeyError(
+                'Please reduce the log interval in the config so that'
+                'interval is less than iterations of one epoch.')
         all_times = np.array(all_times)
         epoch_ave_time = all_times.mean(-1)
         slowest_epoch = epoch_ave_time.argmax()
@@ -59,29 +63,31 @@ def plot_curve(log_dicts, args):
         epochs = list(log_dict.keys())
         for j, metric in enumerate(metrics):
             print(f'plot curve of {args.json_logs[i]}, metric is {metric}')
-            if metric not in log_dict[epochs[0]]:
+            if metric not in log_dict[epochs[int(args.eval_interval) - 1]]:
+                if 'mAP' in metric:
+                    raise KeyError(
+                        f'{args.json_logs[i]} does not contain metric '
+                        f'{metric}. Please check if "--no-validate" is '
+                        'specified when you trained the model.')
                 raise KeyError(
-                    f'{args.json_logs[i]} does not contain metric {metric}')
+                    f'{args.json_logs[i]} does not contain metric {metric}. '
+                    'Please reduce the log interval in the config so that '
+                    'interval is less than iterations of one epoch.')
 
             if 'mAP' in metric:
-                xs = np.arange(1, max(epochs) + 1)
+                xs = []
                 ys = []
                 for epoch in epochs:
                     ys += log_dict[epoch][metric]
-                ax = plt.gca()
-                ax.set_xticks(xs)
+                    xs += [epoch]
                 plt.xlabel('epoch')
                 plt.plot(xs, ys, label=legend[i * num_metrics + j], marker='o')
             else:
                 xs = []
                 ys = []
-                num_iters_per_epoch = log_dict[epochs[0]]['iter'][-2]
                 for epoch in epochs:
-                    iters = log_dict[epoch]['iter']
-                    if log_dict[epoch]['mode'][-1] == 'val':
-                        iters = iters[:-1]
-                    xs.append(
-                        np.array(iters) + (epoch - 1) * num_iters_per_epoch)
+                    iters = log_dict[epoch]['step']
+                    xs.append(np.array(iters))
                     ys.append(np.array(log_dict[epoch][metric][:len(iters)]))
                 xs = np.concatenate(xs)
                 ys = np.concatenate(ys)
@@ -114,6 +120,16 @@ def add_plot_parser(subparsers):
         nargs='+',
         default=['bbox_mAP'],
         help='the metric that you want to plot')
+    parser_plt.add_argument(
+        '--start-epoch',
+        type=str,
+        default='1',
+        help='the epoch that you want to start')
+    parser_plt.add_argument(
+        '--eval-interval',
+        type=str,
+        default='1',
+        help='the eval interval when training')
     parser_plt.add_argument('--title', type=str, help='title of figure')
     parser_plt.add_argument(
         '--legend',
@@ -157,29 +173,35 @@ def parse_args():
 
 
 def load_json_logs(json_logs):
-    """Load and convert json_logs to log_dict, key is epoch, value is a sub
-    dict keys of sub dict is different metrics, e.g. memory, bbox_mAP value of
-    sub dict is a list of corresponding values of all iterations.
-
-    Args:
-        json_logs (str): json file of logs.
-
-    Returns:
-        dict: dict of logs.
-    """
-    log_dicts = [{} for _ in json_logs]
+    # load and convert json_logs to log_dict, key is epoch, value is a sub dict
+    # keys of sub dict is different metrics, e.g. memory, bbox_mAP
+    # value of sub dict is a list of corresponding values of all iterations
+    log_dicts = [dict() for _ in json_logs]
     for json_log, log_dict in zip(json_logs, log_dicts):
         with open(json_log, 'r') as log_file:
-            for line in log_file:
+            epoch = 1
+            for i, line in enumerate(log_file):
                 log = json.loads(line.strip())
-                # skip lines without `epoch` field
-                if 'epoch' not in log:
+                val_flag = False
+                # skip lines only contains one key
+                if not len(log) > 1:
                     continue
-                epoch = log.pop('epoch')
+
                 if epoch not in log_dict:
                     log_dict[epoch] = defaultdict(list)
+
                 for k, v in log.items():
-                    log_dict[epoch][k].append(v)
+                    if '/' in k:
+                        log_dict[epoch][k.split('/')[-1]].append(v)
+                        val_flag = True
+                    elif val_flag:
+                        continue
+                    else:
+                        log_dict[epoch][k].append(v)
+
+                if 'epoch' in log.keys():
+                    epoch = log['epoch']
+
     return log_dicts
 
 
