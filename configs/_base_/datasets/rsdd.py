@@ -43,7 +43,7 @@ test_pipeline = [
                    'scale_factor'))
 ]
 
-metainfo = dict(CLASSES=('ship',))
+metainfo = dict(CLASSES=('ship', ))
 
 train_dataloader = dict(
     batch_size=2,

@@ -43,8 +43,9 @@ test_pipeline = [
                    'scale_factor'))
 ]
 
-metainfo = dict(CLASSES=('Container', 'Dredger', 'LawEnforce', 'Cell-Container',
-               'ore-oil', 'Fishing'))
+metainfo = dict(
+    CLASSES=('Container', 'Dredger', 'LawEnforce', 'Cell-Container', 'ore-oil',
+             'Fishing'))
 
 train_dataloader = dict(
     batch_size=2,
