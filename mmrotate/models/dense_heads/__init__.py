@@ -10,10 +10,12 @@ from .rotated_reppoints_head import RotatedRepPointsHead
 from .rotated_retina_head import RotatedRetinaHead
 from .s2a_head import S2AHead, S2ARefineHead
 from .sam_reppoints_head import SAMRepPointsHead
+from .rotated_rtmdet_head import RotatedRTMDetHead, RotatedRTMDetSepBNHead
 
 __all__ = [
     'RotatedRetinaHead', 'OrientedRPNHead', 'RotatedRepPointsHead',
     'SAMRepPointsHead', 'AngleBranchRetinaHead', 'RotatedATSSHead',
     'RotatedFCOSHead', 'OrientedRepPointsHead', 'R3Head', 'R3RefineHead',
-    'S2AHead', 'S2ARefineHead', 'CFAHead'
+    'S2AHead', 'S2ARefineHead', 'CFAHead', 'RotatedRTMDetHead',
+    'RotatedRTMDetSepBNHead'
 ]
