@@ -26,9 +26,8 @@ mmrotate
 ├── configs
 ├── data
 │   ├── hrsid
-│   │   ├── trainsplit
-│   │   ├── valsplit
-│   │   ├── testsplit
+│   │   ├── train
+│   │   ├── test
 ```
 
 ## Change base config

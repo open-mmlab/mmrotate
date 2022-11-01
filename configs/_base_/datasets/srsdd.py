@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'mmdet.CocoDataset'
-data_root = 'data/hrsid/'
+data_root = 'data/srsdd/'
 file_client_args = dict(backend='disk')
 
 train_pipeline = [
@@ -11,7 +11,7 @@ train_pipeline = [
         with_mask=True,
         poly2mask=False),
     dict(type='ConvertMask2BoxType', box_type='rbox'),
-    dict(type='mmdet.Resize', scale=(800, 800), keep_ratio=True),
+    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     dict(
         type='mmdet.RandomFlip',
         prob=0.75,
@@ -20,7 +20,7 @@ train_pipeline = [
 ]
 val_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
-    dict(type='mmdet.Resize', scale=(800, 800), keep_ratio=True),
+    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     # avoid bboxes being resized
     dict(
         type='mmdet.LoadAnnotations',
@@ -35,7 +35,7 @@ val_pipeline = [
 ]
 test_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
-    dict(type='mmdet.Resize', scale=(800, 800), keep_ratio=True),
+    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     # avoid bboxes being resized
     dict(
         type='mmdet.PackDetInputs',
@@ -43,7 +43,8 @@ test_pipeline = [
                    'scale_factor'))
 ]
 
-metainfo = dict(CLASSES=('ship', ))
+metainfo = dict(CLASSES=('Container', 'Dredger', 'LawEnforce', 'Cell-Container',
+               'ore-oil', 'Fishing'))
 
 train_dataloader = dict(
     batch_size=2,
