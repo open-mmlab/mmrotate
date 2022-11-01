@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'mmdet.CocoDataset'
-data_root = 'data/hrsid/'
+data_root = 'data/HRSID_JPG/'
 file_client_args = dict(backend='disk')
 
 train_pipeline = [
@@ -55,8 +55,8 @@ train_dataloader = dict(
         type=dataset_type,
         metainfo=metainfo,
         data_root=data_root,
-        ann_file='train/train.json',
-        data_prefix=dict(img='train/images/'),
+        ann_file='annotations/train2017.json',
+        data_prefix=dict(img='JPEGImages/'),
         filter_cfg=dict(filter_empty_gt=True),
         pipeline=train_pipeline))
 val_dataloader = dict(
@@ -69,8 +69,8 @@ val_dataloader = dict(
         type=dataset_type,
         metainfo=metainfo,
         data_root=data_root,
-        ann_file='test/test.json',
-        data_prefix=dict(img='test/images/'),
+        ann_file='annotations/test2017.json',
+        data_prefix=dict(img='JPEGImages/'),
         test_mode=True,
         pipeline=val_pipeline))
 test_dataloader = val_dataloader

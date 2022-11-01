@@ -15,7 +15,7 @@ pages={120234-120254},
 
 ## Download HRSID dataset
 
-The HRSID dataset can be downloaded from [here:0518](https://pan.baidu.com/s/1vks9fj64Bb06U170GNL7mw).
+The HRSID dataset can be downloaded from [here](https://drive.google.com/file/d/1BZTU8Gyg20wqHXtBPFzRazn_lEdvhsbE/view).
 
 The data structure is as follows:
 
@@ -25,11 +25,11 @@ mmrotate
 ├── tools
 ├── configs
 ├── data
-│   ├── hrsid
-│   │   ├── train
-│   │   ├── test
+│   ├── HRSID_JPG
+│   │   ├── JPEGImages
+│   │   ├── annotations
 ```
 
 ## Change base config
 
-Please change `data_root` in `configs/_base_/datasets/hrisd.py` to `data/hrsid/`.
+Please change `data_root` in `configs/_base_/datasets/hrisd.py` to `data/HRSID_JPG/`.
