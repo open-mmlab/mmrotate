@@ -7,7 +7,6 @@ import numpy as np
 from matplotlib.ticker import MultipleLocator
 from mmcv.ops import nms_rotated
 from mmdet.registry import DATASETS
-from mmdet.utils import replace_cfg_vals, update_data_root
 from mmengine import Config, DictAction
 from mmengine.fileio import load
 from mmengine.utils import ProgressBar
@@ -240,12 +239,6 @@ def main():
     args = parse_args()
 
     cfg = Config.fromfile(args.config)
-
-    # replace the ${key} with the value of cfg.key
-    cfg = replace_cfg_vals(cfg)
-
-    # update data root according to MMDET_DATASETS
-    update_data_root(cfg)
 
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
