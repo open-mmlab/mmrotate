@@ -15,7 +15,7 @@ pages={120234-120254},
 
 ## Download HRSID dataset
 
-The HRSID dataset can be downloaded from [here](https://drive.google.com/file/d/1BZTU8Gyg20wqHXtBPFzRazn_lEdvhsbE/view).
+The HRSID dataset can be downloaded from [Google drive](https://drive.google.com/file/d/1BZTU8Gyg20wqHXtBPFzRazn_lEdvhsbE/view).
 
 The data structure is as follows:
 

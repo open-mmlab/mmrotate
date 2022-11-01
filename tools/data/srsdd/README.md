@@ -18,7 +18,7 @@ pages={5104},
 
 ## Download SRSDD dataset
 
-The SRSDD dataset can be downloaded from [here:0518](https://pan.baidu.com/s/1_uezALB6eZ7DiPIozFoGJQ).
+The SRSDD dataset can be downloaded from [Google drive](https://drive.google.com/file/d/1QtCjih1ChOmG-TOPUTlsL3WbMh0L-1zp/view?usp=sharing).
 
 The data structure is as follows:
 

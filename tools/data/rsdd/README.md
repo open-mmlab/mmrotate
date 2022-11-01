@@ -17,7 +17,7 @@ pages={581},
 
 ## Download RSDD dataset
 
-The RSDD dataset can be downloaded from [here:0518](https://pan.baidu.com/s/1_uezALB6eZ7DiPIozFoGJQ).
+The RSDD dataset can be downloaded from [Google drive](https://drive.google.com/file/d/1PJxr7Tbr_ZAzuG8MNloDa4mLaRYCD3qc/view?usp=sharing).
 
 The data structure is as follows:
 

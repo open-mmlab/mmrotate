@@ -17,7 +17,7 @@ pages={3690},
 
 ## Download SSDD dataset
 
-The SSDD dataset can be downloaded from [here:0518](https://pan.baidu.com/s/1_uezALB6eZ7DiPIozFoGJQ).
+The SSDD dataset can be downloaded from [Google drive](https://drive.google.com/file/d/1LmoHBk4xUvm0Zdtm8X7256dHigyFW4Nh/view?usp=sharing).
 
 The data structure is as follows:
 
@@ -30,6 +30,9 @@ mmrotate
 │   ├── ssdd
 │   │   ├── train
 │   │   ├── test
+│   │   │   ├── all
+│   │   │   ├── inshore
+│   │   │   ├── offshore
 ```
 
 ## Change base config
