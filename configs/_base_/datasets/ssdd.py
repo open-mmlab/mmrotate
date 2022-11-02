@@ -36,7 +36,6 @@ val_pipeline = [
 test_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
     dict(type='mmdet.Resize', scale=(512, 512), keep_ratio=True),
-    # avoid bboxes being resized
     dict(
         type='mmdet.PackDetInputs',
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
