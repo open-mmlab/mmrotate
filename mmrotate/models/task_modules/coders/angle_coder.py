@@ -86,8 +86,8 @@ class CSLCoder(BaseBBoxCoder):
             radius_range = (base_radius_range +
                             angle_targets_long) % self.encode_size
             smooth_value = torch.true_divide(
-                torch.exp(-torch.pow(base_radius_range, 2),
-                          2 * self.radius**2))
+                torch.exp(-torch.pow(base_radius_range, 2)),
+                2 * self.radius**2)
 
         else:
             raise NotImplementedError
