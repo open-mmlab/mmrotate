@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import os.path as osp
 import unittest
 
 from mmrotate.datasets import HRSCDataset
@@ -21,10 +22,11 @@ class TestHRSCDataset(unittest.TestCase):
         self.assertEqual(data_list[0]['img_id'], '100000006')
         self.assertEqual(
             data_list[0]['img_path'],
-            'tests/data/hrsc/FullDataSet/AllImages/100000006.bmp')
+            osp.join('tests/data/hrsc/FullDataSet/AllImages', '100000006.bmp'))
         self.assertEqual(
             data_list[0]['xml_path'],
-            'tests/data/hrsc/FullDataSet/Annotations/100000006.xml')
+            osp.join('tests/data/hrsc/FullDataSet/Annotations',
+                     '100000006.xml'))
         self.assertEqual(len(data_list[0]['instances']), 1)
         self.assertEqual(dataset.get_cat_ids(0), [0])
         self.assertEqual(dataset._metainfo['CLASSES'], ('ship', ))
@@ -45,10 +47,11 @@ class TestHRSCDataset(unittest.TestCase):
         self.assertEqual(data_list[0]['img_id'], '100000006')
         self.assertEqual(
             data_list[0]['img_path'],
-            'tests/data/hrsc/FullDataSet/AllImages/100000006.bmp')
+            osp.join('tests/data/hrsc/FullDataSet/AllImages', '100000006.bmp'))
         self.assertEqual(
             data_list[0]['xml_path'],
-            'tests/data/hrsc/FullDataSet/Annotations/100000006.xml')
+            osp.join('tests/data/hrsc/FullDataSet/Annotations',
+                     '100000006.xml'))
         self.assertEqual(len(data_list[0]['instances']), 1)
         self.assertEqual(dataset.get_cat_ids(0), [12])
         self.assertEqual(len(dataset._metainfo['CLASSES']), 31)
