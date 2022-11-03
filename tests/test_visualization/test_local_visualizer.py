@@ -14,7 +14,7 @@ from mmrotate.visualization import RotLocalVisualizer
 
 def _rand_rbboxes(num_boxes, h, w):
     cx, cy, bw, bh, angle = torch.rand(num_boxes, 5).T
-    bboxes = torch.vstack([cx * w, cy * h, w * bw, h * bh, angle]).T
+    bboxes = torch.stack([cx * w, cy * h, w * bw, h * bh, angle], dim=0).T
     return bboxes
 
 

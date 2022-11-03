@@ -79,10 +79,8 @@ class RotLocalVisualizer(DetLocalVisualizer):
                 alpha=self.alpha,
                 line_widths=self.line_width)
 
-            positions = bboxes[:, :2] + self.line_width
-            areas = (bboxes[:, 3] - bboxes[:, 1]) * (
-                bboxes[:, 2] - bboxes[:, 0])
-            scales = _get_adaptive_scales(areas)
+            positions = bboxes.centers + self.line_width
+            scales = _get_adaptive_scales(bboxes.areas)
 
             for i, (pos, label) in enumerate(zip(positions, labels)):
                 label_text = classes[
