@@ -8,6 +8,7 @@ import torch
 from mmdet.structures import DetDataSample
 from mmengine.structures import InstanceData
 
+from mmrotate.structures.bbox import RotatedBoxes
 from mmrotate.visualization import RotLocalVisualizer
 
 
@@ -30,7 +31,7 @@ class TestRotLocalVisualizer(TestCase):
 
         # test gt_instances
         gt_instances = InstanceData()
-        gt_instances.bboxes = _rand_rbboxes(num_bboxes, h, w)
+        gt_instances.bboxes = RotatedBoxes(_rand_rbboxes(num_bboxes, h, w))
         gt_instances.labels = torch.randint(0, num_class, (num_bboxes, ))
         det_data_sample = DetDataSample()
         det_data_sample.gt_instances = gt_instances
@@ -52,7 +53,7 @@ class TestRotLocalVisualizer(TestCase):
 
         # test gt_instances and pred_instances
         pred_instances = InstanceData()
-        pred_instances.bboxes = _rand_rbboxes(num_bboxes, h, w)
+        pred_instances.bboxes = RotatedBoxes(_rand_rbboxes(num_bboxes, h, w))
         pred_instances.labels = torch.randint(0, num_class, (num_bboxes, ))
         pred_instances.scores = torch.rand((num_bboxes, ))
         det_data_sample = DetDataSample()
