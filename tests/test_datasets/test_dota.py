@@ -1,5 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import os.path as osp
 import unittest
 
 from mmrotate.datasets import DOTADataset
@@ -22,9 +21,8 @@ class TestDOTADataset(unittest.TestCase):
         self.assertEqual(len(data_list), 1)
         self.assertEqual(data_list[0]['img_id'], 'P2805__1024__0___0')
         self.assertEqual(data_list[0]['file_name'], 'P2805__1024__0___0.png')
-        self.assertEqual(
-            data_list[0]['img_path'],
-            osp.join('tests/data/dota/images', 'P2805__1024__0___0.png'))
+        self.assertEqual(data_list[0]['img_path'].replace('\\', '/'),
+                         'tests/data/dota/images/P2805__1024__0___0.png')
         self.assertEqual(len(data_list[0]['instances']), 4)
         self.assertEqual(dataset.get_cat_ids(0), [0, 0, 0, 0])
 
@@ -42,8 +40,7 @@ class TestDOTADataset(unittest.TestCase):
         self.assertEqual(len(data_list), 1)
         self.assertEqual(data_list[0]['img_id'], 'P2805__1024__0___0')
         self.assertEqual(data_list[0]['file_name'], 'P2805__1024__0___0.png')
-        self.assertEqual(
-            data_list[0]['img_path'],
-            osp.join('tests/data/dota/images', 'P2805__1024__0___0.png'))
+        self.assertEqual(data_list[0]['img_path'].replace('\\', '/'),
+                         'tests/data/dota/images/P2805__1024__0___0.png')
         self.assertEqual(len(data_list[0]['instances']), 1)
         self.assertEqual(dataset.get_cat_ids(0), [[]])
