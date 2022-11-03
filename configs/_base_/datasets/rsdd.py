@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'mmdet.CocoDataset'
-data_root = 'data/HRSID_JPG/'
+data_root = 'data/rsdd/'
 file_client_args = dict(backend='disk')
 
 train_pipeline = [
@@ -11,7 +11,7 @@ train_pipeline = [
         with_mask=True,
         poly2mask=False),
     dict(type='ConvertMask2BoxType', box_type='rbox'),
-    dict(type='mmdet.Resize', scale=(800, 800), keep_ratio=True),
+    dict(type='mmdet.Resize', scale=(512, 512), keep_ratio=True),
     dict(
         type='mmdet.RandomFlip',
         prob=0.75,
@@ -20,7 +20,7 @@ train_pipeline = [
 ]
 val_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
-    dict(type='mmdet.Resize', scale=(800, 800), keep_ratio=True),
+    dict(type='mmdet.Resize', scale=(512, 512), keep_ratio=True),
     # avoid bboxes being resized
     dict(
         type='mmdet.LoadAnnotations',
@@ -35,7 +35,7 @@ val_pipeline = [
 ]
 test_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
-    dict(type='mmdet.Resize', scale=(800, 800), keep_ratio=True),
+    dict(type='mmdet.Resize', scale=(512, 512), keep_ratio=True),
     dict(
         type='mmdet.PackDetInputs',
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
@@ -54,7 +54,7 @@ train_dataloader = dict(
         type=dataset_type,
         metainfo=metainfo,
         data_root=data_root,
-        ann_file='annotations/train2017.json',
+        ann_file='ImageSets/train.json',
         data_prefix=dict(img='JPEGImages/'),
         filter_cfg=dict(filter_empty_gt=True),
         pipeline=train_pipeline))
@@ -68,7 +68,7 @@ val_dataloader = dict(
         type=dataset_type,
         metainfo=metainfo,
         data_root=data_root,
-        ann_file='annotations/test2017.json',
+        ann_file='ImageSets/test.json',
         data_prefix=dict(img='JPEGImages/'),
         test_mode=True,
         pipeline=val_pipeline))

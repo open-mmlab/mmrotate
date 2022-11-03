@@ -9,3 +9,5 @@ Datasets supported in MMRotate:
 - [SSDD Dataset](ssdd/README.md)
 - [HRSC Dataset](hrsc/README.md)
 - [HRSID Dataset](hrsid/README.md)
+- [SRSDD Dataset](srsdd/README.md)
+- [RSDD Dataset](rsdd/README.md)
