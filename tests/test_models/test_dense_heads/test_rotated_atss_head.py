@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from unittest import TestCase
+import unittest
 
 import torch
 from mmengine import Config
@@ -10,13 +10,16 @@ from mmrotate.structures import RotatedBoxes
 from mmrotate.utils import register_all_modules
 
 
-class TestRotatedATSSHead(TestCase):
+class TestRotatedATSSHead(unittest.TestCase):
 
     def setUp(self):
         register_all_modules()
 
     def test_atss_head_loss(self):
         """Tests atss head loss when truth is empty and non-empty."""
+        if not torch.cuda.is_available():
+            return unittest.skip('test requires GPU and torch+cuda')
+
         s = 256
         img_metas = [{
             'img_shape': (s, s, 3),
