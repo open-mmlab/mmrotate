@@ -121,7 +121,7 @@ jobs:
             docker exec mmrotate coverage xml
             docker exec mmrotate coverage report -m
       - codecov/upload
-          file: {{ coverage_report_filepath }}
+          file: './coverage.xml'
 workflows:
   pr_stage_lint:
     when: << pipeline.parameters.lint_only >>
