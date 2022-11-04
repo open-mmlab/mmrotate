@@ -242,7 +242,7 @@ class TestRotatedCocoMetric(TestCase):
         rle_mask['counts'] = rle_mask['counts'].decode('utf-8')
         instances = [{
             'bbox_label': 0,
-            'bbox': [40., 50., 40., 70., 60., 70., 60., 50],            
+            'bbox': [40., 50., 40., 70., 60., 70., 60., 50],
             'ignore_flag': 0,
             'mask': rle_mask,
         }, {

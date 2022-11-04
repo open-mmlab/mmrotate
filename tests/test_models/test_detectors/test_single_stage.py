@@ -19,8 +19,6 @@ class TestSingleStageDetector(TestCase):
 
     @parameterized.expand([
         'rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
-        'cfa/cfa-qbox_r50_fpn_1x_dota.py',
-        'csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py'
     ])
     def test_init(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -37,6 +35,7 @@ class TestSingleStageDetector(TestCase):
          ('cpu', 'cuda')),
         ('csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py',
          ('cpu', 'cuda')),
+        ('rotated_fcos/rotated-fcos-le90_r50_fpn_1x_dota.py', ('cuda', )),
     ])
     def test_single_stage_forward_loss_mode(self, cfg_file, devices):
         message_hub = MessageHub.get_instance(
@@ -65,6 +64,8 @@ class TestSingleStageDetector(TestCase):
 
     @parameterized.expand([
         ('cfa/cfa-qbox_r50_fpn_1x_dota.py', ('cuda', )),
+        ('oriented_reppoints/oriented-reppoints-qbox_r50_fpn_1x_dota.py',
+         ('cuda', )),
     ])
     def test_single_stage_qbox_forward_loss_mode(self, cfg_file, devices):
         message_hub = MessageHub.get_instance(
@@ -98,6 +99,7 @@ class TestSingleStageDetector(TestCase):
          ('cpu', 'cuda')),
         ('csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py',
          ('cpu', 'cuda')),
+        ('rotated_fcos/rotated-fcos-le90_r50_fpn_1x_dota.py', ('cuda', )),
     ])
     def test_single_stage_forward_predict_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
@@ -126,6 +128,8 @@ class TestSingleStageDetector(TestCase):
 
     @parameterized.expand([
         ('cfa/cfa-qbox_r50_fpn_1x_dota.py', ('cuda', )),
+        ('oriented_reppoints/oriented-reppoints-qbox_r50_fpn_1x_dota.py',
+         ('cuda', )),
     ])
     def test_single_stage_qbox_forward_predict_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
@@ -156,9 +160,6 @@ class TestSingleStageDetector(TestCase):
 
     @parameterized.expand([
         ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
-         ('cpu', 'cuda')),
-        ('cfa/cfa-qbox_r50_fpn_1x_dota.py', ('cpu', 'cuda')),
-        ('csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py',
          ('cpu', 'cuda')),
     ])
     def test_single_stage_forward_tensor_mode(self, cfg_file, devices):
