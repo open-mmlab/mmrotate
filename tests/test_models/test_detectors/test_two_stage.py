@@ -18,6 +18,8 @@ class TestTwoStageBBox(TestCase):
     @parameterized.expand([
         'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
         'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
+        'gliding_vertex/gliding-vertex-qbox_r50_fpn_1x_dota.py',
+        'roi_trans/roi-trans-le90_r50_fpn_1x_dota.py',
     ])
     def test_init(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -42,6 +44,7 @@ class TestTwoStageBBox(TestCase):
     @parameterized.expand([
         'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
         'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
+        'roi_trans/roi-trans-le90_r50_fpn_1x_dota.py',
     ])
     def test_two_stage_forward_loss_mode(self, cfg_file):
         model = get_detector_cfg(cfg_file)
@@ -66,8 +69,37 @@ class TestTwoStageBBox(TestCase):
         self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
+        'gliding_vertex/gliding-vertex-qbox_r50_fpn_1x_dota.py',
+    ])
+    def test_two_stage_qbox_forward_loss_mode(self, cfg_file):
+        model = get_detector_cfg(cfg_file)
+        # backbone convert to ResNet18
+        model.backbone.depth = 18
+        model.neck.in_channels = [64, 128, 256, 512]
+        model.backbone.init_cfg = None
+
+        from mmdet.registry import MODELS
+        detector = MODELS.build(model)
+
+        if not torch.cuda.is_available():
+            return unittest.skip('test requires GPU and torch+cuda')
+        detector = detector.cuda()
+
+        packed_inputs = demo_mm_inputs(
+            2, [[3, 128, 128], [3, 125, 130]],
+            use_box_type=True,
+            use_qbox=True)
+
+        data = detector.data_preprocessor(packed_inputs, True)
+        # Test loss mode
+        losses = detector.forward(**data, mode='loss')
+        self.assertIsInstance(losses, dict)
+
+    @parameterized.expand([
         'rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py',
         'oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py',
+        'gliding_vertex/gliding-vertex-qbox_r50_fpn_1x_dota.py',
+        'roi_trans/roi-trans-le90_r50_fpn_1x_dota.py',
     ])
     def test_two_stage_forward_predict_mode(self, cfg_file):
         model = get_detector_cfg(cfg_file)
