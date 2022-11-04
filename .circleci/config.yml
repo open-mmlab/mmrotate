@@ -7,7 +7,6 @@ setup: true
 # the path of an updated fileset
 orbs:
   path-filtering: circleci/path-filtering@0.1.2
-  codecov: codecov/codecov@3.2.2
 
 workflows:
   # the always-run workflow is always triggered, regardless of the pipeline parameters.

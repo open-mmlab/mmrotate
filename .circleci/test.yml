@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@3.2.2
+
 # the default pipeline parameters, which will be updated according to
 # the results of the path-filtering orb
 parameters:
