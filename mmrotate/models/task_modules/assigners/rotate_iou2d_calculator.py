@@ -216,7 +216,7 @@ class QBbox2HBboxOverlaps2D:
             bboxes1 = QuadriBoxes(bboxes1)
         # convert qbb to minimum circumscribed hbb in <x1, y1, x2, y2> format.
         if bboxes1.size(0) == 0:
-            bboxes1 = bboxes1.new_zeros(0, 4).to(bboxes1.device)
+            bboxes1 = bboxes1.new_zeros(0, 4)
         else:
             bboxes1 = bboxes1.convert_to('hbox').tensor
 
