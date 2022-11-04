@@ -20,7 +20,6 @@
 - [KLD](https://github.com/open-mmlab/mmrotate/tree/main/configs/kld/README.md) (NeurIPS'2021)
 - [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
 - [KFIoU](https://github.com/open-mmlab/mmrotate/tree/main/configs/kfiou/README.md) (arXiv)
-- [G-Rep](https://github.com/open-mmlab/mmrotate/tree/main/configs/g_reppoints/README.md) (stay tuned)
 
 ## DOTA v1.0 数据集上的结果
 
