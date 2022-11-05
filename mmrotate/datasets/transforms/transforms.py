@@ -319,7 +319,7 @@ class RandomChoiceRotate(BaseTransform):
                  angles,
                  prob: Union[float, List[float]] = 0.5,
                  rect_obj_labels=None,
-                 rotate_type='mmrotate.Rotate',
+                 rotate_type='Rotate',
                  **rotate_kwargs) -> None:
         if isinstance(prob, list):
             assert is_list_of(prob, Number)
