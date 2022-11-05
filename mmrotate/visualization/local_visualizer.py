@@ -128,7 +128,7 @@ class RotLocalVisualizer(DetLocalVisualizer):
 
             if len(labels) > 0 and \
                     ('bboxes' not in instances or
-                     instances.bboxes.sum() == 0):
+                     instances.bboxes.tensor.sum() == 0):
                 # instances.bboxes.sum()==0 represent dummy bboxes.
                 # A typical example of SOLO does not exist bbox branch.
                 areas = []

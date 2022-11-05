@@ -723,7 +723,7 @@ class GVBBoxHead(BaseModule):
         bboxes = QuadriBoxes(qboxes)
 
         if self.predict_box_type == 'rbox':
-            bboxes = bboxes.convert_to('rbox')
+            bboxes = bboxes.detach().convert_to('rbox')
 
         if rescale and qboxes.size(0) > 0:
             assert img_meta.get('scale_factor') is not None

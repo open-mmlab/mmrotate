@@ -3,20 +3,29 @@ import copy
 import unittest
 
 import numpy as np
+import torch
 from mmdet.structures.mask import BitmapMasks
 
-from mmrotate.datasets.transforms import ConvertMask2BoxType
+from mmrotate.datasets.transforms import ConvertBoxType, ConvertMask2BoxType
 from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes
+
+
+class TestConvertBoxType(unittest.TestCase):
+
+    def setUp(self):
+        self.data_info = dict(
+            gt_bboxes=QuadriBoxes(
+                torch.Tensor([[10, 10, 20, 10, 20, 20, 10, 20]])))
+
+    def test_convert(self):
+        transform = ConvertBoxType(box_type_mapping=dict(gt_bboxes='rbox'))
+        results = transform(copy.deepcopy(self.data_info))
+        self.assertIsInstance(results['gt_bboxes'], RotatedBoxes)
 
 
 class TestConvertMask2BoxType(unittest.TestCase):
 
     def setUp(self):
-        """Setup the model and optimizer which are used in every test method.
-
-        TestCase calls functions in this order: setUp() -> testMethod() ->
-        tearDown() -> cleanUp()
-        """
         rng = np.random.RandomState(0)
         self.data_info = dict(
             ori_shape=(1333, 800),
