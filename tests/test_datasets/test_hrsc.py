@@ -11,7 +11,8 @@ class TestHRSCDataset(unittest.TestCase):
             data_root='tests/data/hrsc/',
             ann_file='demo.txt',
             data_prefix=dict(sub_data_root='FullDataSet/'),
-            filter_cfg=dict(filter_empty_gt=True, min_size=32),
+            filter_cfg=dict(
+                filter_empty_gt=True, min_size=32, bbox_min_size=4),
             pipeline=[])
         dataset.full_init()
         self.assertEqual(len(dataset), 1)

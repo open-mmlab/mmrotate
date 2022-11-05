@@ -1,7 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import List, Optional
 
-import cv2
 import numpy as np
 import torch
 from mmdet.structures.mask import BitmapMasks, PolygonMasks, bitmap_to_polygon
@@ -125,41 +124,4 @@ class RotLocalVisualizer(DetLocalVisualizer):
                 polygons.extend(contours)
             self.draw_polygons(polygons, edge_colors='w', alpha=self.alpha)
             self.draw_binary_masks(masks, colors=colors, alphas=self.alpha)
-
-            if len(labels) > 0 and \
-                    ('bboxes' not in instances or
-                     instances.bboxes.tensor.sum() == 0):
-                # instances.bboxes.sum()==0 represent dummy bboxes.
-                # A typical example of SOLO does not exist bbox branch.
-                areas = []
-                positions = []
-                for mask in masks:
-                    _, _, stats, centroids = cv2.connectedComponentsWithStats(
-                        mask.astype(np.uint8), connectivity=8)
-                    if stats.shape[0] > 1:
-                        largest_id = np.argmax(stats[1:, -1]) + 1
-                        positions.append(centroids[largest_id])
-                        areas.append(stats[largest_id, -1])
-                areas = np.stack(areas, axis=0)
-                scales = _get_adaptive_scales(areas)
-
-                for i, (pos, label) in enumerate(zip(positions, labels)):
-                    label_text = classes[
-                        label] if classes is not None else f'class {label}'
-                    if 'scores' in instances:
-                        score = round(float(instances.scores[i]) * 100, 1)
-                        label_text += f': {score}'
-
-                    self.draw_texts(
-                        label_text,
-                        pos,
-                        colors=text_colors[i],
-                        font_sizes=int(13 * scales[i]),
-                        horizontal_alignments='center',
-                        bboxes=[{
-                            'facecolor': 'black',
-                            'alpha': 0.8,
-                            'pad': 0.7,
-                            'edgecolor': 'none'
-                        }])
         return self.get_image()

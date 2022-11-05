@@ -298,6 +298,29 @@ class TestRotatedCocoMetric(TestCase):
         self.assertTrue(
             osp.isfile(osp.join(self.tmp_dir.name, 'test.gt.json')))
 
+    def test_evaluate_proposal(self):
+        # create dummy data
+        fake_json_file = osp.join(self.tmp_dir.name, 'fake_data.json')
+        self._create_dummy_coco_json(fake_json_file)
+        dummy_pred = self._create_dummy_results()
+
+        coco_metric = RotatedCocoMetric(
+            ann_file=fake_json_file, metric='proposal')
+        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.process(
+            {},
+            [dict(pred_instances=dummy_pred, img_id=0, ori_shape=(640, 640))])
+        eval_results = coco_metric.evaluate(size=1)
+        target = {
+            'r_coco/AR@100': 1,
+            'r_coco/AR@300': 1.0,
+            'r_coco/AR@1000': 1.0,
+            'r_coco/AR_s@1000': 1.0,
+            'r_coco/AR_m@1000': 1.0,
+            'r_coco/AR_l@1000': 1.0
+        }
+        self.assertDictEqual(eval_results, target)
+
     def test_format_only(self):
         # create dummy data
         fake_json_file = osp.join(self.tmp_dir.name, 'fake_data.json')
