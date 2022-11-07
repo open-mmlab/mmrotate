@@ -1,4 +1,4 @@
-# Benchmark and Model Zoo
+# Benchmark and Model Zoo (To be updated)
 
 - [Rotated RetinaNet-OBB/HBB](https://github.com/open-mmlab/mmrotate/tree/main/configs/rotated_retinanet/README.md) (ICCV'2017)
 - [Rotated FasterRCNN-OBB](https://github.com/open-mmlab/mmrotate/tree/main/configs/rotated_faster_rcnn/README.md) (TPAMI'2017)

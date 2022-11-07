@@ -1,4 +1,4 @@
-# Test a model
+# Test a model (To be updated)
 
 - single GPU
 - single node multiple GPU

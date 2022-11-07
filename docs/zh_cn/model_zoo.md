@@ -1,4 +1,4 @@
-# 基准和模型库
+# 基准和模型库 (待更新)
 
 - [Rotated RetinaNet-OBB/HBB](https://github.com/open-mmlab/mmrotate/tree/main/configs/rotated_retinanet/README.md) (
   ICCV'2017)

@@ -1,4 +1,4 @@
-# OVERVIEW
+# OVERVIEW (To be updated)
 
 This chapter introduces the basic conception of rotated object detection and the framework of MMRotate, and provides
 links to detailed tutorials about MMRotate.
