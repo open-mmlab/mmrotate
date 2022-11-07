@@ -92,9 +92,6 @@ Please see [Overview](https://mmrotate.readthedocs.io/en/1.x/overview.html) for 
 For detailed user guides and advanced guides, please refer to our [documentation](https://mmrotate.readthedocs.io/en/1.x/):
 
 - User Guides
-
-  <details>
-
   - [Train & Test](https://mmrotate.readthedocs.io/en/1.x/user_guides/index.html#train-test)
     - [Learn about Configs](https://mmrotate.readthedocs.io/en/1.x/user_guides/config.html)
     - [Inference with existing models](https://mmrotate.readthedocs.io/en/1.x/user_guides/inference.html)
@@ -103,22 +100,14 @@ For detailed user guides and advanced guides, please refer to our [documentation
     - [Train predefined models on standard datasets](https://mmrotate.readthedocs.io/en/1.x/user_guides/train_test.html)
     - [Test Results Submission](https://mmrotate.readthedocs.io/en/1.x/user_guides/test_results_submission.html)
   - [Useful Tools](https://mmrotate.readthedocs.io/en/1.x/user_guides/index.html#useful-tools)
-
-  </details>
-
 - Advanced Guides
-
-  <details>
-
   - [Basic Concepts](https://mmrotate.readthedocs.io/en/1.x/advanced_guides/index.html#basic-concepts)
   - [Component Customization](https://mmrotate.readthedocs.io/en/1.x/advanced_guides/index.html#component-customization)
   - [How to](https://mmrotate.readthedocs.io/en/1.x/advanced_guides/index.html#how-to)
 
-  </details>
+We also provide colab tutorial [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](demo/MMRotate_Tutorial.ipynb).
 
-We also provide [colab tutorial](demo/MMRotate_Tutorial.ipynb).
-
-To migrate from MMRotate 0.x, please refer to [migration](https://mmdetection.readthedocs.io/en/1.x/migration.html).
+To migrate from MMRotate 0.x, please refer to [migration](https://mmrotate.readthedocs.io/en/1.x/migration.html).
 
 ## Model Zoo
 

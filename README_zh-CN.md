@@ -88,9 +88,6 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 为了帮助用户更进一步了解 MMDetection，我们准备了用户指南和进阶指南，请阅读我们的[文档](https://mmrotate.readthedocs.io/zh_CN/1.x/)：
 
 - 用户指南
-
-  <details>
-
   - [训练 & 测试](https://mmrotate.readthedocs.io/zh_CN/1.x/user_guides/index.html#train-test)
     - [学习配置文件](https://mmrotate.readthedocs.io/zh_CN/1.x/user_guides/config.html)
     - [使用已有模型在标准数据集上进行推理](https://mmrotate.readthedocs.io/en/1.x/user_guides/inference.html)
@@ -99,20 +96,14 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
     - [在标准数据集上训练预定义的模型](https://mmrotate.readthedocs.io/zh_CN/1.x/user_guides/train_test.html#train)
     - [提交测试结果](https://mmrotate.readthedocs.io/zh_CN/1.x/user_guides/test_results_submission.html)
   - [实用工具](https://mmrotate.readthedocs.io/zh_CN/1.x/user_guides/index.html#useful-tools)
-
-  </details>
-
 - 进阶指南
-
-  <details>
-
   - [基础概念](https://mmrotate.readthedocs.io/zh_CN/1.x/advanced_guides/index.html#basic-concepts)
   - [组件定制](https://mmrotate.readthedocs.io/zh_CN/1.x/advanced_guides/index.html#component-customization)
   - [How to](https://mmrotate.readthedocs.io/zh_CN/1.x/advanced_guides/index.html#how-to)
 
-  </details>
+我们提供了旋转检测的 colab 教程 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](demo/MMRotate_Tutorial.ipynb)。
 
-我们提供了 [旋转检测的 colab 教程](demo/MMRotate_Tutorial.ipynb)
+若需要将0.x版本的代码迁移至新版，请参考[迁移文档](https://mmrotate.readthedocs.io/zh_CN/1.x/migration.html)。
 
 ## 模型库
 
