@@ -193,12 +193,3 @@ docker run --gpus all --shm-size=8g -it -v {DATA_DIR}:/mmrotate/data mmrotate
 
 If you have some issues during the installation, please first view the [FAQ](faq.md) page.
 You may [open an issue](https://github.com/open-mmlab/mmrotate/issues/new/choose) on GitHub if no solution is found.
-
-## Dependency on MMEngine, MMCV & MMDetection
-
-MMOCR has different version requirements on MMEngine, MMCV and MMDetection at each release to guarantee the implementation correctness. Please refer to the table below and ensure the package versions fit the requirement.
-
-| MMRotate | MMEngine                    | MMCV                       | MMDetection                 |
-| -------- | --------------------------- | -------------------------- | --------------------------- |
-| dev-1.x  | 0.1.0 \<= mmengine \< 1.0.0 | 2.0.0rc2 \<= mmcv \< 2.1.0 | 3.0.0rc2 \<= mmdet \< 3.1.0 |
-| 1.0.0rc0 | 0.1.0 \<= mmengine \< 1.0.0 | 2.0.0rc2 \<= mmcv \< 2.1.0 | 3.0.0rc2 \<= mmdet \< 3.1.0 |

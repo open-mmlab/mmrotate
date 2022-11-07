@@ -1,4 +1,4 @@
-# Contributing to MMRotate
+# Contributing to MMRotate (To be updated)
 
 This section introduces following contents:
 
