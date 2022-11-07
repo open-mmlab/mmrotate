@@ -12,11 +12,9 @@ Built upon the new [training engine](https://github.com/open-mmlab/mmengine), MM
 
 2. **Unified interfaces**. As a part of the OpenMMLab 2.0 projects, MMRotate 1.x unifies and refactors the interfaces and internal logics of train, testing, datasets, models, evaluation, and visualization. All the OpenMMLab 2.0 projects share the same design in those interfaces and logics to allow the emergence of multi-task/modality algorithms.
 
-3. **Cross project calling**. Benefiting from the BoxType design, you can use the models or piplines implemented in MMDet directly.
+3. **New BoxType design**. We support data structures RotatedBoxes and QuadriBoxes to encapsulate different kinds of bounding boxes. We are migrating to use data structures of boxes to replace the use of pure tensor boxes. This will unify the usages of different kinds of bounding boxes in MMDetection 3.x and MMRotate 1.x to simplify the implementation and reduce redundant codes.
 
 4. **Stronger visualization**. We provide a series of useful tools which are mostly based on brand-new visualizers. As a result, it is more convenient for the users to explore the models and datasets now.
-
-5. **More documentation and tutorials (To be updated)**. We add a bunch of documentation and tutorials to help users get started more smoothly.
 
 ### Breaking Changes
 
@@ -27,6 +25,7 @@ We will update the [migration guide](../migration.md) to provide complete detail
 
 - MMRotate 1.x relies on MMEngine to run. MMEngine is a new foundational library for training deep learning models in OpenMMLab 2.0 models. The dependencies of file IO and training are migrated from MMCV 1.x to MMEngine.
 - MMRotate 1.x relies on MMCV>=2.0.0rc2. Although MMCV no longer maintains the training functionalities since 2.0.0rc0, MMRotate 1.x relies on the data transforms, CUDA operators, and image processing interfaces in MMCV. Note that the package `mmcv` is the version that provide pre-built CUDA operators and `mmcv-lite` does not since MMCV 2.0.0rc0, while `mmcv-full` has been deprecated.
+- MMRotate 1.x relies on MMDetection>=3.0.0rc2.
 
 #### Training and testing
 
@@ -73,10 +72,9 @@ The functions of visualization in MMRotate 1.x are removed. Instead, in OpenMMLa
 
 ### Improvements
 
-- Add `RotatedBoxes` and `QuadriBoxes` data structure (#450)
 - Support quadrilateral box detection (#520)
 - Support RotatedCocoMetric (#557)
-- Support Coco style annotations (#582)
+- Support COCO style annotations (#582)
 - Support two new SAR datasets: RSDD and SRSDD (#591)
 
 ### Ongoing changes
