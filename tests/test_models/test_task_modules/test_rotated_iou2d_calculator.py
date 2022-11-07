@@ -159,6 +159,14 @@ class TestRBoxOverlaps2D(TestCase):
         self.assertEqual(ious.size(), (num_bbox, ), ious.size())
         self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
 
+        # is_aligned is True, bboxes1.size(-2) == 0
+        bboxes1 = torch.empty((0, 8))
+        bboxes2 = torch.empty((0, 4))
+        ious = overlap(bboxes1, bboxes2, 'iou', True)
+        self.assertEqual(ious.size(), torch.Size([0]))
+        self.assertTrue(torch.all(ious == torch.empty((0, ))))
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
+
         # is_aligned is False
         bboxes1, num_bbox1 = self._construct_rbbox()
         bboxes1 = rbox2qbox(bboxes1)
