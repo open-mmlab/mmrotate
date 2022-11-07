@@ -72,9 +72,13 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## What's New
 
-**v1.0.0rc0** was released in 11/11/2022:
+**v1.0.0rc0** was released in 7/11/2022:
 
 - Unifies interfaces of all components based on [MMEngine](https://github.com/open-mmlab/mmengine).
+- Support data structures RotatedBoxes and QuadriBoxes to encapsulate different kinds of bounding boxes. This will unify the usages of different kinds of bounding boxes in MMDet 3.x and MMRotate 1.x to simplify the implementation and reduce redundant codes.
+- Support RotatedCocoMetric，which can generate evaluation indicators in COCO format.
+- Support COCO style annotations.
+- Support two new SAR datasets: [RSDD](tools/data/rsdd) and [SRSDD](tools/data/srsdd).
 
 ## Installation
 
