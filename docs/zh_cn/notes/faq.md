@@ -8,23 +8,23 @@
 
 MMRotate 和 MMCV, MMDet 版本兼容性如下所示，需要安装正确的版本以避免安装出现问题。
 
-| MMRotate 版本 |         MMCV 版本         | MMDetection 版本  |
-| :-----------: | :-----------------------: | :---------------: |
-|    dev-1.x    |    mmcv-full>=2.0.0rc2    | mmdet >= 3.0.0rc2 |
-|     main      | mmcv-full>=1.5.3, \<1.7.0 |  mmdet >= 2.25.1  |
-|     0.3.2     | mmcv-full>=1.5.3, \<1.7.0 |  mmdet >= 2.25.1  |
-|     0.3.1     | mmcv-full>=1.4.5, \<1.6.0 |  mmdet >= 2.22.0  |
-|     0.3.0     | mmcv-full>=1.4.5, \<1.6.0 |  mmdet >= 2.22.0  |
-|     0.2.0     | mmcv-full>=1.4.5, \<1.5.0 |  mmdet >= 2.19.0  |
-|     0.1.1     | mmcv-full>=1.4.5, \<1.5.0 |  mmdet >= 2.19.0  |
-|     0.1.0     | mmcv-full>=1.4.5, \<1.5.0 |  mmdet >= 2.19.0  |
+| MMRotate | MMEngine                    | MMCV                       | MMDetection                 |
+| -------- | --------------------------- | -------------------------- | --------------------------- |
+| dev-1.x  | 0.1.0 \<= mmengine \< 1.0.0 | 2.0.0rc2 \<= mmcv \< 2.1.0 | 3.0.0rc2 \<= mmdet \< 3.1.0 |
+| 1.0.0rc0 | 0.1.0 \<= mmengine \< 1.0.0 | 2.0.0rc2 \<= mmcv \< 2.1.0 | 3.0.0rc2 \<= mmdet \< 3.1.0 |
+
+**注意：**
+
+1. 如果你希望安装 mmrotate-v0.x, MMRotate 和 MMCV 版本兼容表可以在 [这里](https://mmrotate.readthedocs.io/en/stable/faq.html#installation) 找到，请选择合适的版本避免安装错误。
+2. 在 MMCV-v2.x 中，`mmcv-full` 改名为 `mmcv`，如果你想安装不包含 CUDA 算子的版本，可以选择安装 MMCV 精简版 `mmcv-lite`。
 
 - "No module named 'mmcv.ops'"; "No module named 'mmcv.\_ext'".
 
-  原因是安装了 `mmcv` 而不是 `mmcv-full`。
+  原因是安装了 `mmcv-lite` 而不是 `mmcv`。
 
-  1. 使用 `pip uninstall mmcv` 卸载。
-  2. 根据 [安装说明](install#best-practices) 安装 `mmcv-full`。
+  1. `pip uninstall mmcv-lite` 卸载安装的 `mmcv-lite`
+
+  2. 安装 `mmcv` 根据 [安装说明](https://mmcv.readthedocs.io/zh_CN/2.x/get_started/installation.html)。
 
 ## PyTorch/CUDA 环境相关
 

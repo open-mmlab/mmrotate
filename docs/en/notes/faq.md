@@ -8,21 +8,20 @@ We list some common troubles faced by many users and their corresponding solutio
 
 Compatible MMCV, MMDetection and MMRotate versions are shown as below. Please install the correct version of them to avoid installation issues.
 
-| MMRotate version |       MMCV version        | MMDetection version |
-| :--------------: | :-----------------------: | :-----------------: |
-|     dev-1.x      |    mmcv-full>=2.0.0rc2    |  mmdet >= 3.0.0rc2  |
-|       main       | mmcv-full>=1.5.3, \<1.7.0 |   mmdet >= 2.25.1   |
-|      0.3.2       | mmcv-full>=1.5.3, \<1.7.0 |   mmdet >= 2.25.1   |
-|      0.3.1       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
-|      0.3.0       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
-|      0.2.0       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
-|      0.1.1       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
-|      0.1.0       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
+| MMRotate | MMEngine                    | MMCV                       | MMDetection                 |
+| -------- | --------------------------- | -------------------------- | --------------------------- |
+| dev-1.x  | 0.1.0 \<= mmengine \< 1.0.0 | 2.0.0rc2 \<= mmcv \< 2.1.0 | 3.0.0rc2 \<= mmdet \< 3.1.0 |
+| 1.0.0rc0 | 0.1.0 \<= mmengine \< 1.0.0 | 2.0.0rc2 \<= mmcv \< 2.1.0 | 3.0.0rc2 \<= mmdet \< 3.1.0 |
+
+**Note:**
+
+1. If you want to install mmrotate-v0.x, the compatible MMRotate and MMCV versions table can be found at [here](https://mmrotate.readthedocs.io/en/stable/faq.html#installation). Please choose the correct version of MMCV to avoid installation issues.
+2. In MMCV-v2.x, `mmcv-full` is rename to `mmcv`, if you want to install `mmcv` without CUDA ops, you can install `mmcv-lite`.
 
 - "No module named 'mmcv.ops'"; "No module named 'mmcv.\_ext'".
 
-  1. Uninstall existing mmcv in the environment using `pip uninstall mmcv`.
-  2. Install mmcv-full following the [installation instruction](install#best-practices).
+  1. Uninstall existing `mmcv-lite` in the environment using `pip uninstall mmcv-lite`.
+  2. Install `mmcv` following the [installation instruction](https://mmcv.readthedocs.io/en/2.x/get_started/installation.html).
 
 ## PyTorch/CUDA Environment
 
