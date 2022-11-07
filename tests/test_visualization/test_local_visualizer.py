@@ -6,15 +6,22 @@ import cv2
 import numpy as np
 import torch
 from mmdet.structures import DetDataSample
+from mmdet.structures.mask import BitmapMasks
 from mmengine.structures import InstanceData
 
+from mmrotate.structures.bbox import RotatedBoxes
 from mmrotate.visualization import RotLocalVisualizer
 
 
 def _rand_rbboxes(num_boxes, h, w):
     cx, cy, bw, bh, angle = torch.rand(num_boxes, 5).T
-    bboxes = torch.vstack([cx * w, cy * h, w * bw, h * bh, angle]).T
+    bboxes = torch.stack([cx * w, cy * h, w * bw, h * bh, angle], dim=0).T
     return bboxes
+
+
+def _fake_masks(num_items, img_h, img_w):
+    masks = np.zeros((num_items, img_h, img_w))
+    return BitmapMasks(masks, height=img_h, width=img_w)
 
 
 class TestRotLocalVisualizer(TestCase):
@@ -30,7 +37,8 @@ class TestRotLocalVisualizer(TestCase):
 
         # test gt_instances
         gt_instances = InstanceData()
-        gt_instances.bboxes = _rand_rbboxes(num_bboxes, h, w)
+        gt_instances.bboxes = RotatedBoxes(_rand_rbboxes(num_bboxes, h, w))
+        gt_instances.masks = _fake_masks(num_bboxes, h, w)
         gt_instances.labels = torch.randint(0, num_class, (num_bboxes, ))
         det_data_sample = DetDataSample()
         det_data_sample.gt_instances = gt_instances
@@ -52,7 +60,7 @@ class TestRotLocalVisualizer(TestCase):
 
         # test gt_instances and pred_instances
         pred_instances = InstanceData()
-        pred_instances.bboxes = _rand_rbboxes(num_bboxes, h, w)
+        pred_instances.bboxes = RotatedBoxes(_rand_rbboxes(num_bboxes, h, w))
         pred_instances.labels = torch.randint(0, num_class, (num_bboxes, ))
         pred_instances.scores = torch.rand((num_bboxes, ))
         det_data_sample = DetDataSample()

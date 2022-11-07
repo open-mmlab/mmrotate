@@ -4,6 +4,7 @@ from unittest import TestCase
 
 import torch
 from mmengine.config import Config
+from parameterized import parameterized
 
 from mmrotate.registry import MODELS
 from mmrotate.testing import demo_mm_inputs, demo_mm_proposals
@@ -88,7 +89,7 @@ class TestGVRatioRoIHead(TestCase):
         self.assertTrue(roi_head.with_bbox)
 
     def test_gv_roi_head_loss(self):
-        """Tests standard roi head loss when truth is empty and non-empty."""
+        """Tests gv_ratio roi head loss when truth is empty and non-empty."""
         if not torch.cuda.is_available():
             # RoI pooling only support in GPU
             return unittest.skip('test requires GPU and torch+cuda')
@@ -149,3 +150,54 @@ class TestGVRatioRoIHead(TestCase):
         self.assertEqual(
             empty_bbox_loss.sum(), 0,
             'there should be no box loss when there are no true boxes')
+
+    @parameterized.expand(['cpu', 'cuda'])
+    def test_gv_ratio_roi_head_predict(self, device):
+        """Tests gv_ratio roi head predict."""
+        if device == 'cuda':
+            if not torch.cuda.is_available():
+                return unittest.skip('test requires GPU and torch+cuda')
+
+        roi_head_cfg = _fake_roi_head()
+        roi_head = MODELS.build(roi_head_cfg)
+        roi_head = roi_head.to(device=device)
+        s = 256
+        feats = []
+        for i in range(len(roi_head.bbox_roi_extractor.featmap_strides)):
+            feats.append(
+                torch.rand(1, 256, s // (2**(i + 2)),
+                           s // (2**(i + 2))).to(device=device))
+
+        image_shapes = [(3, s, s)]
+        batch_data_samples = demo_mm_inputs(
+            batch_size=1,
+            image_shapes=image_shapes,
+            num_items=[0],
+            num_classes=4,
+            with_mask=True,
+            device=device)['data_samples']
+        proposals_list = demo_mm_proposals(
+            image_shapes=image_shapes, num_proposals=100, device=device)
+        roi_head.predict(feats, proposals_list, batch_data_samples)
+
+    @parameterized.expand(['cpu', 'cuda'])
+    def test_gv_ratio_roi_head_forward(self, device):
+        """Tests gv ratio roi head forward."""
+        if device == 'cuda':
+            if not torch.cuda.is_available():
+                return unittest.skip('test requires GPU and torch+cuda')
+
+        roi_head_cfg = _fake_roi_head()
+        roi_head = MODELS.build(roi_head_cfg)
+        roi_head = roi_head.to(device=device)
+        s = 256
+        feats = []
+        for i in range(len(roi_head.bbox_roi_extractor.featmap_strides)):
+            feats.append(
+                torch.rand(1, 256, s // (2**(i + 2)),
+                           s // (2**(i + 2))).to(device=device))
+
+        image_shapes = [(3, s, s)]
+        proposals_list = demo_mm_proposals(
+            image_shapes=image_shapes, num_proposals=100, device=device)
+        roi_head.forward(feats, proposals_list)

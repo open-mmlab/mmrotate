@@ -9,6 +9,7 @@ from mmcv.transforms import BaseTransform
 from mmcv.transforms.utils import cache_randomness
 from mmdet.structures.bbox import BaseBoxes, get_box_type
 from mmdet.structures.mask import PolygonMasks
+from mmengine.utils import is_list_of
 
 from mmrotate.registry import TRANSFORMS
 
@@ -277,7 +278,7 @@ class RandomRotate(BaseTransform):
     def __repr__(self):
         repr_str = self.__class__.__name__
         repr_str += f'(prob={self.prob}, '
-        repr_str += f'angle_range={self.angle_range}, '
+        repr_str += f'rotate_angle={self.angle_range}, '
         repr_str += f'rect_obj_labels={self.rect_obj_labels}, '
         repr_str += f'rotate_cfg={self.rotate_cfg})'
         return repr_str
@@ -318,10 +319,10 @@ class RandomChoiceRotate(BaseTransform):
                  angles,
                  prob: Union[float, List[float]] = 0.5,
                  rect_obj_labels=None,
-                 rotate_type='mmrotate.Rotate',
+                 rotate_type='Rotate',
                  **rotate_kwargs) -> None:
         if isinstance(prob, list):
-            assert mmcv.is_list_of(prob, Number)
+            assert is_list_of(prob, Number)
             assert 0 <= sum(prob) <= 1
         elif isinstance(prob, Number):
             assert 0 <= prob <= 1
@@ -330,7 +331,7 @@ class RandomChoiceRotate(BaseTransform):
                               got `{type(prob)}`.')
         self.prob = prob
 
-        assert isinstance(angles, list) and mmcv.is_list_of(angles, int)
+        assert isinstance(angles, list) and is_list_of(angles, int)
         assert 0 not in angles
         self.angles = angles
         if isinstance(self.prob, list):

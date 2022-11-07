@@ -36,13 +36,13 @@ We recommend that users follow our best practices to install MMRotate. However, 
 ```shell
 pip install -U openmim
 mim install mmengine
-mim install "mmcv>=2.0.0rc1"
+mim install "mmcv>=2.0.0rc2"
 ```
 
 **Step 1.** Install [MMDetection](https://github.com/open-mmlab/mmdetection) as a dependency.
 
 ```shell
-mim install 'mmdet>=3.0.0rc1'
+mim install 'mmdet>=3.0.0rc2'
 ```
 
 Optionally, you could also build MMDetection from source in case you want to modify the code:
@@ -149,8 +149,8 @@ thus we only need to install MMCV and MMDetection with the following commands.
 
 ```shell
 !pip3 install -U openmim
-!mim install "mmcv>=2.0.0rc1"
-!mim install 'mmdet>=3.0.0rc1'
+!mim install "mmcv>=2.0.0rc2"
+!mim install 'mmdet>=3.0.0rc2'
 ```
 
 **Step 2.** Install MMRotate from the source.

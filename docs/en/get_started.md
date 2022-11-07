@@ -36,13 +36,13 @@ We recommend that users follow our best practices to install MMRotate. However, 
 ```shell
 pip install -U openmim
 mim install mmengine
-mim install "mmcv>=2.0.0rc1"
+mim install "mmcv>=2.0.0rc2"
 ```
 
 **Step 1.** Install [MMDetection](https://github.com/open-mmlab/mmdetection) as a dependency.
 
 ```shell
-mim install 'mmdet>=3.0.0rc0'
+mim install 'mmdet>=3.0.0rc2'
 ```
 
 Optionally, you could also build MMDetection from source in case you want to modify the code:
@@ -149,8 +149,8 @@ thus we only need to install MMCV and MMDetection with the following commands.
 
 ```shell
 !pip3 install -U openmim
-!mim install "mmcv>=2.0.0rc1"
-!mim install 'mmdet>=3.0.0rc0'
+!mim install "mmcv>=2.0.0rc2"
+!mim install 'mmdet>=3.0.0rc2'
 ```
 
 **Step 2.** Install MMRotate from the source.
@@ -193,3 +193,12 @@ docker run --gpus all --shm-size=8g -it -v {DATA_DIR}:/mmrotate/data mmrotate
 
 If you have some issues during the installation, please first view the [FAQ](faq.md) page.
 You may [open an issue](https://github.com/open-mmlab/mmrotate/issues/new/choose) on GitHub if no solution is found.
+
+## Dependency on MMEngine, MMCV & MMDetection
+
+MMOCR has different version requirements on MMEngine, MMCV and MMDetection at each release to guarantee the implementation correctness. Please refer to the table below and ensure the package versions fit the requirement.
+
+| MMRotate | MMEngine                    | MMCV                       | MMDetection                 |
+| -------- | --------------------------- | -------------------------- | --------------------------- |
+| dev-1.x  | 0.1.0 \<= mmengine \< 1.0.0 | 2.0.0rc2 \<= mmcv \< 2.1.0 | 3.0.0rc2 \<= mmdet \< 3.1.0 |
+| 1.0.0rc0 | 0.1.0 \<= mmengine \< 1.0.0 | 2.0.0rc2 \<= mmcv \< 2.1.0 | 3.0.0rc2 \<= mmdet \< 3.1.0 |

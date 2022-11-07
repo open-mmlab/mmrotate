@@ -1,6 +1,6 @@
 e2cnn
-mmcv>=2.0.0rc1
-mmdet>=3.0.0rc1
+mmcv>=2.0.0rc2
+mmdet>=3.0.0rc2
 mmengine>=0.1.0
 torch
 torchvision

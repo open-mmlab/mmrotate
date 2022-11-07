@@ -16,6 +16,9 @@ class TestCFAHead(unittest.TestCase):
         register_all_modules()
 
     def test_cfa_head_loss(self):
+        if not torch.cuda.is_available():
+            return unittest.skip('test requires GPU and torch+cuda')
+
         cfg = ConfigDict(
             dict(
                 num_classes=2,

@@ -105,16 +105,8 @@ class RotatedSingleRoIExtractor(BaseRoIExtractor):
         else:
             out_size = self.roi_layers[0].output_size
         num_levels = len(feats)
-        expand_dims = (-1, self.out_channels * out_size[0] * out_size[1])
-        if torch.onnx.is_in_onnx_export():
-            # Work around to export mask-rcnn to onnx
-            roi_feats = rois[:, :1].clone().detach()
-            roi_feats = roi_feats.expand(*expand_dims)
-            roi_feats = roi_feats.reshape(-1, self.out_channels, *out_size)
-            roi_feats = roi_feats * 0
-        else:
-            roi_feats = feats[0].new_zeros(
-                rois.size(0), self.out_channels, *out_size)
+        roi_feats = feats[0].new_zeros(
+            rois.size(0), self.out_channels, *out_size)
         # TODO: remove this when parrots supports
         if torch.__version__ == 'parrots':
             roi_feats.requires_grad = True

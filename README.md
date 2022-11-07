@@ -141,7 +141,6 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 - [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
 - [x] [Oriented RepPoints](configs/oriented_reppoints/README.md) (CVPR'2022)
 - [x] [KFIoU](configs/kfiou/README.md) (arXiv)
-- [x] [G-Rep](configs/g_reppoints/README.md) (stay tuned)
 
 </details>
 
