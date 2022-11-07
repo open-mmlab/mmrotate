@@ -33,9 +33,6 @@ class TestSingleStageDetector(TestCase):
     @parameterized.expand([
         ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
          ('cpu', 'cuda')),
-        ('csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py',
-         ('cpu', 'cuda')),
-        ('rotated_fcos/rotated-fcos-le90_r50_fpn_1x_dota.py', ('cuda', )),
     ])
     def test_single_stage_forward_loss_mode(self, cfg_file, devices):
         message_hub = MessageHub.get_instance(
@@ -63,43 +60,8 @@ class TestSingleStageDetector(TestCase):
             self.assertIsInstance(losses, dict)
 
     @parameterized.expand([
-        ('cfa/cfa-qbox_r50_fpn_1x_dota.py', ('cuda', )),
-        ('oriented_reppoints/oriented-reppoints-qbox_r50_fpn_1x_dota.py',
-         ('cuda', )),
-    ])
-    def test_single_stage_qbox_forward_loss_mode(self, cfg_file, devices):
-        message_hub = MessageHub.get_instance(
-            f'test_single_stage_forward_loss_mode-{time.time()}')
-        message_hub.update_info('iter', 0)
-        message_hub.update_info('epoch', 0)
-        model = get_detector_cfg(cfg_file)
-        model.backbone.init_cfg = None
-
-        from mmrotate.registry import MODELS
-        assert all([device in ['cpu', 'cuda'] for device in devices])
-
-        for device in devices:
-            detector = MODELS.build(model)
-            detector.init_weights()
-
-            if device == 'cuda':
-                if not torch.cuda.is_available():
-                    return unittest.skip('test requires GPU and torch+cuda')
-                detector = detector.cuda()
-            packed_inputs = demo_mm_inputs(
-                2, [[3, 128, 128], [3, 125, 130]],
-                use_box_type=True,
-                use_qbox=True)
-            data = detector.data_preprocessor(packed_inputs, True)
-            losses = detector.forward(**data, mode='loss')
-            self.assertIsInstance(losses, dict)
-
-    @parameterized.expand([
         ('rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py',
          ('cpu', 'cuda')),
-        ('csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py',
-         ('cpu', 'cuda')),
-        ('rotated_fcos/rotated-fcos-le90_r50_fpn_1x_dota.py', ('cuda', )),
     ])
     def test_single_stage_forward_predict_mode(self, cfg_file, devices):
         model = get_detector_cfg(cfg_file)
@@ -118,38 +80,6 @@ class TestSingleStageDetector(TestCase):
 
             packed_inputs = demo_mm_inputs(
                 2, [[3, 128, 128], [3, 125, 130]], use_box_type=True)
-            data = detector.data_preprocessor(packed_inputs, False)
-            # Test forward test
-            detector.eval()
-            with torch.no_grad():
-                batch_results = detector.forward(**data, mode='predict')
-                self.assertEqual(len(batch_results), 2)
-                self.assertIsInstance(batch_results[0], DetDataSample)
-
-    @parameterized.expand([
-        ('cfa/cfa-qbox_r50_fpn_1x_dota.py', ('cuda', )),
-        ('oriented_reppoints/oriented-reppoints-qbox_r50_fpn_1x_dota.py',
-         ('cuda', )),
-    ])
-    def test_single_stage_qbox_forward_predict_mode(self, cfg_file, devices):
-        model = get_detector_cfg(cfg_file)
-        model.backbone.init_cfg = None
-
-        from mmrotate.registry import MODELS
-        assert all([device in ['cpu', 'cuda'] for device in devices])
-
-        for device in devices:
-            detector = MODELS.build(model)
-
-            if device == 'cuda':
-                if not torch.cuda.is_available():
-                    return unittest.skip('test requires GPU and torch+cuda')
-                detector = detector.cuda()
-
-            packed_inputs = demo_mm_inputs(
-                2, [[3, 128, 128], [3, 125, 130]],
-                use_box_type=True,
-                use_qbox=True)
             data = detector.data_preprocessor(packed_inputs, False)
             # Test forward test
             detector.eval()
