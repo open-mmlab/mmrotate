@@ -22,7 +22,7 @@ Welcome to MMRotate's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: 迁移版本
+   :caption: 迁移指南
 
    migration.md
 
