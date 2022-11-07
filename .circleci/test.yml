@@ -120,7 +120,7 @@ jobs:
             docker exec mmrotate coverage run --branch --source mmrotate -m pytest tests/
             docker exec mmrotate coverage xml
             docker exec mmrotate coverage report -m
-      - codecov/upload
+      - codecov/upload:
           file: './coverage.xml'
 workflows:
   pr_stage_lint:
