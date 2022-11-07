@@ -74,7 +74,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 **v1.0.0rc0** was released in 7/11/2022:
 
-- Unifies interfaces of all components based on [MMEngine](https://github.com/open-mmlab/mmengine).
+- Unifies interfaces of all components based on [MMEngine](https://github.com/open-mmlab/mmengine) and [MMDetection 3.x](https://github.com/open-mmlab/mmdetection/tree/3.x).
 - Support data structures RotatedBoxes and QuadriBoxes to encapsulate different kinds of bounding boxes. This will unify the usages of different kinds of bounding boxes in MMDetection 3.x and MMRotate 1.x to simplify the implementation and reduce redundant codes.
 - Support [quadrilateral box detection](configs/gliding_vertex/).
 - Support RotatedCocoMetric, which can generate evaluation indicators in COCO format.

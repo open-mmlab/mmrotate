@@ -70,7 +70,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 最新的 **v1.0.0rc0** 版本已经在 2022.11.7 发布:
 
-- 基于 [MMEngine](https://github.com/open-mmlab/mmengine) 统一了各组件接口。
+- 基于 [MMEngine](https://github.com/open-mmlab/mmengine) 和 [MMDetection 3.x](https://github.com/open-mmlab/mmdetection/tree/3.x) 统一了各组件接口。
 - 支持用 RotatedBoxes 和 QuadriBoxes 数据结构封装不同类型的边界框。这将统一 MMDetection 3.x 和 MMRotate 1.x 中不同类型边界框的用法，以简化实现并减少冗余代码。
 - 支持了[四边形框检测](configs/gliding_vertex/)
 - 支持了 RotatedCocoMetric, 它可以生成 COCO 格式的评测指标。
