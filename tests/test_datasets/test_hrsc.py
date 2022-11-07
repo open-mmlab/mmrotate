@@ -1,5 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import os.path as osp
 import unittest
 
 from mmrotate.datasets import HRSCDataset
