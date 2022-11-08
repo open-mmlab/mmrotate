@@ -1,33 +1,36 @@
+# Copyright (c) OpenMMLab. All rights reserved.
 import copy
-from typing import Tuple, List, Optional
+from typing import List, Optional, Tuple
 
 import torch
-from mmcv.cnn import Scale, ConvModule, is_norm
+from mmcv.cnn import ConvModule, Scale, is_norm
 from mmdet.models import inverse_sigmoid
 from mmdet.models.dense_heads import RTMDetHead
 from mmdet.models.task_modules import anchor_inside_flags
-from mmdet.models.utils import sigmoid_geometric_mean, multi_apply, unmap, select_single_mlvl, filter_scores_and_topk
-from mmdet.structures.bbox import distance2bbox, get_box_tensor, cat_boxes, bbox_cxcywh_to_xyxy
-from mmdet.utils import ConfigType, OptConfigType, InstanceList, OptInstanceList, reduce_mean
+from mmdet.models.utils import (filter_scores_and_topk, multi_apply,
+                                select_single_mlvl, sigmoid_geometric_mean,
+                                unmap)
+from mmdet.structures.bbox import bbox_cxcywh_to_xyxy, cat_boxes, distance2bbox
+from mmdet.utils import (ConfigType, InstanceList, OptConfigType,
+                         OptInstanceList, reduce_mean)
 from mmengine import ConfigDict
-from mmengine.model import normal_init, constant_init, bias_init_with_prob
+from mmengine.model import bias_init_with_prob, constant_init, normal_init
 from mmengine.structures import InstanceData
-from mmrotate.registry import MODELS, TASK_UTILS
+from torch import Tensor, nn
 
 from mmrotate.models.task_modules.coders import DistanceAnglePointCoder
-from mmrotate.structures import norm_angle, RotatedBoxes
-from torch import nn, Tensor
+from mmrotate.registry import MODELS, TASK_UTILS
+from mmrotate.structures import RotatedBoxes, norm_angle
 
 
 # TODO move to mmrotate.structures.transform and update Coder
-def distance2obb(points,
-                 distance,
-                 angle_version='oc'):
+def distance2obb(points, distance, angle_version='oc'):
     distance, angle = distance.split([4, 1], dim=-1)
 
     cos_angle, sin_angle = torch.cos(angle), torch.sin(angle)
 
-    rot_matrix = torch.cat([cos_angle, -sin_angle, sin_angle, cos_angle], dim=-1)
+    rot_matrix = torch.cat([cos_angle, -sin_angle, sin_angle, cos_angle],
+                           dim=-1)
     rot_matrix = rot_matrix.reshape(*rot_matrix.shape[:-1], 2, 2)
 
     wh = distance[..., :2] + distance[..., 2:]
@@ -57,11 +60,13 @@ class RotatedRTMDetHead(RTMDetHead):
     def __init__(self,
                  num_classes: int,
                  in_channels: int,
+                 angle_version: str = 'le90',
                  use_hbbox_loss: bool = False,
                  scale_angle: bool = True,
                  angle_coder: ConfigType = dict(type='PseudoAngleCoder'),
                  loss_angle: OptConfigType = None,
                  **kwargs) -> None:
+        self.angle_version = angle_version
         self.use_hbbox_loss = use_hbbox_loss
         self.is_scale_angle = scale_angle
         self.angle_coder = TASK_UTILS.build(angle_coder)
@@ -147,10 +152,10 @@ class RotatedRTMDetHead(RTMDetHead):
             angle_preds.append(angle_pred)
         return tuple(cls_scores), tuple(bbox_preds), tuple(angle_preds)
 
-    def loss_by_feat_single(self, cls_score: Tensor, bbox_pred: Tensor, angle_pred: Tensor,
-                            labels: Tensor, label_weights: Tensor,
-                            bbox_targets: Tensor, assign_metrics: Tensor,
-                            stride: List[int]):
+    def loss_by_feat_single(self, cls_score: Tensor, bbox_pred: Tensor,
+                            angle_pred: Tensor, labels: Tensor,
+                            label_weights: Tensor, bbox_targets: Tensor,
+                            assign_metrics: Tensor, stride: List[int]):
         """Compute loss of a single scale level.
 
         Args:
@@ -201,14 +206,16 @@ class RotatedRTMDetHead(RTMDetHead):
             pos_decode_bbox_pred = pos_bbox_pred
             pos_decode_bbox_targets = pos_bbox_targets
             if self.use_hbbox_loss:
-                pos_decode_bbox_targets = bbox_cxcywh_to_xyxy(pos_bbox_targets[:, :4])
+                pos_decode_bbox_targets = bbox_cxcywh_to_xyxy(
+                    pos_bbox_targets[:, :4])
 
             # regression loss
             pos_bbox_weight = assign_metrics[pos_inds]
 
             loss_angle = angle_pred.sum() * 0
             if self.loss_angle is not None:
-                angle_pred = angle_pred.reshape(-1, self.angle_coder.encode_size)
+                angle_pred = angle_pred.reshape(-1,
+                                                self.angle_coder.encode_size)
                 pos_angle_pred = angle_pred[pos_inds]
                 pos_angle_target = pos_bbox_targets[:, 4:5]
                 pos_angle_target = self.angle_coder.encode(pos_angle_target)
@@ -229,7 +236,8 @@ class RotatedRTMDetHead(RTMDetHead):
             pos_bbox_weight = bbox_targets.new_tensor(0.)
             loss_angle = angle_pred.sum() * 0
 
-        return loss_cls, loss_bbox, loss_angle, assign_metrics.sum(), pos_bbox_weight.sum(), pos_bbox_weight.sum()
+        return loss_cls, loss_bbox, loss_angle, assign_metrics.sum(
+        ), pos_bbox_weight.sum(), pos_bbox_weight.sum()
 
     def loss_by_feat(self,
                      cls_scores: List[Tensor],
@@ -275,10 +283,12 @@ class RotatedRTMDetHead(RTMDetHead):
         decoded_bboxes = []
         decoded_hbboxes = []
         angle_preds_list = []
-        for anchor, bbox_pred, angle_pred in zip(anchor_list[0], bbox_preds, angle_preds):
+        for anchor, bbox_pred, angle_pred in zip(anchor_list[0], bbox_preds,
+                                                 angle_preds):
             anchor = anchor.reshape(-1, 4)
             bbox_pred = bbox_pred.permute(0, 2, 3, 1).reshape(num_imgs, -1, 4)
-            angle_pred = angle_pred.permute(0, 2, 3, 1).reshape(num_imgs, -1, self.angle_coder.encode_size)
+            angle_pred = angle_pred.permute(0, 2, 3, 1).reshape(
+                num_imgs, -1, self.angle_coder.encode_size)
 
             if self.use_hbbox_loss:
                 hbbox_pred = distance2bbox(anchor, bbox_pred)
@@ -287,15 +297,8 @@ class RotatedRTMDetHead(RTMDetHead):
             decoded_angle = self.angle_coder.decode(angle_pred, keepdim=True)
             bbox_pred = torch.cat([bbox_pred, decoded_angle], dim=-1)
 
-            # res = distance2obb(anchor, bbox_pred, 'le90').reshape(-1, 5)
-            #
-            # c = DistanceAnglePointCoder(angle_version='le90')
-            # res2 = c.decode(anchor.repeat(8, 1)[:, :2], bbox_pred.reshape(-1, 5))
-            #
-            # print((res == res2).unique())
-
-            # TODO add arg angle_version
-            bbox_pred = distance2obb(anchor, bbox_pred, angle_version='le90')
+            bbox_pred = distance2obb(
+                anchor, bbox_pred, angle_version=self.angle_version)
             decoded_bboxes.append(bbox_pred)
             angle_preds_list.append(angle_pred)
 
@@ -316,17 +319,12 @@ class RotatedRTMDetHead(RTMDetHead):
         if self.use_hbbox_loss:
             decoded_bboxes = decoded_hbboxes
 
-        losses_cls, losses_bbox, losses_angle, \
-        cls_avg_factors, bbox_avg_factors, angle_avg_factors = multi_apply(
-            self.loss_by_feat_single,
-            cls_scores,
-            decoded_bboxes,
-            angle_preds_list,
-            labels_list,
-            label_weights_list,
-            bbox_targets_list,
-            assign_metrics_list,
-            self.prior_generator.strides)
+        (losses_cls, losses_bbox, losses_angle, cls_avg_factors,
+         bbox_avg_factors, angle_avg_factors) = multi_apply(
+             self.loss_by_feat_single, cls_scores, decoded_bboxes,
+             angle_preds_list, labels_list, label_weights_list,
+             bbox_targets_list, assign_metrics_list,
+             self.prior_generator.strides)
 
         cls_avg_factor = reduce_mean(sum(cls_avg_factors)).clamp_(min=1).item()
         losses_cls = list(map(lambda x: x / cls_avg_factor, losses_cls))
@@ -337,8 +335,12 @@ class RotatedRTMDetHead(RTMDetHead):
         if self.loss_angle is not None:
             angle_avg_factors = reduce_mean(
                 sum(angle_avg_factors)).clamp_(min=1).item()
-            losses_angle = list(map(lambda x: x / angle_avg_factors, losses_angle))
-            return dict(loss_cls=losses_cls, loss_bbox=losses_bbox, loss_angle=losses_angle)
+            losses_angle = list(
+                map(lambda x: x / angle_avg_factors, losses_angle))
+            return dict(
+                loss_cls=losses_cls,
+                loss_bbox=losses_bbox,
+                loss_angle=losses_angle)
         else:
             return dict(loss_cls=losses_cls, loss_bbox=losses_bbox)
 
@@ -390,7 +392,7 @@ class RotatedRTMDetHead(RTMDetHead):
                                            img_meta['img_shape'][:2],
                                            self.train_cfg['allowed_border'])
         if not inside_flags.any():
-            return (None,) * 7
+            return (None, ) * 7
         # assign gt and sample anchors
         anchors = flat_anchors[inside_flags, :]
 
@@ -407,7 +409,7 @@ class RotatedRTMDetHead(RTMDetHead):
 
         num_valid_anchors = anchors.shape[0]
         bbox_targets = anchors.new_zeros((*anchors.size()[:-1], 5))
-        labels = anchors.new_full((num_valid_anchors,),
+        labels = anchors.new_full((num_valid_anchors, ),
                                   self.num_classes,
                                   dtype=torch.long)
         label_weights = anchors.new_zeros(num_valid_anchors, dtype=torch.float)
@@ -420,7 +422,8 @@ class RotatedRTMDetHead(RTMDetHead):
             # point-based
             pos_bbox_targets = sampling_result.pos_gt_bboxes
             # TODO add arg angle_version
-            pos_bbox_targets = pos_bbox_targets.regularize_boxes('le90')
+            pos_bbox_targets = pos_bbox_targets.regularize_boxes(
+                self.angle_version)
             bbox_targets[pos_inds, :] = pos_bbox_targets
 
             labels[pos_inds] = sampling_result.pos_gt_labels
@@ -716,7 +719,8 @@ class RotatedRTMDetSepBNHead(RotatedRTMDetHead):
                  **kwargs) -> None:
         self.share_conv = share_conv
         self.exp_on_reg = exp_on_reg
-        assert scale_angle == False, 'scale_angle does not support in RotatedRTMDetSepBNHead'
+        assert scale_angle is False, \
+            'scale_angle does not support in RotatedRTMDetSepBNHead'
         super().__init__(
             num_classes,
             in_channels,
@@ -804,7 +808,8 @@ class RotatedRTMDetSepBNHead(RotatedRTMDetHead):
             if is_norm(m):
                 constant_init(m, 1)
         bias_cls = bias_init_with_prob(0.01)
-        for rtm_cls, rtm_reg, rtm_ang in zip(self.rtm_cls, self.rtm_reg, self.rtm_ang):
+        for rtm_cls, rtm_reg, rtm_ang in zip(self.rtm_cls, self.rtm_reg,
+                                             self.rtm_ang):
             normal_init(rtm_cls, std=0.01, bias=bias_cls)
             normal_init(rtm_reg, std=0.01)
             normal_init(rtm_ang, std=0.01)
@@ -863,44 +868,43 @@ class RotatedRTMDetSepBNHead(RotatedRTMDetHead):
 
 
 if __name__ == '__main__':
-    points = torch.tensor([[0., 0., 8., 8.],
-                           [8., 0., 8., 8.],
-                           [16., 0., 8., 8.],
-                           [24., 0., 8., 8.]], device='cuda:0')
+    points = torch.tensor([[0., 0., 8., 8.], [8., 0., 8., 8.],
+                           [16., 0., 8., 8.], [24., 0., 8., 8.]],
+                          device='cuda:0')
 
-    distances = torch.tensor(
-        [[[7.4215, 7.8629, 7.4568, 8.1447, -0.0224],
-          [7.3209, 7.7807, 7.4076, 8.1743, -0.0194],
-          [7.2929, 7.7480, 7.3624, 8.1829, -0.0228],
-          [7.3291, 7.7770, 7.3966, 8.2230, -0.0215]],
-         [[7.5713, 7.8529, 7.5189, 8.1220, -0.0212],
-          [7.6215, 7.8978, 7.5875, 8.2110, -0.0304],
-          [7.6464, 7.8849, 7.4770, 8.0470, -0.0372],
-          [7.5255, 7.8110, 7.4478, 8.1207, -0.0282]],
-         [[7.4363, 7.8605, 7.4451, 8.1569, -0.0239],
-          [7.3455, 7.7839, 7.4027, 8.1784, -0.0184],
-          [7.3022, 7.7584, 7.3663, 8.1751, -0.0232],
-          [7.3419, 7.7717, 7.3903, 8.2077, -0.0242]],
-         [[7.4416, 7.8393, 7.4837, 8.1546, -0.0213],
-          [7.3217, 7.7790, 7.3956, 8.1805, -0.0154],
-          [7.3080, 7.7377, 7.3658, 8.1779, -0.0205],
-          [7.3390, 7.7580, 7.4031, 8.2245, -0.0205]],
-         [[7.7741, 7.8088, 7.7546, 8.3303, -0.0151],
-          [7.7897, 7.9653, 7.9556, 8.3727, -0.0266],
-          [8.2531, 8.2622, 8.4759, 8.1064, -0.0506],
-          [8.1185, 7.9733, 8.1983, 8.3481, -0.0243]],
-         [[7.4850, 7.8193, 7.4702, 8.1592, -0.0248],
-          [7.3636, 7.7511, 7.4078, 8.1570, -0.0204],
-          [7.3184, 7.7122, 7.3942, 8.1611, -0.0243],
-          [7.3617, 7.7788, 7.4001, 8.2358, -0.0256]],
-         [[7.4395, 7.8696, 7.4530, 8.1517, -0.0246],
-          [7.3550, 7.7790, 7.4124, 8.1524, -0.0221],
-          [7.3377, 7.7614, 7.3752, 8.1712, -0.0226],
-          [7.3411, 7.7603, 7.4000, 8.2265, -0.0246]],
-         [[7.4344, 7.8780, 7.4388, 8.1534, -0.0247],
-          [7.3309, 7.8050, 7.3925, 8.1647, -0.0202],
-          [7.2904, 7.7461, 7.3651, 8.1827, -0.0221],
-          [7.3486, 7.7741, 7.4090, 8.2144, -0.0230]]], device='cuda:0')
+    distances = torch.tensor([[[7.4215, 7.8629, 7.4568, 8.1447, -0.0224],
+                               [7.3209, 7.7807, 7.4076, 8.1743, -0.0194],
+                               [7.2929, 7.7480, 7.3624, 8.1829, -0.0228],
+                               [7.3291, 7.7770, 7.3966, 8.2230, -0.0215]],
+                              [[7.5713, 7.8529, 7.5189, 8.1220, -0.0212],
+                               [7.6215, 7.8978, 7.5875, 8.2110, -0.0304],
+                               [7.6464, 7.8849, 7.4770, 8.0470, -0.0372],
+                               [7.5255, 7.8110, 7.4478, 8.1207, -0.0282]],
+                              [[7.4363, 7.8605, 7.4451, 8.1569, -0.0239],
+                               [7.3455, 7.7839, 7.4027, 8.1784, -0.0184],
+                               [7.3022, 7.7584, 7.3663, 8.1751, -0.0232],
+                               [7.3419, 7.7717, 7.3903, 8.2077, -0.0242]],
+                              [[7.4416, 7.8393, 7.4837, 8.1546, -0.0213],
+                               [7.3217, 7.7790, 7.3956, 8.1805, -0.0154],
+                               [7.3080, 7.7377, 7.3658, 8.1779, -0.0205],
+                               [7.3390, 7.7580, 7.4031, 8.2245, -0.0205]],
+                              [[7.7741, 7.8088, 7.7546, 8.3303, -0.0151],
+                               [7.7897, 7.9653, 7.9556, 8.3727, -0.0266],
+                               [8.2531, 8.2622, 8.4759, 8.1064, -0.0506],
+                               [8.1185, 7.9733, 8.1983, 8.3481, -0.0243]],
+                              [[7.4850, 7.8193, 7.4702, 8.1592, -0.0248],
+                               [7.3636, 7.7511, 7.4078, 8.1570, -0.0204],
+                               [7.3184, 7.7122, 7.3942, 8.1611, -0.0243],
+                               [7.3617, 7.7788, 7.4001, 8.2358, -0.0256]],
+                              [[7.4395, 7.8696, 7.4530, 8.1517, -0.0246],
+                               [7.3550, 7.7790, 7.4124, 8.1524, -0.0221],
+                               [7.3377, 7.7614, 7.3752, 8.1712, -0.0226],
+                               [7.3411, 7.7603, 7.4000, 8.2265, -0.0246]],
+                              [[7.4344, 7.8780, 7.4388, 8.1534, -0.0247],
+                               [7.3309, 7.8050, 7.3925, 8.1647, -0.0202],
+                               [7.2904, 7.7461, 7.3651, 8.1827, -0.0221],
+                               [7.3486, 7.7741, 7.4090, 8.2144, -0.0230]]],
+                             device='cuda:0')
 
     res = distance2obb(points, distances, 'le90').reshape(-1, 5)
 
