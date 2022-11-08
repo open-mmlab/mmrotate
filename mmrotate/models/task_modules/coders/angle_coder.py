@@ -172,10 +172,10 @@ class DistributionAngleCoder(BaseBBoxCoder):
         return dfl_target.flatten()
 
     def decode(self, angle: Tensor, keepdim: bool = False) -> Tensor:
-        angle = F.softmax(angle.reshape(-1, self.reg_max + 1), dim=-1)
-        angle = F.linear(angle, self.project.type_as(angle))
+        decode_angle = F.softmax(angle.reshape(-1, self.reg_max + 1), dim=-1)
+        decode_angle = F.linear(decode_angle, self.project.type_as(angle))
         if keepdim:
-            angle = angle.reshape(-1, 1)
+            decode_angle = decode_angle.reshape(*angle.shape[:-1], 1)
         else:
-            angle = angle.reshape(-1)
-        return self.angle_range * angle / self.reg_max - self.angle_offset
+            decode_angle = decode_angle.reshape(-1)
+        return self.angle_range * decode_angle / self.reg_max - self.angle_offset
