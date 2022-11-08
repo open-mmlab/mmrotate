@@ -99,7 +99,8 @@ class DistanceAnglePointCoder(BaseBBoxCoder):
 
         cos_angle, sin_angle = torch.cos(angle), torch.sin(angle)
 
-        rot_matrix = torch.cat([cos_angle, -sin_angle, sin_angle, cos_angle], dim=-1)
+        rot_matrix = torch.cat([cos_angle, -sin_angle, sin_angle, cos_angle],
+                               dim=-1)
         rot_matrix = rot_matrix.reshape(*rot_matrix.shape[:-1], 2, 2)
 
         wh = distance[..., :2] + distance[..., 2:]

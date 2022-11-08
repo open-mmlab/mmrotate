@@ -178,4 +178,6 @@ class DistributionAngleCoder(BaseBBoxCoder):
             decode_angle = decode_angle.reshape(*angle.shape[:-1], 1)
         else:
             decode_angle = decode_angle.reshape(-1)
-        return self.angle_range * decode_angle / self.reg_max - self.angle_offset
+        decode_angle = self.angle_offset * decode_angle / self.reg_max
+        decode_angle = decode_angle - self.angle_offset
+        return decode_angle

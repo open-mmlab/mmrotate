@@ -8,9 +8,9 @@ from .rotated_atss_head import RotatedATSSHead
 from .rotated_fcos_head import RotatedFCOSHead
 from .rotated_reppoints_head import RotatedRepPointsHead
 from .rotated_retina_head import RotatedRetinaHead
+from .rotated_rtmdet_head import RotatedRTMDetHead, RotatedRTMDetSepBNHead
 from .s2a_head import S2AHead, S2ARefineHead
 from .sam_reppoints_head import SAMRepPointsHead
-from .rotated_rtmdet_head import RotatedRTMDetHead, RotatedRTMDetSepBNHead
 
 __all__ = [
     'RotatedRetinaHead', 'OrientedRPNHead', 'RotatedRepPointsHead',
