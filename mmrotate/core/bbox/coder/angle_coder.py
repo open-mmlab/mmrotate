@@ -139,7 +139,10 @@ class PSCCoder(BaseBBoxCoder):
         self.dual_freq = dual_freq
         self.num_step = num_step
         self.thr_mod = thr_mod
-        self.coding_len = 2 * self.num_step if self.dual_freq else self.num_step
+        if self.dual_freq:
+            self.coding_len = 2 * self.num_step
+        else:
+            self.coding_len = self.num_step
 
         self.coef_sin = torch.tensor(
             tuple(
