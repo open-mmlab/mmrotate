@@ -23,6 +23,7 @@ class CSLCoder(BaseBBoxCoder):
             ['triangle', 'rect', 'pulse'], float type for
             ['gaussian']. Default: 6.
     """
+
     def __init__(self, angle_version, omega=1, window='gaussian', radius=6):
         super().__init__()
         self.angle_version = angle_version
@@ -62,25 +63,24 @@ class CSLCoder(BaseBBoxCoder):
             radius_range = angle_targets_long % self.coding_len
             smooth_value = 1.0
         elif self.window == 'rect':
-            base_radius_range = torch.arange(-self.radius,
-                                             self.radius,
-                                             device=angle_targets_long.device)
+            base_radius_range = torch.arange(
+                -self.radius, self.radius, device=angle_targets_long.device)
             radius_range = (base_radius_range +
                             angle_targets_long) % self.coding_len
             smooth_value = 1.0
         elif self.window == 'triangle':
-            base_radius_range = torch.arange(-self.radius,
-                                             self.radius,
-                                             device=angle_targets_long.device)
+            base_radius_range = torch.arange(
+                -self.radius, self.radius, device=angle_targets_long.device)
             radius_range = (base_radius_range +
                             angle_targets_long) % self.coding_len
             smooth_value = 1.0 - torch.abs(
                 (1 / self.radius) * base_radius_range)
 
         elif self.window == 'gaussian':
-            base_radius_range = torch.arange(-self.angle_range // 2,
-                                             self.angle_range // 2,
-                                             device=angle_targets_long.device)
+            base_radius_range = torch.arange(
+                -self.angle_range // 2,
+                self.angle_range // 2,
+                device=angle_targets_long.device)
 
             radius_range = (base_radius_range +
                             angle_targets_long) % self.coding_len
@@ -128,6 +128,7 @@ class PSCCoder(BaseBBoxCoder):
         num_step (int, optional): Number of phase steps. Default: 3.
         thr_mod (float): Threshold of modulation. Default: 0.47.
     """
+
     def __init__(self,
                  angle_version,
                  dual_freq=True,
@@ -194,10 +195,10 @@ class PSCCoder(BaseBBoxCoder):
         self.coef_sin = self.coef_sin.to(angle_preds)
         self.coef_cos = self.coef_cos.to(angle_preds)
 
-        phase_sin = torch.sum(angle_preds[:, 0:self.num_step] * self.coef_sin,
-                              dim=-1)
-        phase_cos = torch.sum(angle_preds[:, 0:self.num_step] * self.coef_cos,
-                              dim=-1)
+        phase_sin = torch.sum(
+            angle_preds[:, 0:self.num_step] * self.coef_sin, dim=-1)
+        phase_cos = torch.sum(
+            angle_preds[:, 0:self.num_step] * self.coef_cos, dim=-1)
         phase_mod = phase_cos**2 + phase_sin**2
         phase = -torch.atan2(phase_sin, phase_cos)  # In range [-pi,pi)
 
