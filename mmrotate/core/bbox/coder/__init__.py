@@ -8,5 +8,6 @@ from .gliding_vertex_coder import GVFixCoder, GVRatioCoder
 
 __all__ = [
     'DeltaXYWHAOBBoxCoder', 'DeltaXYWHAHBBoxCoder', 'MidpointOffsetCoder',
-    'GVFixCoder', 'GVRatioCoder', 'CSLCoder', 'PSCCoder', 'DistanceAnglePointCoder'
+    'GVFixCoder', 'GVRatioCoder', 'CSLCoder', 'PSCCoder',
+    'DistanceAnglePointCoder'
 ]

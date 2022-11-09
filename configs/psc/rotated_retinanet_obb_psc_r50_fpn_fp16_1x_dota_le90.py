@@ -1,4 +1,5 @@
-_base_ = '../rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90.py'
+_base_ = \
+    '../rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90.py'
 
 angle_version = 'le90'
 model = dict(
