@@ -3,7 +3,8 @@ from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import mmcv
+from mmengine.config import Config
+from mmengine.utils import mkdir_or_exist
 
 try:
     from model_archiver.model_packaging import package_model
@@ -42,9 +43,9 @@ def mmrotate2torchserve(
             If True, if there is an existing `{model_name}.mar`
             file under `output_folder` it will be overwritten.
     """
-    mmcv.mkdir_or_exist(output_folder)
+    mkdir_or_exist(output_folder)
 
-    config = mmcv.Config.fromfile(config_file)
+    config = Config.fromfile(config_file)
 
     with TemporaryDirectory() as tmpdir:
         config.dump(f'{tmpdir}/config.py')
@@ -108,3 +109,4 @@ if __name__ == '__main__':
 
     mmrotate2torchserve(args.config, args.checkpoint, args.output_folder,
                         args.model_name, args.model_version, args.force)
+    
