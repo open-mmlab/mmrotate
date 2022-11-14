@@ -66,10 +66,9 @@ class AngleBranchRetinaHead(RetinaHead):
                              bias_prob=0.01),
                      ]),
                  **kwargs) -> None:
-        angle_range = 90 if angle_coder['angle_version'] == 'oc' else 180
-        self.encoded_size = int(angle_range // angle_coder['omega'])
-        super().__init__(*args, init_cfg=init_cfg, **kwargs)
         self.angle_coder = TASK_UTILS.build(angle_coder)
+        self.encoded_size = self.angle_coder.encoded_size
+        super().__init__(*args, init_cfg=init_cfg, **kwargs)
         self.loss_angle = MODELS.build(loss_angle)
         self.shield_reg_angle = shield_reg_angle
         self.use_encoded_angle = use_encoded_angle
