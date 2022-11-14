@@ -141,10 +141,10 @@ class PSCCoder(BaseBBoxCoder):
     """
 
     def __init__(self,
-                 angle_version,
-                 dual_freq=True,
-                 num_step=3,
-                 thr_mod=0.47):
+                 angle_version: str,
+                 dual_freq: bool = True,
+                 num_step: int = 3,
+                 thr_mod: float = 0.47):
         super().__init__()
         self.angle_version = angle_version
         assert angle_version in ['le90']
