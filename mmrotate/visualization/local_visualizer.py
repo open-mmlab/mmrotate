@@ -7,8 +7,10 @@ from mmdet.structures.mask import BitmapMasks, PolygonMasks, bitmap_to_polygon
 from mmdet.visualization import DetLocalVisualizer, jitter_color
 from mmdet.visualization.palette import _get_adaptive_scales
 from mmengine.structures import InstanceData
+from torch import Tensor
 
 from mmrotate.registry import VISUALIZERS
+from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes
 from .palette import get_palette
 
 
@@ -68,7 +70,17 @@ class RotLocalVisualizer(DetLocalVisualizer):
             bbox_palette = get_palette(bbox_color, max_label + 1)
             colors = [bbox_palette[label] for label in labels]
 
-            # convert to qbox
+            if isinstance(bboxes, Tensor):
+                if bboxes.size(-1) == 5:
+                    bboxes = RotatedBoxes(bboxes)
+                elif bboxes.size(-1) == 8:
+                    bboxes = QuadriBoxes(bboxes)
+                else:
+                    raise TypeError(
+                        'Require the shape of `bboxes` to be (n, 5) '
+                        'or (n, 8), but get `bboxes` with shape being '
+                        f'{bboxes.shape}.')
+
             polygons = bboxes.convert_to('qbox').tensor
             polygons = polygons.reshape(-1, 4, 2).numpy()
             polygons = [p for p in polygons]
