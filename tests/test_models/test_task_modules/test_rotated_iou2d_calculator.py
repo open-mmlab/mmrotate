@@ -100,6 +100,16 @@ class TestRBoxOverlaps2D(TestCase):
         self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
         self.assertEqual(ious.size(), (bboxes1.size(0), bboxes2.size(0)))
 
+        # test boundary condition
+        bboxes1 = torch.FloatTensor([[-8.3e8, 1.4e8, 2.0e9, 3.3e1, -1.7e-1],
+                                     [8.3e8, -1.4e8, 2.0e9, 3.3e1, -1.7e-1],
+                                     [-8.3e8, -1.4e8, 2.0e9, 3.3e9, -1.7e-1]])
+        bboxes2 = torch.FloatTensor([[160.0, 152.0, 2.54, 13.13, -1.5708],
+                                     [128.0, 121.0, 2.75, 17.0, -1.5708],
+                                     [136.0, 82.5, 5.8, 2.16, -1.22]])
+        ious = rbbox_overlaps(bboxes1, bboxes2, 'iou')
+        self.assertTrue(torch.all(ious >= -1) and torch.all(ious <= 1))
+
     def test_fake_rbbox_overlaps_2d(self):
         overlap = FakeRBboxOverlaps2D()
         bboxes1, num_bbox = self._construct_rbbox()
