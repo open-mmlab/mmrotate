@@ -76,7 +76,10 @@ class RotLocalVisualizer(DetLocalVisualizer):
                 elif bboxes.size(-1) == 8:
                     bboxes = QuadriBoxes(bboxes)
                 else:
-                    NotImplementedError
+                    raise TypeError(
+                        'Require the shape of `bboxes` to be (n, 5) '
+                        'or (n, 8), but get `bboxes` with shape being '
+                        f'{bboxes.shape}.')
 
             polygons = bboxes.convert_to('qbox').tensor
             polygons = polygons.reshape(-1, 4, 2).numpy()
