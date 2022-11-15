@@ -43,6 +43,11 @@ def rbbox_overlaps(bboxes1: Tensor,
     clamped_bboxes1[:, 2:4].clamp_(min=1e-3)
     clamped_bboxes2[:, 2:4].clamp_(min=1e-3)
 
+    # resolve `rbbox_overlaps` abnormal when coordinate value is too large.
+    # TODO: fix in mmcv
+    clamped_bboxes1[:, :2].clamp_(min=1e7, max=1e7)
+    clamped_bboxes2[:, :2].clamp_(min=1e7, max=1e7)
+
     return box_iou_rotated(clamped_bboxes1, clamped_bboxes2, mode, is_aligned)
 
 
@@ -88,5 +93,10 @@ def fake_rbbox_overlaps(bboxes1: RotatedBoxes,
     clamped_bboxes2 = fake_rbboxes2.detach().clone().tensor
     clamped_bboxes1[:, 2:4].clamp_(min=1e-3)
     clamped_bboxes2[:, 2:4].clamp_(min=1e-3)
+
+    # resolve `rbbox_overlaps` abnormal when coordinate value is too large.
+    # TODO: fix in mmcv
+    clamped_bboxes1[:, :2].clamp_(min=1e7, max=1e7)
+    clamped_bboxes2[:, :2].clamp_(min=1e7, max=1e7)
 
     return box_iou_rotated(clamped_bboxes1, clamped_bboxes2, mode, is_aligned)
