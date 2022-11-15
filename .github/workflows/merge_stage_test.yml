@@ -165,7 +165,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Upgrade pip
-        run: pip install pip --upgrade
+        run: python -m pip install --upgrade pip
       - name: Install lmdb
         run: pip install lmdb
       - name: Install PyTorch
@@ -175,6 +175,7 @@ jobs:
           pip install git+https://github.com/open-mmlab/mmengine.git@main
           pip install -U openmim
           mim install 'mmcv >= 2.0.0rc2'
+          pip install pycocotools
           pip install git+https://github.com/open-mmlab/mmdetection.git@dev-3.x
           pip install -r requirements/tests.txt
       - name: Build and install
