@@ -114,6 +114,7 @@ jobs:
           pip install git+https://github.com/open-mmlab/mmengine.git@main
           pip install -U openmim
           mim install 'mmcv >= 2.0.0rc2'
+          pip install pycocotools
           pip install git+https://github.com/open-mmlab/mmdetection.git@dev-3.x
           pip install -r requirements/tests.txt
       - name: Build and install
