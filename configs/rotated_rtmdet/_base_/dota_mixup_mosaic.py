@@ -8,21 +8,62 @@ train_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
-    dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
+    dict(
+        type='mmdet.CachedMosaic',
+        img_scale=(1024, 1024),
+        pad_val=114.0,
+        max_cached_images=20,
+        random_pop=False),
+    dict(
+        type='mmdet.RandomResize',
+        resize_type='mmdet.Resize',
+        scale=(2048, 2048),
+        ratio_range=(0.5, 2.0),
+        keep_ratio=True),
+    dict(type='RandomRotate', prob=0.5, angle_range=180),
+    dict(type='mmdet.RandomCrop', crop_size=(1024, 1024)),
+    dict(type='mmdet.YOLOXHSVRandomAug'),
     dict(
         type='mmdet.RandomFlip',
         prob=0.75,
         direction=['horizontal', 'vertical', 'diagonal']),
     dict(
-        type='RandomRotate',
-        prob=0.5,
-        angle_range=180,
-        rect_obj_labels=[9, 11]),
+        type='mmdet.Pad', size=(1024, 1024),
+        pad_val=dict(img=(114, 114, 114))),
+    dict(
+        type='mmdet.CachedMixUp',
+        img_scale=(1024, 1024),
+        ratio_range=(1.0, 1.0),
+        max_cached_images=10,
+        random_pop=False,
+        pad_val=(114, 114, 114),
+        prob=0.5),
+    dict(type='mmdet.PackDetInputs')
+]
+
+train_pipeline_stage2 = [
+    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
+    dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
+    dict(
+        type='mmdet.RandomResize',
+        resize_type='mmdet.Resize',
+        scale=(1024, 1024),
+        ratio_range=(0.5, 2.0),
+        keep_ratio=True),
+    dict(type='RandomRotate', prob=0.5, angle_range=180),
+    dict(type='mmdet.RandomCrop', crop_size=(1024, 1024)),
+    dict(type='mmdet.YOLOXHSVRandomAug'),
+    dict(
+        type='mmdet.RandomFlip',
+        prob=0.75,
+        direction=['horizontal', 'vertical', 'diagonal']),
     dict(
         type='mmdet.Pad', size=(1024, 1024),
         pad_val=dict(img=(114, 114, 114))),
     dict(type='mmdet.PackDetInputs')
 ]
+
 val_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
@@ -109,5 +150,9 @@ custom_hooks = [
         ema_type='mmdet.ExpMomentumEMA',
         momentum=0.0002,
         update_buffers=True,
-        priority=49)
+        priority=49),
+    dict(
+        type='mmdet.PipelineSwitchHook',
+        switch_epoch=30,
+        switch_pipeline=train_pipeline_stage2)
 ]

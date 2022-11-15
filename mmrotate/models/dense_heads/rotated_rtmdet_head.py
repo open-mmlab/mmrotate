@@ -219,10 +219,14 @@ class RotatedRTMDetHead(RTMDetHead):
                 pos_angle_pred = angle_pred[pos_inds]
                 pos_angle_target = pos_bbox_targets[:, 4:5]
                 pos_angle_target = self.angle_coder.encode(pos_angle_target)
+                if pos_angle_target.dim() == 2:
+                    pos_angle_weight = pos_bbox_weight.unsqueeze(-1)
+                else:
+                    pos_angle_weight = pos_bbox_weight
                 loss_angle = self.loss_angle(
                     pos_angle_pred,
                     pos_angle_target,
-                    weight=pos_bbox_weight,
+                    weight=pos_angle_weight,
                     avg_factor=1.0)
 
             loss_bbox = self.loss_bbox(
@@ -236,8 +240,8 @@ class RotatedRTMDetHead(RTMDetHead):
             pos_bbox_weight = bbox_targets.new_tensor(0.)
             loss_angle = angle_pred.sum() * 0
 
-        return loss_cls, loss_bbox, loss_angle, assign_metrics.sum(
-        ), pos_bbox_weight.sum(), pos_bbox_weight.sum()
+        return (loss_cls, loss_bbox, loss_angle, assign_metrics.sum(),
+                pos_bbox_weight.sum(), pos_bbox_weight.sum())
 
     def loss_by_feat(self,
                      cls_scores: List[Tensor],
