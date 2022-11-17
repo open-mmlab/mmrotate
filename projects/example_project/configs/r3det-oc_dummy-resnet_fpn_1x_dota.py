@@ -1,6 +1,4 @@
-_base_ = [
-    '../../../configs/r3det/r3det-oc_r50_fpn_1x_dota.py'
-]
+_base_ = ['../../../configs/r3det/r3det-oc_r50_fpn_1x_dota.py']
 
 custom_imports = dict(imports=['projects.example_project.dummy'])
 
