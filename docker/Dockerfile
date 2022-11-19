@@ -18,11 +18,8 @@ RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build 
 
 # Install openmim
 RUN pip install --no-cache-dir -U openmim
-# Install mmengine and mmcv
-RUN mim install mmengine
-RUN mim install "mmcv>=2.0.0rc2"
-# Install mmdetection
-RUN mim install 'mmdet>=3.0.0rc2'
+# Install mmengine, mmcv, and mmdetection
+RUN mim install --no-cache-dir mmengine "mmcv>=2.0.0rc2" "mmdet>=3.0.0rc2"
 # Install MMRotate
 RUN conda clean --all -y
 RUN git clone https://github.com/open-mmlab/mmrotate.git -b dev-1.x /mmrotate
