@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build 
     && rm -rf /var/lib/apt/lists/*
 
 # Install openmim
-RUN pip install -U openmim
+RUN pip install --no-cache-dir -U openmim
 # Install mmengine and mmcv
 RUN mim install mmengine
 RUN mim install "mmcv>=2.0.0rc2"
