@@ -81,8 +81,9 @@ class RotLocalVisualizer(DetLocalVisualizer):
                         'or (n, 8), but get `bboxes` with shape being '
                         f'{bboxes.shape}.')
 
+            bboxes = bboxes.cpu()
             polygons = bboxes.convert_to('qbox').tensor
-            polygons = polygons.reshape(-1, 4, 2).numpy()
+            polygons = polygons.reshape(-1, 4, 2)
             polygons = [p for p in polygons]
             self.draw_polygons(
                 polygons,
