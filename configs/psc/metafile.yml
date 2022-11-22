@@ -5,7 +5,7 @@ Collections:
     Training Techniques:
       - SGD with Momentum
       - Weight Decay
-    Training Resources: 1x GeForce GTX 3080
+    Training Resources: 1x GeForce RTX 3080
     Architecture:
       - ResNet
   Paper:
