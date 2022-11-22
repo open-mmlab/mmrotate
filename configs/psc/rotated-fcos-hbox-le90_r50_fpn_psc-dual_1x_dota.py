@@ -21,5 +21,5 @@ model = dict(
         loss_bbox=dict(type='mmdet.IoULoss', loss_weight=1.0),
         loss_centerness=dict(
             type='mmdet.CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
-        loss_angle=dict(_delete_=True, type='mmdet.L1Loss', loss_weight=0.3),
+        loss_angle=dict(_delete_=True, type='mmdet.L1Loss', loss_weight=0.1),
     ))

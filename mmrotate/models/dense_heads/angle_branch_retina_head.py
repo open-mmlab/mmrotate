@@ -39,6 +39,7 @@ class AngleBranchRetinaHead(RetinaHead):
                  *args,
                  use_encoded_angle: bool = True,
                  shield_reg_angle: bool = False,
+                 use_normalized_angle_feat: bool = False,
                  angle_coder: ConfigType = dict(
                      type='CSLCoder',
                      angle_version='le90',
@@ -72,6 +73,7 @@ class AngleBranchRetinaHead(RetinaHead):
         self.loss_angle = MODELS.build(loss_angle)
         self.shield_reg_angle = shield_reg_angle
         self.use_encoded_angle = use_encoded_angle
+        self.use_normalized_angle_feat = use_normalized_angle_feat
 
     def _init_layers(self) -> None:
         """Initialize layers of the head."""
@@ -107,6 +109,8 @@ class AngleBranchRetinaHead(RetinaHead):
         cls_score = self.retina_cls(cls_feat)
         bbox_pred = self.retina_reg(reg_feat)
         angle_pred = self.retina_angle_cls(reg_feat)
+        if self.use_normalized_angle_feat:
+            angle_pred = angle_pred.sigmoid() * 2 - 1
         return cls_score, bbox_pred, angle_pred
 
     def loss_by_feat_single(self, cls_score: Tensor, bbox_pred: Tensor,
@@ -567,8 +571,8 @@ class AngleBranchRetinaHead(RetinaHead):
 
             dim = self.bbox_coder.encode_size
             bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, dim)
-            angle_pred = angle_pred.permute(1, 2, 0).reshape(
-                -1, self.encode_size).sigmoid()
+            angle_pred = angle_pred.permute(1, 2,
+                                            0).reshape(-1, self.encode_size)
             if with_score_factors:
                 score_factor = score_factor.permute(1, 2,
                                                     0).reshape(-1).sigmoid()

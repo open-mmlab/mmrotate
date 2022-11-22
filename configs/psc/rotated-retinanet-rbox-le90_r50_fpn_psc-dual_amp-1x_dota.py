@@ -4,7 +4,9 @@ _base_ = \
 angle_version = 'le90'
 model = dict(
     bbox_head=dict(
+        anchor_generator=dict(angle_version=None),
         type='AngleBranchRetinaHead',
+        use_normalized_angle_feat=True,
         angle_coder=dict(
             type='PSCCoder',
             angle_version=angle_version,
