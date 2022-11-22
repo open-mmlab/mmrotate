@@ -17,3 +17,4 @@ Import:
   - configs/rotated_retinanet/metafile.yml
   - configs/s2anet/metafile.yml
   - configs/sasm_reppoints/metafile.yml
+  - configs/psc/metafile.yml
