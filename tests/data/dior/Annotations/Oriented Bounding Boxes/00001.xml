@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<annotation>
+    <folder>/JPEGImages-trainval.zip/JPEGImages-trainval/JPEGImages-trainval</folder>
+    <filename>00001.jpg</filename>
+    <path>/JPEGImages-trainval.zip/JPEGImages-trainval/JPEGImages-trainval</path>
+    <source>
+        <database>Unknown</database>
+    </source>
+    <size>
+        <width>800</width>
+        <height>800</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <type>robndbox</type>
+        <name>golffield</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <robndbox>
+            <x_left_top>133</x_left_top>
+            <y_left_top>237</y_left_top>
+            <x_right_top>684</x_right_top>
+            <y_right_top>237</y_right_top>
+            <x_right_bottom>684</x_right_bottom>
+            <y_right_bottom>672</y_right_bottom>
+            <x_left_bottom>133</x_left_bottom>
+            <y_left_bottom>672</y_left_bottom>
+        </robndbox>
+        <angle>0</angle>
+    </object>
+</annotation>
