@@ -74,7 +74,7 @@ model = dict(
     bbox_head=dict(
         type='RotatedRetinaHead',
         # explicitly over-write all the `num_classes` field from default 15 to 5.
-        num_classes=15))
+        num_classes=5))
 ```
 
 #### 2. Check the annotations of the customized dataset
@@ -131,7 +131,7 @@ dataset_A_train = dict(
 
 There are three ways to concatenate the dataset.
 
-1. If the datasets you want to concatenate are in the same type with different annotation files, you can concatenate the dataset configs like the following.
+1. If the datasets you want to concatenate are of the same type with different annotation files, you can concatenate the dataset configs like the following.
 
    ```python
    dataset_A_train = dict(
