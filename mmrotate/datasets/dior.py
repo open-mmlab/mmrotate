@@ -44,10 +44,10 @@ class DIORDataset(BaseDataset):
     def __init__(self,
                  ann_subdir: str = 'Annotations/Oriented Bounding Boxes/',
                  file_client_args: dict = dict(backend='disk'),
-                 xmltype: str = 'obb',
+                 ann_type: str = 'obb',
                  **kwargs) -> None:
-        assert xmltype in ['hbb', 'obb']
-        self.xmltype = xmltype
+        assert ann_type in ['hbb', 'obb']
+        self.ann_type = ann_type
         self.ann_subdir = ann_subdir
         self.file_client_args = file_client_args
         self.file_client = FileClient(**self.file_client_args)
@@ -135,7 +135,7 @@ class DIORDataset(BaseDataset):
             if label is None:
                 continue
 
-            if self.xmltype == 'obb':
+            if self.ann_type == 'obb':
                 bnd_box = obj.find('robndbox')
                 polygon = np.array([
                     float(bnd_box.find('x_left_top').text),
