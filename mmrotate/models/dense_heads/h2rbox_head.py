@@ -47,8 +47,6 @@ class H2RBoxHead(RotatedFCOSHead):
         loss_centerness (:obj:`ConfigDict`, or dict): Config of centerness loss.
         loss_angle (:obj:`ConfigDict` or dict, Optional): Config of angle loss.
         loss_bbox_ss (:obj:`ConfigDict` or dict): Config of consistency loss.
-        loss_angle_ss (:obj:`ConfigDict` or dict, Optional): Config of angle loss
-            in self-supervised branch.
         rotation_agnostic_classes (list): Ids of rotation agnostic category.
         weak_supervised (bool): If true, horizontal gtbox is input.
             Default to True.
@@ -88,7 +86,6 @@ class H2RBoxHead(RotatedFCOSHead):
                  loss_angle: OptConfigType = None,
                  loss_bbox_ss: ConfigType = dict(
                      type='mmdet.IoULoss', loss_weight=1.0),
-                 loss_angle_ss: OptConfigType = None,
                  rotation_agnostic_classes: list = None,
                  weak_supervised: bool = True,
                  square_classes: list = None,
@@ -110,10 +107,6 @@ class H2RBoxHead(RotatedFCOSHead):
             **kwargs)
 
         self.loss_bbox_ss = MODELS.build(loss_bbox_ss)
-        if loss_angle is not None:
-            self.loss_angle_ss = MODELS.build(loss_angle_ss)
-        else:
-            self.loss_angle_ss = None
         self.rotation_agnostic_classes = rotation_agnostic_classes
         self.weak_supervised = weak_supervised
         self.square_classes = square_classes
@@ -379,7 +372,7 @@ class H2RBoxHead(RotatedFCOSHead):
 
             if has_valid_ss:
                 pos_inds_ss = torch.cat(pos_inds_ss)
-                pos_inds_ss_b = torch.cat(pos_inds_ss_b)
+                # pos_inds_ss_b = torch.cat(pos_inds_ss_b)
                 flatten_bbox_preds_ss = [
                     bbox_pred.permute(0, 2, 3, 1).reshape(-1, 4)
                     for bbox_pred in bbox_preds_ss
@@ -394,16 +387,13 @@ class H2RBoxHead(RotatedFCOSHead):
                 pos_angle_preds_ss = flatten_angle_preds_ss[pos_inds_ss]
                 pos_points_ss = flatten_points[pos_inds_ss]
 
-            if self.use_hbbox_loss:
-                bbox_coder = self.h_bbox_coder
-            else:
-                bbox_coder = self.bbox_coder
-                pos_decoded_angle_preds = self.angle_coder.decode(
-                    pos_angle_preds, keepdim=True)
-                pos_bbox_preds = torch.cat(
-                    [pos_bbox_preds, pos_decoded_angle_preds], dim=-1)
-                pos_bbox_targets = torch.cat(
-                    [pos_bbox_targets, pos_angle_targets], dim=-1)
+            bbox_coder = self.bbox_coder
+            pos_decoded_angle_preds = self.angle_coder.decode(
+                pos_angle_preds, keepdim=True)
+            pos_bbox_preds = torch.cat(
+                [pos_bbox_preds, pos_decoded_angle_preds], dim=-1)
+            pos_bbox_targets = torch.cat([pos_bbox_targets, pos_angle_targets],
+                                         dim=-1)
 
             pos_decoded_bbox_preds = bbox_coder.decode(pos_points,
                                                        pos_bbox_preds)
@@ -422,12 +412,6 @@ class H2RBoxHead(RotatedFCOSHead):
                     pos_decoded_target_preds,
                     weight=pos_centerness_targets,
                     avg_factor=centerness_denorm)
-
-                if self.loss_angle is not None:
-                    pos_angle_targets = self.angle_coder.encode(
-                        pos_angle_targets)
-                    loss_angle = self.loss_angle(
-                        pos_angle_preds, pos_angle_targets, avg_factor=num_pos)
 
             loss_centerness = self.loss_centerness(
                 pos_centerness, pos_centerness_targets, avg_factor=num_pos)
@@ -469,38 +453,19 @@ class H2RBoxHead(RotatedFCOSHead):
                     weight=pos_centerness_targets_ss,
                     avg_factor=centerness_denorm_ss)
 
-                if self.loss_angle is not None:
-                    loss_angle_ss = self.loss_angle_ss(
-                        pos_angle_preds_ss,
-                        pos_angle_targets_ss,
-                        avg_factor=num_pos)
             else:
                 loss_bbox_ss = pos_bbox_preds[[]].sum()
-                if self.loss_angle is not None:
-                    loss_angle_ss = pos_bbox_preds[[]].sum()
 
         else:
             loss_bbox = pos_bbox_preds.sum()
             loss_bbox_ss = pos_bbox_preds.sum()
             loss_centerness = pos_centerness.sum()
-            if self.loss_angle is not None:
-                loss_angle = pos_angle_preds.sum()
-                loss_angle_ss = pos_angle_preds.sum()
 
-        if self.loss_angle:
-            return dict(
-                loss_cls=loss_cls,
-                loss_bbox=loss_bbox,
-                loss_angle=loss_angle,
-                loss_centerness=loss_centerness,
-                loss_bbox_ss=loss_bbox_ss,
-                loss_angle_ss=loss_angle_ss)
-        else:
-            return dict(
-                loss_cls=loss_cls,
-                loss_bbox=loss_bbox,
-                loss_centerness=loss_centerness,
-                loss_bbox_ss=loss_bbox_ss)
+        return dict(
+            loss_cls=loss_cls,
+            loss_bbox=loss_bbox,
+            loss_centerness=loss_centerness,
+            loss_bbox_ss=loss_bbox_ss)
 
     def predict_by_feat(self,
                         cls_scores: List[Tensor],
