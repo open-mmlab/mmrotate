@@ -4,7 +4,7 @@ import unittest
 from mmrotate.datasets import DIORDataset
 
 
-class TestHRSCDataset(unittest.TestCase):
+class TestDIORDataset(unittest.TestCase):
 
     def test_dior(self):
         dataset = DIORDataset(
