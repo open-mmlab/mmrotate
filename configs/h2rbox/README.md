@@ -28,6 +28,7 @@ DOTA1.0
 - Inf time was tested on a single RTX3090.
 - [Original PyTorch Implementation (Paper) for H2RBox](https://github.com/yangxue0827/h2rbox-mmrotate)
 - [Jittor Implementation for H2RBox](https://github.com/yangxue0827/h2rbox-jittor)
+- [JDet Implementation for H2RBox](https://github.com/Jittor/JDet)
 
 ## Citation
 
