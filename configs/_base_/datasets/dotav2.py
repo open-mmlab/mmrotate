@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'DOTAv2Dataset'
-data_root = 'data//split_ss_dota2_0/'
+data_root = 'data/split_ss_dota2_0/'
 file_client_args = dict(backend='disk')
 
 train_pipeline = [
