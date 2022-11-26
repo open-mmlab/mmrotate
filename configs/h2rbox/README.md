@@ -16,11 +16,11 @@ Oriented object detection emerges in many applications from aerial images to aut
 
 DOTA1.0
 
-|         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                   Configs                                   |         Download         |
-| :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :-------------------------------------------------------------------------: | :----------------------: |
-| ResNet50 (1024,1024,200) | 68.75 | le90  |   1x    |          |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dota](./h2rbox-le90_r50_fpn_adamw-1x_dota.py) | [model](<>) \| [log](<>) |
-| ResNet50 (1024,1024,200) | 71.31 | le90  |   3x    |          |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-3x_dota](./h2rbox-le90_r50_fpn_adamw-3x_dota.py) | [model](<>) \| [log](<>) |
-| ResNet50 (1024,1024,200) |       | le90  |   1x    |          |       -        |  √  |     2      |                                   [](./.)                                   | [model](<>) \| [log](<>) |
+|         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                      Configs                                      |         Download         |
+| :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :-------------------------------------------------------------------------------: | :----------------------: |
+| ResNet50 (1024,1024,200) | 68.75 | le90  |   1x    |          |                |  -  |     2      |    [h2rbox-le90_r50_fpn_adamw-1x_dota](./h2rbox-le90_r50_fpn_adamw-1x_dota.py)    | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 71.31 | le90  |   3x    |          |                |  -  |     2      |    [h2rbox-le90_r50_fpn_adamw-3x_dota](./h2rbox-le90_r50_fpn_adamw-3x_dota.py)    | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 74.43 | le90  |   1x    |          |       -        |  √  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dota-ms](./h2rbox-le90_r50_fpn_adamw-1x_dota-ms.py) | [model](<>) \| [log](<>) |
 
 DOTA1.5
 
