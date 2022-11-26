@@ -104,6 +104,7 @@ test_evaluator = dict(
     outfile_prefix='./work_dirs/rtm_iou_test_coco/Task1')
 
 custom_hooks = [
+    dict(type='mmdet.NumClassCheckHook'),
     dict(
         type='EMAHook',
         ema_type='mmdet.ExpMomentumEMA',
