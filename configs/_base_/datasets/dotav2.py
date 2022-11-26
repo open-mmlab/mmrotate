@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'DOTAv2Dataset'
-data_root = 'data/split_ss_dota2_0/'
+data_root = 'datasplit_ss_dota2_0/'
 file_client_args = dict(backend='disk')
 
 train_pipeline = [
@@ -85,4 +85,4 @@ test_evaluator = val_evaluator
 #     type='DOTAMetric',
 #     format_only=True,
 #     merge_patches=True,
-#     outfile_prefix='./work_dirs/dotav2/Task1')
+#     outfile_prefix='./work_dirs/dotav2/h2rbox-le90_r50_fpn_adamw-1x_dotav2/Task1')
