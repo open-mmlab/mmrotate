@@ -27,6 +27,7 @@ DOTA1.5
 |         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                          Configs                                          |         Download         |
 | :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :---------------------------------------------------------------------------------------: | :----------------------: |
 | ResNet50 (1024,1024,200) | 60.33 | le90  |   1x    |   6.83   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dotav15](./dotav15/h2rbox-le90_r50_fpn_adamw-1x_dotav15.py) | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 62.65 | le90  |   1x    |   6.34   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-3x_dotav15](./dotav15/h2rbox-le90_r50_fpn_adamw-3x_dotav15.py) | [model](<>) \| [log](<>) |
 
 DOTA2.0
 
