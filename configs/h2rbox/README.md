@@ -18,23 +18,30 @@ DOTA1.0
 
 |         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                      Configs                                      |         Download         |
 | :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :-------------------------------------------------------------------------------: | :----------------------: |
-| ResNet50 (1024,1024,200) | 68.75 | le90  |   1x    |          |                |  -  |     2      |    [h2rbox-le90_r50_fpn_adamw-1x_dota](./h2rbox-le90_r50_fpn_adamw-1x_dota.py)    | [model](<>) \| [log](<>) |
-| ResNet50 (1024,1024,200) | 71.31 | le90  |   3x    |          |                |  -  |     2      |    [h2rbox-le90_r50_fpn_adamw-3x_dota](./h2rbox-le90_r50_fpn_adamw-3x_dota.py)    | [model](<>) \| [log](<>) |
-| ResNet50 (1024,1024,200) | 74.43 | le90  |   1x    |          |       -        |  √  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dota-ms](./h2rbox-le90_r50_fpn_adamw-1x_dota-ms.py) | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 68.75 | le90  |   1x    |   6.25   |                |  -  |     2      |    [h2rbox-le90_r50_fpn_adamw-1x_dota](./h2rbox-le90_r50_fpn_adamw-1x_dota.py)    | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 71.31 | le90  |   3x    |   6.64   |                |  -  |     2      |    [h2rbox-le90_r50_fpn_adamw-3x_dota](./h2rbox-le90_r50_fpn_adamw-3x_dota.py)    | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 74.43 | le90  |   1x    |   6.12   |       -        |  √  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dota-ms](./h2rbox-le90_r50_fpn_adamw-1x_dota-ms.py) | [model](<>) \| [log](<>) |
 
 DOTA1.5
 
 |         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                          Configs                                          |         Download         |
 | :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :---------------------------------------------------------------------------------------: | :----------------------: |
-| ResNet50 (1024,1024,200) | 60.33 | le90  |   1x    |          |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dotav15](./dotav15/h2rbox-le90_r50_fpn_adamw-1x_dotav15.py) | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 60.33 | le90  |   1x    |   6.83   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dotav15](./dotav15/h2rbox-le90_r50_fpn_adamw-1x_dotav15.py) | [model](<>) \| [log](<>) |
+
+DOTA2.0
+
+|         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                        Configs                                         |         Download         |
+| :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :------------------------------------------------------------------------------------: | :----------------------: |
+| ResNet50 (1024,1024,200) | 47.08 | le90  |   1x    |   7.58   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dotav2](./dotav2/h2rbox-le90_r50_fpn_adamw-1x_dotav2.py) | [model](<>) \| [log](<>) |
 
 **Notes:**
 
 - `MS` means multiple scale image split.
-- Inf time was tested on a single RTX3090.
+- `Inf Time` was tested on a single RTX3090.
 - [Original PyTorch Implementation (Paper) for H2RBox](https://github.com/yangxue0827/h2rbox-mmrotate)
 - [Jittor Implementation for H2RBox](https://github.com/yangxue0827/h2rbox-jittor)
 - [JDet Implementation for H2RBox](https://github.com/Jittor/JDet)
+- The memory log of MMRotate 1.x is dynamic, so the last iteration is recorded here.
 
 ## Citation
 
