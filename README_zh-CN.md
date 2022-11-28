@@ -131,6 +131,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 - [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
 - [x] [Oriented RepPoints](configs/oriented_reppoints/README.md) (CVPR'2022)
 - [x] [KFIoU](configs/kfiou/README.md) (arXiv)
+- [x] [H2RBox](configs/h2rbox/README.md) (arXiv)
 
 </details>
 
