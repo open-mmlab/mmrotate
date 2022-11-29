@@ -1,0 +1,99 @@
+Collections:
+- Name: psc
+  Metadata:
+    Training Data: DOTAv1.0, DOTAv1.5, DOTAv2.0
+    Training Techniques:
+      - AdamW
+      - Weight Decay
+    Training Resources: 1x GeForce RTX 3090
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/abs/2210.06742.pdf
+    Title: 'H2RBox: Horizontal Box Annotation is All You Need for Oriented Object Detection'
+  README: configs/h2rbox/README.md
+
+Models:
+  - Name: h2rbox-le90_r50_fpn_adamw-1x_dota
+    In Collection: h2rbox
+    Config: configs/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 68.75
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dota/h2rbox-le90_r50_fpn_adamw-1x_dota-d02c933a.pth
+
+  - Name: h2rbox-le90_r50_fpn_adamw-3x_dota
+    In Collection: h2rbox
+    Config: configs/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.31
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dota/h2rbox-le90_r50_fpn_adamw-3x_dota-8bca2d7f.pth
+
+  - Name: h2rbox-le90_r50_fpn_adamw-1x_dota-ms
+    In Collection: h2rbox
+    Config: configs/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dota-ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 74.43
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dota-ms/h2rbox-le90_r50_fpn_adamw-1x_dota-ms-30dcdc68.pth
+
+  - Name: h2rbox-le90_r50_fpn_adamw-1x_dotav15
+    In Collection: h2rbox
+    Config: configs/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dotav15.py
+    Metadata:
+      Training Data: DOTAv1.5
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.5
+        Metrics:
+          mAP: 60.33
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dotav15/h2rbox-le90_r50_fpn_adamw-1x_dotav15-5f2178e6.pth
+
+  - Name: h2rbox-le90_r50_fpn_adamw-3x_dotav15
+    In Collection: h2rbox
+    Config: configs/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dotav15.py
+    Metadata:
+      Training Data: DOTAv1.5
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.5
+        Metrics:
+          mAP: 62.65
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dotav15/h2rbox-le90_r50_fpn_adamw-3x_dotav15-d8337c8e.pth
+
+  - Name: h2rbox-le90_r50_fpn_adamw-1x_dotav2
+    In Collection: h2rbox
+    Config: configs/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dotav2.py
+    Metadata:
+      Training Data: DOTAv2.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv2.0
+        Metrics:
+          mAP: 47.08
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dotav2/h2rbox-le90_r50_fpn_adamw-1x_dotav2-366ced3d.pth
+
+  - Name: h2rbox-le90_r50_fpn_adamw-3x_dotav2
+    In Collection: h2rbox
+    Config: configs/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dotav2.py
+    Metadata:
+      Training Data: DOTAv2.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv2.0
+        Metrics:
+          mAP: 50.20
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dotav2/h2rbox-le90_r50_fpn_adamw-3x_dotav2-85bf9bfa.pth
