@@ -23,10 +23,7 @@ INF = 1e8
 
 @MODELS.register_module()
 class H2RBoxHead(RotatedFCOSHead):
-    """Anchor-free head used in `FCOS <https://arxiv.org/abs/1904.01355>`_.
-
-    Compared with FCOS head, Rotated FCOS head add a angle branch to
-    support rotated object detection.
+    """Anchor-free head used in `H2RBox <https://arxiv.org/abs/2210.06742>`_.
 
     Args:
         num_classes (int): Number of categories excluding the background
@@ -34,9 +31,9 @@ class H2RBoxHead(RotatedFCOSHead):
         in_channels (int): Number of channels in the input feature map.
         angle_version (str): Angle representations. Defaults to 'le90'.
         use_hbbox_loss (bool): If true, use horizontal bbox loss and
-            loss_angle should not be None. Default to False.
+            loss_angle should not be None. Defaults to False.
         scale_angle (bool): If true, add scale to angle pred branch.
-            Default to True.
+            Defaults to True.
         angle_coder (:obj:`ConfigDict` or dict): Config of angle coder.
         h_bbox_coder (dict): Config of horzional bbox coder,
             only used when use_hbbox_loss is True.
@@ -49,7 +46,7 @@ class H2RBoxHead(RotatedFCOSHead):
         loss_bbox_ss (:obj:`ConfigDict` or dict): Config of consistency loss.
         rotation_agnostic_classes (list): Ids of rotation agnostic category.
         weak_supervised (bool): If true, horizontal gtbox is input.
-            Default to True.
+            Defaults to True.
         square_classes (list): Ids of the square category.
         crop_size (tuple[int]): Crop size from image center.
             Defaults to (768, 768).

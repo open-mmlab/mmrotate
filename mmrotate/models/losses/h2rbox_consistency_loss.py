@@ -1,6 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Optional
+
 import torch
 from mmdet.utils import ConfigType
+from torch import Tensor
 
 from mmrotate.registry import MODELS
 
@@ -25,11 +28,11 @@ class H2RBoxConsistencyLoss(torch.nn.Module):
         self.loss_weight = loss_weight
 
     def forward(self,
-                pred,
-                target,
-                weight,
-                avg_factor=None,
-                reduction_override=None):
+                pred: Tensor,
+                target: Tensor,
+                weight: Tensor,
+                avg_factor: Optional[int] = None,
+                reduction_override: Optional[str] = None) -> Tensor:
         """Forward function.
 
         Args:
@@ -43,7 +46,7 @@ class H2RBoxConsistencyLoss(torch.nn.Module):
                Defaults to None.
 
         Returns:
-            Calculated loss (torch.Tensor)
+            Calculated loss (Tensor)
         """
         assert reduction_override in (None, 'none', 'mean', 'sum')
         reduction = (
