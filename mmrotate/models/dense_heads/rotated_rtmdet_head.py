@@ -30,10 +30,13 @@ class RotatedRTMDetHead(RTMDetHead):
         num_classes (int): Number of categories excluding the background
             category.
         in_channels (int): Number of channels in the input feature map.
-        with_objectness (bool): Whether to add an objectness branch.
-            Defaults to True.
-        act_cfg (:obj:`ConfigDict` or dict): Config dict for activation layer.
-            Default: dict(type='ReLU')
+        angle_version (str): Angle representations. Defaults to 'le90'.
+        use_hbbox_loss (bool): If true, use horizontal bbox loss and
+            loss_angle should not be None. Default to False.
+        scale_angle (bool): If true, add scale to angle pred branch.
+            Default to True.
+        angle_coder (:obj:`ConfigDict` or dict): Config of angle coder.
+        loss_angle (:obj:`ConfigDict` or dict, Optional): Config of angle loss.
     """
 
     def __init__(self,
@@ -141,7 +144,10 @@ class RotatedRTMDetHead(RTMDetHead):
             cls_score (Tensor): Box scores for each scale level
                 Has shape (N, num_anchors * num_classes, H, W).
             bbox_pred (Tensor): Decoded bboxes for each scale
-                level with shape (N, num_anchors * 4, H, W).
+                level with shape (N, num_anchors * 5, H, W) for rbox loss
+                or (N, num_anchors * 4, H, W) for hbox loss.
+            angle_pred (Tensor): Decoded bboxes for each scale
+                level with shape (N, num_anchors * angle_dim, H, W).
             labels (Tensor): Labels of each anchors with shape
                 (N, num_total_anchors).
             label_weights (Tensor): Label weights of each anchor with shape
@@ -233,10 +239,12 @@ class RotatedRTMDetHead(RTMDetHead):
 
         Args:
             cls_scores (list[Tensor]): Box scores for each scale level
-                Has shape (N, num_anchors * num_classes, H, W)
-            bbox_preds (list[Tensor]): Decoded box for each scale
+                Has shape (N, num_anchors * num_classes, H, W).
+            bbox_preds (list[Tensor]): Box predict for each scale
                 level with shape (N, num_anchors * 4, H, W) in
-                [tl_x, tl_y, br_x, br_y] format.
+                [t, b, l, r] format.
+            bbox_preds (list[Tensor]): Angle pred for each scale
+                level with shape (N, num_anchors * angle_dim, H, W).
             batch_gt_instances (list[:obj:`InstanceData`]): Batch of
                 gt_instance.  It usually includes ``bboxes`` and ``labels``
                 attributes.
@@ -367,7 +375,7 @@ class RotatedRTMDetHead(RTMDetHead):
             - label_weights (Tensor): Label weights of all anchor in the
               image with shape (N,).
             - bbox_targets (Tensor): BBox targets of all anchors in the
-              image with shape (N, 4).
+              image with shape (N, 5).
             - norm_alignment_metrics (Tensor): Normalized alignment metrics
               of all priors in the image with shape (N,).
         """
@@ -404,7 +412,6 @@ class RotatedRTMDetHead(RTMDetHead):
         if len(pos_inds) > 0:
             # point-based
             pos_bbox_targets = sampling_result.pos_gt_bboxes
-            # TODO add arg angle_version
             pos_bbox_targets = pos_bbox_targets.regularize_boxes(
                 self.angle_version)
             bbox_targets[pos_inds, :] = pos_bbox_targets
@@ -460,7 +467,7 @@ class RotatedRTMDetHead(RTMDetHead):
                 scale levels, each is a 4D-tensor, has shape
                 (batch_size, num_priors * 4, H, W).
             angle_preds (list[Tensor]): Box angle for each scale level
-                with shape (N, num_points * encode_size, H, W)
+                with shape (N, num_points * angle_dim, H, W)
             score_factors (list[Tensor], optional): Score factor for
                 all scale level, each is a 4D-tensor, has shape
                 (batch_size, num_priors * 1, H, W). Defaults to None.
@@ -550,7 +557,7 @@ class RotatedRTMDetHead(RTMDetHead):
                 all scale levels of a single image, each item has shape
                 (num_priors * 4, H, W).
             angle_pred_list (list[Tensor]): Box angle for a single scale
-                level with shape (N, num_points * encode_size, H, W).
+                level with shape (N, num_points * angle_dim, H, W).
             score_factor_list (list[Tensor]): Score factor from all scale
                 levels of a single image, each item has shape
                 (num_priors * 1, H, W).
@@ -605,7 +612,6 @@ class RotatedRTMDetHead(RTMDetHead):
 
             assert cls_score.size()[-2:] == bbox_pred.size()[-2:]
 
-            # dim = self.bbox_coder.encode_size
             bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, 4)
             angle_pred = angle_pred.permute(1, 2, 0).reshape(
                 -1, self.angle_coder.encode_size)
@@ -682,11 +688,15 @@ class RotatedRTMDetSepBNHead(RotatedRTMDetHead):
         in_channels (int): Number of channels in the input feature map.
         share_conv (bool): Whether to share conv layers between stages.
             Defaults to True.
+        scale_angle (bool): Does not support in RotatedRTMDetSepBNHead,
+            Defaults to False.
         norm_cfg (:obj:`ConfigDict` or dict)): Config dict for normalization
             layer. Defaults to dict(type='BN', momentum=0.03, eps=0.001).
         act_cfg (:obj:`ConfigDict` or dict)): Config dict for activation layer.
             Defaults to dict(type='SiLU').
         pred_kernel_size (int): Kernel size of prediction layer. Defaults to 1.
+        exp_on_reg (bool): Whether to apply exponential on bbox_pred.
+            Defaults to False.
     """
 
     def __init__(self,
@@ -698,7 +708,7 @@ class RotatedRTMDetSepBNHead(RotatedRTMDetHead):
                      type='BN', momentum=0.03, eps=0.001),
                  act_cfg: ConfigType = dict(type='SiLU'),
                  pred_kernel_size: int = 1,
-                 exp_on_reg=False,
+                 exp_on_reg: bool = False,
                  **kwargs) -> None:
         self.share_conv = share_conv
         self.exp_on_reg = exp_on_reg
@@ -809,15 +819,16 @@ class RotatedRTMDetSepBNHead(RotatedRTMDetHead):
 
         Returns:
             tuple: Usually a tuple of classification scores and bbox prediction
-
-            - cls_scores (tuple[Tensor]): Classification scores for all scale
+            - cls_scores (list[Tensor]): Classification scores for all scale
               levels, each is a 4D-tensor, the channels number is
-              num_anchors * num_classes.
-            - bbox_preds (tuple[Tensor]): Box energies / deltas for all scale
+              num_base_priors * num_classes.
+            - bbox_preds (list[Tensor]): Box energies / deltas for all scale
               levels, each is a 4D-tensor, the channels number is
-              num_anchors * 4.
+              num_base_priors * 4.
+            - angle_preds (list[Tensor]): Angle prediction for all scale
+              levels, each is a 4D-tensor, the channels number is
+              num_base_priors * angle_dim.
         """
-
         cls_scores = []
         bbox_preds = []
         angle_preds = []
