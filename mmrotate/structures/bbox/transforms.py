@@ -78,3 +78,35 @@ def gt2gaussian(target):
     R = torch.stack([cos_sin * neg, cos_sin[..., [1, 0]]], dim=-2)
 
     return (center, R.matmul(diag).matmul(R.transpose(-1, -2)))
+
+
+def distance2obb(points: torch.Tensor,
+                 distance: torch.Tensor,
+                 angle_version: str = 'oc'):
+    """Convert distance angle to rotated boxes.
+
+    Args:
+        points (Tensor): Shape (B, N, 2) or (N, 2).
+        distance (Tensor): Distance from the given point to 4
+            boundaries and angle (left, top, right, bottom, angle).
+            Shape (B, N, 5) or (N, 5)
+        angle_version: angle representations.
+    Returns:
+        dict[str, torch.Tensor]: Gaussian distributions.
+    """
+    distance, angle = distance.split([4, 1], dim=-1)
+
+    cos_angle, sin_angle = torch.cos(angle), torch.sin(angle)
+
+    rot_matrix = torch.cat([cos_angle, -sin_angle, sin_angle, cos_angle],
+                           dim=-1)
+    rot_matrix = rot_matrix.reshape(*rot_matrix.shape[:-1], 2, 2)
+
+    wh = distance[..., :2] + distance[..., 2:]
+    offset_t = (distance[..., 2:] - distance[..., :2]) / 2
+    offset_t = offset_t.unsqueeze(-1)
+    offset = torch.matmul(rot_matrix, offset_t).squeeze(-1)
+    ctr = points[..., :2] + offset
+
+    angle_regular = norm_angle(angle, angle_version)
+    return torch.cat([ctr, wh, angle_regular], dim=-1)
