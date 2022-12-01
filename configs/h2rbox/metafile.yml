@@ -1,7 +1,7 @@
 Collections:
 - Name: psc
   Metadata:
-    Training Data: DOTAv1.0, DOTAv1.5, DOTAv2.0
+    Training Data: DOTAv1.0, DOTAv1.5, DOTAv2.0, DIOR
     Training Techniques:
       - AdamW
       - Weight Decay
@@ -97,3 +97,16 @@ Models:
         Metrics:
           mAP: 50.20
     Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dotav2/h2rbox-le90_r50_fpn_adamw-3x_dotav2-85bf9bfa.pth
+
+
+  - Name: h2rbox-le90_r50_fpn_adamw-1x_dior
+    In Collection: h2rbox
+    Config: configs/dior/h2rbox-le90_r50_fpn_adamw-1x_dior.py
+    Metadata:
+      Training Data: DIOR
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DIOR
+        Metrics:
+          mAP: 33.06/57.40/2.50
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dior/h2rbox-le90_r50_fpn_adamw-1x_dior-949b0e4c.pth

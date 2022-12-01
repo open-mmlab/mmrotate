@@ -36,6 +36,12 @@ DOTA2.0
 | ResNet50 (1024,1024,200) | 47.08 | le90  |   1x    |   7.58   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dotav2](./dotav2/h2rbox-le90_r50_fpn_adamw-1x_dotav2.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dotav2/h2rbox-le90_r50_fpn_adamw-1x_dotav2-366ced3d.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dotav2/h2rbox-le90_r50_fpn_adamw-1x_dotav2-20221126_141507.json) |
 | ResNet50 (1024,1024,200) | 50.20 | le90  |   1x    |   7.74   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-3x_dotav2](./dotav2/h2rbox-le90_r50_fpn_adamw-3x_dotav2.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dotav2/h2rbox-le90_r50_fpn_adamw-3x_dotav2-85bf9bfa.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-3x_dotav2/h2rbox-le90_r50_fpn_adamw-3x_dotav2-20221126_225316.json) |
 
+DIOR
+
+|         Backbone         | AP50:95 | AP50  | AP75  | Angle | lr schd | Mem (GB) | Inf Time (fps) | MS  | Batch Size |                                     Configs                                      |                                                                                                                                               Download                                                                                                                                               |
+| :----------------------: | :-----: | :---: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ResNet50 (1024,1024,200) |  33.06  | 57.40 | 32.50 | le90  |   1x    |   3.83   |                |  -  |     2      | [h2rbox-le90_r50_fpn_adamw-1x_dior](./dior/h2rbox-le90_r50_fpn_adamw-1x_dior.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dior/h2rbox-le90_r50_fpn_adamw-1x_dior-949b0e4c.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dior/h2rbox-le90_r50_fpn_adamw-1x_dior-20221130_204038.json) |
+
 **Notes:**
 
 - `MS` means multiple scale image split.
