@@ -17,7 +17,7 @@ Our tech-report will be released soon.
 |  Backbone   | size | pretrain |  Aug  |  mAP  | Params(M) | FLOPS(G) | TRT-FP16-Latency(ms) |                          Config                          |         Download          |
 | :---------: | :--: | :------: | :---: | :---: | :-------: | :------: | :------------------: | :------------------------------------------------------: | :-----------------------: |
 | RTMDet-tiny | 1024 |   IMP    |  RR   | 75.60 |   4.88    |  20.45   |         4.40         |        [config](./rotated_rtmdet_tiny-3x-dota.py)        | [model](<>) \|  [log](<>) |
-| RTMDet-tiny | 1024 |   IMP    | MS+RR | 79.82 |   4.88    |  20.45   |         4.46         |      [config](./rotated_rtmdet_tiny-3x-dota_ms.py)       | [model](<>) \|  [log](<>) |
+| RTMDet-tiny | 1024 |   IMP    | MS+RR | 79.82 |   4.88    |  20.45   |         4.40         |      [config](./rotated_rtmdet_tiny-3x-dota_ms.py)       | [model](<>) \|  [log](<>) |
 |  RTMDet-s   | 1024 |   IMP    |  RR   | 76.93 |   8.86    |  37.62   |         4.86         |         [config](./rotated_rtmdet_s-3x-dota.py)          | [model](<>) \|  [log](<>) |
 |  RTMDet-s   | 1024 |   IMP    | MS+RR | 79.98 |   8.86    |  37.62   |         4.86         |        [config](./rotated_rtmdet_s-3x-dota_ms.py)        | [model](<>) \|  [log](<>) |
 |  RTMDet-m   | 1024 |   IMP    |  RR   | 78.24 |   24.67   |  99.76   |         7.82         |         [config](./rotated_rtmdet_m-3x-dota.py)          | [model](<>) \|  [log](<>) |
