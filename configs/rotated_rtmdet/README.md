@@ -28,13 +28,14 @@ Our tech-report will be released soon.
 
 ### HRSC
 
-|  Backbone   | size | pretrain | Aug | mAP07 | mAP12 | Params(M) | FLOPS(G) |                   Config                   |         Download          |
-| :---------: | :--: | :------: | :-: | :---: | :---: | :-------: | :------: | :----------------------------------------: | :-----------------------: |
-| RTMDet-tiny | 800  |   IMP    | RR  | 90.6  | 97.1  |   4.88    |  12.54   | [config](./rotated_rtmdet_tiny-9x-hrsc.py) | [model](<>) \|  [log](<>) |
+|  Backbone   | size | pretrain | Aug | mAP 07 | mAP 12 | Params(M) | FLOPS(G) |                   Config                   |         Download          |
+| :---------: | :--: | :------: | :-: | :----: | :----: | :-------: | :------: | :----------------------------------------: | :-----------------------: |
+| RTMDet-tiny | 800  |   IMP    | RR  |  90.6  |  97.1  |   4.88    |  12.54   | [config](./rotated_rtmdet_tiny-9x-hrsc.py) | [model](<>) \|  [log](<>) |
 
 **Note**:
 
 1. By default, DOTA-v1.0 dataset trained with 3x schedule and HRSC dataset trained with 9x schedule.
-2. The inference speed is measured on an NVIDIA 2080Ti GPU with TensorRT 8.4.3, cuDNN 8.2.0, FP16, batch size=1, and
+2. `IMP` means ImageNet pretrain, `COP` means COCO pretrain.
+3. The inference speed is measured on an NVIDIA 2080Ti GPU with TensorRT 8.4.3, cuDNN 8.2.0, FP16, batch size=1, and
    without NMS.
-3. We also provide config with mixup and mosaic for longer schedule.
+4. We also provide config with mixup and mosaic for longer schedule.
