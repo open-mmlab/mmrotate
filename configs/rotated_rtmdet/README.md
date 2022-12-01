@@ -7,7 +7,7 @@
 Our tech-report will be released soon.
 
 <div align=center>
-<img src="https://user-images.githubusercontent.com/12907710/192182907-f9a671d6-89cb-4d73-abd8-c2b9dada3c66.png"/>
+<img src="https://user-images.githubusercontent.com/11705038/204995787-ef739910-e196-42c7-a9db-c9c8e28a494d.jpg"/>
 </div>
 
 ## Results and Models

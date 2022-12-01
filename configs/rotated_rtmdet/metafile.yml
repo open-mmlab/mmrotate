@@ -1,0 +1,135 @@
+Collections:
+  - Name: rotated_rtmdet
+    Metadata:
+      Training Data:
+        - DOTAv1.0
+        - HRSC
+      Training Techniques:
+        - AdamW
+        - Flat Cosine Annealing
+      Training Resources: 1x RTX3090 GPUs
+      Architecture:
+        - CSPNeXt
+        - CSPNeXtPAFPN
+    README: configs/rotated_rtmdet/README.md
+
+Models:
+  - Name: rotated_rtmdet_tiny-3x-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_tiny-3x-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 75.60
+    Weights: todo
+
+  - Name: rotated_rtmdet_tiny-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_tiny-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 79.82
+    Weights: todo
+
+  - Name: rotated_rtmdet_s-3x-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_s-3x-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 76.93
+    Weights: todo
+
+  - Name: rotated_rtmdet_s-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_s-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 79.98
+    Weights: todo
+
+  - Name: rotated_rtmdet_m-3x-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_m-3x-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 78.24
+    Weights: todo
+
+  - Name: rotated_rtmdet_m-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_m-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 80.26
+    Weights: todo
+
+  - Name: rotated_rtmdet_l-3x-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_l-3x-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 78.85
+    Weights: todo
+
+  - Name: rotated_rtmdet_l-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_l-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 80.54
+    Weights: todo
+
+  - Name: rotated_rtmdet_l-coco_pretrain-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_l-coco_pretrain-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 81.33
+    Weights: todo
+
+  - Name: rotated_rtmdet_tiny-9x-hrsc
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/
+    Metadata:
+      Training Data: HRSC
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC
+        Metrics:
+          mAP: 90.6
+    Weights: todo
