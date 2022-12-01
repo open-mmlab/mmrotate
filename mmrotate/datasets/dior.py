@@ -21,7 +21,7 @@ class DIORDataset(BaseDataset):
         file_client_args (dict): Arguments to instantiate a FileClient.
             See :class:`mmengine.fileio.FileClient` for details.
             Defaults to ``dict(backend='disk')``.
-        xmltype (str): Choose obb or hbb as ground truth.
+        ann_type (str): Choose obb or hbb as ground truth.
             Defaults to `obb`.
     """
 
