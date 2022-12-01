@@ -1,6 +1,6 @@
 _base_ = [
     './_base_/default_runtime.py', './_base_/schedule_3x.py',
-    './_base_/dota_rr.py'
+    './_base_/hrsc_rr.py'
 ]
 checkpoint = './work_dirs/cspnext_rsb_pretrain/cspnext-l_8xb256-rsb-a1-600e_in1k/cspnext-l_8xb256-rsb-a1-600e_in1k-6a760974.pth'  # noqa
 
@@ -35,7 +35,7 @@ model = dict(
         act_cfg=dict(type='SiLU')),
     bbox_head=dict(
         type='RotatedRTMDetSepBNHead',
-        num_classes=15,
+        num_classes=1,
         in_channels=256,
         stacked_convs=2,
         feat_channels=256,
@@ -75,5 +75,31 @@ model = dict(
         max_per_img=2000),
 )
 
-# batch_size = (2 GPUs) x (4 samples per GPU) = 8
-train_dataloader = dict(batch_size=4, num_workers=4)
+# training schedule, hrsc dataset is repeated 3 times, in
+# `./_base_/hrsc_rr.py`, so the actual epoch = 3 * 3 * 12 = 9 * 12
+max_epochs = 3 * 12
+
+# hrsc dataset use larger learning rate for better performance
+base_lr = 0.004 / 2
+
+# learning rate
+param_scheduler = [
+    dict(
+        type='LinearLR',
+        start_factor=1.0e-5,
+        by_epoch=False,
+        begin=0,
+        end=1000),
+    dict(
+        # use cosine lr from 150 to 300 epoch
+        type='CosineAnnealingLR',
+        eta_min=base_lr * 0.05,
+        begin=max_epochs // 2,
+        end=max_epochs,
+        T_max=max_epochs // 2,
+        by_epoch=True,
+        convert_to_iter_based=True),
+]
+
+# optimizer
+optim_wrapper = dict(optimizer=dict(lr=base_lr))

@@ -4,7 +4,7 @@ default_hooks = dict(
     timer=dict(type='IterTimerHook'),
     logger=dict(type='LoggerHook', interval=50),
     param_scheduler=dict(type='ParamSchedulerHook'),
-    checkpoint=dict(type='CheckpointHook', interval=1, max_keep_ckpts=3),
+    checkpoint=dict(type='CheckpointHook', interval=12, max_keep_ckpts=3),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='mmdet.DetVisualizationHook'))
 
@@ -22,3 +22,13 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 log_level = 'INFO'
 load_from = None
 resume = False
+
+custom_hooks = [
+    dict(type='mmdet.NumClassCheckHook'),
+    dict(
+        type='EMAHook',
+        ema_type='mmdet.ExpMomentumEMA',
+        momentum=0.0002,
+        update_buffers=True,
+        priority=49)
+]

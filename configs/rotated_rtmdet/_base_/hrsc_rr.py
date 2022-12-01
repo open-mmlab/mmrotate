@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'HRSCDataset'
-data_root = '/home/wangchen/liuyanyi/datasets/hrsc/'
+data_root = 'data/hrsc/'
 file_client_args = dict(backend='disk')
 
 train_pipeline = [
@@ -69,17 +69,13 @@ val_dataloader = dict(
         pipeline=val_pipeline))
 test_dataloader = val_dataloader
 
-val_evaluator = dict(
-    type='DOTAMetric',
-    iou_thrs=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
-    metric='mAP')
-test_evaluator = val_evaluator
-
-custom_hooks = [
+val_evaluator = [
     dict(
-        type='EMAHook',
-        ema_type='mmdet.ExpMomentumEMA',
-        momentum=0.0002,
-        update_buffers=True,
-        priority=49)
+        type='DOTAMetric',
+        eval_mode='11points',
+        prefix='dota_ap07',
+        metric='mAP'),
+    dict(
+        type='DOTAMetric', eval_mode='area', prefix='dota_ap12', metric='mAP'),
 ]
+test_evaluator = val_evaluator
