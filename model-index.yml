@@ -1,7 +1,6 @@
 Import:
   - configs/cfa/metafile.yml
   - configs/csl/metafile.yml
-  - configs/g_reppoints/metafile.yml
   - configs/gliding_vertex/metafile.yml
   - configs/gwd/metafile.yml
   - configs/kfiou/metafile.yml
@@ -17,3 +16,4 @@ Import:
   - configs/rotated_retinanet/metafile.yml
   - configs/s2anet/metafile.yml
   - configs/sasm_reppoints/metafile.yml
+  - configs/psc/metafile.yml

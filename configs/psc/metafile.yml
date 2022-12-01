@@ -1,0 +1,63 @@
+Collections:
+- Name: psc
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce RTX 3080
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/abs/2211.06368.pdf
+    Title: 'Phase-Shifting Coder: Predicting Accurate Orientation in Oriented Object Detection'
+  README: configs/psc/README.md
+
+Models:
+  - Name: rotated-fcos-hbox-le90_r50_fpn_psc-dual_1x_dota
+    In Collection: psc
+    Config: configs/psc/rotated-fcos-hbox-le90_r50_fpn_psc-dual_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.14
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/psc/rotated-fcos-hbox-le90_r50_fpn_psc-dual_1x_dota/rotated-fcos-hbox-le90_r50_fpn_psc-dual_1x_dota-326e276b.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_psc-dual_amp-1x_dota
+    In Collection: psc
+    Config: configs/psc/rotated-retinanet-rbox-le90_r50_fpn_psc-dual_amp-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.92
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/psc/rotated-retinanet-rbox-le90_r50_fpn_psc-dual_amp-1x_dota/rotated-retinanet-rbox-le90_r50_fpn_psc-dual_amp-1x_dota-951713be.pth
+
+  - Name: rotated-fcos-hbox-le90_r50_fpn_psc_rr-6x_hrsc
+    In Collection: psc
+    Config: configs/psc/rotated-fcos-hbox-le90_r50_fpn_psc_rr-6x_hrsc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 90.10
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/psc/rotated-fcos-hbox-le90_r50_fpn_psc_rr-6x_hrsc/rotated-fcos-hbox-le90_r50_fpn_psc_rr-6x_hrsc-3da09c7a.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_psc_rr-6x_hrsc
+    In Collection: psc
+    Config: configs/psc/rotated-retinanet-rbox-le90_r50_fpn_psc_rr-6x_hrsc.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 84.86
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/psc/rotated-retinanet-rbox-le90_r50_fpn_psc_rr-6x_hrsc/rotated-retinanet-rbox-le90_r50_fpn_psc_rr-6x_hrsc-d2e78a2d.pth

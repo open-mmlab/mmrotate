@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from .angle_coder import CSLCoder, DistributionAngleCoder, PseudoAngleCoder
+from .angle_coder import (CSLCoder, DistributionAngleCoder, PSCCoder,
+                          PseudoAngleCoder)
 from .delta_midpointoffset_rbbox_coder import MidpointOffsetCoder
 from .delta_xywh_hbbox_coder import DeltaXYWHHBBoxCoder
 from .delta_xywh_qbbox_coder import DeltaXYWHQBBoxCoder
@@ -10,7 +11,7 @@ from .gliding_vertex_coder import GVFixCoder, GVRatioCoder
 
 __all__ = [
     'DeltaXYWHTRBBoxCoder', 'DeltaXYWHTHBBoxCoder', 'MidpointOffsetCoder',
-    'GVFixCoder', 'GVRatioCoder', 'CSLCoder', 'DistanceAnglePointCoder',
-    'DeltaXYWHHBBoxCoder', 'DeltaXYWHQBBoxCoder', 'PseudoAngleCoder',
-    'DistributionAngleCoder'
+    'GVFixCoder', 'GVRatioCoder', 'CSLCoder', 'PSCCoder',
+    'DistanceAnglePointCoder', 'DeltaXYWHHBBoxCoder', 'DeltaXYWHQBBoxCoder',
+    'PseudoAngleCoder', 'DistributionAngleCoder'
 ]
