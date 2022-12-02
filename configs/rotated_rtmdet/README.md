@@ -32,19 +32,19 @@ Our tech-report will be released soon.
 
 |  Backbone   | pretrain | Aug | mAP 07 | mAP 12 | Params(M) | FLOPS(G) |                   Config                   |                                                                                                                                           Download                                                                                                                                           |
 | :---------: | :------: | :-: | :----: | :----: | :-------: | :------: | :----------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| RTMDet-tiny |   IMP    | RR  |  90.6  |  97.1  |   4.88    |  12.54   | [config](./rotated_rtmdet_tiny-9x-hrsc.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_tiny-9x-hrsc/rotated_rtmdet_tiny-9x-hrsc-9f2e3ca6.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_tiny-9x-hrsc/rotated_rtmdet_tiny-9x-hrsc-20221125_145920.json) |
+| RTMDet-tiny |   IMP    | RR  |  90.6  |  97.1  |   4.88    |  12.54   | [config](./rotated_rtmdet_tiny-9x-hrsc.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_tiny-9x-hrsc/rotated_rtmdet_tiny-9x-hrsc-9f2e3ca6.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_tiny-9x-hrsc/rotated_rtmdet_tiny-9x-hrsc_20221125_145920.json) |
 
 - By default, HRSC dataset trained with 9x schedule and image size 800\*800.
 
 ### Stronger augmentation
 
-We also provide configs with Mixup and Mosaic. Training time is less than MS.
+We also provide configs with Mixup, Mosaic and RandomRotate. Training time is less than MS.
 
 DOTA:
 
-| Backbone | pretrain | schedule |       Aug       | mmAP  | mAP50 | mAP75 |                    Config                     |                                                                                                  Download                                                                                                  |
-| :------: | :------: | :------: | :-------------: | :---: | :---: | :---: | :-------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| RTMDet-l |   IMP    |   100e   | Mixup+Mosaic+RR | 54.59 | 80.16 | 61.16 | [config](./rotated_rtmdet_l-100e-aug-dota.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-100e-aug-dota/) \| [log](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-100e-aug-dota/) |
+| Backbone | pretrain | schedule |       Aug       | mmAP  | mAP50 | mAP75 |                    Config                     |                                                                                                                                                 Download                                                                                                                                                 |
+| :------: | :------: | :------: | :-------------: | :---: | :---: | :---: | :-------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| RTMDet-l |   IMP    |   100e   | Mixup+Mosaic+RR | 54.59 | 80.16 | 61.16 | [config](./rotated_rtmdet_l-100e-aug-dota.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-100e-aug-dota/rotated_rtmdet_l-100e-aug-dota-bc59fd88.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-100e-aug-dota/rotated_rtmdet_l-100e-aug-dota_20221124_224135.json) |
 
 **Note**:
 
