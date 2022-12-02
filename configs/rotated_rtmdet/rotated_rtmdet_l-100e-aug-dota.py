@@ -121,7 +121,7 @@ train_pipeline_stage2 = [
         type='mmdet.RandomResize',
         resize_type='mmdet.Resize',
         scale=(1024, 1024),
-        ratio_range=(0.5, 2.0),
+        ratio_range=(0.1, 2.0),
         keep_ratio=True),
     dict(
         type='RandomRotate',

@@ -36,6 +36,16 @@ Our tech-report will be released soon.
 
 - By default, HRSC dataset trained with 9x schedule and image size 800\*800.
 
+### Stronger augmentation
+
+We also provide configs with Mixup and Mosaic. Training time is less than MS.
+
+DOTA:
+
+| Backbone | pretrain | schedule |       Aug       | mmAP  | mAP50 | mAP75 |                    Config                     |                                                                                                  Download                                                                                                  |
+| :------: | :------: | :------: | :-------------: | :---: | :---: | :---: | :-------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| RTMDet-l |   IMP    |   100e   | Mixup+Mosaic+RR | 54.59 | 80.16 | 61.16 | [config](./rotated_rtmdet_l-100e-aug-dota.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-100e-aug-dota/) \| [log](https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-100e-aug-dota/) |
+
 **Note**:
 
 1. We follow the latest metrics from the DOTA evaluation server, original voc format mAP is now mAP50.
