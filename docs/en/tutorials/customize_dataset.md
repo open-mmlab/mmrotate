@@ -71,10 +71,10 @@ data = dict(
 
 # 2. model settings
 model = dict(
-    bbox_head=dict(
-        type='RotatedRetinaHead',
-        # explicitly over-write all the `num_classes` field from default 15 to 5.
-        num_classes=15))
+    roi_head=dict(
+        bbox_head=dict(
+            # explicitly over-write all the `num_classes` field from default 15 to 5.
+            num_classes=5)))
 ```
 
 #### 2. Check the annotations of the customized dataset
