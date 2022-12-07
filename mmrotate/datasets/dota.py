@@ -10,7 +10,7 @@ from mmrotate.registry import DATASETS
 
 @DATASETS.register_module()
 class DOTADataset(BaseDataset):
-    """DOTA dataset for detection.
+    """DOTA-v1.0 dataset for detection.
 
     Note: ``ann_file`` in DOTADataset is different from the BaseDataset.
     In BaseDataset, it is the path of an annotation file. In DOTADataset,
@@ -141,3 +141,53 @@ class DOTADataset(BaseDataset):
 
         instances = self.get_data_info(idx)['instances']
         return [instance['bbox_label'] for instance in instances]
+
+
+@DATASETS.register_module()
+class DOTAv15Dataset(DOTADataset):
+    """DOTA-v1.5 dataset for detection.
+
+    Note: ``ann_file`` in DOTAv15Dataset is different from the BaseDataset.
+    In BaseDataset, it is the path of an annotation file. In DOTAv15Dataset,
+    it is the path of a folder containing XML files.
+    """
+
+    METAINFO = {
+        'CLASSES':
+        ('plane', 'baseball-diamond', 'bridge', 'ground-track-field',
+         'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
+         'basketball-court', 'storage-tank', 'soccer-ball-field', 'roundabout',
+         'harbor', 'swimming-pool', 'helicopter', 'container-crane'),
+        # PALETTE is a list of color tuples, which is used for visualization.
+        'PALETTE': [(165, 42, 42), (189, 183, 107), (0, 255, 0), (255, 0, 0),
+                    (138, 43, 226), (255, 128, 0), (255, 0, 255),
+                    (0, 255, 255), (255, 193, 193), (0, 51, 153),
+                    (255, 250, 205), (0, 139, 139), (255, 255, 0),
+                    (147, 116, 116), (0, 0, 255), (220, 20, 60)]
+    }
+
+
+@DATASETS.register_module()
+class DOTAv2Dataset(DOTADataset):
+    """DOTA-v2.0 dataset for detection.
+
+    Note: ``ann_file`` in DOTAv2Dataset is different from the BaseDataset.
+    In BaseDataset, it is the path of an annotation file. In DOTAv2Dataset,
+    it is the path of a folder containing XML files.
+    """
+
+    METAINFO = {
+        'CLASSES':
+        ('plane', 'baseball-diamond', 'bridge', 'ground-track-field',
+         'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
+         'basketball-court', 'storage-tank', 'soccer-ball-field', 'roundabout',
+         'harbor', 'swimming-pool', 'helicopter', 'container-crane', 'airport',
+         'helipad'),
+        # PALETTE is a list of color tuples, which is used for visualization.
+        'PALETTE': [(165, 42, 42), (189, 183, 107), (0, 255, 0), (255, 0, 0),
+                    (138, 43, 226), (255, 128, 0), (255, 0, 255),
+                    (0, 255, 255), (255, 193, 193), (0, 51, 153),
+                    (255, 250, 205), (0, 139, 139), (255, 255, 0),
+                    (147, 116, 116), (0, 0, 255), (220, 20, 60), (119, 11, 32),
+                    (0, 0, 142)]
+    }
