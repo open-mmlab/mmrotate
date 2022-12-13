@@ -5,6 +5,16 @@ from mmdet.core.mask import BitmapMasks
 
 
 class RBitmapMasks(BitmapMasks):
+    """This class represents masks in the form of bitmaps. Compared to the
+    original class, this class supports getting the minimum area rectangles
+    from masks.
+
+    Args:
+        masks (ndarray): ndarray of masks in shape (N, H, W), where N is
+            the number of objects.
+        height (int): height of masks
+        width (int): width of masks
+    """
 
     def get_rbboxes(self):
         num_masks = len(self)
