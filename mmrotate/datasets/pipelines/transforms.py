@@ -357,12 +357,11 @@ class RRandomCrop(RandomCrop):
                                    dtype=np.float32)
             bboxes = results[key] - bbox_offset
 
-            windows = np.array([width / 2, height / 2, width, height, 0] *
-                               len(bboxes)).reshape(-1, 5)
+            windows = np.array([width / 2, height / 2, width, height, 0], dtype=np.float32).reshape(-1, 5)
 
             valid_inds = box_iou_rotated(
                 torch.tensor(bboxes), torch.tensor(windows),
-                mode='iof').numpy() > self.iof_thr
+                mode='iof').numpy().squeeze() > self.iof_thr
 
             # If the crop does not contain any gt-bbox area and
             # allow_negative_crop is False, skip this image.
