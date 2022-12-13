@@ -4,6 +4,8 @@ import copy
 import cv2
 import mmcv
 import numpy as np
+import torch
+from mmcv.ops import box_iou_rotated
 from mmdet.datasets.pipelines.transforms import (Mosaic, RandomCrop,
                                                  RandomFlip, Resize)
 from numpy import random
@@ -290,6 +292,8 @@ class RRandomCrop(RandomCrop):
             in range [crop_size[0], min(w, crop_size[1])]. Default "absolute".
         allow_negative_crop (bool, optional): Whether to allow a crop that does
             not contain any bbox area. Default False.
+        iof_thr (float): The minimal iof between a object and window.
+            Defaults to 0.7.
 
     Note:
         - If the image is smaller than the absolute crop size, return the
@@ -305,8 +309,10 @@ class RRandomCrop(RandomCrop):
                  crop_size,
                  crop_type='absolute',
                  allow_negative_crop=False,
+                 iof_thr=0.7,
                  version='oc'):
         self.version = version
+        self.iof_thr = iof_thr
         super(RRandomCrop, self).__init__(crop_size, crop_type,
                                           allow_negative_crop)
 
@@ -350,10 +356,11 @@ class RRandomCrop(RandomCrop):
             bbox_offset = np.array([offset_w, offset_h, 0, 0, 0],
                                    dtype=np.float32)
             bboxes = results[key] - bbox_offset
+            
+            windows = np.array([width/2, height/2, width, height, 0] * len(bboxes)).reshape(-1, 5)
 
-            valid_inds = (bboxes[:, 0] >=
-                          0) & (bboxes[:, 0] < width) & (bboxes[:, 1] >= 0) & (
-                              bboxes[:, 1] < height)
+            valid_inds = box_iou_rotated(torch.tensor(bboxes), torch.tensor(windows), mode='iof').numpy() > self.iof_thr
+
             # If the crop does not contain any gt-bbox area and
             # allow_negative_crop is False, skip this image.
             if (key == 'gt_bboxes' and not valid_inds.any()
