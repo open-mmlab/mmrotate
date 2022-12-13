@@ -357,7 +357,8 @@ class RRandomCrop(RandomCrop):
                                    dtype=np.float32)
             bboxes = results[key] - bbox_offset
 
-            windows = np.array([width / 2, height / 2, width, height, 0], dtype=np.float32).reshape(-1, 5)
+            windows = np.array([width / 2, height / 2, width, height, 0],
+                               dtype=np.float32).reshape(-1, 5)
 
             valid_inds = box_iou_rotated(
                 torch.tensor(bboxes), torch.tensor(windows),
