@@ -591,7 +591,7 @@ class RCopyPaste(CopyPaste):
         version='le90',
     ):
         self.max_num_pasted = max_num_pasted
-        self.rbbox_occluded_iou_thr= rbbox_occluded_iou_thr
+        self.rbbox_occluded_iou_thr = rbbox_occluded_iou_thr
         self.mask_occluded_thr = mask_occluded_thr
         self.selected = selected
         self.paste_by_box = False
@@ -652,8 +652,8 @@ class RCopyPaste(CopyPaste):
 
         # filter totally occluded objects
         bboxes_inds = box_iou_rotated(
-            torch.tensor(dst_bboxes), torch.tensor(updated_dst_bboxes)
-        )[:, 0].numpy() <= self.rbbox_occluded_iou_thr
+            torch.tensor(dst_bboxes), torch.tensor(updated_dst_bboxes)).numpy(
+            ).max(-1) <= self.rbbox_occluded_iou_thr
         masks_inds = updated_dst_masks.masks.sum(
             axis=(1, 2)) > self.mask_occluded_thr
         valid_inds = bboxes_inds | masks_inds
