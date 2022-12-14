@@ -153,13 +153,13 @@ class DOTAv15Dataset(DOTADataset):
     """
 
     METAINFO = {
-        'CLASSES':
+        'classes':
         ('plane', 'baseball-diamond', 'bridge', 'ground-track-field',
          'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
          'basketball-court', 'storage-tank', 'soccer-ball-field', 'roundabout',
          'harbor', 'swimming-pool', 'helicopter', 'container-crane'),
-        # PALETTE is a list of color tuples, which is used for visualization.
-        'PALETTE': [(165, 42, 42), (189, 183, 107), (0, 255, 0), (255, 0, 0),
+        # palette is a list of color tuples, which is used for visualization.
+        'palette': [(165, 42, 42), (189, 183, 107), (0, 255, 0), (255, 0, 0),
                     (138, 43, 226), (255, 128, 0), (255, 0, 255),
                     (0, 255, 255), (255, 193, 193), (0, 51, 153),
                     (255, 250, 205), (0, 139, 139), (255, 255, 0),
@@ -177,14 +177,14 @@ class DOTAv2Dataset(DOTADataset):
     """
 
     METAINFO = {
-        'CLASSES':
+        'classes':
         ('plane', 'baseball-diamond', 'bridge', 'ground-track-field',
          'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
          'basketball-court', 'storage-tank', 'soccer-ball-field', 'roundabout',
          'harbor', 'swimming-pool', 'helicopter', 'container-crane', 'airport',
          'helipad'),
-        # PALETTE is a list of color tuples, which is used for visualization.
-        'PALETTE': [(165, 42, 42), (189, 183, 107), (0, 255, 0), (255, 0, 0),
+        # palette is a list of color tuples, which is used for visualization.
+        'palette': [(165, 42, 42), (189, 183, 107), (0, 255, 0), (255, 0, 0),
                     (138, 43, 226), (255, 128, 0), (255, 0, 255),
                     (0, 255, 255), (255, 193, 193), (0, 51, 153),
                     (255, 250, 205), (0, 139, 139), (255, 255, 0),
