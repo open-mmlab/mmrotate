@@ -591,7 +591,7 @@ class RCopyPaste(CopyPaste):
         version='le90',
     ):
         self.max_num_pasted = max_num_pasted
-        self.rbbox_iou_thr = rbbox_occluded_iou_thr
+        self.rbbox_occluded_iou_thr= rbbox_occluded_iou_thr
         self.mask_occluded_thr = mask_occluded_thr
         self.selected = selected
         self.paste_by_box = False
