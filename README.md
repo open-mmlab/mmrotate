@@ -127,6 +127,7 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 - [x] [S<sup>2</sup>A-Net](configs/s2anet/README.md) (TGRS'2021)
 - [x] [ReDet](configs/redet/README.md) (CVPR'2021)
 - [x] [Beyond Bounding-Box](configs/cfa/README.md) (CVPR'2021)
+- [x] [Rotated YOLOX](configs/rotated_yolox/README.md) (CVPR'2021)
 - [x] [Oriented R-CNN](configs/oriented_rcnn/README.md) (ICCV'2021)
 - [x] [GWD](configs/gwd/README.md) (ICML'2021)
 - [x] [KLD](configs/kld/README.md) (NeurIPS'2021)
