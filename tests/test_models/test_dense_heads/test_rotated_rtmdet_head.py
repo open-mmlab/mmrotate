@@ -1,7 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import unittest
 
-import pytest
 import torch
 from mmdet.models import L1Loss
 from mmengine.structures import InstanceData
@@ -18,11 +17,12 @@ class TestRotatedRTMDetHead(unittest.TestCase):
     def setUp(self):
         register_all_modules()
 
-    @pytest.mark.skipif(
-        not torch.cuda.is_available(), reason='requires CUDA support')
     @parameterized.expand([(RotatedRTMDetHead, ), (RotatedRTMDetSepBNHead, )])
     def test_rotated_rtmdet_head_loss(self, head_cls):
         """Tests rotated rtmdet head loss when truth is empty and non-empty."""
+        if not torch.cuda.is_available():
+            return unittest.skip('test requires GPU and torch+cuda')
+
         angle_version = 'le90'
         s = 256
         img_metas = [{
