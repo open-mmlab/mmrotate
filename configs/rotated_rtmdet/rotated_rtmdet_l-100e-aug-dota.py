@@ -160,7 +160,7 @@ param_scheduler = [
         begin=0,
         end=1000),
     dict(
-        # use cosine lr from 150 to 300 epoch
+        # use cosine lr from 50 to 100 epoch
         type='CosineAnnealingLR',
         eta_min=base_lr * 0.05,
         begin=max_epochs // 2,
