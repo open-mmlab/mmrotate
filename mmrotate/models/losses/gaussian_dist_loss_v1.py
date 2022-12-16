@@ -213,6 +213,7 @@ class GDLoss_v1(nn.Module):
             reduction_override if reduction_override else self.reduction)
         if (weight is not None) and (not torch.any(weight > 0)) and (
                 reduction != 'none'):
+            # handle different dim of weight
             if pred.dim() == weight.dim() + 1:
                 weight = weight.unsqueeze(1)
             return (pred * weight).sum()  # 0
