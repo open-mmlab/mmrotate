@@ -61,3 +61,16 @@ DOTA:
 1. We follow the latest metrics from the DOTA evaluation server, original voc format mAP is now mAP50.
 2. `IN` means ImageNet pretrain, `COCO` means COCO pretrain.
 3. Different from the report, the inference speed here is measured on an NVIDIA 2080Ti GPU with TensorRT 8.4.3, cuDNN 8.2.0, FP16, batch size=1, and with NMS.
+
+## Citation
+
+```
+@misc{lyu2022rtmdet,
+      title={RTMDet: An Empirical Study of Designing Real-Time Object Detectors},
+      author={Chengqi Lyu and Wenwei Zhang and Haian Huang and Yue Zhou and Yudong Wang and Yanyi Liu and Shilong Zhang and Kai Chen},
+      year={2022},
+      eprint={2212.07784},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
