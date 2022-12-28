@@ -23,6 +23,43 @@ from mmrotate.structures.bbox import rbox2qbox
 
 @METRICS.register_module()
 class DOTAMetric(DOTAMeanAP):
+    """DOTA evaluation metric.
+
+    Note:  In addition to format the output results to JSON like CocoMetric,
+    it can also generate the full image's results by merging patches' results.
+    The premise is that you must use the tool provided by us to crop the DOTA
+    large images, which can be found at: ``tools/data/dota/split``.
+
+    Args:
+        iou_thrs (float ｜ List[float], optional): IoU threshold.
+        scale_ranges (List[tuple], optional): Scale ranges for evaluating mAP.
+        num_classes (int, optional): The number of classes. If None, it will be
+            obtained from the 'CLASSES' field in ``self.dataset_meta``.
+        eval_mode (str, optional): 'area' or '11points', 'area' means
+            calculating  the area under precision-recall curve, '11points'means
+            calculatingthe average precision of recalls at [0, 0.1, ..., 1].
+        nproc (int, optional): Processes used for computing TP and FP. If nproc
+            is less than or equal to 1, multiprocessing will not be used.
+        drop_class_ap (bool, optional): Whether to drop the class without
+            ground truth when calculating the average precision for each class.
+        dist_backend (str, optional):  The name of the mmeval distributed
+            communication backend, you can get all the backend names through
+            ``mmeval.core.list_all_backends()``.
+        predict_box_type (str, optional): Box type of model results. If the
+            QuadriBoxes is used, you need to specify 'qbox'. Defaults to
+            'rbox'.
+        format_only (bool, optional): Format the output results without perform
+            evaluation. It is useful when you want to format the result
+            to a specific format. Defaults to False.
+        outfile_prefix (Optional[str], optional): The prefix of json/zip files.
+            It includes the file path and the prefix of filename, e.g.,
+            "a/b/prefix". If not specified, a temp file will be created.
+            Defaults to None.
+        merge_patches (bool, optional): Generate the full image's results by
+            merging patches' results.
+        iou_thr (float, optional): IoU threshold of ``nms_rotated`` used in
+            merge patches. Defaults to 0.1.
+    """
 
     def __init__(self,
                  iou_thrs: Union[float, List[float]] = 0.5,
@@ -56,16 +93,16 @@ class DOTAMetric(DOTAMeanAP):
             nproc=nproc,
             drop_class_ap=drop_class_ap,
             classwise=True,
+            predict_box_type=predict_box_type,
             dist_backend=dist_backend,
             **kwargs)
 
-        self.predict_box_type = predict_box_type
-
         self.format_only = format_only
         if self.format_only:
-            assert outfile_prefix is not None, 'outfile_prefix must be not'
-            'None when format_only is True, otherwise the result files will'
-            'be saved to a temp directory which will be cleaned up at the end.'
+            assert outfile_prefix is not None, 'outfile_prefix must be not' \
+                'None when format_only is True, otherwise the result files' \
+                'will be saved to a temp directory which will be cleaned' \
+                'up at the end.'
 
         self.outfile_prefix = outfile_prefix
         self.merge_patches = merge_patches
@@ -74,6 +111,14 @@ class DOTAMetric(DOTAMeanAP):
 
     def process(self, data_batch: Sequence[dict],
                 data_samples: Sequence[dict]):
+        """Process one batch of data samples and predictions. The function will
+        call self.add() to add predictions and groundtruths to self._results.
+
+        Args:
+            data_batch (dict): A batch of data from the dataloader.
+            data_samples (Sequence[dict]): A batch of data samples that
+                contain annotations and predictions.
+        """
         predictions, groundtruths = [], []
         for data_sample in data_samples:
             gt = copy.deepcopy(data_sample)
@@ -244,7 +289,7 @@ class DOTAMetric(DOTAMeanAP):
 
     def evaluate(self, *args, **kwargs) -> dict:
         logger: MMLogger = MMLogger.get_current_instance()
-        preds, gts = zip(*self._results)
+        preds, _ = zip(*self._results)
         tmp_dir = None
         if self.outfile_prefix is None:
             tmp_dir = tempfile.TemporaryDirectory()
@@ -280,12 +325,12 @@ class DOTAMetric(DOTAMeanAP):
 
                 table_data = [header]
                 aps = []
-                for k in range(len(classes)):
-                    class_results = classwise_result[k]
+                for idx, _ in enumerate(classes):
+                    class_results = classwise_result[idx]
                     recalls = class_results['recalls'][i, j]
                     recall = 0 if len(recalls) == 0 else recalls[-1]
                     row_data = [
-                        classes[k], class_results['num_gts'][i, j],
+                        classes[idx], class_results['num_gts'][i, j],
                         class_results['num_dets'],
                         round(recall, 3),
                         round(class_results['ap'][i, j], 3)
@@ -294,14 +339,14 @@ class DOTAMetric(DOTAMeanAP):
                     if class_results['num_gts'][i, j] > 0:
                         aps.append(class_results['ap'][i, j])
 
-                mean_ap = np.mean(aps) if aps != [] else 0
+                mean_ap = np.mean(aps) if aps else 0
                 table_data.append(['mAP', '', '', '', f'{mean_ap:.3f}'])
                 table = AsciiTable(table_data, title=table_title)
                 table.inner_footing_row_border = True
                 print_log('\n' + table.table, logger='current')
 
         evaluate_results = {
-            f'pascal_voc/{k}': round(float(v), 3)
+            f'dota/{k}': round(float(v), 3)
             for k, v in metric_results.items()
         }
         return evaluate_results
