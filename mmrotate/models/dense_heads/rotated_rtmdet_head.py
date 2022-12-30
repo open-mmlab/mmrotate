@@ -305,7 +305,7 @@ class RotatedRTMDetHead(RTMDetHead):
             batch_img_metas,
             batch_gt_instances_ignore=batch_gt_instances_ignore)
         (anchor_list, labels_list, label_weights_list, bbox_targets_list,
-         assign_metrics_list) = cls_reg_targets
+         assign_metrics_list, sampling_results_list) = cls_reg_targets
 
         if self.use_hbbox_loss:
             decoded_bboxes = decoded_hbboxes
@@ -443,7 +443,8 @@ class RotatedRTMDetHead(RTMDetHead):
             bbox_targets = unmap(bbox_targets, num_total_anchors, inside_flags)
             assign_metrics = unmap(assign_metrics, num_total_anchors,
                                    inside_flags)
-        return (anchors, labels, label_weights, bbox_targets, assign_metrics)
+        return (anchors, labels, label_weights, bbox_targets, assign_metrics,
+                sampling_result)
 
     def predict_by_feat(self,
                         cls_scores: List[Tensor],
