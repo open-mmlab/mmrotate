@@ -5,27 +5,28 @@
 ### Highlights
 
 - Support [RTMDet](https://arxiv.org/abs/2212.07784) rotated object detection models. The technical report of RTMDet is on [arxiv](https://arxiv.org/abs/2212.07784) (#662)
-- Support H2RBox (#644)
+- Support H2RBox. (#644)
 
 ### New Features
 
 - Support PSC (#617)
 - Add [`projects/`](./projects/) folder and give an [example](./projects/example_project/README.md) for communities to contribute their projects. (#627)
-- Support DIOR Dataset (#639)
+- Support DIOR Dataset. (#639)
 
 ### Bug Fixes
 
-- Fix `get_flops.py` in 1.x (#646)
-- Fix Windows CI (#621)
-- Fix error in rbbox_overlaps (#620)
+- Fix `get_flops.py` in 1.x. (#646)
+- Fix Windows CI. (#621)
+- Fix error in rbbox_overlaps. (#620)
 
 ### Improvements
 
-- Use iof in RRandomCrop (#660)
-- Add torch 1.13 in CI (#661)
-- Add dockerfile in 1.x (#631)
-- Use mmengine in torchserve deployment (#616)
-- Add `.pre-commit-config-zh-cn.yaml` (#630)
+- Use iof in RRandomCrop. (#660)
+- Modify keys in dataset.metainfo to lower case. (#654)
+- Add torch 1.13 in CI. (#661)
+- Add dockerfile in 1.x. (#631)
+- Use mmengine in torchserve deployment. (#616)
+- Add `.pre-commit-config-zh-cn.yaml`. (#630)
 
 ### New Contributors
 
