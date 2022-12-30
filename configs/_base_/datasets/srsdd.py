@@ -43,7 +43,7 @@ test_pipeline = [
 ]
 
 metainfo = dict(
-    CLASSES=('Container', 'Dredger', 'LawEnforce', 'Cell-Container', 'ore-oil',
+    classes=('Container', 'Dredger', 'LawEnforce', 'Cell-Container', 'ore-oil',
              'Fishing'))
 
 train_dataloader = dict(

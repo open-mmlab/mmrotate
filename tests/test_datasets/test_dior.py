@@ -27,4 +27,4 @@ class TestDIORDataset(unittest.TestCase):
             'tests/data/dior/Annotations/Oriented Bounding Boxes/00001.xml')
         self.assertEqual(len(data_list[0]['instances']), 1)
         self.assertEqual(dataset.get_cat_ids(0), [9])
-        self.assertEqual(len(dataset._metainfo['CLASSES']), 20)
+        self.assertEqual(len(dataset._metainfo['classes']), 20)

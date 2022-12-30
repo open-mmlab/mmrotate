@@ -35,7 +35,7 @@ class HRSCDataset(BaseDataset):
     """
 
     METAINFO = {
-        'CLASSES':
+        'classes':
         ('ship', 'aircraft carrier', 'warcraft', 'merchant ship', 'Nimitz',
          'Enterprise', 'Arleigh Burke', 'WhidbeyIsland', 'Perry', 'Sanantonio',
          'Ticonderoga', 'Kitty Hawk', 'Kuznetsov', 'Abukuma', 'Austen',
@@ -43,8 +43,8 @@ class HRSCDataset(BaseDataset):
          'Hovercraft', 'yacht', 'CntShip(_|.--.--|_]=', 'Cruise', 'submarine',
          'lute', 'Medical', 'Car carrier(======|', 'Ford-class',
          'Midway-class', 'Invincible-class'),
-        # PALETTE is a list of color tuples, which is used for visualization.
-        'PALETTE':
+        # palette is a list of color tuples, which is used for visualization.
+        'palette':
         [(220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230), (106, 0, 228),
          (0, 60, 100), (0, 80, 100), (0, 0, 70), (0, 0, 192), (250, 170, 30),
          (100, 170, 30), (220, 220, 0), (175, 116, 175), (250, 0, 30),
@@ -53,8 +53,8 @@ class HRSCDataset(BaseDataset):
          (199, 100, 0), (72, 0, 118), (255, 179, 240), (0, 125, 92),
          (209, 0, 151), (188, 208, 182), (0, 220, 176), (255, 99, 164),
          (92, 0, 73)],
-        # CLASSES_ID is a tuple, which is used for ``self.catid2label``
-        'CLASSES_ID':
+        # classes_id is a tuple, which is used for ``self.catid2label``
+        'classes_id':
         ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
          '12', '13', '14', '15', '16', '17', '18', '19', '20', '22', '24',
          '25', '26', '27', '28', '29', '30', '31', '32', '33')
@@ -84,16 +84,16 @@ class HRSCDataset(BaseDataset):
         Returns:
             list[dict]: Annotation info from XML file.
         """
-        assert self._metainfo.get('CLASSES', None) is not None, \
-            'CLASSES in `HRSCDataset` can not be None.'
+        assert self._metainfo.get('classes', None) is not None, \
+            'classes in `HRSCDataset` can not be None.'
         if self.classwise:
             self.catid2label = {
                 ('1' + '0' * 6 + cls_id): i
-                for i, cls_id in enumerate(self._metainfo['CLASSES_ID'])
+                for i, cls_id in enumerate(self._metainfo['classes_id'])
             }
         else:
-            self._metainfo['CLASSES'] = ('ship', )
-            self._metainfo['PALETTE'] = [
+            self._metainfo['classes'] = ('ship', )
+            self._metainfo['palette'] = [
                 (220, 20, 60),
             ]
 

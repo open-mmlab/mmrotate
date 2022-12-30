@@ -28,7 +28,7 @@ class TestHRSCDataset(unittest.TestCase):
             'tests/data/hrsc/FullDataSet/Annotations/100000006.xml')
         self.assertEqual(len(data_list[0]['instances']), 1)
         self.assertEqual(dataset.get_cat_ids(0), [0])
-        self.assertEqual(dataset._metainfo['CLASSES'], ('ship', ))
+        self.assertEqual(dataset._metainfo['classes'], ('ship', ))
 
     def test_hrsc_classwise(self):
         dataset = HRSCDataset(
@@ -52,4 +52,4 @@ class TestHRSCDataset(unittest.TestCase):
             'tests/data/hrsc/FullDataSet/Annotations/100000006.xml')
         self.assertEqual(len(data_list[0]['instances']), 1)
         self.assertEqual(dataset.get_cat_ids(0), [12])
-        self.assertEqual(len(dataset._metainfo['CLASSES']), 31)
+        self.assertEqual(len(dataset._metainfo['classes']), 31)

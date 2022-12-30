@@ -31,13 +31,13 @@ def get_palette(palette: Union[List[tuple], str, tuple],
         dataset_palette = [tuple(c) for c in palette]
     elif palette == 'dota':
         from mmrotate.datasets import DOTADataset
-        dataset_palette = DOTADataset.METAINFO['PALETTE']
+        dataset_palette = DOTADataset.METAINFO['palette']
     elif palette == 'sar':
         from mmrotate.datasets import SARDataset
-        dataset_palette = SARDataset.METAINFO['PALETTE']
+        dataset_palette = SARDataset.METAINFO['palette']
     elif palette == 'hrsc':
         from mmrotate.datasets import HRSCDataset
-        dataset_palette = HRSCDataset.METAINFO['PALETTE']
+        dataset_palette = HRSCDataset.METAINFO['palette']
     elif is_str(palette):
         dataset_palette = [mmcv.color_val(palette)[::-1]] * num_classes
     else:

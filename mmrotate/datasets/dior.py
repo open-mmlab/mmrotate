@@ -26,14 +26,14 @@ class DIORDataset(BaseDataset):
     """
 
     METAINFO = {
-        'CLASSES':
+        'classes':
         ('airplane', 'airport', 'baseballfield', 'basketballcourt', 'bridge',
          'chimney', 'expressway-service-area', 'expressway-toll-station',
          'dam', 'golffield', 'groundtrackfield', 'harbor', 'overpass', 'ship',
          'stadium', 'storagetank', 'tenniscourt', 'trainstation', 'vehicle',
          'windmill'),
-        # PALETTE is a list of color tuples, which is used for visualization.
-        'PALETTE': [(220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230),
+        # palette is a list of color tuples, which is used for visualization.
+        'palette': [(220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230),
                     (106, 0, 228), (0, 60, 100), (0, 80, 100), (0, 0, 70),
                     (0, 0, 192), (250, 170, 30), (100, 170, 30), (220, 220, 0),
                     (175, 116, 175), (250, 0, 30), (165, 42, 42),
@@ -59,11 +59,11 @@ class DIORDataset(BaseDataset):
         Returns:
             list[dict]: Annotation info from XML file.
         """
-        assert self._metainfo.get('CLASSES', None) is not None, \
-            'CLASSES in `DIORDataset` can not be None.'
+        assert self._metainfo.get('classes', None) is not None, \
+            'classes in `DIORDataset` can not be None.'
         self.cat2label = {
             cat: i
-            for i, cat in enumerate(self.metainfo['CLASSES'])
+            for i, cat in enumerate(self.metainfo['classes'])
         }
 
         data_list = []
