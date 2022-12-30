@@ -518,6 +518,7 @@ def _load_dota_txt(txtfile):
                     continue
 
                 items = line.split(' ')
+                items = items[3:11] + [items[2]] + ["1"]
                 if len(items) >= 9:
                     bboxes.append([float(i) for i in items[:8]])
                     labels.append(items[8])
