@@ -29,10 +29,23 @@ class DOTADataset(CustomDataset):
         version (str, optional): Angle representations. Defaults to 'oc'.
         difficulty (bool, optional): The difficulty threshold of GT.
     """
-    CLASSES = ('plane', 'baseball-diamond', 'bridge', 'ground-track-field',
+    CLASSES = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field',
                'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
                'basketball-court', 'storage-tank', 'soccer-ball-field',
-               'roundabout', 'harbor', 'swimming-pool', 'helicopter')
+               'roundabout', 'harbor', 'swimming-pool', 'helicopter']
+    clses = '''battery
+electronicequipment
+glassbottle
+knife
+lighter
+metalbottle
+OCbottle
+pressure
+umbrella'''.split()
+    for ci, c in enumerate(clses):
+        CLASSES[ci] = c
+    CLASSES = tuple(CLASSES)
+
 
     PALETTE = [(165, 42, 42), (189, 183, 107), (0, 255, 0), (255, 0, 0),
                (138, 43, 226), (255, 128, 0), (255, 0, 255), (0, 255, 255),
@@ -103,6 +116,7 @@ class DOTADataset(CustomDataset):
                             continue
                         cls_name = bbox_info[8]
                         difficulty = int(bbox_info[9])
+                        print(cls_map)
                         label = cls_map[cls_name]
                         if difficulty > self.difficulty:
                             pass

@@ -32,7 +32,7 @@ def add_parser(parser):
     parser.add_argument(
         '--base-json',
         type=str,
-        default=None,
+        default='./split_configs/ss_test.json',
         help='json config file for split images')
     parser.add_argument(
         '--nproc', type=int, default=10, help='the procession number')
@@ -518,11 +518,14 @@ def _load_dota_txt(txtfile):
                     continue
 
                 items = line.split(' ')
-                items = items[3:11] + [items[2]] + ["1"]
-                if len(items) >= 9:
-                    bboxes.append([float(i) for i in items[:8]])
-                    labels.append(items[8])
-                    diffs.append(int(items[9]) if len(items) == 10 else 0)
+                #if len(items) >= 9:
+                #    bboxes.append([float(i) for i in items[:8]])
+                #    labels.append(items[8])
+                #    diffs.append(int(items[9]) if len(items) == 10 else 0)
+                if len(items) >= 15:
+                    bboxes.append([float(i) for i in items[7:15]])
+                    labels.append(items[2])
+                    diffs.append(1)
 
     bboxes = np.array(bboxes, dtype=np.float32) if bboxes else \
         np.zeros((0, 8), dtype=np.float32)
