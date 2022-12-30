@@ -21,6 +21,7 @@
 
 ### Improvements
 
+- Deprecating old type alias due to new version of numpy (#674)
 - Use iof in RRandomCrop. (#660)
 - Modify keys in dataset.metainfo to lower case. (#654)
 - Add torch 1.13 in CI. (#661)
@@ -36,9 +37,9 @@
 
 ### Contributors
 
-A total of 10 developers contributed to this release.
+A total of 11 developers contributed to this release.
 
-Thanks @yxzhao2022 @yuyi1005 @YanxingLiu @nijkah @austinmw @liuyanyi @yangxue0827 @zytx121 @RangiLyu @ZwwWayne
+Thanks @yxzhao2022 @yuyi1005 @YanxingLiu @nijkah @RangeKing @austinmw @liuyanyi @yangxue0827 @zytx121 @RangiLyu @ZwwWayne
 
 ## v1.0.0rc0 (7/11/2022)
 
