@@ -2,7 +2,6 @@
 import argparse
 import os.path as osp
 
-import numpy as np
 from mmdet.models.utils import mask2ndarray
 from mmdet.registry import DATASETS, VISUALIZERS
 from mmdet.structures.bbox import BaseBoxes
@@ -71,7 +70,7 @@ def main():
         gt_masks = gt_instances.get('masks', None)
         if gt_masks is not None:
             masks = mask2ndarray(gt_masks)
-            gt_instances.masks = masks.astype(np.bool)
+            gt_instances.masks = masks.astype(bool)
         data_sample.gt_instances = gt_instances
 
         visualizer.add_datasample(
