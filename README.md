@@ -93,7 +93,7 @@ We are excited to announce our latest work on real-time object recognition tasks
 **v1.0.0rc1** was released in 30/12/2022:
 
 - Support [RTMDet](configs/rotated_rtmdet) rotated object detection models. The technical report of RTMDet is on [arxiv](https://arxiv.org/abs/2212.07784)
-- Support [H2RBox](configs/h2rbox)
+- Support [H2RBox](configs/h2rbox) models. The technical report of H2RBox is on [arxiv](https://arxiv.org/abs/2210.06742)
 
 ## Installation
 

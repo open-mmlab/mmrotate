@@ -89,7 +89,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 最新的 **v1.0.0rc1** 版本已经在 2022.12.30 发布:
 
 - 支持了 [RTMDet](configs/rotated_rtmdet) 的旋转目标检测模型。RTMDet 的技术报告发布在了 [arxiv](https://arxiv.org/abs/2212.07784) 上。
-- 支持了 [H2RBox](configs/h2rbox) 模型。
+- 支持了 [H2RBox](configs/h2rbox) 模型。H2RBox 的技术报告发布在了 [arxiv](https://arxiv.org/abs/2210.06742) 上。
 
 ## 安装
 
