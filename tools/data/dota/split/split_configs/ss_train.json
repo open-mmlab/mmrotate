@@ -1,10 +1,10 @@
 {
   "nproc": 10,
   "img_dirs": [
-    "data/DOTA/train/images/"
+    "demo/data/datasets_hw/train/images/"
   ],
   "ann_dirs": [
-    "data/DOTA/train/labelTxt/"
+    "demo/data/datasets_hw/train/annotations/"
   ],
   "sizes": [
     1024

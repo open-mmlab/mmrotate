@@ -1,10 +1,10 @@
 {
   "nproc": 10,
   "img_dirs": [
-    "data/DOTA/val/images/"
+    "demo/data/datasets_hw/val/images/"
   ],
   "ann_dirs": [
-    "data/DOTA/val/labelTxt/"
+    "demo/data/datasets_hw/val/annotations/"
   ],
   "sizes": [
     1024

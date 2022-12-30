@@ -28,8 +28,8 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
+    samples_per_gpu=10,
+    workers_per_gpu=10,
     train=dict(
         type=dataset_type,
         ann_file=data_root + 'trainval/annfiles/',
