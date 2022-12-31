@@ -2,6 +2,7 @@
 import mmcv
 import numpy as np
 import torch
+import os
 from mmdet.models import BaseDetector
 
 from mmrotate.core import imshow_det_rbboxes
@@ -58,6 +59,7 @@ class RotatedBaseDetector(BaseDetector):
         Returns:
             img (torch.Tensor): Only if not `show` or `out_file`
         """
+        imgname=os.path.basename(img)
         img = mmcv.imread(img)
         img = img.copy()
         if isinstance(result, tuple):
@@ -84,6 +86,9 @@ class RotatedBaseDetector(BaseDetector):
         if out_file is not None:
             show = False
         # draw bounding boxes
+        # print(imgname)
+        # for b, l in zip(bboxes, labels):
+        #     print(imgname, b, l)
         img = imshow_det_rbboxes(
             img,
             bboxes,
@@ -99,7 +104,8 @@ class RotatedBaseDetector(BaseDetector):
             win_name=win_name,
             show=show,
             wait_time=wait_time,
-            out_file=out_file)
+            out_file=out_file,
+            imgname=imgname)
 
         if not (show or out_file):
             return img
