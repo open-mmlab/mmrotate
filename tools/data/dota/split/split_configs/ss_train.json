@@ -1,10 +1,14 @@
 {
   "nproc": 10,
   "img_dirs": [
-    "demo/data/datasets_hw/train/images/"
+    "demo/data/datasets_hw/train/images/",
+    "datasets_hw_2022.12.28/datasets_hw_2022.12.28/train/images_patched/",
+    "demo/data/datasets_hw/val/images/"
   ],
   "ann_dirs": [
-    "demo/data/datasets_hw/train/annotations/"
+    "demo/data/datasets_hw/train/annotations/",
+    "datasets_hw_2022.12.28/datasets_hw_2022.12.28/train/annotations_patched/",
+    "demo/data/datasets_hw/val/annotations/"
   ],
   "sizes": [
     1024
@@ -23,6 +27,6 @@
     116,
     124
   ],
-  "save_dir": "data/split_ss_dota/train/",
+  "save_dir": "data/split_ss_dota/train2/",
   "save_ext": ".png"
 }
