@@ -158,7 +158,7 @@ class RotatedCocoMetric(CocoMetric):
         """
         categories = [
             dict(id=id, name=name)
-            for id, name in enumerate(self.dataset_meta['CLASSES'])
+            for id, name in enumerate(self.dataset_meta['classes'])
         ]
         image_infos = []
         annotations = []
@@ -241,7 +241,7 @@ class RotatedCocoMetric(CocoMetric):
         # handle lazy init
         if self.cat_ids is None:
             self.cat_ids = self._coco_api.get_cat_ids(
-                cat_names=self.dataset_meta['CLASSES'])
+                cat_names=self.dataset_meta['classes'])
         if self.img_ids is None:
             self.img_ids = self._coco_api.get_img_ids()
 
