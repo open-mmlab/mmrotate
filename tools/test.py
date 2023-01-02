@@ -119,6 +119,12 @@ def main():
 
     cfg = compat_cfg(cfg)
 
+    if args.format_only and cfg.mp_start_method != 'spawn':
+        warnings.warn(
+            '`mp_start_method` in `cfg` is set to `spawn` to use CUDA '
+            'with multiprocessing when formatting output result.')
+        cfg.mp_start_method = 'spawn'
+
     # set multi-process settings
     setup_multi_processes(cfg)
 
