@@ -152,7 +152,7 @@ class DOTAMetric(BaseMetric):
             big_img_results = []
             label_dets = np.concatenate(label_dets_list, axis=0)
             labels, dets = label_dets[:, 0], label_dets[:, 1:]
-            for i in range(len(self.dataset_meta['CLASSES'])):
+            for i in range(len(self.dataset_meta['classes'])):
                 if len(dets[labels == i]) == 0:
                     big_img_results.append(dets[labels == i])
                 else:
@@ -181,7 +181,7 @@ class DOTAMetric(BaseMetric):
 
         files = [
             osp.join(outfile_prefix, 'Task1_' + cls + '.txt')
-            for cls in self.dataset_meta['CLASSES']
+            for cls in self.dataset_meta['classes']
         ]
         file_objs = [open(f, 'w') for f in files]
         for img_id, dets_per_cls in zip(id_list, dets_list):
@@ -284,7 +284,7 @@ class DOTAMetric(BaseMetric):
             result['labels'] = pred['labels'].cpu().numpy()
 
             result['pred_bbox_scores'] = []
-            for label in range(len(self.dataset_meta['CLASSES'])):
+            for label in range(len(self.dataset_meta['classes'])):
                 index = np.where(result['labels'] == label)[0]
                 pred_bbox_scores = np.hstack([
                     result['bboxes'][index], result['scores'][index].reshape(
@@ -329,7 +329,7 @@ class DOTAMetric(BaseMetric):
 
         if self.metric == 'mAP':
             assert isinstance(self.iou_thrs, list)
-            dataset_name = self.dataset_meta['CLASSES']
+            dataset_name = self.dataset_meta['classes']
             dets = [pred['pred_bbox_scores'] for pred in preds]
 
             mean_aps = []

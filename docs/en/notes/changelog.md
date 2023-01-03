@@ -1,5 +1,46 @@
 # Changelog of v1.x
 
+## v1.0.0rc1 (30/12/2022)
+
+### Highlights
+
+- Support [RTMDet](https://arxiv.org/abs/2212.07784) rotated object detection models. The technical report of RTMDet is on [arxiv](https://arxiv.org/abs/2212.07784) (#662)
+- Support H2RBox. (#644)
+
+### New Features
+
+- Support PSC (#617)
+- Add [`projects/`](./projects/) folder and give an [example](./projects/example_project/README.md) for communities to contribute their projects. (#627)
+- Support DIOR Dataset. (#639)
+
+### Bug Fixes
+
+- Fix `get_flops.py` in 1.x. (#646)
+- Fix Windows CI. (#621)
+- Fix error in rbbox_overlaps. (#620)
+
+### Improvements
+
+- Deprecating old type alias due to new version of numpy (#674)
+- Use iof in RRandomCrop. (#660)
+- Modify keys in dataset.metainfo to lower case. (#654)
+- Add torch 1.13 in CI. (#661)
+- Add dockerfile in 1.x. (#631)
+- Use mmengine in torchserve deployment. (#616)
+- Add `.pre-commit-config-zh-cn.yaml`. (#630)
+
+### New Contributors
+
+- @yuyi1005 made their first contribution in <https://github.com/open-mmlab/mmrotate/pull/617>
+- @yxzhao2022 made their first contribution in <https://github.com/open-mmlab/mmrotate/pull/639>
+- @YanxingLiu made their first contribution in <https://github.com/open-mmlab/mmrotate/pull/631>
+
+### Contributors
+
+A total of 11 developers contributed to this release.
+
+Thanks @yxzhao2022 @yuyi1005 @YanxingLiu @nijkah @RangeKing @austinmw @liuyanyi @yangxue0827 @zytx121 @RangiLyu @ZwwWayne
+
 ## v1.0.0rc0 (7/11/2022)
 
 We are excited to announce the release of MMRotate 1.0.0rc0.
