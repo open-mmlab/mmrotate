@@ -217,7 +217,6 @@ class ReFPN(BaseModule):
             self.backbone_end_level = self.num_ins
             assert num_outs >= self.num_ins - start_level
         else:
-            # if end_level < inputs, no extra level is allowed
             self.backbone_end_level = end_level
             assert end_level <= len(in_channels)
             assert num_outs == end_level - start_level
