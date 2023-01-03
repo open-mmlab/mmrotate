@@ -1,3 +1,3 @@
 # These must be installed before building mmrotate
 cython
-numpy
+numpy<1.24.0
