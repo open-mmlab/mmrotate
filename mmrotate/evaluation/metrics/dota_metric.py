@@ -138,7 +138,7 @@ class DOTAMetric(DOTAMeanAP):
             pred['scores'] = pred['scores'].cpu().numpy()
             pred['labels'] = pred['labels'].cpu().numpy()
             predictions.append(pred)
-            self.add(predictions, groundtruths)
+        self.add(predictions, groundtruths)
 
     def merge_results(self, results: Sequence[dict],
                       outfile_prefix: str) -> str:
