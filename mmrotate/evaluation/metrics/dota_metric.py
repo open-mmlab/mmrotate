@@ -93,10 +93,9 @@ class DOTAMetric(DOTAMeanAP):
             nproc=nproc,
             drop_class_ap=drop_class_ap,
             classwise=True,
-            predict_box_type=predict_box_type,
             dist_backend=dist_backend,
             **kwargs)
-
+        self.predict_box_type = predict_box_type
         self.format_only = format_only
         if self.format_only:
             assert outfile_prefix is not None, 'outfile_prefix must be not' \
@@ -138,7 +137,7 @@ class DOTAMetric(DOTAMeanAP):
             pred['scores'] = pred['scores'].cpu().numpy()
             pred['labels'] = pred['labels'].cpu().numpy()
             predictions.append(pred)
-            self.add(predictions, groundtruths)
+        self.add(predictions, groundtruths)
 
     def merge_results(self, results: Sequence[dict],
                       outfile_prefix: str) -> str:
