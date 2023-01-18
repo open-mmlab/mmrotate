@@ -85,7 +85,7 @@ class TestDOTAMetric(unittest.TestCase):
 
     def test_eval(self):
         metric = DOTAMetric()
-        metric.dataset_meta = {'CLASSES': ('plane', )}
+        metric.dataset_meta = {'classes': ('plane', )}
         metric.process({}, self._create_dummy_data_sample())
         results = metric.evaluate(size=1)
         targets = {'dota/AP50': 1.0, 'dota/mAP': 1.0}
@@ -93,7 +93,7 @@ class TestDOTAMetric(unittest.TestCase):
 
         # test multi-threshold
         metric = DOTAMetric(iou_thrs=[0.1, 0.5])
-        metric.dataset_meta = dict(CLASSES=('plane', ))
+        metric.dataset_meta = dict(classes=('plane', ))
         metric.process({}, self._create_dummy_data_sample())
         results = metric.evaluate(size=1)
         targets = {'dota/AP10': 1.0, 'dota/AP50': 1.0, 'dota/mAP': 1.0}
@@ -106,7 +106,7 @@ class TestDOTAMetric(unittest.TestCase):
 
         metric = DOTAMetric(
             format_only=True, outfile_prefix=f'{self.tmp_dir.name}/test')
-        metric.dataset_meta = dict(CLASSES=('plane', ))
+        metric.dataset_meta = dict(classes=('plane', ))
         metric.process({}, self._create_dummy_data_sample())
         eval_results = metric.evaluate(size=1)
         self.assertDictEqual(eval_results, dict())
@@ -117,7 +117,7 @@ class TestDOTAMetric(unittest.TestCase):
             format_only=True,
             merge_patches=True,
             outfile_prefix=f'{self.tmp_dir.name}/Task1')
-        metric.dataset_meta = dict(CLASSES=('plane', ))
+        metric.dataset_meta = dict(classes=('plane', ))
         metric.process({}, self._create_dummy_data_sample())
         eval_results = metric.evaluate(size=1)
         self.assertDictEqual(eval_results, dict())
@@ -125,7 +125,7 @@ class TestDOTAMetric(unittest.TestCase):
 
     def test_eval_qbox(self):
         metric = DOTAMetric(predict_box_type='qbox')
-        metric.dataset_meta = {'CLASSES': ('plane', )}
+        metric.dataset_meta = {'classes': ('plane', )}
         metric.process({}, self._create_dummy_data_sample_qbox())
         results = metric.evaluate(size=1)
         targets = {'dota/AP50': 1.0, 'dota/mAP': 1.0}
@@ -140,7 +140,7 @@ class TestDOTAMetric(unittest.TestCase):
             predict_box_type='qbox',
             format_only=True,
             outfile_prefix=f'{self.tmp_dir.name}/test')
-        metric.dataset_meta = dict(CLASSES=('plane', ))
+        metric.dataset_meta = dict(classes=('plane', ))
         metric.process({}, self._create_dummy_data_sample_qbox())
         eval_results = metric.evaluate(size=1)
         self.assertDictEqual(eval_results, dict())
@@ -152,7 +152,7 @@ class TestDOTAMetric(unittest.TestCase):
             format_only=True,
             merge_patches=True,
             outfile_prefix=f'{self.tmp_dir.name}/Task1')
-        metric.dataset_meta = dict(CLASSES=('plane', ))
+        metric.dataset_meta = dict(classes=('plane', ))
         metric.process({}, self._create_dummy_data_sample_qbox())
         eval_results = metric.evaluate(size=1)
         self.assertDictEqual(eval_results, dict())

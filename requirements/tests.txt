@@ -11,7 +11,7 @@ kwarray
 matplotlib
 parameterized
 pytest
-sklearn
+scikit-learn
 ubelt
 wheel
 xdoctest>=0.10.0

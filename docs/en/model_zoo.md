@@ -18,6 +18,7 @@
 - [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
 - [Oriented RepPoints](https://github.com/open-mmlab/mmrotate/tree/main/configs/oriented_reppoints/README.md) (CVPR'2022)
 - [KFIoU](https://github.com/open-mmlab/mmrotate/tree/main/configs/kfiou/README.md) (arXiv)
+- [H2RBox](https://github.com/open-mmlab/mmrotate/tree/main/configs/h2rbox/README.md) (arXiv)
 
 ## Results on DOTA v1.0
 
@@ -65,6 +66,7 @@
 | Swin-tiny (1024,1024,200)  | 77.51 | le90  |   1x    |          |      10.9      |   -   |     2      |                      [roi-trans-le90_swin-tiny_fpn_1x_dota](../../configs/roi_trans/roi-trans-le90_swin-tiny_fpn_1x_dota.py)                      |                                           [model](https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_swin_tiny_fpn_1x_dota_le90/roi_trans_swin_tiny_fpn_1x_dota_le90-ddeee9ae.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_swin_tiny_fpn_1x_dota_le90/roi_trans_swin_tiny_fpn_1x_dota_le90_20220131_083622.log.json)                                           |
 |  ResNet50 (1024,1024,500)  | 79.66 | le90  |   1x    |          |      14.4      | MS+RR |     2      |                      [roi_trans_r50_fpn_1x_dota_ms_rr_le90](../../configs/roi_trans/roi_trans_r50_fpn_1x_dota_ms_rr_le90.py)                      |                                           [model](https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_1x_dota_ms_rr_le90/roi_trans_r50_fpn_1x_dota_ms_rr_le90-fa99496f.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/roi_trans/roi_trans_r50_fpn_1x_dota_ms_rr_le90/roi_trans_r50_fpn_1x_dota_ms_rr_le90_20220205_171729.log.json)                                           |
 | ReResNet50 (1024,1024,500) | 79.87 | le90  |   1x    |          |      10.9      | MS+RR |     2      |                         [redet-le90_re50_refpn_rr-1x_dota-ms](../../configs/redet/redet-le90_re50_refpn_rr-1x_dota-ms.py)                         |                                                     [model](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90-fc9217b5.pth) \| [log](https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90_20220206_105343.log.json)                                                     |
+|  ResNet50 (1024,1024,200)  | 68.75 | le90  |   1x    |   6.25   |                |   -   |     2      |                          [h2rbox-le90_r50_fpn_adamw-1x_dota](../../configs/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dota.py)                           |                                                        [model](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dota/h2rbox-le90_r50_fpn_adamw-1x_dota-d02c933a.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/h2rbox/h2rbox-le90_r50_fpn_adamw-1x_dota/h2rbox-le90_r50_fpn_adamw-1x_dota-20221124_153420.json)                                                        |
 
 - `MS` means multiple scale image split.
 - `RR` means random rotation.

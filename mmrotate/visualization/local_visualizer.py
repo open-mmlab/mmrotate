@@ -81,8 +81,9 @@ class RotLocalVisualizer(DetLocalVisualizer):
                         'or (n, 8), but get `bboxes` with shape being '
                         f'{bboxes.shape}.')
 
+            bboxes = bboxes.cpu()
             polygons = bboxes.convert_to('qbox').tensor
-            polygons = polygons.reshape(-1, 4, 2).numpy()
+            polygons = polygons.reshape(-1, 4, 2)
             polygons = [p for p in polygons]
             self.draw_polygons(
                 polygons,
@@ -120,7 +121,7 @@ class RotLocalVisualizer(DetLocalVisualizer):
             elif isinstance(masks, (PolygonMasks, BitmapMasks)):
                 masks = masks.to_ndarray()
 
-            masks = masks.astype(np.bool)
+            masks = masks.astype(bool)
 
             max_label = int(max(labels) if len(labels) > 0 else 0)
             mask_color = palette if self.mask_color is None \

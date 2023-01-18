@@ -24,8 +24,8 @@ def test_palette():
         assert color == (255, 0, 0)
 
     # test dataset str
-    palette = get_palette('dota', len(DOTADataset.METAINFO['CLASSES']))
-    assert len(palette) == len(DOTADataset.METAINFO['CLASSES'])
+    palette = get_palette('dota', len(DOTADataset.METAINFO['classes']))
+    assert len(palette) == len(DOTADataset.METAINFO['classes'])
     assert palette[0] == (165, 42, 42)
 
     # test random

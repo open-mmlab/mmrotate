@@ -123,7 +123,7 @@ class TestRotatedCocoMetric(TestCase):
             ann_file=fake_json_file,
             classwise=False,
             outfile_prefix=f'{self.tmp_dir.name}/test')
-        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
         coco_metric.process(
             {},
             [dict(pred_instances=dummy_pred, img_id=0, ori_shape=(640, 640))])
@@ -146,7 +146,7 @@ class TestRotatedCocoMetric(TestCase):
             metric=['bbox', 'segm'],
             classwise=False,
             outfile_prefix=f'{self.tmp_dir.name}/test')
-        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
         coco_metric.process(
             {},
             [dict(pred_instances=dummy_pred, img_id=0, ori_shape=(640, 640))])
@@ -176,7 +176,7 @@ class TestRotatedCocoMetric(TestCase):
                                     'metric item "invalid" is not supported'):
             coco_metric = RotatedCocoMetric(
                 ann_file=fake_json_file, metric_items=['invalid'])
-            coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+            coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
             coco_metric.process({}, [
                 dict(
                     pred_instances=dummy_pred, img_id=0, ori_shape=(640, 640))
@@ -186,7 +186,7 @@ class TestRotatedCocoMetric(TestCase):
         # test custom metric_items
         coco_metric = RotatedCocoMetric(
             ann_file=fake_json_file, metric_items=['mAP_m'])
-        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
         coco_metric.process(
             {},
             [dict(pred_instances=dummy_pred, img_id=0, ori_shape=(640, 640))])
@@ -205,7 +205,7 @@ class TestRotatedCocoMetric(TestCase):
         # test single coco dataset evaluation
         coco_metric = RotatedCocoMetric(
             ann_file=fake_json_file, metric='bbox', classwise=True)
-        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
         coco_metric.process(
             {},
             [dict(pred_instances=dummy_pred, img_id=0, ori_shape=(640, 640))])
@@ -230,7 +230,7 @@ class TestRotatedCocoMetric(TestCase):
         # test single coco dataset evaluation
         coco_metric = RotatedCocoMetric(
             ann_file=fake_json_file, metric='bbox', iou_thrs=[0.3, 0.6])
-        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
         self.assertEqual(coco_metric.iou_thrs, [0.3, 0.6])
 
     def test_evaluate_without_json(self):
@@ -266,7 +266,7 @@ class TestRotatedCocoMetric(TestCase):
             metric=['bbox', 'segm'],
             classwise=False,
             outfile_prefix=f'{self.tmp_dir.name}/test')
-        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
         coco_metric.process({}, [
             dict(
                 pred_instances=dummy_pred,
@@ -306,7 +306,7 @@ class TestRotatedCocoMetric(TestCase):
 
         coco_metric = RotatedCocoMetric(
             ann_file=fake_json_file, metric='proposal')
-        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
         coco_metric.process(
             {},
             [dict(pred_instances=dummy_pred, img_id=0, ori_shape=(640, 640))])
@@ -340,7 +340,7 @@ class TestRotatedCocoMetric(TestCase):
             classwise=False,
             format_only=True,
             outfile_prefix=f'{self.tmp_dir.name}/test')
-        coco_metric.dataset_meta = dict(CLASSES=['car', 'bicycle'])
+        coco_metric.dataset_meta = dict(classes=['car', 'bicycle'])
         coco_metric.process(
             {},
             [dict(pred_instances=dummy_pred, img_id=0, ori_shape=(640, 640))])

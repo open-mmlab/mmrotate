@@ -72,14 +72,28 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 
 ## What's New
 
-**v1.0.0rc0** was released in 7/11/2022:
+### Highlight
 
-- Unifies interfaces of all components based on [MMEngine](https://github.com/open-mmlab/mmengine) and [MMDetection 3.x](https://github.com/open-mmlab/mmdetection/tree/3.x).
-- Support data structures RotatedBoxes and QuadriBoxes to encapsulate different kinds of bounding boxes. This will unify the usages of different kinds of bounding boxes in MMDetection 3.x and MMRotate 1.x to simplify the implementation and reduce redundant codes.
-- Support [quadrilateral box detection](configs/gliding_vertex/).
-- Support RotatedCocoMetric, which can generate evaluation indicators in COCO format.
-- Support COCO style annotations.
-- Support two new SAR datasets: [RSDD](tools/data/rsdd) and [SRSDD](tools/data/srsdd).
+We are excited to announce our latest work on real-time object recognition tasks, **RTMDet**, a family of fully convolutional single-stage detectors. RTMDet not only achieves the best parameter-accuracy trade-off on object detection from tiny to extra-large model sizes but also obtains new state-of-the-art performance on instance segmentation and rotated object detection tasks. Details can be found in the [technical report](https://arxiv.org/abs/2212.07784). Pre-trained models are [here](configs/rotated_rtmdet).
+
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/rtmdet-an-empirical-study-of-designing-real/real-time-instance-segmentation-on-mscoco)](https://paperswithcode.com/sota/real-time-instance-segmentation-on-mscoco?p=rtmdet-an-empirical-study-of-designing-real)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/rtmdet-an-empirical-study-of-designing-real/object-detection-in-aerial-images-on-dota-1)](https://paperswithcode.com/sota/object-detection-in-aerial-images-on-dota-1?p=rtmdet-an-empirical-study-of-designing-real)
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/rtmdet-an-empirical-study-of-designing-real/object-detection-in-aerial-images-on-hrsc2016)](https://paperswithcode.com/sota/object-detection-in-aerial-images-on-hrsc2016?p=rtmdet-an-empirical-study-of-designing-real)
+
+| Task                     | Dataset | AP                                   | FPS(TRT FP16 BS1 3090) |
+| ------------------------ | ------- | ------------------------------------ | ---------------------- |
+| Object Detection         | COCO    | 52.8                                 | 322                    |
+| Instance Segmentation    | COCO    | 44.6                                 | 188                    |
+| Rotated Object Detection | DOTA    | 78.9(single-scale)/81.3(multi-scale) | 121                    |
+
+<div align=center>
+<img src="https://user-images.githubusercontent.com/12907710/208044554-1e8de6b5-48d8-44e4-a7b5-75076c7ebb71.png"/>
+</div>
+
+**v1.0.0rc1** was released in 30/12/2022:
+
+- Support [RTMDet](configs/rotated_rtmdet) rotated object detection models. The technical report of RTMDet is on [arxiv](https://arxiv.org/abs/2212.07784)
+- Support [H2RBox](configs/h2rbox) models. The technical report of H2RBox is on [arxiv](https://arxiv.org/abs/2210.06742)
 
 ## Installation
 
@@ -135,6 +149,7 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 - [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
 - [x] [Oriented RepPoints](configs/oriented_reppoints/README.md) (CVPR'2022)
 - [x] [KFIoU](configs/kfiou/README.md) (arXiv)
+- [x] [H2RBox](configs/h2rbox/README.md) (arXiv)
 
 </details>
 

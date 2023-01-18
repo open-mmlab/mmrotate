@@ -1,13 +1,17 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import unittest
 
-from mmrotate.datasets import DOTADataset
+from parameterized import parameterized
+
+from mmrotate.datasets import DOTADataset, DOTAv2Dataset, DOTAv15Dataset
 
 
 class TestDOTADataset(unittest.TestCase):
 
-    def test_dota_with_ann_file(self):
-        dataset = DOTADataset(
+    @parameterized.expand([(DOTADataset, ), (DOTAv15Dataset, ),
+                           (DOTAv2Dataset, )])
+    def test_dota_with_ann_file(self, Dataset):
+        dataset = Dataset(
             data_root='tests/data/dota/',
             ann_file='labelTxt/',
             data_prefix=dict(img_path='images/'),
@@ -26,8 +30,10 @@ class TestDOTADataset(unittest.TestCase):
         self.assertEqual(len(data_list[0]['instances']), 4)
         self.assertEqual(dataset.get_cat_ids(0), [0, 0, 0, 0])
 
-    def test_dota_without_ann_file(self):
-        dataset = DOTADataset(
+    @parameterized.expand([(DOTADataset, ), (DOTAv15Dataset, ),
+                           (DOTAv2Dataset, )])
+    def test_dota_without_ann_file(self, Dataset):
+        dataset = Dataset(
             data_root='tests/data/dota/',
             data_prefix=dict(img_path='images/'),
             filter_cfg=dict(

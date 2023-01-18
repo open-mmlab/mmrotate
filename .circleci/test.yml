@@ -70,6 +70,7 @@ jobs:
       - run:
           name: Build and install
           command: |
+            pip install 'numpy < 1.24.0'
             pip install -e .
       - run:
           name: Run unittests
@@ -113,6 +114,7 @@ jobs:
       - run:
           name: Build and install
           command: |
+            docker exec mmrotate pip install 'numpy < 1.24.0'
             docker exec mmrotate pip install -e .
       - run:
           name: Run unittests
@@ -153,8 +155,8 @@ workflows:
             - lint
       - build_cpu:
           name: maximum_version_cpu
-          torch: 1.12.1
-          torchvision: 0.13.1
+          torch: 1.13.0
+          torchvision: 0.14.0
           python: 3.9.0
           requires:
             - minimum_version_cpu

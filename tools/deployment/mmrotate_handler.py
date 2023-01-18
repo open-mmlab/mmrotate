@@ -93,7 +93,7 @@ class MMRotateHandler(BaseHandler):
                 bbox_result, segm_result = image_result, None
 
             for class_index, class_result in enumerate(bbox_result):
-                class_name = self.model.CLASSES[class_index]
+                class_name = self.model.classes[class_index]
                 for bbox in class_result:
                     bbox_coords = bbox[:-1].tolist()
                     score = float(bbox[-1])

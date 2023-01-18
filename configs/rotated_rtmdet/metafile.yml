@@ -1,0 +1,147 @@
+Collections:
+  - Name: rotated_rtmdet
+    Metadata:
+      Training Data:
+        - DOTAv1.0
+        - HRSC
+      Training Techniques:
+        - AdamW
+        - Flat Cosine Annealing
+      Training Resources: 1x RTX3090 GPUs
+      Architecture:
+        - CSPNeXt
+        - CSPNeXtPAFPN
+    README: configs/rotated_rtmdet/README.md
+
+Models:
+  - Name: rotated_rtmdet_tiny-3x-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_tiny-3x-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 75.60
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_tiny-3x-dota/rotated_rtmdet_tiny-3x-dota-9d821076.pth
+
+  - Name: rotated_rtmdet_tiny-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_tiny-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 79.82
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_tiny-3x-dota_ms/rotated_rtmdet_tiny-3x-dota_ms-f12286ff.pth
+
+  - Name: rotated_rtmdet_s-3x-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_s-3x-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 76.93
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_s-3x-dota/rotated_rtmdet_s-3x-dota-11f6ccf5.pth
+
+  - Name: rotated_rtmdet_s-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_s-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 79.98
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_s-3x-dota_ms/rotated_rtmdet_s-3x-dota_ms-20ead048.pth
+
+  - Name: rotated_rtmdet_m-3x-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_m-3x-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 78.24
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_m-3x-dota/rotated_rtmdet_m-3x-dota-beeadda6.pth
+
+  - Name: rotated_rtmdet_m-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_m-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 80.26
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_m-3x-dota_ms/rotated_rtmdet_m-3x-dota_ms-c71eb375.pth
+
+  - Name: rotated_rtmdet_l-3x-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_l-3x-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 78.85
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-3x-dota/rotated_rtmdet_l-3x-dota-23992372.pth
+
+  - Name: rotated_rtmdet_l-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_l-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 80.54
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-3x-dota_ms/rotated_rtmdet_l-3x-dota_ms-2738da34.pth
+
+  - Name: rotated_rtmdet_l-coco_pretrain-3x-dota_ms
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/rotated_rtmdet_l-coco_pretrain-3x-dota_ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 81.33
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-coco_pretrain-3x-dota_ms/rotated_rtmdet_l-coco_pretrain-3x-dota_ms-06d248a2.pth
+
+  - Name: rotated_rtmdet_tiny-9x-hrsc
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/
+    Metadata:
+      Training Data: HRSC
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC
+        Metrics:
+          mAP: 90.6
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_tiny-9x-hrsc/rotated_rtmdet_tiny-9x-hrsc-9f2e3ca6.pth
+
+  - Name: rotated_rtmdet_l-100e-aug-dota
+    In Collection: rotated_rtmdet
+    Config: configs/rotated_rtmdet/
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 80.16
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_l-100e-aug-dota/rotated_rtmdet_l-100e-aug-dota-bc59fd88.pth
