@@ -14,6 +14,7 @@ Import:
   - configs/rotated_fcos/metafile.yml
   - configs/rotated_reppoints/metafile.yml
   - configs/rotated_retinanet/metafile.yml
+  - configs/rotated_rtmdet/metafile.yml
   - configs/s2anet/metafile.yml
   - configs/sasm_reppoints/metafile.yml
   - configs/psc/metafile.yml
