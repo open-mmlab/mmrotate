@@ -1,5 +1,5 @@
 Collections:
-- Name: psc
+- Name: h2rbox
   Metadata:
     Training Data: DOTAv1.0, DOTAv1.5, DOTAv2.0, DIOR
     Training Techniques:
