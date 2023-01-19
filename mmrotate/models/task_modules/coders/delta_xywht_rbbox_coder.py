@@ -8,7 +8,7 @@ from mmdet.structures.bbox import get_box_tensor
 from torch import Tensor
 
 from mmrotate.registry import TASK_UTILS
-from mmrotate.structures.bbox import RotatedBoxes
+from mmrotate.structures.bbox import RotatedBoxes, RotatedHeadBoxes
 from ....structures.bbox.transforms import norm_angle
 
 
@@ -77,7 +77,8 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         """
         assert bboxes.size(0) == gt_bboxes.size(0)
         assert bboxes.size(-1) == 5
-        assert gt_bboxes.size(-1) == 5
+        # The length of last dim of bboxes in RotatedHeadBoxes is 7
+        assert gt_bboxes.size(-1) == 5 or gt_bboxes.size(-1) == 7
         return bbox2delta(bboxes, gt_bboxes, self.means, self.stds,
                           self.angle_version, self.norm_factor, self.edge_swap,
                           self.proj_xy)
@@ -154,7 +155,11 @@ def bbox2delta(proposals: RotatedBoxes,
         Tensor: deltas with shape (N, 5), where columns represent dx, dy,
         dw, dh, dt.
     """
-    assert proposals.size() == gts.size()
+    if isinstance(gts, RotatedHeadBoxes):
+        assert proposals.shape[:-1] == gts.shape[:-1]
+        assert proposals.size(-1) == (gts.size(-1) - 2)
+    else:
+        assert proposals.size() == gts.size()
     proposals = proposals.tensor
     gts = gts.regularize_boxes(angle_version)
     proposals = proposals.float()
