@@ -59,7 +59,7 @@ def map_masks(masks, offset, new_shape):
             ori_height -= y_end - new_height
             y_end = new_height
 
-        extended_mask = np.zeros((new_height, new_width), dtype=np.bool)
+        extended_mask = np.zeros((new_height, new_width), dtype=bool)
         extended_mask[y_start:y_end,
                       x_start:x_end] = mask[:ori_height, :ori_width]
         mapped.append(extended_mask)
