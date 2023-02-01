@@ -1,11 +1,15 @@
 Import:
   - configs/cfa/metafile.yml
+  - configs/convnext/metafile.yml
   - configs/csl/metafile.yml
   - configs/gliding_vertex/metafile.yml
   - configs/gwd/metafile.yml
+  - configs/h2rbox/metafile.yml
   - configs/kfiou/metafile.yml
   - configs/kld/metafile.yml
   - configs/oriented_rcnn/metafile.yml
+  - configs/oriented_reppoints/metafile.yml
+  - configs/psc/metafile.yml
   - configs/r3det/metafile.yml
   - configs/redet/metafile.yml
   - configs/roi_trans/metafile.yml
@@ -14,6 +18,6 @@ Import:
   - configs/rotated_fcos/metafile.yml
   - configs/rotated_reppoints/metafile.yml
   - configs/rotated_retinanet/metafile.yml
+  - configs/rotated_rtmdet/metafile.yml
   - configs/s2anet/metafile.yml
   - configs/sasm_reppoints/metafile.yml
-  - configs/psc/metafile.yml

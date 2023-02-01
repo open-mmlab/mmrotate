@@ -1,5 +1,5 @@
 Collections:
-- Name: ConvNeXt
+- Name: convnext
   Metadata:
     Training Data: DOTAv1.0
     Training Techniques:
