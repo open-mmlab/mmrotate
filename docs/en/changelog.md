@@ -1,5 +1,27 @@
 ## Changelog
 
+### v0.3.4 (01/02/2023)
+
+#### Improvements
+
+- Use iof for RRandomCrop validation (#660)
+- Upgrade e2cnn version (#713)
+- Support empty patch in Rotate Transform (#712)
+
+#### Bug Fixes
+
+- Fix scikit-learn installation (#658)
+- Fix deprecated np.bool (#685)
+
+#### Documentations
+
+- Minor correction in the documentation (#643)
+
+#### Contributors
+
+A total of 3 developers contributed to this release.
+Thanks @nijkah, @jistiak, @RangiLyu
+
 ### v0.3.3 (27/10/2022)
 
 #### Bug Fixes

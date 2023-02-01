@@ -8,16 +8,17 @@ We list some common troubles faced by many users and their corresponding solutio
 
 Compatible MMCV, MMDetection and MMRotate versions are shown as below. Please install the correct version of them to avoid installation issues.
 
-| MMRotate version |       MMCV version        | MMDetection version |
-| :--------------: | :-----------------------: | :-----------------: |
-|       main       | mmcv-full>=1.5.3, \<1.8.0 |   mmdet >= 2.25.1   |
-|      0.3.3       | mmcv-full>=1.5.3, \<1.7.0 |   mmdet >= 2.25.1   |
-|      0.3.2       | mmcv-full>=1.5.3, \<1.7.0 |   mmdet >= 2.25.1   |
-|      0.3.1       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
-|      0.3.0       | mmcv-full>=1.4.5, \<1.6.0 |   mmdet >= 2.22.0   |
-|      0.2.0       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
-|      0.1.1       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
-|      0.1.0       | mmcv-full>=1.4.5, \<1.5.0 |   mmdet >= 2.19.0   |
+| MMRotate version |       MMCV version        |   MMDetection version    |
+| :--------------: | :-----------------------: | :----------------------: |
+|       main       | mmcv-full>=1.5.3, \<1.8.0 | mmdet >= 2.25.1, \<3.0.0 |
+|      0.3.4       | mmcv-full>=1.5.3, \<1.8.0 | mmdet >= 2.25.1, \<3.0.0 |
+|      0.3.3       | mmcv-full>=1.5.3, \<1.7.0 | mmdet >= 2.25.1, \<3.0.0 |
+|      0.3.2       | mmcv-full>=1.5.3, \<1.7.0 | mmdet >= 2.25.1, \<3.0.0 |
+|      0.3.1       | mmcv-full>=1.4.5, \<1.6.0 | mmdet >= 2.22.0, \<3.0.0 |
+|      0.3.0       | mmcv-full>=1.4.5, \<1.6.0 | mmdet >= 2.22.0, \<3.0.0 |
+|      0.2.0       | mmcv-full>=1.4.5, \<1.5.0 | mmdet >= 2.19.0, \<3.0.0 |
+|      0.1.1       | mmcv-full>=1.4.5, \<1.5.0 | mmdet >= 2.19.0, \<3.0.0 |
+|      0.1.0       | mmcv-full>=1.4.5, \<1.5.0 | mmdet >= 2.19.0, \<3.0.0 |
 
 - "No module named 'mmcv.ops'"; "No module named 'mmcv.\_ext'".
 

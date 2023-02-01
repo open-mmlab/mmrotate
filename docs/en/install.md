@@ -34,7 +34,7 @@ We recommend that users follow our best practices to install MMRotate. However, 
 ```shell
 pip install -U openmim
 mim install mmcv-full
-mim install mmdet
+mim install mmdet\<3.0.0
 ```
 
 **Step 1.** Install MMRotate.
