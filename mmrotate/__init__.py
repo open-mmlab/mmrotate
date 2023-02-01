@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import mmcv
+import mmdet
 
 from .core import *  # noqa: F401, F403
 from .datasets import *  # noqa: F401, F403
@@ -28,5 +29,14 @@ assert (mmcv_version >= digit_version(mmcv_minimum_version)
         and mmcv_version <= digit_version(mmcv_maximum_version)), \
     f'MMCV=={mmcv.__version__} is used but incompatible. ' \
     f'Please install mmcv>={mmcv_minimum_version}, <={mmcv_maximum_version}.'
+
+mmdet_minimum_version = '2.25.1'
+mmdet_maximum_version = '3.0.0'
+mmdet_version = digit_version(mmdet.__version__)
+
+assert (mmdet_version >= digit_version(mmdet_minimum_version)
+        and mmdet_version < digit_version(mmdet_maximum_version)), \
+    f'MMDetection=={mmdet.__version__} is used but incompatible. ' \
+    f'Please install mmdet>={mmdet_minimum_version}, <{mmdet_maximum_version}.'
 
 __all__ = ['__version__', 'short_version']

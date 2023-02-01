@@ -34,7 +34,7 @@ conda install pytorch==1.8.0 torchvision==0.9.0 cudatoolkit=10.2 -c pytorch
 ```shell
 pip install -U openmim
 mim install mmcv-full
-mim install mmdet
+mim install mmdet\<3.0.0
 ```
 
 **第1步：** 安装 MMRotate.
