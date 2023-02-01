@@ -105,6 +105,7 @@ jobs:
           command: |
             docker build .circleci/docker -t mmrotate:gpu --build-arg PYTORCH=<< parameters.torch >> --build-arg CUDA=<< parameters.cuda >> --build-arg CUDNN=<< parameters.cudnn >>
             docker run --gpus all -t -d -v /home/circleci/project:/mmrotate -w /mmrotate --name mmrotate mmrotate:gpu
+            docker exec mmrotate apt-get install -y git
       - run:
           name: Install mmrotate dependencies
           command: |
