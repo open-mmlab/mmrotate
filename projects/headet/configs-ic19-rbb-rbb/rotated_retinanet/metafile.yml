@@ -1,0 +1,123 @@
+Collections:
+- Name: rotated_retinanet
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/1708.02002.pdf
+    Title: 'Focal loss for dense object detection'
+  README: configs/rotated_retinanet/README.md
+
+Models:
+  - Name: rotated-retinanet-hbox-oc_r50_fpn_1x_dota
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-hbox-oc_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 64.55
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_r50_fpn_1x_dota_oc-e8a7c7df.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_1x_dota
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 68.42
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le90/rotated_retinanet_obb_r50_fpn_1x_dota_le90-c0097bc4.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_amp-1x_dota
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_amp-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 68.79
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_r50_fpn_fp16_1x_dota_le90-01de71b5.pth
+
+  - Name: rotated-retinanet-rbox-le135_r50_fpn_1x_dota
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le135_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.79
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135-e4131166.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_rr-1x_dota-ms
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_rr-1x_dota-ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 76.50
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90/rotated_retinanet_obb_r50_fpn_1x_dota_ms_rr_le90-1da1ec9c.pth
+
+  - Name: rotated-retinanet-hbox-oc_r50_fpn_rr-6x_hrsc
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-hbox-oc_r50_fpn_rr-6x_hrsc.py
+    Metadata:
+      Training Data: HRSC2016
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC2016
+        Metrics:
+          mAP: 45.09/79.30/46.90
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc/rotated_retinanet_hbb_r50_fpn_6x_hrsc_rr_oc-f37eada6.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_rr-6x_hrsc
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_rr-6x_hrsc.py
+    Metadata:
+      Training Data: HRSC2016
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC2016
+        Metrics:
+          mAP: 52.06/84.80/58.10
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90/rotated_retinanet_obb_r50_fpn_6x_hrsc_rr_le90-ee4f18af.pth
+
+  - Name: rotated-retinanet-rbox-oc_r50_fpn_1x_dior
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-oc_r50_fpn_1x_dior.py
+    Metadata:
+      Training Data: DIOR
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DIOR
+        Metrics:
+          mAP: 50.26
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_retinanet/rotated-retinanet-rbox-oc_r50_fpn_1x_dior/rotated-retinanet-rbox-oc_r50_fpn_1x_dior-dbdbc2f8.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_1x_dior
+    In Collection: rotated_retinanet
+    Config: configs/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dior.py
+    Metadata:
+      Training Data: DIOR
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DIOR
+        Metrics:
+          mAP: 53.94
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/rotated_retinanet/rotated-retinanet-rbox-le90_r50_fpn_1x_dior/rotated-retinanet-rbox-le90_r50_fpn_1x_dior-caf9143c.pth

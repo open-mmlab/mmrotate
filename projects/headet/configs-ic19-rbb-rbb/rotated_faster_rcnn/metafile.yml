@@ -1,0 +1,27 @@
+Collections:
+- Name: rotated_faster_rcnn
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://papers.nips.cc/paper/2015/file/14bfa6bb14875e45bba028a21ed38046-Paper.pdf
+    Title: 'Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks'
+  README: configs/rotated_faster_rcnn/README.md
+
+Models:
+  - Name: rotated-faster-rcnn-le90_r50_fpn_1x_dota
+    In Collection: rotated_faster_rcnn
+    Config: configs/rotated_faster_rcnn/rotated-faster-rcnn-le90_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 73.40
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_faster_rcnn/rotated_faster_rcnn_r50_fpn_1x_dota_le90/rotated_faster_rcnn_r50_fpn_1x_dota_le90-0393aa5c.pth

@@ -1,0 +1,123 @@
+Collections:
+- Name: kld
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum and AdamW
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/2106.01883.pdf
+    Title: 'Learning High-Precision Bounding Box for Rotated Object Detection via Kullback-Leibler Divergence'
+  README: configs/kld/README.md
+
+Models:
+  - Name: rotated-retinanet-hbox-oc_r50_fpn_kld_1x_dota
+    In Collection: kld
+    Config: configs/kld/rotated-retinanet-hbox-oc_r50_fpn_kld_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.94
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_hbb_kld_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_kld_r50_fpn_1x_dota_oc-49c1f937.pth
+
+  - Name: rotated-retinanet-hbox-oc_r50_fpn_kld-stable_1x_dota
+    In Collection: kld
+    Config: configs/kld/rotated-retinanet-hbox-oc_r50_fpn_kld-stable_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.86
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_hbb_kld_stable_r50_fpn_1x_dota_oc/rotated_retinanet_hbb_kld_stable_r50_fpn_1x_dota_oc-92a76443.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_kld-stable_1x_dota
+    In Collection: kld
+    Config: configs/kld/rotated-retinanet-rbox-le90_r50_fpn_kld-stable_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 70.22
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90/rotated_retinanet_obb_kld_stable_r50_fpn_1x_dota_le90-31193e00.pth
+
+  - Name: r3det-oc_r50_fpn_kld-stable_1x_dota
+    In Collection: kld
+    Config: configs/kld/r3det-oc_r50_fpn_kld-stable_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.83
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/r3det_kld_r50_fpn_1x_dota_oc/r3det_kld_r50_fpn_1x_dota_oc-31866226.pth
+
+  - Name: r3det-oc_r50_fpn_kld-stable_1x_dota
+    In Collection: kld
+    Config: configs/kld/r3det-oc_r50_fpn_kld-stable_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 72.12
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/r3det_kld_stable_r50_fpn_1x_dota_oc/r3det_kld_stable_r50_fpn_1x_dota_oc-e011059d.pth
+
+  - Name: r3det-tiny-oc_r50_fpn_kld_1x_dota
+    In Collection: kld
+    Config: configs/kld/r3det-tiny-oc_r50_fpn_kld_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 72.76
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/r3det_tiny_kld_r50_fpn_1x_dota_oc/r3det_tiny_kld_r50_fpn_1x_dota_oc-589e142a.pth
+
+  - Name: rotated-retinanet-hbox-oc_r50_fpn_kld-stable_rr-6x_hrsc
+    In Collection: kld
+    Config: configs/kld/rotated-retinanet-hbox-oc_r50_fpn_kld-stable_rr-6x_hrsc.py
+    Metadata:
+      Training Data: HRSC2016
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC2016
+        Metrics:
+          mAP: 58.17/87.00/69.30
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_hbb_kld_stable_r50_fpn_6x_hrsc_rr_oc/rotated_retinanet_hbb_kld_stable_r50_fpn_6x_hrsc_rr_oc-9a4ac8e2.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_kld-stable_rr-6x_hrsc
+    In Collection: kld
+    Config: configs/kld/rotated-retinanet-rbox-le90_r50_fpn_kld-stable_rr-6x_hrsc.py
+    Metadata:
+      Training Data: HRSC2016
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC2016
+        Metrics:
+          mAP: 54.15/86.20/60.60
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90/rotated_retinanet_obb_kld_stable_r50_fpn_6x_hrsc_rr_le90-58665364.pth
+
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_kld-stable_adamw-1x_dota
+    In Collection: kld
+    Config: configs/kld/rotated-retinanet-rbox-le90_r50_fpn_kld-stable_adamw-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.30
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/kld/rotated_retinanet_obb_kld_stable_r50_adamw_fpn_1x_dota_le90/rotated_retinanet_obb_kld_stable_r50_adamw_fpn_1x_dota_le90-474d9955.pth

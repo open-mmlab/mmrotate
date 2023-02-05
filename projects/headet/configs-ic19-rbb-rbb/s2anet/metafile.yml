@@ -1,0 +1,39 @@
+Collections:
+- Name: s2anet
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://ieeexplore.ieee.org/document/9377550
+    Title: 'Align Deep Features for Oriented Object Detection'
+  README: configs/s2anet/README.md
+
+Models:
+  - Name: s2anet-le135_r50_fpn_1x_dota
+    In Collection: s2anet
+    Config: configs/s2anet/s2anet-le135_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 73.91
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_1x_dota_le135/s2anet_r50_fpn_1x_dota_le135-5dfcf396.pth
+
+  - Name: s2anet-le135_r50_fpn_amp-1x_dota
+    In Collection: s2anet
+    Config: configs/s2anet/s2anet-le135_r50_fpn_amp-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 74.19
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/s2anet/s2anet_r50_fpn_fp16_1x_dota_le135/s2anet_r50_fpn_fp16_1x_dota_le135-5cac515c.pth

@@ -1,0 +1,27 @@
+Collections:
+- Name: ConvNeXt
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - AdamW
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 3090
+    Architecture:
+      - ConvNeXt
+  Paper:
+    URL: https://arxiv.org/abs/2201.03545
+    Title: 'A ConvNet for the 2020s'
+  README: configs/convnext/README.md
+
+Models:
+  - Name: rotated-retinanet-rbox-le90_convnext-tiny_fpn_kld-stable_adamw-1x_dota
+    In Collection: convnext
+    Config: configs/convnext/rotated-retinanet-rbox-le90_convnext-tiny_fpn_kld-stable_adamw-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 74.49
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/convnext/rotated_retinanet_obb_kld_stable_convnext_adamw_fpn_1x_dota_le90/rotated_retinanet_obb_kld_stable_convnext_adamw_fpn_1x_dota_le90-388184f6.pth

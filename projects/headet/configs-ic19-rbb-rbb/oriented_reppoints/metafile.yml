@@ -1,0 +1,39 @@
+Collections:
+- Name: oriented_reppoints
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 4x GeForce GTX 2080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://openaccess.thecvf.com/content/CVPR2022/papers/Li_Oriented_RepPoints_for_Aerial_Object_Detection_CVPR_2022_paper.pdf
+    Title: 'Oriented RepPoints for Aerial Object Detection'
+  README: configs/oriented_reppoints/README.md
+
+Models:
+  - Name: oriented-reppoints-qbox_r50_fpn_1x_dota
+    In Collection: oriented_reppoints
+    Config: configs/oriented_reppoints/oriented-reppoints-qbox_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.94
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/oriented_reppoints/oriented_reppoints_r50_fpn_1x_dota_le135/oriented_reppoints_r50_fpn_1x_dota_le135-ef072de9.pth
+
+  - Name: oriented-reppoints-qbox_r50_fpn_40e_dota-ms
+    In Collection: oriented_reppoints
+    Config: configs/oriented_reppoints/oriented-reppoints-qbox_r50_fpn_40e_dota-ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 75.21
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/oriented_reppoints/oriented_reppoints_r50_fpn_40e_dota_ms_le135/oriented_reppoints_r50_fpn_40e_dota_ms_le135-bb0323fd.pth

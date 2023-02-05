@@ -1,0 +1,39 @@
+Collections:
+- Name: oriented_rcnn
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://openaccess.thecvf.com/content/ICCV2021/papers/Xie_Oriented_R-CNN_for_Object_Detection_ICCV_2021_paper.pdf
+    Title: 'Oriented R-CNN for Object Detection'
+  README: configs/oriented_rcnn/README.md
+
+Models:
+  - Name: oriented-rcnn-le90_r50_fpn_amp-1x_dota
+    In Collection: oriented_rcnn
+    Config: configs/oriented_rcnn/oriented-rcnn-le90_r50_fpn_amp-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 75.63
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/oriented_rcnn/oriented_rcnn_r50_fpn_fp16_1x_dota_le90/oriented_rcnn_r50_fpn_fp16_1x_dota_le90-57c88621.pth
+
+  - Name: oriented-rcnn-le90_r50_fpn_1x_dota
+    In Collection: oriented_rcnn
+    Config: configs/oriented_rcnn/oriented-rcnn-le90_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 75.69
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/oriented_rcnn/oriented_rcnn_r50_fpn_1x_dota_le90/oriented_rcnn_r50_fpn_1x_dota_le90-6d2b2ce0.pth

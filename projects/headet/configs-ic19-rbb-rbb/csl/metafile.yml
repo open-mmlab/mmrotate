@@ -1,0 +1,27 @@
+Collections:
+- Name: csl
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x Quadro RTX 8000
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://link.springer.com/chapter/10.1007/978-3-030-58598-3_40
+    Title: 'Arbitrary-Oriented Object Detection with Circular Smooth Label'
+  README: configs/csl/README.md
+
+Models:
+  - Name: rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota
+    In Collection: csl
+    Config: configs/csl/rotated-retinanet-rbox-le90_r50_fpn_csl-gaussian_amp-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 69.51
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/csl/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90/rotated_retinanet_obb_csl_gaussian_r50_fpn_fp16_1x_dota_le90-b4271aed.pth

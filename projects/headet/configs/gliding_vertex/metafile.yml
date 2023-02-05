@@ -1,0 +1,27 @@
+Collections:
+- Name: gliding_vertex
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/1911.09358.pdf
+    Title: 'Gliding Vertex on the Horizontal Bounding Box for Multi-Oriented Object Detection'
+  README: configs/cfa/README.md
+
+Models:
+  - Name: gliding-vertex-rbox_r50_fpn_1x_dota
+    In Collection: gliding_vertex
+    Config: configs/gliding_vertex/gliding-vertex-rbox_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 73.23
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/gliding_vertex/gliding_vertex_r50_fpn_1x_dota_le90/gliding_vertex_r50_fpn_1x_dota_le90-12e7423c.pth

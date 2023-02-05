@@ -1,0 +1,63 @@
+Collections:
+- Name: redet
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x GeForce GTX 1080 Ti
+    Architecture:
+      - ReResNet
+  Paper:
+    URL: https://openaccess.thecvf.com/content/CVPR2021/papers/Han_ReDet_A_Rotation-Equivariant_Detector_for_Aerial_Object_Detection_CVPR_2021_paper.pdf
+    Title: 'ReDet: A Rotation-equivariant Detector for Aerial Object Detection'
+  README: configs/redet/README.md
+
+Models:
+  - Name: redet-le90_re50_refpn_amp-1x_dota
+    In Collection: redet
+    Config: configs/redet/redet-le90_re50_refpn_amp-1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 75.99
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_refpn_fp16_1x_dota_le90/redet_re50_refpn_fp16_1x_dota_le90-1e34da2d.pth
+
+  - Name: redet-le90_re50_refpn_1x_dota
+    In Collection: redet
+    Config: configs/redet/redet-le90_re50_refpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 76.68
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_le90/redet_re50_fpn_1x_dota_le90-724ab2da.pth
+
+  - Name: redet-le90_re50_refpn_rr-1x_dota-ms
+    In Collection: redet
+    Config: configs/redet/redet-le90_re50_refpn_rr-1x_dota-ms.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 79.87
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_fpn_1x_dota_ms_rr_le90/redet_re50_fpn_1x_dota_ms_rr_le90-fc9217b5.pth
+
+  - Name: redet-le90_re50_refpn_3x_hrsc
+    In Collection: redet
+    Config: configs/redet/redet-le90_re50_refpn_3x_hrsc.py
+    Metadata:
+      Training Data: HRSC2016
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC2016
+        Metrics:
+          mAP: 72.31/90.40/89.50
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/redet/redet_re50_refpn_3x_hrsc_le90/redet_re50_refpn_3x_hrsc_le90-241e217b.pth

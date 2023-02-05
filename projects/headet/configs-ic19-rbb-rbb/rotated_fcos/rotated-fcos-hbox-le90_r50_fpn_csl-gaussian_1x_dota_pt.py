@@ -1,0 +1,2 @@
+_base_ = './rotated-fcos-hbox-le90_r50_fpn_csl-gaussian_1x_dota.py'
+load_from = 'https://download.openmmlab.com/mmrotate/v0.1.0/rotated_fcos/rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90/rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90-4e044ad2.pth'

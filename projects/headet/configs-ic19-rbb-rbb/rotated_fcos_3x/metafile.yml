@@ -1,0 +1,63 @@
+Collections:
+- Name: rotated_fcos
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - SGD with Momentum
+      - Weight Decay
+    Training Resources: 1x Tesla V100
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/abs/1904.01355
+    Title: 'FCOS: Fully Convolutional One-Stage Object Detection'
+  README: configs/rotated_fcos/README.md
+
+Models:
+  - Name: rotated-fcos-hbox-le90_r50_fpn_1x_dota
+    In Collection: rotated_fcos
+    Config: configs/rotated_fcos/rotated-fcos-hbox-le90_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 70.70
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_fcos/rotated-fcos-hbox-le90_r50_fpn_1x_dota/rotated_fcos_sep_angle_r50_fpn_1x_dota_le90-0be71a0c.pth
+
+  - Name: rotated-fcos-le90_r50_fpn_1x_dota
+    In Collection: rotated_fcos
+    Config: configs/rotated_fcos/rotated-fcos-le90_r50_fpn_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.28
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_fcos/rotated_fcos_r50_fpn_1x_dota_le90/rotated_fcos_r50_fpn_1x_dota_le90-d87568ed.pth
+
+  - Name: rotated-fcos-hbox-le90_r50_fpn_csl-gaussian_1x_dota
+    In Collection: rotated_fcos
+    Config: configs/rotated_fcos/rotated-fcos-hbox-le90_r50_fpn_csl-gaussian_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.76
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_fcos/rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90/rotated_fcos_csl_gaussian_r50_fpn_1x_dota_le90-4e044ad2.pth
+
+  - Name: rotated-fcos-le90_r50_fpn_kld_1x_dota
+    In Collection: rotated_fcos
+    Config: configs/rotated_fcos/rotated-fcos-le90_r50_fpn_kld_1x_dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 71.89
+    Weights: https://download.openmmlab.com/mmrotate/v0.1.0/rotated_fcos/rotated_fcos_kld_r50_fpn_1x_dota_le90/rotated_fcos_kld_r50_fpn_1x_dota_le90-ecafdb2b.pth
