@@ -54,7 +54,7 @@ class DeltaXYWHTHBBoxCoder(BaseBBoxCoder):
         self.means = target_means
         self.stds = target_stds
         self.angle_version = angle_version
-        assert self.angle_version in ['oc', 'le135', 'le90']
+        assert self.angle_version in ['oc', 'le135', 'le90', 'h180']
         self.norm_factor = norm_factor
         self.edge_swap = edge_swap
         self.clip_border = clip_border
