@@ -13,13 +13,14 @@ train_pipeline = [
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     dict(
         type='mmdet.RandomFlip',
-        prob=0.75,
+        prob=0.0,
         direction=['horizontal', 'vertical', 'diagonal']),
-    dict(
-        type='RandomRotate',
-        prob=0.5,
-        angle_range=180,
-        rect_obj_labels=[9, 11]),
+    # dict(
+    #     type='RandomRotate',
+    #     prob=1.0,
+    #     rotate_type='RotateAutoBound',
+    #     angle_range=180,
+    #     rect_obj_labels=[9, 11]),
     dict(
         type='mmdet.Pad', size=(1024, 1024),
         pad_val=dict(img=(114, 114, 114))),
@@ -89,22 +90,27 @@ val_dataloader = dict(
 test_dataloader = val_dataloader
 
 val_evaluator = [
-    # dict(
-    #     type='DOTAHeadMetric',
-    #     metric='mAP',
-    #     iou_thrs=[0.5],
-    #     hangle_thr=90),
+    dict(
+        type='DOTAHeadMetric',
+        metric='mAP',
+        iou_thrs=[0.5],
+        hangle_thr=90),
+    dict(
+        type='DOTAHeadMetric',
+        metric='mAP',
+        iou_thrs=[0.5],
+        hangle_thr=360),
     dict(
         type='DOTAMetric',
         metric='mAP',
-        iou_thrs=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95])
+        iou_thrs=[0.5])
 ]
 test_evaluator = [
-    # dict(
-    #     type='DOTAHeadMetric',
-    #     metric='mAP',
-    #     iou_thrs=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
-    #     hangle_thr=90),
+    dict(
+        type='DOTAHeadMetric',
+        metric='mAP',
+        iou_thrs=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
+        hangle_thr=90),
     dict(
         type='DOTAMetric',
         metric='mAP',
