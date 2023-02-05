@@ -82,6 +82,21 @@ python projects/headet/tools/train.py \
 
 ```
 
+
+|config_file|FPS|test/dota/AP50|test/dota/AP50H90|max_epochs|max_iters|max_memory|model_group|model_name|
+|:----|:----|:----|:----|:----|:----|:----|:----|:----|
+|rotated_rtmdet_s-3x-dota_pt.py|33.2933599|0.881|0.229|36|2700|191|rotated_rtmdet|RTMDet|
+|rotated_rtmdet_l-3x-dota_pt.py|11.55385597|0.862|0.257|36|5400|637|rotated_rtmdet|RTMDet|
+|rotated_rtmdet_m-3x-dota_pt.py|19.31390973|0.796|0.23|36|2700|372|rotated_rtmdet|RTMDet|
+|rotated_rtmdet_tiny-3x-dota_pt.py|41.30585248|0.774|0.245|36|2700|133|rotated_rtmdet|RTMDet|
+|rotated_rtmdet_l-3x-dota.py|12.62933935|0.76|0.278|36|5400|637|rotated_rtmdet|RTMDet|
+|rotated_rtmdet_l-3x-dota.py|11.21752858|0.734|0.251|36|5400|637|rotated_rtmdet|RTMDet|
+|rotated_rtmdet_m-3x-dota.py|18.6458565|0.674|0.158|36|2700|372|rotated_rtmdet|RTMDet|
+|rotated_rtmdet_tiny-3x-dota.py|40.2439923|0.668|0.229|36|2700|133|rotated_rtmdet|RTMDet|
+|rotated_rtmdet_s-3x-dota.py|31.8266572|0.58|0.19|36|2700|191|rotated_rtmdet|RTMDet|
+|rotated-retinanet-rbox-h180_r50_fpn_6x_dota_pt.py|12.40695562|0.339|0.061|72|21600|143|rotated_retinanet|RetinaNet|
+
+
  # RBB 结果 (180°)
 
 
