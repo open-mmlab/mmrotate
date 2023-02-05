@@ -79,6 +79,11 @@ val_evaluator = [
         iou_thrs=[0.5],
         hangle_thr=90),
     dict(
+        type='DOTAHeadMetric',
+        metric='mAP',
+        iou_thrs=[0.5],
+        hangle_thr=360),
+    dict(
         type='DOTAMetric',
         metric='mAP',
         iou_thrs=[0.5])
