@@ -15,7 +15,8 @@ pip install -v -e .
 ## 数据集下载
 
 ```shell
-git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git
+cd mmrotate
+git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git data/ICDAR2019_MTD_HOQ
 ```
 
 ## 数据集介绍
@@ -72,14 +73,16 @@ python projects/headet/tools/browse_dataset.py \
 
 ```shell
 python projects/headet/tools/train.py \
-    projects/headet/configs-ic19-obb-obb/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota_pt.py \
-    --d
+projects/headet/configs-ic19-obb-obb/rotated_rtmdet/rotated_rtmdet_l-3x-dota_pt.py \
+--d
 ```
 
 测试推理
 
 ```shell
-
+python projects/headet/tools/test.py \
+work_dirs/headet/configs-ic19-obb-obb/rotated_rtmdet/rotated_rtmdet_l-3x-dota_pt/rotated_rtmdet_l-3x-dota_pt.py \
+work_dirs/headet/configs-ic19-obb-obb/rotated_rtmdet/rotated_rtmdet_l-3x-dota_pt/epoch_36.pth
 ```
 
 
