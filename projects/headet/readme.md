@@ -4,9 +4,6 @@
 
 # 数据集准备
 
-本仓库在 [ICDAR2019_cTDaRA Modern](https://github.com/cndplab-founder/ICDAR2019_cTDaR)数据集基础上生成而来。
-
-
 ## 数据集下载
 
 ```shell
