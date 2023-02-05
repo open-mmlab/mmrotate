@@ -18,7 +18,7 @@ from mmrotate.visualization.palette import get_palette
 
 @VISUALIZERS.register_module()
 class ORLocalVisualizer(DetLocalVisualizer):
-    """MMRotate Local Visualizer.
+    """ORLocalVisualizer Local Visualizer, show the A B C D Points.
 
     Args:
         name (str): Name of the instance. Defaults to 'visualizer'.
