@@ -2,6 +2,14 @@
 
 本项目尝试支持360的矩形框检测。
 
+# 环境配置
+
+```
+git clone https://github.com/open-mmlab/mmrotate -b dev-1.x
+cd mmrotate 
+pip install -v -e .
+```
+
 # 数据集准备
 
 ## 数据集下载
@@ -64,10 +72,15 @@ python projects/headet/tools/browse_dataset.py \
 
 ```shell
 python projects/headet/tools/train.py \
-    projects/headet/configs-ic19-obb-obb/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota.py \
+    projects/headet/configs-ic19-obb-obb/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota_pt.py \
     --d
 ```
 
+测试推理
+
+```shell
+
+```
 
  # RBB 结果 (180°)
 
