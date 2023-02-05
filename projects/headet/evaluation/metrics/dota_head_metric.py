@@ -336,7 +336,7 @@ class DOTAHeadMetric(BaseMetric):
 
             mean_aps = []
             for iou_thr in self.iou_thrs:
-                logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}')
+                logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}angle_thr: {self.hangle_thr}{"-" * 15}')
                 mean_ap, _ = eval_rbbox_head_map(
                     dets,
                     gts,
