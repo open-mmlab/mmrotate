@@ -54,7 +54,7 @@ DIOR
 ## Citation
 
 ```
-@article{yang2022h2rbox,
+@article{yang2023h2rbox,
   title={H2RBox: Horizontal Box Annotation is All You Need for Oriented Object Detection},
   author={Yang, Xue and Zhang, Gefan and Li, Wentong and Wang, Xuehui and Zhou, Yue and Yan, Junchi},
 	booktitle={International Conference on Learning Representations},

@@ -42,7 +42,7 @@ DOTA1.0
 ## Citation
 
 ```
-@misc{yang2022kfiou,
+@misc{yang2023kfiou,
       title={The KFIoU Loss for Rotated Object Detection},
       author={Xue Yang and Yue Zhou and Gefan Zhang and Jirui Yang and Wentao Wang and Junchi Yan and Xiaopeng Zhang and Qi Tian},
 	booktitle={International Conference on Learning Representations},
