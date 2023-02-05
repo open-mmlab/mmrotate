@@ -7,8 +7,7 @@
 ## 数据集下载
 
 ```shell
-# git clone https://github.com/vansin/ICDAR2019_cTDaR.git -b new ICDAR2019_cTDaR_TRACKA_Modern_HOQ_BBox
-git clone https://github.com/vansin/ICDAR2019_cTDaR.git -b new ICDAR2019_MTD_HOQ
+git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git
 ```
 
 ## 数据集介绍
@@ -37,6 +36,13 @@ ICDAR2019_MTD_HOQ
 
 ### obbox有向边界框数据集
 
+通过 browse_dataset.py 检测数据集的正确性
+
+```shell
+python projects/headet/tools/browse_dataset.py \
+    projects/headet/configs-ic19-obb-obb/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota.py
+```
+
 在 hbbox 水平框原始数据集的基础上，通过随机旋转变换生成 rbbox 旋转边界框数据集，让后通过手动调整部分标注，生成 obbox 有向边界框数据集。
 ![image](https://user-images.githubusercontent.com/25839884/214334546-b9a940e3-9e88-47ae-aa96-5f2d6444c20c.png)
 
@@ -52,45 +58,20 @@ ICDAR2019_MTD_HOQ
 ![image](https://user-images.githubusercontent.com/25839884/214337078-854e530d-6cfb-4e33-82a3-d17c51af39c8.png)
 
 
+# OBB 结果 (360°)
 
-
-## 数据集config说明
-
-训练集格式为RBBox，测试集格式也为RBBox
-project/headet/configs/_base_/datasets/ic19-rbb-rbb.py
-
-训练集格式为OBBox，测试集格式也为OBBox
-project/headet/configs/_base_/datasets/ic19-obb-obb.py
-
-训练集格式为HBBox，测试集格式也为OBBox
-project/headet/configs/_base_/datasets/ic19-hbb-obb.py
-
-训练集格式为QBBox，测试集格式也为QBBox
-project/headet/configs/_base_/datasets/ic19-qbb-qbb.py
-
-
-## 数据集可视化
+训练
 
 ```shell
-python projects/headet/tools/browse_dataset.py configs/gliding_vertex/gliding-vertex-qbox_r50_fpn_1x_dota.py --stage test
-python projects/headet/tools/browse_dataset.py projects/headet/configs/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_1x_dota.py --stage train
+python projects/headet/tools/train.py \
+    projects/headet/configs-ic19-obb-obb/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota.py \
+    --d
 ```
 
 
+ # RBB 结果 (180°)
 
-# 调试
 
-```shell
-python -m debugpy --wait-for-client --listen 5678 tools/train.py projects/headet/configs/rotated_retinanet/rotated-retinanet-hbox-le90_r50_fpn_1x_dota.py
-python -m debugpy --wait-for-client --listen 5678 tools/train.py projects/headet/configs/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_1x_dota.py
-```
-
-```shell
- python -m debugpy --wait-for-client --listen 5678 projects/headet/tools/browse_dataset.py projects/headet/configs/gliding_vertex/gliding-vertex-qbox_r50_fpn_1x_dota.py
- python -m debugpy --wait-for-client --listen 5678 projects/headet/tools/browse_dataset.py projects/headet/configs/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_1x_dota.py --stage train
- ```
-
- ## RBB 结果
 
  |config_file|FPS|max_epochs|max_memory|model_group|model_name|test/dota/AP50|
 |:----|:----|:----|:----|:----|:----|:----|
