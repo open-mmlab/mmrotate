@@ -58,7 +58,7 @@ class DeltaXYWHTRBBoxCoder(BaseBBoxCoder):
         self.add_ctr_clamp = add_ctr_clamp
         self.ctr_clamp = ctr_clamp
         self.angle_version = angle_version
-        assert self.angle_version in ['oc', 'le135', 'le90']
+        assert self.angle_version in ['oc', 'le135', 'le90', 'h180']
         self.norm_factor = norm_factor
         self.edge_swap = edge_swap
         self.proj_xy = proj_xy
