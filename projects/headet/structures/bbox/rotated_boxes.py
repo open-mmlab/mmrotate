@@ -25,13 +25,13 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
     """
     Copy form mmrotate/structures/bbox/RotatedBoxes
     add new rotate logic +-180
-          0
+        -90
           |
           |
-    -90---------90
+    +-180---------0
           |
           |
-        +-180
+        +90
     """
     box_dim = 5
 
