@@ -42,12 +42,10 @@ DOTA1.0
 ## Citation
 
 ```
-@misc{yang2022kfiou,
+@misc{yang2023kfiou,
       title={The KFIoU Loss for Rotated Object Detection},
       author={Xue Yang and Yue Zhou and Gefan Zhang and Jirui Yang and Wentao Wang and Junchi Yan and Xiaopeng Zhang and Qi Tian},
-      year={2022},
-      eprint={2201.12558},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+	booktitle={International Conference on Learning Representations},
+	year={2023}
 }
 ```

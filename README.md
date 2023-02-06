@@ -148,8 +148,9 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 - [x] [KLD](configs/kld/README.md) (NeurIPS'2021)
 - [x] [SASM](configs/sasm_reppoints/README.md) (AAAI'2022)
 - [x] [Oriented RepPoints](configs/oriented_reppoints/README.md) (CVPR'2022)
-- [x] [KFIoU](configs/kfiou/README.md) (arXiv)
-- [x] [H2RBox](configs/h2rbox/README.md) (arXiv)
+- [x] [KFIoU](configs/kfiou/README.md) (ICLR'2023)
+- [x] [H2RBox](configs/h2rbox/README.md) (ICLR'2023)
+- [x] [RTMDet](configs/rotated_rtmdet/README.md) (arXiv)
 
 </details>
 
