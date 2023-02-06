@@ -151,7 +151,8 @@ class Rotate(BaseTransform):
 
     def _filter_invalid(self, results: dict) -> None:
         """Filter invalid data w.r.t `gt_bboxes`"""
-        height, width = results['img_shape']
+        # results['img_shape'] maybe (h,w,c) or (h,w)
+        height, width = results['img_shape'][:2]
         if 'gt_bboxes' in results:
             if len(results['gt_bboxes']) == 0:
                 return
