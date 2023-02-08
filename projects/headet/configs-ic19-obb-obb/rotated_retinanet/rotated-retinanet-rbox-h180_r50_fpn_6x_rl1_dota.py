@@ -4,6 +4,10 @@ _base_ = [
 ]
 angle_version = 'h180'
 
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', interval=3, save_best=['dota/AP50'], rule='greater', max_keep_ckpts=1),
+)
+
 # custom_imports = dict(imports=['mmcls.models', 'projects.headet.visualization', 'projects.headet.structures'], allow_failed_imports=False)
 
 default_hooks = dict(
