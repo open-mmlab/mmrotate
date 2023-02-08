@@ -32,6 +32,7 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
           |
           |
         +90
+    [-180,180)
     """
     box_dim = 5
 

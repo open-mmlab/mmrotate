@@ -61,5 +61,6 @@ custom_imports = dict(imports=[
     'projects.headet.visualization',
     'projects.headet.structures',
     'projects.headet.datasets.transforms',
-    'projects.headet.evaluation'
+    'projects.headet.evaluation',
+    'projects.headet.models'
     ], allow_failed_imports=False)
