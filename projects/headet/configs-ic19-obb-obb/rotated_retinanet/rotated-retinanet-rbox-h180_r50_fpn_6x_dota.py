@@ -6,10 +6,15 @@ angle_version = 'h180'
 
 # custom_imports = dict(imports=['mmcls.models', 'projects.headet.visualization', 'projects.headet.structures'], allow_failed_imports=False)
 
+# default_hooks = dict(
+#     logger=dict(interval=1),
+#     # visualization=dict(draw=True, interval=10),
+# )
+
 default_hooks = dict(
-    logger=dict(interval=1),
-    # visualization=dict(draw=True, interval=10),
+    checkpoint=dict(type='CheckpointHook', interval=3, save_best=['dota/AP50'], rule='greater', max_keep_ckpts=1),
 )
+
 
 model = dict(
     type='mmdet.RetinaNet',
