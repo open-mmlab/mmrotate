@@ -3,6 +3,7 @@ import argparse
 import logging
 import os
 import os.path as osp
+import sys
 
 from mmdet.utils import register_all_modules as register_all_modules_mmdet
 from mmengine.config import Config, DictAction
@@ -10,7 +11,14 @@ from mmengine.logging import print_log
 from mmengine.registry import RUNNERS
 from mmengine.runner import Runner
 
+
+from projects.headet.structures.bbox import RotatedBoxes
+
+import mmrotate.structures
+mmrotate.structures.RotatedBoxes = RotatedBoxes
 from mmrotate.utils import register_all_modules
+
+# sys.modules['mmrotate.structures.bbox'].RotatedBoxes = RotatedBoxes
 
 
 def parse_args():
