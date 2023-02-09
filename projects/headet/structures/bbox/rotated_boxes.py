@@ -49,7 +49,7 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
             elif pattern == 'le135':
                 width_longer, start_angle = True, -45
             elif pattern == 'h180':
-                width_longer, start_angle = False, -90
+                width_longer, start_angle = False, -180
             else:
                 raise ValueError("pattern only can be 'oc', 'le90', 'h180' and"
                                  f"'le135', but get {pattern}.")
