@@ -3,7 +3,6 @@
 import warnings
 from typing import List, Optional, Sequence, Tuple, Union
 
-import e2cnn.nn as enn
 import torch.nn as nn
 from mmdet.utils import MultiConfig, OptConfigType
 from mmengine.model import BaseModule
@@ -12,6 +11,12 @@ from torch import Tensor
 from mmrotate.registry import MODELS
 from ..utils import (build_enn_feature, build_enn_norm_layer, ennConv,
                      ennInterpolate, ennMaxPool, ennReLU)
+
+try:
+    import e2cnn.nn as enn
+except ImportError:
+    raise ImportError('Please install e2cnn by "pip install e2cnn", '
+                      'which requires numpy < 1.24.0')
 
 
 class ConvModule(enn.EquivariantModule):

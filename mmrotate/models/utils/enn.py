@@ -1,5 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import e2cnn.nn as enn
+try:
+    import e2cnn.nn as enn
+except ImportError:
+    raise ImportError('Please install e2cnn by "pip install e2cnn", '
+                      'which requires numpy < 1.24.0')
+
 from e2cnn import gspaces
 
 N = 8

@@ -2,7 +2,6 @@
 # Modified from csuhan: https://github.com/csuhan/ReDet
 from typing import Optional, Sequence, Tuple
 
-import e2cnn.nn as enn
 import torch.nn as nn
 import torch.utils.checkpoint as cp
 from mmdet.utils import ConfigType, OptConfigType, OptMultiConfig
@@ -14,6 +13,12 @@ from mmrotate.registry import MODELS
 from ..utils import (build_enn_divide_feature, build_enn_norm_layer,
                      build_enn_trivial_feature, ennAvgPool, ennConv,
                      ennMaxPool, ennReLU, ennTrivialConv)
+
+try:
+    import e2cnn.nn as enn
+except ImportError:
+    raise ImportError('Please install e2cnn by "pip install e2cnn", '
+                      'which requires numpy < 1.24.0')
 
 
 class BasicBlock(enn.EquivariantModule):
