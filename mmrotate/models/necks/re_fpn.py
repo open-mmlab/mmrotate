@@ -9,14 +9,18 @@ from mmengine.model import BaseModule
 from torch import Tensor
 
 from mmrotate.registry import MODELS
-from ..utils import (build_enn_feature, build_enn_norm_layer, ennConv,
-                     ennInterpolate, ennMaxPool, ennReLU)
 
 try:
     import e2cnn.nn as enn
+    from ..utils.enn import (build_enn_feature, build_enn_norm_layer, ennConv,
+                             ennInterpolate, ennMaxPool, ennReLU)
 except ImportError:
-    raise ImportError('Please install e2cnn by "pip install e2cnn", '
-                      'which requires numpy < 1.24.0')
+    build_enn_feature = None
+    build_enn_norm_layer = None
+    ennConv = None
+    ennInterpolate = None
+    ennMaxPool = None
+    ennReLU = None
 
 
 class ConvModule(enn.EquivariantModule):
@@ -207,7 +211,11 @@ class ReFPN(BaseModule):
         init_cfg: MultiConfig = dict(
             type='Xavier', layer='Conv2d', distribution='uniform')
     ) -> None:
-
+        try:
+            import e2cnn.nn as enn  # noqa: F401
+        except ImportError:
+            raise ImportError('Please install e2cnn by "pip install e2cnn", '
+                              'which requires numpy < 1.24.0')
         super().__init__(init_cfg=init_cfg)
         assert isinstance(in_channels, list)
         self.in_channels = in_channels
