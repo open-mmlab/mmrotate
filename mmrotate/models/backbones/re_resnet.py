@@ -13,10 +13,12 @@ from mmrotate.registry import MODELS
 
 try:
     import e2cnn.nn as enn
+    from e2cnn.nn import EquivariantModule
     from ..utils.enn import (build_enn_divide_feature, build_enn_norm_layer,
                              build_enn_trivial_feature, ennAvgPool, ennConv,
                              ennMaxPool, ennReLU, ennTrivialConv)
 except ImportError:
+    enn = None
     build_enn_divide_feature = None
     build_enn_norm_layer = None
     build_enn_trivial_feature = None
@@ -25,9 +27,10 @@ except ImportError:
     ennMaxPool = None
     ennReLU = None
     ennTrivialConv = None
+    EquivariantModule = BaseModule
 
 
-class BasicBlock(enn.EquivariantModule):
+class BasicBlock(EquivariantModule):
     """BasicBlock for ReResNet.
 
     Args:
@@ -150,7 +153,7 @@ class BasicBlock(enn.EquivariantModule):
             return input_shape
 
 
-class Bottleneck(enn.EquivariantModule):
+class Bottleneck(EquivariantModule):
     """Bottleneck block for ReResNet.
 
     Args:
@@ -503,7 +506,7 @@ class ReResNet(BaseModule):
         super().__init__(init_cfg=init_cfg)
 
         try:
-            import e2cnn.nn as enn  # noqa: F401
+            import e2cnn  # noqa: F401
         except ImportError:
             raise ImportError('Please install e2cnn by "pip install e2cnn", '
                               'which requires numpy < 1.24.0')

@@ -11,7 +11,8 @@ from torch import Tensor
 from mmrotate.registry import MODELS
 
 try:
-    import e2cnn.nn as enn
+    import e2cnn.nn as enn  # noqa: F401
+    from e2cnn.nn import EquivariantModule
     from ..utils.enn import (build_enn_feature, build_enn_norm_layer, ennConv,
                              ennInterpolate, ennMaxPool, ennReLU)
 except ImportError:
@@ -21,9 +22,10 @@ except ImportError:
     ennInterpolate = None
     ennMaxPool = None
     ennReLU = None
+    EquivariantModule = BaseModule
 
 
-class ConvModule(enn.EquivariantModule):
+class ConvModule(EquivariantModule):
     """ConvModule.
 
     Args:
@@ -212,7 +214,7 @@ class ReFPN(BaseModule):
             type='Xavier', layer='Conv2d', distribution='uniform')
     ) -> None:
         try:
-            import e2cnn.nn as enn  # noqa: F401
+            import e2cnn  # noqa: F401
         except ImportError:
             raise ImportError('Please install e2cnn by "pip install e2cnn", '
                               'which requires numpy < 1.24.0')
