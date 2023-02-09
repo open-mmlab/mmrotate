@@ -48,7 +48,7 @@ jobs:
       - name: Install other dependencies
         run: pip install -r requirements/tests.txt
       - name: Build and install
-        run: rm -rf .eggs && pip install 'numpy < 1.24.0' && pip install -e .
+        run: rm -rf .eggs && pip install -e .
       - name: Run unittests and generate coverage report
         run: |
           coverage run --branch --source mmrotate -m pytest tests/
