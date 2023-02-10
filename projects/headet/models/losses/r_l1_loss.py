@@ -27,11 +27,23 @@ def rl1_loss(pred: Tensor, target: Tensor) -> Tensor:
     pred_part1, pred_part2 = torch.split(pred, [4, 1], dim=1)
     target_part1, target_part2 = torch.split(target, [4, 1], dim=1)
 
+
     loss_part1 = torch.abs(pred_part1-target_part1)
 
-    loss_part2_1 = torch.abs(pred_part2-target_part2)
+
+    pred_part2 = torch.where(pred_part2 > torch.tensor(np.pi, dtype=torch.float).cuda(), torch.tensor(np.pi, dtype=torch.float).cuda(), pred_part2)
+    pred_part2 = torch.where(pred_part2 < -torch.tensor(np.pi, dtype=torch.float).cuda(), torch.tensor(np.pi, dtype=torch.float).cuda(), pred_part2)
+
+
+    # pred_part2 = torch.where(pred_part2 > np.pi, np.pi, pred_part2.float())
+    # pred_part2 = torch.where(pred_part2 < -np.pi, -np.pi, pred_part2.float())
+
+    loss_part2_1 = torch.abs((pred_part2-target_part2))
     loss_part2 = torch.where(loss_part2_1 > np.pi, 2 *
                              np.pi-loss_part2_1, loss_part2_1)
+
+    # print(loss_part2.sum())
+    # print(loss_part1.mean(), loss_part2.mean())
 
     loss = torch.cat((loss_part1, loss_part2), dim=1)
 
