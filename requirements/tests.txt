@@ -2,15 +2,13 @@ asynctest
 codecov
 coverage
 cython
-e2cnn
+-e git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn
 flake8
 interrogate
 isort==4.3.21
 # Note: used for kwarray.group_items, this may be ported to mmcv in the future.
 kwarray
 matplotlib
-# numpy's version is restricted by e2cnn
-numpy<1.24.0
 parameterized
 pytest
 scikit-learn

@@ -2,9 +2,9 @@
 try:
     import e2cnn.nn as enn
 except ImportError:
-    raise ImportError('Please install e2cnn by "pip install e2cnn", '
-                      'which requires numpy < 1.24.0')
-
+    raise ImportError(
+        'Please install e2cnn by '
+        '"pip install -e git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn"')
 from e2cnn import gspaces
 
 N = 8
