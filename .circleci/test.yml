@@ -97,6 +97,7 @@ jobs:
           command: |
             git clone -b main --depth 1 https://github.com/open-mmlab/mmengine.git /home/circleci/mmengine
             git clone -b dev-3.x --depth 1 https://github.com/open-mmlab/mmdetection.git /home/circleci/mmdetection
+            git clone  --depth 1 https://github.com/QUVA-Lab/e2cnn.git /home/circleci/e2cnn
       - run:
           name: Build Docker image
           command: |
@@ -109,6 +110,7 @@ jobs:
             docker exec mmrotate pip install -U openmim
             docker exec mmrotate mim install 'mmcv >= 2.0.0rc2'
             docker exec mmrotate pip install -e /mmdetection
+            docker exec mmrotate pip install -e /e2cnn
             docker exec mmrotate pip install -r requirements/tests.txt
       - run:
           name: Build and install
