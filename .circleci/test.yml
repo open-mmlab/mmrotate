@@ -103,6 +103,7 @@ jobs:
           command: |
             docker build .circleci/docker -t mmrotate:gpu --build-arg PYTORCH=<< parameters.torch >> --build-arg CUDA=<< parameters.cuda >> --build-arg CUDNN=<< parameters.cudnn >>
             docker run --gpus all -t -d -v /home/circleci/project:/mmrotate -v /home/circleci/mmengine:/mmengine -v /home/circleci/mmdetection:/mmdetection -w /mmrotate --name mmrotate mmrotate:gpu
+            docker exec mmrotate apt-get install -y git
       - run:
           name: Install mmrotate dependencies
           command: |
@@ -110,7 +111,6 @@ jobs:
             docker exec mmrotate pip install -U openmim
             docker exec mmrotate mim install 'mmcv >= 2.0.0rc2'
             docker exec mmrotate pip install -e /mmdetection
-            docker exec mmrotate pip install -e /e2cnn
             docker exec mmrotate pip install -r requirements/tests.txt
       - run:
           name: Build and install
