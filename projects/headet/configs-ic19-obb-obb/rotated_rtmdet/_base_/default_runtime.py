@@ -2,7 +2,7 @@ default_scope = 'mmrotate'
 
 default_hooks = dict(
     timer=dict(type='IterTimerHook'),
-    logger=dict(type='LoggerHook', interval=50),
+    logger=dict(type='LoggerHook', interval=5),
     param_scheduler=dict(type='ParamSchedulerHook'),
     checkpoint=dict(type='CheckpointHook', interval=12, max_keep_ckpts=3),
     sampler_seed=dict(type='DistSamplerSeedHook'),
