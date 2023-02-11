@@ -217,9 +217,8 @@ class ReFPN(BaseModule):
             import e2cnn  # noqa: F401
         except ImportError:
             raise ImportError(
-                'Please install e2cnn by '
-                '"pip install -e git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn"'
-            )
+                'Please install e2cnn by "pip install -e '
+                'git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn"')
         super().__init__(init_cfg=init_cfg)
         assert isinstance(in_channels, list)
         self.in_channels = in_channels

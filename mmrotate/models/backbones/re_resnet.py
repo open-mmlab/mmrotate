@@ -509,9 +509,8 @@ class ReResNet(BaseModule):
             import e2cnn  # noqa: F401
         except ImportError:
             raise ImportError(
-                'Please install e2cnn by '
-                '"pip install -e git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn"'
-            )
+                'Please install e2cnn by "pip install -e '
+                'git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn"')
         self.in_type = build_enn_trivial_feature(in_channels)
         if depth not in self.arch_settings:
             raise KeyError(f'invalid depth {depth} for resnet')
