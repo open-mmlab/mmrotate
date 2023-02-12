@@ -3,6 +3,10 @@ import argparse
 import os
 import os.path as osp
 
+from projects.headet.structures.bbox import RotatedBoxes
+import mmrotate.structures
+mmrotate.structures.bbox.RotatedBoxes = RotatedBoxes
+
 from mmdet.utils import register_all_modules as register_all_modules_mmdet
 from mmengine.config import Config, DictAction
 from mmengine.evaluator import DumpResults

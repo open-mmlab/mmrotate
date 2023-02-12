@@ -56,7 +56,7 @@ model = dict(
         pred_kernel_size=1,
         use_hbbox_loss=False,
         scale_angle=False,
-        loss_angle=None,
+        loss_angle=dict(type='AL1Loss', loss_weight=4.0),
         norm_cfg=dict(type='SyncBN'),
         act_cfg=dict(type='SiLU')),
     train_cfg=dict(
@@ -76,4 +76,4 @@ model = dict(
 )
 
 # batch_size = (2 GPUs) x (4 samples per GPU) = 8
-train_dataloader = dict(batch_size=4, num_workers=4)
+train_dataloader = dict(batch_size=2, num_workers=4)

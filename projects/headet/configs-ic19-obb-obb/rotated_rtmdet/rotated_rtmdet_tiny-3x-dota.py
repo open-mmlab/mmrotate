@@ -17,4 +17,4 @@ model = dict(
     ))
 
 # batch_size = (1 GPUs) x (8 samples per GPU) = 8
-train_dataloader = dict(batch_size=8, num_workers=8)
+train_dataloader = dict(batch_size=2, num_workers=8)
