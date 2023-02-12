@@ -10,7 +10,7 @@ from mmdet.models.losses.utils import weighted_loss
 
 @weighted_loss
 def al1_loss(pred: Tensor, target: Tensor) -> Tensor:
-    """L1 loss.
+    """AL1 loss.
 
     Args:
         pred (Tensor): The prediction.
@@ -24,38 +24,14 @@ def al1_loss(pred: Tensor, target: Tensor) -> Tensor:
 
     assert pred.size() == target.size()
 
-
-
-    # pred_part1, pred_part2 = torch.split(pred, [4, 1], dim=1)
-    # target_part1, target_part2 = torch.split(target, [4, 1], dim=1)
-
-
-    # loss_part1 = torch.abs(pred_part1-target_part1)
     pred = (pred + np.pi) % (2*np.pi) - np.pi 
-
     assert pred.max() < np.pi
     assert pred.min() > -np.pi
     assert target.max() < np.pi
     assert target.min() > -np.pi
-
-
-
-    # pred = torch.where(pred > torch.tensor(np.pi, dtype=torch.float).cuda(), torch.tensor(np.pi, dtype=torch.float).cuda(), pred)
-    # target = torch.where(target < -torch.tensor(np.pi, dtype=torch.float).cuda(), torch.tensor(np.pi, dtype=torch.float).cuda(), target)
-
-
-    # pred_part2 = torch.where(pred_part2 > np.pi, np.pi, pred_part2.float())
-    # pred_part2 = torch.where(pred_part2 < -np.pi, -np.pi, pred_part2.float())
     loss = torch.abs(pred-target)
-
-    # loss_part2_1 = torch.abs((pred_part2-target_part2))
     loss = torch.where(loss > np.pi, 2 *
                              np.pi-loss, loss)
-
-    # print(loss_part2.sum())
-    # print(loss_part1.mean(), loss_part2.mean())
-
-    # loss = torch.cat((loss_part1, loss_part2), dim=1)
 
     return loss
 
