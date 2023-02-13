@@ -33,8 +33,13 @@ Notes:
 
 - `MS` means multiple scale image split.
 - `RR` means random rotation.
+- ReDet needs to install [e2cnn](https://github.com/QUVA-Lab/e2cnn) first.
+
+```shell
+pip install -e git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn
+```
+
 - Please download pretrained weight of ReResNet from [ReDet](https://github.com/csuhan/ReDet), and put it on `work_dirs/pretrain`. BTW, it is normal for `missing keys in source state_dict: xxx.filter ` to appear in the log. Don't worry!
-- Please use distributed training, there are some bugs when using `train.py`.
 
 ## Citation
 

@@ -2,7 +2,7 @@ asynctest
 codecov
 coverage
 cython
-e2cnn
+-e git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn
 flake8
 interrogate
 isort==4.3.21

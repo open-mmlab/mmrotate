@@ -70,7 +70,6 @@ jobs:
       - run:
           name: Build and install
           command: |
-            pip install 'numpy < 1.24.0'
             pip install -e .
       - run:
           name: Run unittests
@@ -98,11 +97,13 @@ jobs:
           command: |
             git clone -b main --depth 1 https://github.com/open-mmlab/mmengine.git /home/circleci/mmengine
             git clone -b dev-3.x --depth 1 https://github.com/open-mmlab/mmdetection.git /home/circleci/mmdetection
+            git clone  --depth 1 https://github.com/QUVA-Lab/e2cnn.git /home/circleci/e2cnn
       - run:
           name: Build Docker image
           command: |
             docker build .circleci/docker -t mmrotate:gpu --build-arg PYTORCH=<< parameters.torch >> --build-arg CUDA=<< parameters.cuda >> --build-arg CUDNN=<< parameters.cudnn >>
             docker run --gpus all -t -d -v /home/circleci/project:/mmrotate -v /home/circleci/mmengine:/mmengine -v /home/circleci/mmdetection:/mmdetection -w /mmrotate --name mmrotate mmrotate:gpu
+            docker exec mmrotate apt-get install -y git
       - run:
           name: Install mmrotate dependencies
           command: |
@@ -114,7 +115,6 @@ jobs:
       - run:
           name: Build and install
           command: |
-            docker exec mmrotate pip install 'numpy < 1.24.0'
             docker exec mmrotate pip install -e .
       - run:
           name: Run unittests

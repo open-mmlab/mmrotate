@@ -8,7 +8,7 @@ from torch.nn.modules.batchnorm import _BatchNorm
 
 from mmrotate.models.backbones.re_resnet import (BasicBlock, Bottleneck,
                                                  ReResNet, ResLayer)
-from mmrotate.models.utils import build_enn_divide_feature
+from mmrotate.models.utils.enn import build_enn_divide_feature
 
 
 def is_block(modules):
