@@ -2,7 +2,8 @@ _base_ = [
     './_base_/default_runtime.py', './_base_/schedule_3x.py',
     './_base_/dota_rr.py'
 ]
-checkpoint = 'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-l_8xb256-rsb-a1-600e_in1k-6a760974.pth'  # noqa
+checkpoint = 'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-s_imagenet_600e.pth'  # noqa
+
 
 angle_version = 'h180'
 model = dict(
@@ -18,8 +19,8 @@ model = dict(
         type='mmdet.CSPNeXt',
         arch='P5',
         expand_ratio=0.5,
-        deepen_factor=1,
-        widen_factor=1,
+        deepen_factor=0.33,
+        widen_factor=0.5,
         channel_attention=True,
         norm_cfg=dict(type='SyncBN'),
         act_cfg=dict(type='SiLU'),
@@ -27,18 +28,18 @@ model = dict(
             type='Pretrained', prefix='backbone.', checkpoint=checkpoint)),
     neck=dict(
         type='mmdet.CSPNeXtPAFPN',
-        in_channels=[256, 512, 1024],
-        out_channels=256,
-        num_csp_blocks=3,
+        in_channels=[128, 256, 512],
+        out_channels=128,
+        num_csp_blocks=1,
         expand_ratio=0.5,
         norm_cfg=dict(type='SyncBN'),
         act_cfg=dict(type='SiLU')),
     bbox_head=dict(
         type='RotatedRTMDetSepBNHead',
         num_classes=1,
-        in_channels=256,
+        in_channels=128,
         stacked_convs=2,
-        feat_channels=256,
+        feat_channels=128,
         angle_version=angle_version,
         anchor_generator=dict(
             type='mmdet.MlvlPointGenerator', offset=0, strides=[8, 16, 32]),
@@ -51,12 +52,12 @@ model = dict(
             loss_weight=1.0),
         loss_bbox=dict(type='RotatedIoULoss', mode='linear', loss_weight=2.0),
         with_objectness=False,
-        exp_on_reg=True,
+        exp_on_reg=False,
         share_conv=True,
         pred_kernel_size=1,
         use_hbbox_loss=False,
         scale_angle=False,
-        loss_angle=dict(type='AL1Loss', loss_weight=4.0),
+        loss_angle=dict(type='AL1Loss', loss_weight=2.0),
         norm_cfg=dict(type='SyncBN'),
         act_cfg=dict(type='SiLU')),
     train_cfg=dict(
@@ -75,5 +76,12 @@ model = dict(
         max_per_img=2000),
 )
 
+
+load_from = 'https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_s-3x-dota/rotated_rtmdet_s-3x-dota-11f6ccf5.pth'
+
 # batch_size = (2 GPUs) x (4 samples per GPU) = 8
 train_dataloader = dict(batch_size=2, num_workers=4)
+
+
+
+
