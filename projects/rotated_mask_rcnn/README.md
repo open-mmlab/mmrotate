@@ -7,10 +7,10 @@ Author: @xxx.
 This is an implementation of \[XXX\]. -->
 
 This project implements a Mask RCNN for rotated boxes. Benefiting from the BoxType design, we only need to modify the code slightly in mmrotate, and then we can support the instance segmentation task.
+
 <center>
 <img src="https://user-images.githubusercontent.com/10410257/218915978-f09bbf87-360d-4751-b52c-66d765d98035.png">
 </center>
-
 
 ## Usage
 
@@ -37,10 +37,10 @@ python tools/test.py projects/rotated_mask_rcnn/configs/rotated-mask-rcnn_r50_fp
 <!-- List the results as usually done in other model's README. [Example](https://github.com/open-mmlab/mmrotate/blob/1.x/configs/r3det/README.md#results-and-models)
 You should claim whether this is based on the pre-trained weights, which are converted from the official release; or it's a reproduced result obtained from retraining the model in this project. -->
 
-|         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                      Configs                                       |         Download         |
-| :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :--------------------------------------------------------------------------------: | :----------------------: |
-| ResNet50 (1024,1024,200) | 72.71 |  le90   |   1x    |   -   |      -      |  -  |     2      | [rotated-mask-rcnn_r50_fpn_1x_dota](confsigs/rotated-mask-rcnn_r50_fpn_1x_dota.py) | [model](<>) \| [log](<>) |
-| ResNet50 (1024,1024,200) | 70.74 |  le90   |   1x    |   -   |      -      |  -  |     2      | [rotated-mask-orcnn_r50_fpn_1x_dota](confsigs/rotated-mask-orcnn_r50_fpn_1x_dota.py) | [model](<>) \| [log](<>) |
+|         Backbone         |  mAP  | Angle | lr schd | Mem (GB) | Inf Time (fps) | Aug | Batch Size |                                       Configs                                        |         Download         |
+| :----------------------: | :---: | :---: | :-----: | :------: | :------------: | :-: | :--------: | :----------------------------------------------------------------------------------: | :----------------------: |
+| ResNet50 (1024,1024,200) | 72.71 | le90  |   1x    |    -     |       -        |  -  |     2      |  [rotated-mask-rcnn_r50_fpn_1x_dota](confsigs/rotated-mask-rcnn_r50_fpn_1x_dota.py)  | [model](<>) \| [log](<>) |
+| ResNet50 (1024,1024,200) | 70.74 | le90  |   1x    |    -     |       -        |  -  |     2      | [rotated-mask-orcnn_r50_fpn_1x_dota](confsigs/rotated-mask-orcnn_r50_fpn_1x_dota.py) | [model](<>) \| [log](<>) |
 
 Although the rotated box indicator will drop slightly after adding mask head, it may help improve the instance segmentation task. We hope this project can inspire you and welcome you to explore more uses of mmrotate!
 
@@ -66,21 +66,21 @@ OpenMMLab's maintainer will review the code to ensure the project's quality. Rea
 Note that keeping this section up-to-date is crucial not only for this project's developers but the entire community, since there might be some other contributors joining this project and deciding their starting point from this list. It also helps maintainers accurately estimate time and effort on further code polishing, if needed.
 A project does not necessarily have to be finished in a single PR, but it's essential for the project to at least reach the first milestone in its very first PR. -->
 
-- [ ] Milestone 1: PR-ready, and acceptable to be one of the `projects/`.
+- [x] Milestone 1: PR-ready, and acceptable to be one of the `projects/`.
 
-  - [ ] Finish the code
+  - [x] Finish the code
 
     <!-- The code's design shall follow existing interfaces and convention. For example, each model component should be registered into `mmrotate.registry.MODELS` and configurable via a config file. -->
 
-  - [ ] Basic docstrings & proper citation
+  - [x] Basic docstrings & proper citation
 
     <!-- Each major object should contain a docstring, describing its functionality and arguments. If you have adapted the code from other open-source projects, don't forget to cite the source project in docstring and make sure your behavior is not against its license. Typically, we do not accept any code snippet under GPL license. [A Short Guide to Open Source Licenses](https://medium.com/nationwide-technology/a-short-guide-to-open-source-licenses-cf5b1c329edd) -->
 
-  - [ ] Test-time correctness
+  - [x] Test-time correctness
 
     <!-- If you are reproducing the result from a paper, make sure your model's inference-time performance matches that in the original paper. The weights usually could be obtained by simply renaming the keys in the official pre-trained weights. This test could be skipped though, if you are able to prove the training-time correctness and check the second milestone. -->
 
-  - [ ] A full README
+  - [x] A full README
 
     <!-- As this template does. -->
 

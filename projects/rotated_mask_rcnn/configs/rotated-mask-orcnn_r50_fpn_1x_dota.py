@@ -103,7 +103,8 @@ model = dict(
             conv_out_channels=256,
             num_classes=15,
             loss_mask=dict(
-                type='mmdet.CrossEntropyLoss', use_mask=True, loss_weight=1.0))),
+                type='mmdet.CrossEntropyLoss', use_mask=True,
+                loss_weight=1.0))),
     train_cfg=dict(
         rpn=dict(
             assigner=dict(

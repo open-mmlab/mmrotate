@@ -1,21 +1,20 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from mmdet.models.roi_heads.mask_heads import FCNMaskHead
+from mmdet.models.task_modules.samplers import SamplingResult
+from mmdet.structures.bbox import scale_boxes
+from mmdet.utils import InstanceList
 from mmengine.config import ConfigDict
 from torch import Tensor
 
-from mmdet.models.task_modules.samplers import SamplingResult
-from mmdet.models.roi_heads.mask_heads import FCNMaskHead
-from mmdet.utils import ConfigType, InstanceList, OptConfigType, OptMultiConfig
 from mmrotate.registry import MODELS
-from .mask_target import mask_target
-from mmdet.structures.bbox import scale_boxes
-from mmrotate.structures.bbox import RotatedBoxes
 from mmrotate.structures import rbox2hbox
+from mmrotate.structures.bbox import RotatedBoxes
+from .mask_target import mask_target
 
 BYTES_PER_FLOAT = 4
 # TODO: This memory limit may be too much or too little. It would be better to
@@ -146,12 +145,14 @@ class RotatedFCNMaskHead(FCNMaskHead):
             im_mask[(inds, ) + spatial_inds] = masks_chunk
         return im_mask
 
+
 def _do_paste_mask(masks: Tensor,
-                boxes: Tensor,
-                img_h: int,
-                img_w: int,
-                skip_empty: bool = True) -> tuple:
+                   boxes: Tensor,
+                   img_h: int,
+                   img_w: int,
+                   skip_empty: bool = True) -> tuple:
     """Paste instance masks according to boxes.
+
     This implementation is modified from
     https://github.com/facebookresearch/detectron2/
     Args:
@@ -218,6 +219,7 @@ def _do_paste_mask(masks: Tensor,
     else:
         return img_masks[:, 0], ()
 
+
 @MODELS.register_module()
 class ORCNNFCNMaskHead(RotatedFCNMaskHead):
 
@@ -226,6 +228,7 @@ class ORCNNFCNMaskHead(RotatedFCNMaskHead):
                     rcnn_train_cfg: ConfigDict) -> Tensor:
         """Calculate the ground truth for all samples in a batch according to
         the sampling_results.
+
         Args:
             sampling_results (List[obj:SamplingResult]): Assign results of
                 all images in a batch after sampling.

@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 from torch.nn.modules.utils import _pair
-from mmcv.ops.roi_align_rotated import roi_align_rotated
+
 from mmrotate.structures import rbox2hbox
 
 

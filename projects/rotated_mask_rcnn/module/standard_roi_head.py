@@ -1,16 +1,15 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
-import torch
+from mmdet.models.roi_heads import StandardRoIHead
+from mmdet.models.utils import empty_instances
+from mmdet.structures.bbox import bbox2roi
+from mmdet.utils import InstanceList
 from torch import Tensor
 
 from mmrotate.registry import MODELS
-from mmdet.structures.bbox import bbox2roi
-from mmdet.utils import InstanceList
-from mmdet.models.utils import empty_instances
-
-from mmdet.models.roi_heads import StandardRoIHead
 from mmrotate.structures import rbox2hbox
+
 
 @MODELS.register_module()
 class RStandardRoIHead(StandardRoIHead):
