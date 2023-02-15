@@ -20,13 +20,7 @@ cd mmrotate
 git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git data/ICDAR2019_MTD_HOQ
 ```
 
-### hbbox水平框原始数据集
-
-![image](https://user-images.githubusercontent.com/25839884/214336065-7aa155b3-75ca-4e46-85f1-22c47a79de4e.png)
-
 600 个训练图片，240个测试图片
-
-### obbox有向边界框数据集
 
 通过 browse_dataset.py 检测数据集的正确性
 
@@ -41,10 +35,6 @@ python projects/RR360/tools/browse_dataset.py \
 
 数据集有由语义信息的，ABCD点是表格左上角开始，依次顺时钟的四个点。
 ![](https://cdn.vansin.top//picgo/3e4a042cd4b4725c4ae05aa7471467e.png)
-
-
-![image](https://user-images.githubusercontent.com/25839884/214337078-854e530d-6cfb-4e33-82a3-d17c51af39c8.png)
-
 
 # configs360
 
