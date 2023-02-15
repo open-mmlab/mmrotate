@@ -86,18 +86,49 @@ work_dirs/headet/configs-ic19-obb-obb/rotated_rtmdet/rotated_rtmdet_l-3x-dota_pt
 ```
 
 
-|config_file|FPS|test/dota/AP50|test/dota/AP50H90|max_epochs|max_iters|max_memory|model_group|model_name|
+|config_file|model_group|model_name|test/dota/AP50|test/dota/AP50H90|FPS|max_memory|max_epochs|max_iters|
 |:----|:----|:----|:----|:----|:----|:----|:----|:----|
-|rotated_rtmdet_s-3x-dota_pt.py|33.2933599|0.881|0.229|36|2700|191|rotated_rtmdet|RTMDet|
-|rotated_rtmdet_l-3x-dota_pt.py|11.55385597|0.862|0.257|36|5400|637|rotated_rtmdet|RTMDet|
-|rotated_rtmdet_m-3x-dota_pt.py|19.31390973|0.796|0.23|36|2700|372|rotated_rtmdet|RTMDet|
-|rotated_rtmdet_tiny-3x-dota_pt.py|41.30585248|0.774|0.245|36|2700|133|rotated_rtmdet|RTMDet|
-|rotated_rtmdet_l-3x-dota.py|12.62933935|0.76|0.278|36|5400|637|rotated_rtmdet|RTMDet|
-|rotated_rtmdet_l-3x-dota.py|11.21752858|0.734|0.251|36|5400|637|rotated_rtmdet|RTMDet|
-|rotated_rtmdet_m-3x-dota.py|18.6458565|0.674|0.158|36|2700|372|rotated_rtmdet|RTMDet|
-|rotated_rtmdet_tiny-3x-dota.py|40.2439923|0.668|0.229|36|2700|133|rotated_rtmdet|RTMDet|
-|rotated_rtmdet_s-3x-dota.py|31.8266572|0.58|0.19|36|2700|191|rotated_rtmdet|RTMDet|
-|rotated-retinanet-rbox-h180_r50_fpn_6x_dota_pt.py|12.40695562|0.339|0.061|72|21600|143|rotated_retinanet|RetinaNet|
+|rotated_rtmdet_l_l1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.897|0.896|25.18980848|419|36|32400|
+|rotated_rtmdet_l_a1l1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.898|0.895|25.12457385|419|36|32400|
+|rotated_rtmdet_m_l1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.896|0.893|30.62018724|202|36|32400|
+|rotated_rtmdet_m_al1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.898|0.889|29.43219076|202|36|32400|
+|rotated_rtmdet_s_l1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.89|0.887|34.76708714|72|36|32400|
+|rotated_rtmdet_m_a1l1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.894|0.886|29.92472451|202|36|32400|
+|rotated_rtmdet_s_al1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.875|0.805|34.99214249|72|36|32400|
+|rotated_rtmdet_tiny_l1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.805|0.805|33.83307671|40|36|32400|
+|rotated_rtmdet_tiny_a1l1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.801|0.799|34.5884871|40|36|32400|
+|rotated_rtmdet_tiny_al1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.801|0.798|34.35242392|40|36|32400|
+|rotated_rtmdet_s_a1l1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.87|0.795|34.03341603|72|36|32400|
+|rotated_rtmdet_l_l1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.802|0.794|27.51497858|419|36|32400|
+|rotated_rtmdet_m_l1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.798|0.79|28.53407624|202|36|32400|
+|rotated_rtmdet_l_al1-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.788|0.787|24.99243089|419|36|32400|
+|rotated_rtmdet_l-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.799|0.786|28.72683885|419|36|32400|
+|rotated_rtmdet_s_l1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.798|0.78|34.72571773|72|36|32400|
+|rotated_rtmdet_l_a1l1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.795|0.779|27.62019302|419|36|32400|
+|rotated_rtmdet_m_l1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.793|0.704|31.1818681|202|36|10800|
+|rotated_rtmdet_l_l1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.783|0.702|22.56788876|419|36|10800|
+|rotated_rtmdet_l_a1l1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.766|0.699|27.27286338|419|36|10800|
+|rotated_rtmdet_m_al1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.78|0.697|22.95045136|202|36|10800|
+|rotated_rtmdet_s_al1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.785|0.695|34.81889286|72|36|32400|
+|rotated_rtmdet_m_al1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.702|0.69|31.28286532|202|36|32400|
+|rotated_rtmdet_tiny_l1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.772|0.689|35.23428897|40|36|32400|
+|rotated_rtmdet_l-3x-ic19.py|rotated_rtmdet_x3_r|RTMDet|0.696|0.683|26.95822517|419|36|32400|
+|rotated_rtmdet_tiny_al1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.702|0.68|24.18143699|40|36|10800|
+|rotated_rtmdet_tiny_a1l1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.776|0.676|35.83994276|40|36|32400|
+|rotated_rtmdet_tiny_a1l1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.762|0.675|22.82166165|40|36|10800|
+|rotated_rtmdet_s_a1l1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.773|0.673|33.53111446|72|36|32400|
+|rotated_rtmdet_s_al1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.755|0.673|32.36082248|72|36|10800|
+|rotated_rtmdet_tiny_al1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.771|0.672|35.6979651|40|36|32400|
+|rotated_rtmdet_l_al1-3x-ic19_pt.py|rotated_rtmdet_x3|RTMDet|0.686|0.67|27.38270746|419|36|32400|
+|rotated_rtmdet_tiny_l1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.69|0.664|24.68802856|40|36|10800|
+|rotated_rtmdet_m_a1l1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.692|0.663|30.65861447|202|36|10800|
+|rotated_rtmdet_s_a1l1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.695|0.659|23.62099277|72|36|10800|
+|rotated_rtmdet_l-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.695|0.658|22.38194881|419|36|10800|
+|rotated_rtmdet_l_al1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.692|0.607|27.49131127|419|36|10800|
+|rotated_rtmdet_l-3x-ic19_pt.py|rotated_rtmdet_x3_r|RTMDet|0.689|0.596|26.61555252|419|36|32400|
+|rotated_rtmdet_s_l1-3x-ic19_pt.py|rotated_rtmdet|RTMDet|0.674|0.575|34.29938491|72|36|10800|
+|rotated_rtmdet_l-3x-ic19.py|rotated_rtmdet_x3|RTMDet|0.279|0.26|26.20734586|419|36|32400|
+|rotated_rtmdet_l-3x-ic19.py|rotated_rtmdet|RTMDet|0.184|0.172|26.48888138|419|36|10800|
 
 
  # RBB 结果 (180°)
