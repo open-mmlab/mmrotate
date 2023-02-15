@@ -8,6 +8,7 @@
 # 假设已经安装mmengine、mmcv 2.x、mmdetection
 git clone https://github.com/open-mmlab/mmrotate -b dev-1.x
 cd mmrotate 
+export MMROTATE_HOME=$(pwd)
 pip install -v -e .
 ```
 
@@ -16,7 +17,7 @@ pip install -v -e .
 ## 数据集下载
 
 ```shell
-cd mmrotate
+cd $MMROTATE_HOME
 git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git data/ICDAR2019_MTD_HOQ
 ```
 
@@ -25,6 +26,7 @@ git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git data/ICDAR2019_MTD_HOQ
 通过 browse_dataset.py 检测数据集的正确性
 
 ```shell
+cd $MMROTATE_HOME
 python projects/RR360/tools/browse_dataset.py \
     projects/RR360/configs360/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota.py
 ```
@@ -37,6 +39,8 @@ python projects/RR360/tools/browse_dataset.py \
 推理已训练好的模型
 
 ```shell
+cd $MMROTATE_HOME
+
 wget https://openmmlab.vansin.top/work_dirs/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt/epoch_36.pth
 
 python projects/RR360/tools/test.py \
@@ -49,6 +53,7 @@ python projects/RR360/tools/test.py \
 训练
 
 ```shell
+cd $MMROTATE_HOME
 python projects/RR360/tools/train.py \
     projects/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt.py \
     --d
@@ -57,6 +62,7 @@ python projects/RR360/tools/train.py \
 测试自行训练的
 
 ```shell
+cd $MMROTATE_HOME
 python projects/RR360/tools/test.py \
     work_dirs/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt/rotated_rtmdet_s_l1-3x-ic19_pt.py \
     work_dirs/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt/epoch_36.pth
