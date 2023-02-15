@@ -67,15 +67,15 @@ python projects/headet/tools/browse_dataset.py \
 ![image](https://user-images.githubusercontent.com/25839884/214337078-854e530d-6cfb-4e33-82a3-d17c51af39c8.png)
 
 
-# OBB 结果 (360°)
+# configs360
 
 推理已训练好的模型
 
 ```shell
-wget https://open-mmlab.oss-cn-shanghai.aliyuncs.com/work_dirs/RR360/configs360/rotated_rtmdet_s_l1-3x-ic19_pt/epoch_36.pth
+wget https://openmmlab.vansin.top/work_dirs/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt/epoch_36.pth
 
 python projects/RR360/tools/test.py \
-    projects/RR360/configs360/rotated_rtmdet_s_l1-3x-ic19_pt.py \
+    projects/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt.py \
     epoch_36.pth
 
 ```
