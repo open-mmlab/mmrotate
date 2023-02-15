@@ -29,10 +29,6 @@ python projects/RR360/tools/browse_dataset.py \
     projects/RR360/configs360/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota.py
 ```
 
-在 hbbox 水平框原始数据集的基础上，通过随机旋转变换生成 rbbox 旋转边界框数据集，让后通过手动调整部分标注，生成 obbox 有向边界框数据集。
-![image](https://user-images.githubusercontent.com/25839884/214334546-b9a940e3-9e88-47ae-aa96-5f2d6444c20c.png)
-
-
 数据集有由语义信息的，ABCD点是表格左上角开始，依次顺时钟的四个点。
 ![](https://cdn.vansin.top//picgo/3e4a042cd4b4725c4ae05aa7471467e.png)
 
