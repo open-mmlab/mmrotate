@@ -20,24 +20,6 @@ cd mmrotate
 git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git data/ICDAR2019_MTD_HOQ
 ```
 
-## 数据集介绍
-
-```shell
-ICDAR2019_MTD_HOQ
-├── ann_test_hbbox  # 原始HBB水平框测试集标注
-├── ann_test_obbox  # 旋转变换后有向边界框测试集标注（算法生成）
-├── ann_test_qbbox  # 投影变换后边界框测试集标注（算法生成）
-├── ann_train_hbb   # 原始HBB水平框训练集标注
-├── ann_train_obbox # 旋转变换后有向边界框训练集标注（算法生成）
-├── ann_train_qbbox # 投影变换后边界框训练集标注（算法生成）
-├── img_test_hbbox  # 原始测试集图像
-├── img_test_obbox  # 旋转变换后测试集图像
-├── img_test_qbbox  # 投影变换后测试集图像
-├── img_train_hbbox # 原始训练集图片
-├── img_train_obbox # 旋转变换后训练集图像
-└── img_train_qbbox # 投影变换后训练集图像
-```
-
 ### hbbox水平框原始数据集
 
 ![image](https://user-images.githubusercontent.com/25839884/214336065-7aa155b3-75ca-4e46-85f1-22c47a79de4e.png)
@@ -60,10 +42,6 @@ python projects/RR360/tools/browse_dataset.py \
 数据集有由语义信息的，ABCD点是表格左上角开始，依次顺时钟的四个点。
 ![](https://cdn.vansin.top//picgo/3e4a042cd4b4725c4ae05aa7471467e.png)
 
-
-### qbbox投影变换后qbbox四边形边界框数据集
-
-在 hbbox 水平框原始数据集的基础上，通过随机投影变换生成 qbbox 四边形边界框数据集。
 
 ![image](https://user-images.githubusercontent.com/25839884/214337078-854e530d-6cfb-4e33-82a3-d17c51af39c8.png)
 
