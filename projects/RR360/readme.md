@@ -49,8 +49,8 @@ ICDAR2019_MTD_HOQ
 通过 browse_dataset.py 检测数据集的正确性
 
 ```shell
-python projects/headet/tools/browse_dataset.py \
-    projects/headet/configs-ic19-obb-obb/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota.py
+python projects/RR360/tools/browse_dataset.py \
+    projects/RR360/configs360/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota.py
 ```
 
 在 hbbox 水平框原始数据集的基础上，通过随机旋转变换生成 rbbox 旋转边界框数据集，让后通过手动调整部分标注，生成 obbox 有向边界框数据集。
@@ -77,24 +77,25 @@ wget https://openmmlab.vansin.top/work_dirs/RR360/configs360/rotated_rtmdet_x3_r
 
 python projects/RR360/tools/test.py \
     projects/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt.py \
-    epoch_36.pth
+    epoch_36.pth \
+    # --show
 
 ```
 
-
+训练
 
 ```shell
-python projects/headet/tools/train.py \
-projects/headet/configs-ic19-obb-obb/rotated_rtmdet/rotated_rtmdet_l-3x-dota_pt.py \
---d
+python projects/RR360/tools/train.py \
+    projects/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt.py \
+    --d
 ```
 
-测试推理
+测试自行训练的
 
 ```shell
-python projects/headet/tools/test.py \
-work_dirs/headet/configs-ic19-obb-obb/rotated_rtmdet/rotated_rtmdet_l-3x-dota_pt/rotated_rtmdet_l-3x-dota_pt.py \
-work_dirs/headet/configs-ic19-obb-obb/rotated_rtmdet/rotated_rtmdet_l-3x-dota_pt/epoch_36.pth
+python projects/RR360/tools/test.py \
+    work_dirs/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt/rotated_rtmdet_s_l1-3x-ic19_pt.py \
+    work_dirs/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt/epoch_36.pth
 ```
 
 

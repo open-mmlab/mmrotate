@@ -14,12 +14,12 @@ def parse_args():
     # parser.add_argument(
     #     '--prefix',
     #     type=str,
-    #     default='work_dirs/headet/configs-ic19-rbb-rbb/'
+    #     default='work_dirs/RR360/configs180/'
     #     help='dump prediction')
 
     parser.add_argument(
         '--prefix',
-        default='work_dirs/headet/configs-ic19-obb-obb/',
+        default='work_dirs/RR360/configs360/',
         type=str,
         help='dump predictions to a pickle file for offline evaluation')
     
@@ -54,7 +54,7 @@ if __name__ == '__main__':
             sorted(pths, key=lambda x: int(x.split('_')[-1].split('.')[0]))
             
             try:
-                cmd = f'python projects/headet/tools/test.py {prefix}{group}/{config}/{config}.py {prefix}{group}/{config}/{pths[-1]} --mongo {mongo}'
+                cmd = f'python projects/RR360/tools/test.py {prefix}{group}/{config}/{config}.py {prefix}{group}/{config}/{pths[-1]} --mongo {mongo}'
                 os.system(cmd)
             except Exception as e:
                 print(e)
