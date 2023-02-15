@@ -2,7 +2,6 @@
 # Modified from csuhan: https://github.com/csuhan/ReDet
 from typing import Optional, Sequence, Tuple
 
-import e2cnn.nn as enn
 import torch.nn as nn
 import torch.utils.checkpoint as cp
 from mmdet.utils import ConfigType, OptConfigType, OptMultiConfig
@@ -11,12 +10,27 @@ from torch import Tensor
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from mmrotate.registry import MODELS
-from ..utils import (build_enn_divide_feature, build_enn_norm_layer,
-                     build_enn_trivial_feature, ennAvgPool, ennConv,
-                     ennMaxPool, ennReLU, ennTrivialConv)
+
+try:
+    import e2cnn.nn as enn
+    from e2cnn.nn import EquivariantModule
+    from ..utils.enn import (build_enn_divide_feature, build_enn_norm_layer,
+                             build_enn_trivial_feature, ennAvgPool, ennConv,
+                             ennMaxPool, ennReLU, ennTrivialConv)
+except ImportError:
+    enn = None
+    build_enn_divide_feature = None
+    build_enn_norm_layer = None
+    build_enn_trivial_feature = None
+    ennAvgPool = None
+    ennConv = None
+    ennMaxPool = None
+    ennReLU = None
+    ennTrivialConv = None
+    EquivariantModule = BaseModule
 
 
-class BasicBlock(enn.EquivariantModule):
+class BasicBlock(EquivariantModule):
     """BasicBlock for ReResNet.
 
     Args:
@@ -139,7 +153,7 @@ class BasicBlock(enn.EquivariantModule):
             return input_shape
 
 
-class Bottleneck(enn.EquivariantModule):
+class Bottleneck(EquivariantModule):
     """Bottleneck block for ReResNet.
 
     Args:
@@ -490,8 +504,14 @@ class ReResNet(BaseModule):
                  zero_init_residual: bool = True,
                  init_cfg: OptMultiConfig = None) -> None:
         super().__init__(init_cfg=init_cfg)
-        self.in_type = build_enn_trivial_feature(in_channels)
 
+        try:
+            import e2cnn  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                'Please install e2cnn by "pip install -e '
+                'git+https://github.com/QUVA-Lab/e2cnn.git#egg=e2cnn"')
+        self.in_type = build_enn_trivial_feature(in_channels)
         if depth not in self.arch_settings:
             raise KeyError(f'invalid depth {depth} for resnet')
         self.depth = depth
