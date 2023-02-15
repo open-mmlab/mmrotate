@@ -18,6 +18,7 @@ pip install -v -e .
 
 ```shell
 cd $MMROTATE_HOME
+mkdir data
 git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git data/ICDAR2019_MTD_HOQ
 ```
 
