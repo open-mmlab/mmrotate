@@ -58,9 +58,9 @@ resume = False
 
 custom_imports = dict(imports=[
     'mmcls.models',
-    'projects.headet.visualization',
-    'projects.headet.structures',
-    'projects.headet.datasets.transforms',
-    'projects.headet.evaluation',
-    'projects.headet.models'
+    'projects.RR360.visualization',
+    'projects.RR360.structures',
+    'projects.RR360.datasets.transforms',
+    'projects.RR360.evaluation',
+    'projects.RR360.models'
     ], allow_failed_imports=False)

@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import sys
 
-from projects.headet.structures.bbox import RotatedBoxes
+from projects.RR360.structures.bbox import RotatedBoxes
 import mmrotate.structures
 mmrotate.structures.bbox.RotatedBoxes = RotatedBoxes
 # sys.modules['mmrotate.structures.bbox'].RotatedBoxes = RotatedBoxes

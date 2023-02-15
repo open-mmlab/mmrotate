@@ -3,7 +3,7 @@ import argparse
 import os
 import os.path as osp
 
-from projects.headet.structures.bbox import RotatedBoxes
+from projects.RR360.structures.bbox import RotatedBoxes
 import mmrotate.structures
 mmrotate.structures.bbox.RotatedBoxes = RotatedBoxes
 
@@ -113,7 +113,7 @@ def main():
 
     cfg.visualizer.vis_backends = [dict(type='LocalVisBackend')]
 
-    from projects.headet.hooks.fps_hook import FPSHook
+    from projects.RR360.hooks.fps_hook import FPSHook
     
     if args.mongo is not None:
         FPSHook=dict(type='FPSHook', mongo=args.mongo)

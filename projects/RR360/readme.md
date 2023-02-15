@@ -69,7 +69,18 @@ python projects/headet/tools/browse_dataset.py \
 
 # OBB 结果 (360°)
 
-训练
+推理已训练好的模型
+
+```shell
+wget https://open-mmlab.oss-cn-shanghai.aliyuncs.com/work_dirs/RR360/configs360/rotated_rtmdet_s_l1-3x-ic19_pt/epoch_36.pth
+
+python projects/RR360/tools/test.py \
+    projects/RR360/configs360/rotated_rtmdet_s_l1-3x-ic19_pt.py \
+    epoch_36.pth
+
+```
+
+
 
 ```shell
 python projects/headet/tools/train.py \

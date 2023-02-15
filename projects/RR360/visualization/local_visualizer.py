@@ -12,7 +12,7 @@ from torch import Tensor
 from mmrotate.registry import VISUALIZERS
 # from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes
 from mmrotate.structures.bbox import QuadriBoxes
-from projects.headet.structures.bbox import RotatedBoxes
+from projects.RR360.structures.bbox import RotatedBoxes
 from mmrotate.visualization.palette import get_palette
 
 
