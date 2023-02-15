@@ -7,6 +7,10 @@ Author: @xxx.
 This is an implementation of \[XXX\]. -->
 
 This project implements a Mask RCNN for rotated boxes. Benefiting from the BoxType design, we only need to modify the code slightly in mmrotate, and then we can support the instance segmentation task.
+<center>
+<img src="https://user-images.githubusercontent.com/10410257/218915978-f09bbf87-360d-4751-b52c-66d765d98035.png">
+</center>
+
 
 ## Usage
 
