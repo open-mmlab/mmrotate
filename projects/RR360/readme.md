@@ -1,6 +1,6 @@
-# heading detection
+# RR360(360 Rotated Rectangle Detection)
 
-本项目尝试支持360的矩形框检测。
+本项目在ICDAR2019_MTD_HOQ上支持360度旋转矩形框目标检测
 
 # 环境配置
 
