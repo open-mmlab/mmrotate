@@ -75,7 +75,7 @@ class DOTAR360Metric(BaseMetric):
                  outfile_prefix: Optional[str] = None,
                  merge_patches: bool = False,
                  iou_thr: float = 0.1,
-                 hangle_thr: float= 90,
+                 angle_thr: float= 90,
                  eval_mode: str = '11points',
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None) -> None:
@@ -103,7 +103,7 @@ class DOTAR360Metric(BaseMetric):
         self.outfile_prefix = outfile_prefix
         self.merge_patches = merge_patches
         self.iou_thr = iou_thr
-        self.hangle_thr = hangle_thr
+        self.angle_thr = angle_thr
 
         self.use_07_metric = True if eval_mode == '11points' else False
 
@@ -336,7 +336,7 @@ class DOTAR360Metric(BaseMetric):
 
             mean_aps = []
             for iou_thr in self.iou_thrs:
-                logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}angle_thr: {self.hangle_thr}{"-" * 15}')
+                logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}angle_thr: {self.angle_thr}{"-" * 15}')
                 mean_ap, _ = eval_rbbox_head_map(
                     dets,
                     gts,
@@ -346,11 +346,11 @@ class DOTAR360Metric(BaseMetric):
                     box_type=self.predict_box_type,
                     dataset=dataset_name,
                     logger=logger,
-                    hangle_thr=self.hangle_thr)
+                    angle_thr=self.angle_thr)
                 mean_aps.append(mean_ap)
-                eval_results[f'AP{int(iou_thr * 100):02d}H{self.hangle_thr}'] = round(mean_ap, 3)
-            eval_results[f'mAPH{self.hangle_thr}'] = sum(mean_aps) / len(mean_aps)
-            eval_results.move_to_end(f'mAPH{self.hangle_thr}', last=False)
+                eval_results[f'AP{int(iou_thr * 100):02d}H{self.angle_thr}'] = round(mean_ap, 3)
+            eval_results[f'mAPH{self.angle_thr}'] = sum(mean_aps) / len(mean_aps)
+            eval_results.move_to_end(f'mAPH{self.angle_thr}', last=False)
         else:
             raise NotImplementedError
         return eval_results

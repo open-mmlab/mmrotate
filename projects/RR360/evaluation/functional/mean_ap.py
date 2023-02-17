@@ -15,7 +15,7 @@ def tpfp_default(det_bboxes,
                  iou_thr=0.5,
                  box_type='rbox',
                  area_ranges=None,
-                 hangle_thr=90):
+                 angle_thr=90):
     """Check if detected bboxes are true positive or false positive.
 
     Args:
@@ -90,7 +90,7 @@ def tpfp_default(det_bboxes,
             distance_gt_pred_angle = np.abs(det_bboxes[i][4]-gt_bboxes[matched_gt][4])
             if distance_gt_pred_angle>np.pi:
                 distance_gt_pred_angle = 2*np.pi-distance_gt_pred_angle
-            if ious_max[i] >= iou_thr and distance_gt_pred_angle<hangle_thr*np.pi/180:
+            if ious_max[i] >= iou_thr and distance_gt_pred_angle<angle_thr*np.pi/180:
                 # matched_gt = ious_argmax[i]
                 if not (gt_ignore_inds[matched_gt]
                         or gt_area_ignore[matched_gt]):
@@ -166,7 +166,7 @@ def eval_rbbox_head_map(det_results,
                    box_type='rbox',
                    dataset=None,
                    logger=None,
-                   hangle_thr=90,
+                   angle_thr=90,
                    nproc=4):
     """Evaluate mAP of a rotated dataset.
 
@@ -224,7 +224,7 @@ def eval_rbbox_head_map(det_results,
                 [iou_thr for _ in range(num_imgs)],
                 [box_type for _ in range(num_imgs)],
                 [area_ranges for _ in range(num_imgs)],
-                [hangle_thr for _ in range(num_imgs)]))
+                [angle_thr for _ in range(num_imgs)]))
         tp, fp = tuple(zip(*tpfp))
         # calculate gt number of each scale
         # ignored gts or gts beyond the specific scale are not counted
