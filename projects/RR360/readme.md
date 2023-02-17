@@ -29,7 +29,7 @@ git clone https://github.com/vansin/ICDAR2019_MTD_HOQ.git data/ICDAR2019_MTD_HOQ
 ```shell
 cd $MMROTATE_HOME
 python projects/RR360/tools/browse_dataset.py \
-    projects/RR360/configs360/rotated_retinanet/rotated-retinanet-rbox-h180_r50_fpn_6x_dota.py
+    projects/RR360/configs360/rotated_retinanet/rotated-retinanet-rbox-r360_r50_fpn_6x_ic19.py
 ```
 
 数据集有由语义信息的，ABCD点是表格左上角开始，依次顺时钟的四个点。
