@@ -5,7 +5,7 @@ _base_ = [
 checkpoint = 'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-s_imagenet_600e.pth'  # noqa
 
 
-angle_version = 'h180'
+angle_version = 'r360'
 model = dict(
     type='mmdet.RTMDet',
     data_preprocessor=dict(

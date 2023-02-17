@@ -1,4 +1,4 @@
-"""copy from /mmrotate/structures/bbox/rotated_boxes.py and redefine 'h180'."""
+"""copy from /mmrotate/structures/bbox/rotated_boxes.py and redefine 'r360'."""
 import math
 from typing import Optional, Tuple, TypeVar, Union
 
@@ -48,21 +48,21 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
                 width_longer, start_angle = True, -90
             elif pattern == 'le135':
                 width_longer, start_angle = True, -45
-            elif pattern == 'h180':
+            elif pattern == 'r360':
                 width_longer, start_angle = False, -180
             else:
-                raise ValueError("pattern only can be 'oc', 'le90', 'h180' and"
+                raise ValueError("pattern only can be 'oc', 'le90', 'r360' and"
                                  f"'le135', but get {pattern}.")
         start_angle = start_angle / 180 * np.pi
 
         x, y, w, h, t = boxes.unbind(dim=-1)
-        if width_longer and pattern != 'h180':
+        if width_longer and pattern != 'r360':
             # swap edge and angle if h >= w
             w_ = torch.where(w > h, w, h)
             h_ = torch.where(w > h, h, w)
             t = torch.where(w > h, t, t + np.pi / 2)
             t = ((t - start_angle) % np.pi) + start_angle
-        elif pattern != 'h180':
+        elif pattern != 'r360':
             t = ((t - start_angle) % np.pi)
             w_ = torch.where(t < np.pi / 2, w, h)
             h_ = torch.where(t < np.pi / 2, h, w)
