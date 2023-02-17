@@ -29,10 +29,6 @@ def parse_args():
         type=str,
         help='dump predictions to a pickle file for offline evaluation')
     parser.add_argument(
-        '--mongo',
-        type=str,
-        help='dump predictions to a pickle file for offline evaluation')
-    parser.add_argument(
         '--show', action='store_true', help='show prediction results')
     parser.add_argument(
         '--show-dir',
@@ -112,24 +108,6 @@ def main():
         cfg = trigger_visualization_hook(cfg, args)
 
     cfg.visualizer.vis_backends = [dict(type='LocalVisBackend')]
-
-    from projects.RR360.hooks.fps_hook import FPSHook
-    
-    if args.mongo is not None:
-        FPSHook=dict(type='FPSHook', mongo=args.mongo)
-        if hasattr(cfg, 'custom_hooks'):
-            
-            FPSHookExists = False
-            for hook in cfg.custom_hooks:
-                if hook['type'] == 'FPSHook':
-                    hook['mongo'] = args.mongo
-                    FPSHookExists=True
-                    break
-            if not FPSHookExists:
-                cfg.custom_hooks.append(FPSHook)
-        else:
-            cfg.custom_hooks = [FPSHook]
-
     # build the runner from config
     if 'runner_type' not in cfg:
         # build the default runner

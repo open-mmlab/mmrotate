@@ -47,6 +47,7 @@ wget https://openmmlab.vansin.top/work_dirs/RR360/configs360/rotated_rtmdet_x3_r
 python projects/RR360/tools/test.py \
     projects/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt.py \
     epoch_36.pth \
+    --show-dir predict_result
     # --show
 
 ```
