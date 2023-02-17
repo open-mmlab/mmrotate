@@ -21,7 +21,7 @@ from mmrotate.structures.bbox import rbox2qbox
 
 
 @METRICS.register_module()
-class DOTAHeadMetric(BaseMetric):
+class DOTAR360Metric(BaseMetric):
     """DOTA evaluation metric.
 
     Note:  In addition to format the output results to JSON like CocoMetric,
