@@ -40,7 +40,7 @@ custom_hooks = [
 
 
 custom_imports = dict(imports=[
-    'mmcls.models',
+    # 'mmcls.models',
     'projects.RR360.visualization',
     'projects.RR360.structures',
     'projects.RR360.datasets.transforms',
