@@ -7,12 +7,12 @@ from mmdet.structures.mask import BitmapMasks, PolygonMasks, bitmap_to_polygon
 from mmdet.visualization import DetLocalVisualizer, jitter_color
 from mmdet.visualization.palette import _get_adaptive_scales
 from mmengine.structures import InstanceData
+from projects.RR360.structures.bbox import RotatedBoxes
 from torch import Tensor
 
 from mmrotate.registry import VISUALIZERS
 # from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes
 from mmrotate.structures.bbox import QuadriBoxes
-from projects.RR360.structures.bbox import RotatedBoxes
 from mmrotate.visualization.palette import get_palette
 
 
@@ -96,14 +96,16 @@ class RR360LocalVisualizer(DetLocalVisualizer):
 
             for i, (poly, label) in enumerate(zip(polygons, labels)):
                 self.draw_points(
-                    positions=bboxes.convert_to('qbox').tensor.reshape(-1, 4, 2)[i],
-                    colors=[(0,0,0),(255,0,0),(0,255,0),(0,0,255)],
+                    positions=bboxes.convert_to('qbox').tensor.reshape(
+                        -1, 4, 2)[i],
+                    colors=[(0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255)],
                     sizes=20,
                 )
                 self.draw_texts(
                     ['A', 'B', 'C', 'D'],
-                    positions=bboxes.convert_to('qbox').tensor.reshape(-1, 4, 2)[i],
-                    colors=[(0,0,0),(255,0,0),(0,255,0),(0,0,255)],
+                    positions=bboxes.convert_to('qbox').tensor.reshape(
+                        -1, 4, 2)[i],
+                    colors=[(0, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255)],
                     font_sizes=20,
                 )
 
@@ -117,9 +119,10 @@ class RR360LocalVisualizer(DetLocalVisualizer):
                     score = round(float(instances.scores[i]) * 100, 1)
                     label_text += f': {score}'
 
-                angle_text ='angle '+str(np.round(180*bboxes.numpy()[i][4]/np.pi,1))
+                angle_text = 'angle ' + str(
+                    np.round(180 * bboxes.numpy()[i][4] / np.pi, 1))
 
-                label_text+=' '+angle_text
+                label_text += ' ' + angle_text
 
                 self.draw_texts(
                     label_text,
@@ -132,7 +135,7 @@ class RR360LocalVisualizer(DetLocalVisualizer):
                         'pad': 0.7,
                         'edgecolor': 'none'
                     }])
-                
+
                 # self.draw_texts(
                 #     angle_text,
                 #     pos+3*int(13 * scales[i]),

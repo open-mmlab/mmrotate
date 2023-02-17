@@ -20,7 +20,7 @@ def norm_angle(angle, angle_range):
     elif angle_range == 'le90':
         return (angle + np.pi / 2) % np.pi - np.pi / 2
     elif angle_range == 'r360':
-        return (angle + np.pi) % (2*np.pi) - np.pi
+        return (angle + np.pi) % (2 * np.pi) - np.pi
     else:
         print('Not yet implemented.')
 

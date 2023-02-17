@@ -14,8 +14,8 @@ from mmcv.ops import nms_quadri, nms_rotated
 from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
-
 from projects.RR360.evaluation import eval_rbbox_head_map
+
 from mmrotate.registry import METRICS
 from mmrotate.structures.bbox import rbox2qbox
 
@@ -75,7 +75,7 @@ class DOTAR360Metric(BaseMetric):
                  outfile_prefix: Optional[str] = None,
                  merge_patches: bool = False,
                  iou_thr: float = 0.1,
-                 angle_thr: float= 90,
+                 angle_thr: float = 90,
                  eval_mode: str = '11points',
                  collect_device: str = 'cpu',
                  prefix: Optional[str] = None) -> None:
@@ -336,7 +336,9 @@ class DOTAR360Metric(BaseMetric):
 
             mean_aps = []
             for iou_thr in self.iou_thrs:
-                logger.info(f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}angle_thr: {self.angle_thr}{"-" * 15}')
+                logger.info(
+                    f'\n{"-" * 15}iou_thr: {iou_thr}{"-" * 15}angle_thr: {self.angle_thr}{"-" * 15}'  # noqa: E501
+                )
                 mean_ap, _ = eval_rbbox_head_map(
                     dets,
                     gts,
@@ -348,8 +350,11 @@ class DOTAR360Metric(BaseMetric):
                     logger=logger,
                     angle_thr=self.angle_thr)
                 mean_aps.append(mean_ap)
-                eval_results[f'AP{int(iou_thr * 100):02d}H{self.angle_thr}'] = round(mean_ap, 3)
-            eval_results[f'mAPH{self.angle_thr}'] = sum(mean_aps) / len(mean_aps)
+                eval_results[
+                    f'AP{int(iou_thr * 100):02d}H{self.angle_thr}'] = round(
+                        mean_ap, 3)
+            eval_results[f'mAPH{self.angle_thr}'] = sum(mean_aps) / len(
+                mean_aps)
             eval_results.move_to_end(f'mAPH{self.angle_thr}', last=False)
         else:
             raise NotImplementedError

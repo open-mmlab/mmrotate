@@ -76,8 +76,7 @@ model = dict(
         max_per_img=2000),
 )
 
-
 # batch_size = (1 GPUs) x (8 samples per GPU) = 8
 train_dataloader = dict(batch_size=2, num_workers=8)
 
-load_from = 'https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_m-3x-dota/rotated_rtmdet_m-3x-dota-beeadda6.pth'
+load_from = 'https://download.openmmlab.com/mmrotate/v1.0/rotated_rtmdet/rotated_rtmdet_m-3x-dota/rotated_rtmdet_m-3x-dota-beeadda6.pth'  # noqa: E501

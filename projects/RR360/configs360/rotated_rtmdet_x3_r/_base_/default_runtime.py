@@ -14,11 +14,10 @@ env_cfg = dict(
     dist_cfg=dict(backend='nccl'),
 )
 
-
-vis_backends = [dict(type='LocalVisBackend'),
-                dict(type='WandbVisBackend',
-                     init_kwargs=dict(project='trbox'))
-                ]
+vis_backends = [
+    dict(type='LocalVisBackend'),
+    dict(type='WandbVisBackend', init_kwargs=dict(project='trbox'))
+]
 
 visualizer = dict(
     type='RR360LocalVisualizer', vis_backends=vis_backends, name='visualizer')
@@ -38,12 +37,13 @@ custom_hooks = [
         priority=49)
 ]
 
-
-custom_imports = dict(imports=[
-    # 'mmcls.models',
-    'projects.RR360.visualization',
-    'projects.RR360.structures',
-    'projects.RR360.datasets.transforms',
-    'projects.RR360.evaluation',
-    'projects.RR360.models',
-    ], allow_failed_imports=False)
+custom_imports = dict(
+    imports=[
+        # 'mmcls.models',
+        'projects.RR360.visualization',
+        'projects.RR360.structures',
+        'projects.RR360.datasets.transforms',
+        'projects.RR360.evaluation',
+        'projects.RR360.models',
+    ],
+    allow_failed_imports=False)

@@ -4,11 +4,13 @@ _base_ = [
 ]
 angle_version = 'r360'
 
-
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', interval=3, save_best=['dota/AP50'], rule='greater', max_keep_ckpts=1),
-)
-
+    checkpoint=dict(
+        type='CheckpointHook',
+        interval=3,
+        save_best=['dota/AP50'],
+        rule='greater',
+        max_keep_ckpts=1), )
 
 model = dict(
     type='mmdet.RetinaNet',
@@ -84,4 +86,4 @@ model = dict(
         nms=dict(type='nms_rotated', iou_threshold=0.1),
         max_per_img=2000))
 
-load_from = 'https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135-e4131166.pth'
+load_from = 'https://download.openmmlab.com/mmrotate/v0.1.0/rotated_retinanet/rotated_retinanet_obb_r50_fpn_1x_dota_le135/rotated_retinanet_obb_r50_fpn_1x_dota_le135-e4131166.pth'  # noqa: E501

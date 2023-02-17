@@ -87,10 +87,12 @@ def tpfp_default(det_bboxes,
             raise NotImplementedError
         for i in sort_inds:
             matched_gt = ious_argmax[i]
-            distance_gt_pred_angle = np.abs(det_bboxes[i][4]-gt_bboxes[matched_gt][4])
-            if distance_gt_pred_angle>np.pi:
-                distance_gt_pred_angle = 2*np.pi-distance_gt_pred_angle
-            if ious_max[i] >= iou_thr and distance_gt_pred_angle<angle_thr*np.pi/180:
+            distance_gt_pred_angle = np.abs(det_bboxes[i][4] -
+                                            gt_bboxes[matched_gt][4])
+            if distance_gt_pred_angle > np.pi:
+                distance_gt_pred_angle = 2 * np.pi - distance_gt_pred_angle
+            if ious_max[
+                    i] >= iou_thr and distance_gt_pred_angle < angle_thr * np.pi / 180:  # noqa: E501
                 # matched_gt = ious_argmax[i]
                 if not (gt_ignore_inds[matched_gt]
                         or gt_area_ignore[matched_gt]):
@@ -159,15 +161,15 @@ def get_cls_results(det_results, annotations, class_id, box_type):
 
 
 def eval_rbbox_head_map(det_results,
-                   annotations,
-                   scale_ranges=None,
-                   iou_thr=0.5,
-                   use_07_metric=True,
-                   box_type='rbox',
-                   dataset=None,
-                   logger=None,
-                   angle_thr=90,
-                   nproc=4):
+                        annotations,
+                        scale_ranges=None,
+                        iou_thr=0.5,
+                        use_07_metric=True,
+                        box_type='rbox',
+                        dataset=None,
+                        logger=None,
+                        angle_thr=90,
+                        nproc=4):
     """Evaluate mAP of a rotated dataset.
 
     Args:

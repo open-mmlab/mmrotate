@@ -3,9 +3,7 @@ dataset_type = 'DOTADataset'
 data_root = 'data/ICDAR2019_MTD_HOQ/'
 file_client_args = dict(backend='disk')
 
-METAINFO=dict(
-    classes=("table",)
-)
+METAINFO = dict(classes=('table', ))
 
 train_pipeline = [
     dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
@@ -71,22 +69,10 @@ val_dataloader = dict(
         pipeline=val_pipeline))
 test_dataloader = val_dataloader
 
-
 val_evaluator = [
-    dict(
-        type='DOTAR360Metric',
-        metric='mAP',
-        iou_thrs=[0.5],
-        angle_thr=90),
-    dict(
-        type='DOTAR360Metric',
-        metric='mAP',
-        iou_thrs=[0.5],
-        angle_thr=360),
-    dict(
-        type='DOTAMetric',
-        metric='mAP',
-        iou_thrs=[0.5])
+    dict(type='DOTAR360Metric', metric='mAP', iou_thrs=[0.5], angle_thr=90),
+    dict(type='DOTAR360Metric', metric='mAP', iou_thrs=[0.5], angle_thr=360),
+    dict(type='DOTAMetric', metric='mAP', iou_thrs=[0.5])
 ]
 test_evaluator = [
     dict(

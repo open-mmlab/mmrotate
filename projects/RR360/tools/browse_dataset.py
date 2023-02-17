@@ -16,14 +16,11 @@ def parse_args():
     parser.add_argument('config', help='train config file path')
     parser.add_argument(
         '--output-dir',
-        default="work_dirs/browse_dataset",
+        default='work_dirs/browse_dataset',
         type=str,
         help='If there is no display interface, you can save it')
     parser.add_argument(
-        '--stage',
-        default="train",
-        type=str,
-        help='train val test')
+        '--stage', default='train', type=str, help='train val test')
     parser.add_argument('--not-show', default=False, action='store_true')
     parser.add_argument(
         '--show-interval',
@@ -53,8 +50,6 @@ def main():
     # register all modules in mmdet into the registries
     register_all_modules()
 
-
-
     if args.stage == 'train':
         dataset = DATASETS.build(cfg.train_dataloader.dataset)
     elif args.stage == 'val':
@@ -63,7 +58,6 @@ def main():
         dataset = DATASETS.build(cfg.test_dataloader.dataset)
     else:
         raise ValueError(f'Unknown stage {args.stage}')
-
 
     visualizer = VISUALIZERS.build(cfg.visualizer)
     visualizer.dataset_meta = dataset.metainfo

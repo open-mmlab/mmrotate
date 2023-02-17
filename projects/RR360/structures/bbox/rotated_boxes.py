@@ -7,9 +7,10 @@ import numpy as np
 import torch
 from mmdet.structures.bbox import register_box, register_box_converter
 from mmdet.structures.mask import BitmapMasks, PolygonMasks
+from torch import Tensor
+
 from mmrotate.structures.bbox import QuadriBoxes
 from mmrotate.structures.bbox import RotatedBoxes as mmrotate_RotatedBoxes
-from torch import Tensor
 
 # from skimage.draw import line as skidline
 
@@ -22,9 +23,10 @@ MaskType = Union[BitmapMasks, PolygonMasks]
 
 @register_box('rbox', force=True)
 class RotatedBoxes(mmrotate_RotatedBoxes):
-    """
-    Copy form mmrotate/structures/bbox/RotatedBoxes
-    add new rotate logic +-180
+    """Copy form mmrotate/structures/bbox/RotatedBoxes add new rotate logic.
+
+    +-180.
+
         -90
           |
           |
@@ -87,10 +89,10 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
         cys = torch.unsqueeze(torch.sum(points[:, :, 1], axis=1), axis=1) / 4.
         _ws = torch.unsqueeze(dist_torch(points[:, 0], points[:, 1]), axis=1)
         _hs = torch.unsqueeze(dist_torch(points[:, 1], points[:, 2]), axis=1)
-        _thetas = torch.unsqueeze(torch.atan2(
-            (points[:, 1, 0] - points[:, 2, 0]),
-            (points[:, 1, 1] - points[:, 2, 1])),
-                                  axis=1)
+        _thetas = torch.unsqueeze(
+            torch.atan2((points[:, 1, 0] - points[:, 2, 0]),
+                        (points[:, 1, 1] - points[:, 2, 1])),
+            axis=1)
         thetas = torch.where(_thetas >= 0, math.pi - _thetas,
                              -(math.pi + _thetas))
         rbboxes = torch.cat([cxs, cys, _ws, _hs, thetas], axis=1)
@@ -125,8 +127,8 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
                                       flipped[..., 4] - 2 * np.pi, flipped[...,
                                                                            4])
 
-
-    def rotate_auto_bound_(self, center: Tuple[float, float], angle: float, img_shape_record) -> None:
+    def rotate_auto_bound_(self, center: Tuple[float, float], angle: float,
+                           img_shape_record) -> None:
         """Rotate all boxes in-place.
 
         copy from mmrotate
@@ -137,19 +139,18 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
         """
         boxes = self.tensor
 
-        h,w,new_h,new_w= img_shape_record[0][0],img_shape_record[0][1],img_shape_record[1][0],img_shape_record[1][1]
-
+        h, w, new_h, new_w = img_shape_record[0][0], img_shape_record[0][
+            1], img_shape_record[1][0], img_shape_record[1][1]
 
         rotation_matrix = boxes.new_tensor(
-            cv2.getRotationMatrix2D(((w - 1) * 0.5, (h - 1) * 0.5), -angle, 1.0))
+            cv2.getRotationMatrix2D(((w - 1) * 0.5, (h - 1) * 0.5), -angle,
+                                    1.0))
 
-        
         # follow change the rotation matrix according to the change img shape
         # cos = np.abs(rotation_matrix[0, 0])
         # sin = np.abs(rotation_matrix[0, 1])
         # new_w = h * sin + w * cos
         # new_h = h * cos + w * sin
-
 
         rotation_matrix[0, 2] += (new_w - w) * 0.5
         rotation_matrix[1, 2] += (new_h - h) * 0.5
@@ -157,7 +158,7 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
         # w = int(np.round(new_w))
         # h = int(np.round(new_h))
 
-        # 
+        #
 
         centers, wh, t = torch.split(boxes, [2, 2, 1], dim=-1)
         t = t % (2 * np.pi) + angle / 180 * np.pi
@@ -168,7 +169,6 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
         centers_T = torch.matmul(rotation_matrix, centers_T)
         centers = torch.transpose(centers_T, -1, -2)
         self.tensor = torch.cat([centers, wh, t], dim=-1)
-
 
     def rotate_(self, center: Tuple[float, float], angle: float) -> None:
         """Rotate all boxes in-place.
@@ -192,83 +192,6 @@ class RotatedBoxes(mmrotate_RotatedBoxes):
         centers_T = torch.matmul(rotation_matrix, centers_T)
         centers = torch.transpose(centers_T, -1, -2)
         self.tensor = torch.cat([centers, wh, t], dim=-1)
-
-    #  def clip_(self, img_shape: Tuple[int, int]) -> None:
-    #  boxes = self.tensor
-    #  poly_boxes = self.rbox2corner(boxes)
-    #  re_rbbox = []
-    #  for points in poly_boxes:
-    #  all_line = get_linepnts(points.numpy())
-    #  headpt = points[0:2,:].mean(axis=0).numpy()
-    #  footpt = points[2:4,:].mean(axis=0).numpy()
-    #  vecs = (headpt-footpt)[None,:].astype(np.float32)
-    #  bboxpoints = all_line[None, ...]
-    #  mags = np.sqrt((vecs*vecs).sum(axis=-1, keepdims=True))
-    #  mags[mags==0] = 1
-    #  vecs /= mags
-    #  perps = vecs[:,::-1].copy().astype(np.float32)
-    #  perps[:,0] *= -1
-    #  sidevecs = bboxpoints - footpt
-    #  scores = (perps[:,None,:] * sidevecs).sum(axis=-1)
-    #  maxes = scores.max(axis=-1)
-    #  mins = scores.min(axis=-1)
-    #  widths = (maxes-mins)[:,None]
-    #  cxy = footpt + perps*((maxes+mins)*0.5)[:,None]
-    #  scores = (vecs[:,None,:] * sidevecs).sum(axis=-1)
-    #  maxes = scores.max(axis=-1)
-    #  mins = scores.min(axis=-1)
-    #  maxes[maxes<0] = 0
-    #  mins[mins>0] = 0
-    #  heights = (maxes - mins)[:,None]
-    #  cxy += (0.5*(maxes+mins))[:,None]*vecs
-    #  angles = np.arctan2(perps[...,1], perps[...,0])
-    #  angles = angles + np.pi
-    #  re_rbbox.append([cxy[0][0], cxy[0][1], widths[0][0],
-    #  heights[0][0], angles[0]])
-    #  boxes = torch.Tensor(np.array(re_rbbox))
-    #  #angles = (angles/np.pi*180)+ 90
-    #  #breakpoint()
-    #  #boxes = self.corner2rbox(poly_boxes)
-
-
-#  def get_linepnts(points):
-#  point0 = points[0].astype(int)
-#  point1 = points[1].astype(int)
-#  point2 = points[2].astype(int)
-#  point3 = points[3].astype(int)
-#  all_line = []
-#  line1  = get_line(point0,point1)
-#  line2  = get_line(point1,point2)
-#  line3  = get_line(point2,point3)
-#  line4  = get_line(point3,point0)
-#  all_line = line1+ line2+ line3+ line4
-#  all_line = np.array(line1+ line2+ line3+ line4)
-#  all_line[:,0],all_line[:,1] = all_line[:,1], all_line[:,0]
-#  return all_line
-# @register_box_converter(RotatedBoxes, QuadriBoxes, force=True)
-# def rbox2qbox(boxes: Tensor) -> Tensor:
-#     """copy from mmrotate/structures/bbox/box_converters.py Convert rotated
-#     boxes to quadrilateral boxes.
-
-#     Args:
-#         boxes (Tensor): Rotated box tensor with shape of (..., 5).
-#     Returns:
-#         Tensor: Quadrilateral box tensor with shape of (..., 8).
-#     """
-#     centerx, centery, w, h, theta = torch.split(boxes, (1, 1, 1, 1, 1), dim=-1)
-#     # cos_value, sin_value = torch.cos(theta), torch.sin(theta)
-#     cosa = torch.cos(theta)
-#     sina = torch.sin(theta)
-
-#     print(theta, theta*180/np.pi)
-
-#     wx, wy = w / 2 * cosa, w / 2 * sina
-#     hx, hy = -h / 2 * sina, h / 2 * cosa
-#     p1x, p1y = centerx - wx - hx, centery - wy - hy
-#     p2x, p2y = centerx + wx - hx, centery + wy - hy
-#     p3x, p3y = centerx + wx + hx, centery + wy + hy
-#     p4x, p4y = centerx - wx + hx, centery - wy + hy
-#     return torch.stack([p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y], dim=-1)
 
 
 @register_box_converter(RotatedBoxes, QuadriBoxes, force=True)
@@ -314,13 +237,13 @@ def qbox2rbox(boxes: Tensor) -> Tensor:
     for pts in points:
 
         # calculate the center of the line
-        x1,y1 = pts[0]
-        x2,y2 = pts[1]
+        x1, y1 = pts[0]
+        x2, y2 = pts[1]
 
-        theta = np.arctan2(y2-y1, x2-x1)
+        theta = np.arctan2(y2 - y1, x2 - x1)
 
-        w = np.sqrt((x2-x1)**2 + (y2-y1)**2)
-        h = np.sqrt((pts[2][0]-pts[1][0])**2 + (pts[2][1]-pts[1][1])**2)
+        w = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        h = np.sqrt((pts[2][0] - pts[1][0])**2 + (pts[2][1] - pts[1][1])**2)
 
         (x, y), (w1, h1), angle = cv2.minAreaRect(pts)
         # assert np.abs((angle / 180 * np.pi) - theta%(np.pi/2)) < 1e-4
@@ -328,7 +251,6 @@ def qbox2rbox(boxes: Tensor) -> Tensor:
         assert np.abs(h - w1) < 1e-2 or np.abs(h - h1) < 1e-2
 
         rboxes.append([x, y, w, h, theta])
-
 
     rboxes = boxes.new_tensor(rboxes)
     return rboxes.view(*original_shape, 5)

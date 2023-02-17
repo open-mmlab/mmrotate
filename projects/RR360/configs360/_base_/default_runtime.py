@@ -1,4 +1,3 @@
-
 default_scope = 'mmrotate'
 
 default_hooks = dict(
@@ -6,16 +5,20 @@ default_hooks = dict(
     logger=dict(type='LoggerHook', interval=5),
     param_scheduler=dict(type='ParamSchedulerHook'),
     # checkpoint=dict(type='CheckpointHook', interval=1),
-    checkpoint=dict(type='CheckpointHook', interval=4, save_best=[
-                    'dota/AP50'], rule='greater', max_keep_ckpts=1),
+    checkpoint=dict(
+        type='CheckpointHook',
+        interval=4,
+        save_best=['dota/AP50'],
+        rule='greater',
+        max_keep_ckpts=1),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='mmdet.DetVisualizationHook'))
 
-vis_backends = [dict(type='LocalVisBackend'),
-                # dict(type='WandbVisBackend',
-                #      init_kwargs=dict(project='trbox'))
-                ]
-
+vis_backends = [
+    dict(type='LocalVisBackend'),
+    # dict(type='WandbVisBackend',
+    #      init_kwargs=dict(project='trbox'))
+]
 
 env_cfg = dict(
     cudnn_benchmark=False,
@@ -31,11 +34,13 @@ log_level = 'INFO'
 load_from = None
 resume = False
 
-custom_imports = dict(imports=[
-    # 'mmcls.models',
-    'projects.RR360.visualization',
-    'projects.RR360.structures',
-    'projects.RR360.datasets.transforms',
-    'projects.RR360.evaluation',
-    'projects.RR360.models'
-    ], allow_failed_imports=False)
+custom_imports = dict(
+    imports=[
+        # 'mmcls.models',
+        'projects.RR360.visualization',
+        'projects.RR360.structures',
+        'projects.RR360.datasets.transforms',
+        'projects.RR360.evaluation',
+        'projects.RR360.models'
+    ],
+    allow_failed_imports=False)

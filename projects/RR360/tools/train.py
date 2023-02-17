@@ -1,12 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import sys
-
-from projects.RR360.structures.bbox import RotatedBoxes
-import mmrotate.structures
-mmrotate.structures.bbox.RotatedBoxes = RotatedBoxes
-# sys.modules['mmrotate.structures.bbox'].RotatedBoxes = RotatedBoxes
-
-
 import argparse
 import logging
 import os
@@ -17,12 +9,13 @@ from mmengine.config import Config, DictAction
 from mmengine.logging import print_log
 from mmengine.registry import RUNNERS
 from mmengine.runner import Runner
+from projects.RR360.structures.bbox import RotatedBoxes
 
-
-
-
+import mmrotate.structures
 from mmrotate.utils import register_all_modules
 
+mmrotate.structures.bbox.RotatedBoxes = RotatedBoxes
+# sys.modules['mmrotate.structures.bbox'].RotatedBoxes = RotatedBoxes
 
 
 def parse_args():
@@ -35,10 +28,7 @@ def parse_args():
         default=False,
         help='enable automatic-mixed-precision training')
     parser.add_argument(
-        '--d',
-        action='store_true',
-        default=False,
-        help='debug mode')
+        '--d', action='store_true', default=False, help='debug mode')
     parser.add_argument(
         '--auto-scale-lr',
         action='store_true',
@@ -95,7 +85,6 @@ def main():
         cfg.work_dir = osp.join(
             './work_dirs',
             osp.splitext(osp.relpath(args.config, 'projects'))[0])
-
 
     # enable automatic-mixed-precision training
     if args.amp is True:

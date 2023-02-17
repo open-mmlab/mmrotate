@@ -1,12 +1,14 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import Optional
 
+import numpy as np
 import torch
 import torch.nn as nn
-from torch import Tensor
-import numpy as np
-from mmrotate.registry import MODELS
 from mmdet.models.losses.utils import weighted_loss
+from torch import Tensor
+
+from mmrotate.registry import MODELS
+
 
 @weighted_loss
 def al1_loss(pred: Tensor, target: Tensor) -> Tensor:
@@ -24,16 +26,16 @@ def al1_loss(pred: Tensor, target: Tensor) -> Tensor:
 
     assert pred.size() == target.size()
 
-    pred = (pred + np.pi) % (2*np.pi) - np.pi
+    pred = (pred + np.pi) % (2 * np.pi) - np.pi
     assert pred.max() < np.pi
     assert pred.min() > -np.pi
     assert target.max() < np.pi
     assert target.min() > -np.pi
-    loss = torch.abs(pred-target)
-    loss = torch.where(loss > np.pi, 2 *
-                             np.pi-loss, loss)
+    loss = torch.abs(pred - target)
+    loss = torch.where(loss > np.pi, 2 * np.pi - loss, loss)
 
     return loss
+
 
 @MODELS.register_module()
 class AL1Loss(nn.Module):
@@ -81,6 +83,7 @@ class AL1Loss(nn.Module):
             pred, target, weight, reduction=reduction, avg_factor=avg_factor)
         return loss_bbox
 
+
 @weighted_loss
 def a1l1_loss(pred: Tensor, target: Tensor) -> Tensor:
     """AL1 loss.
@@ -95,22 +98,22 @@ def a1l1_loss(pred: Tensor, target: Tensor) -> Tensor:
     if target.numel() == 0:
         return pred.sum() * 0
 
-    loss_pred = torch.where((pred >= -np.pi) & (pred<np.pi), torch.abs(pred*0), torch.abs(pred))
-
+    loss_pred = torch.where((pred >= -np.pi) & (pred < np.pi),
+                            torch.abs(pred * 0), torch.abs(pred))
 
     assert pred.size() == target.size()
 
-    pred = (pred + np.pi) % (2*np.pi) - np.pi
+    pred = (pred + np.pi) % (2 * np.pi) - np.pi
 
     assert pred.max() < np.pi
     assert pred.min() > -np.pi
     assert target.max() < np.pi
     assert target.min() > -np.pi
-    loss = torch.abs(pred-target)
-    loss = torch.where(loss > np.pi, 2 *
-                             np.pi-loss, loss)
+    loss = torch.abs(pred - target)
+    loss = torch.where(loss > np.pi, 2 * np.pi - loss, loss)
 
-    return loss+loss_pred
+    return loss + loss_pred
+
 
 @MODELS.register_module()
 class A1L1Loss(nn.Module):

@@ -1,18 +1,18 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from numbers import Number
-from typing import List, Optional, Union
+from typing import Union
 
-import cv2
+# import cv2
 import mmcv
-import numpy as np
-from mmcv.transforms import BaseTransform
-from mmcv.transforms.utils import cache_randomness
-from mmdet.structures.bbox import BaseBoxes, get_box_type
-from mmdet.structures.mask import PolygonMasks
-from mmengine.utils import is_list_of
 
-from mmrotate.registry import TRANSFORMS
 from mmrotate.datasets.transforms import Rotate
+from mmrotate.registry import TRANSFORMS
+
+# import numpy as np
+# from mmcv.transforms import BaseTransform
+# from mmcv.transforms.utils import cache_randomness
+# from mmdet.structures.bbox import BaseBoxes, get_box_type
+# from mmdet.structures.mask import PolygonMasks
+# from mmengine.utils import is_list_of
 
 
 @TRANSFORMS.register_module()
@@ -77,9 +77,12 @@ class RotateAutoBound(Rotate):
             auto_bound=True,
             border_value=self.img_border_value,
             interpolation=self.interpolation)
-        results['img_shape_record'] = [[results['img_shape'][0],results['img_shape'][1]],[results['img'].shape[0],results['img'].shape[1]]]
-        results['img_shape'] = [results['img'].shape[0],
-                                results['img'].shape[1]]
+        results['img_shape_record'] = [[
+            results['img_shape'][0], results['img_shape'][1]
+        ], [results['img'].shape[0], results['img'].shape[1]]]
+        results['img_shape'] = [
+            results['img'].shape[0], results['img'].shape[1]
+        ]
 
     def _transform_bboxes(self, results: dict) -> None:
         """Rotate the bboxes."""
@@ -87,5 +90,6 @@ class RotateAutoBound(Rotate):
             return
         img_shape = results['img_shape']
         center = (img_shape[1] * 0.5, img_shape[0] * 0.5)
-        results['gt_bboxes'].rotate_auto_bound_(center, self.rotate_angle,results['img_shape_record'])
+        results['gt_bboxes'].rotate_auto_bound_(center, self.rotate_angle,
+                                                results['img_shape_record'])
         results['gt_bboxes'].clip_(img_shape)
