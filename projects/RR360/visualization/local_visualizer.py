@@ -136,18 +136,6 @@ class RR360LocalVisualizer(DetLocalVisualizer):
                         'edgecolor': 'none'
                     }])
 
-                # self.draw_texts(
-                #     angle_text,
-                #     pos+3*int(13 * scales[i]),
-                #     colors=text_colors[i],
-                #     font_sizes=int(13 * scales[i]),
-                #     bboxes=[{
-                #         'facecolor': 'black',
-                #         'alpha': 0.8,
-                #         'pad': 0.7,
-                #         'edgecolor': 'none'
-                #     }])
-
         if 'masks' in instances:
             labels = instances.labels
             masks = instances.masks
