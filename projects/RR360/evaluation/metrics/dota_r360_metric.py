@@ -353,9 +353,9 @@ class DOTAR360Metric(BaseMetric):
                 eval_results[
                     f'AP{int(iou_thr * 100):02d}H{self.angle_thr}'] = round(
                         mean_ap, 3)
-            eval_results[f'mAPH{self.angle_thr}'] = sum(mean_aps) / len(
+            eval_results[f'mAPH(T<{self.angle_thr})'] = sum(mean_aps) / len(
                 mean_aps)
-            eval_results.move_to_end(f'mAPH{self.angle_thr}', last=False)
+            eval_results.move_to_end(f'mAP(T<{self.angle_thr})', last=False)
         else:
             raise NotImplementedError
         return eval_results
