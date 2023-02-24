@@ -1,6 +1,8 @@
 # RR360(360 Rotated Rectangle Detection)
 
-本项目在ICDAR2019_MTD_HOQ上支持360度旋转矩形框目标检测
+本项目在TRR360D数据集上支持360度旋转矩形框目标检测
+
+![image](https://user-images.githubusercontent.com/25839884/221288868-1bb8c3e5-818c-4228-b2dc-8dcfd33e7025.png)
 
 # 环境配置
 
