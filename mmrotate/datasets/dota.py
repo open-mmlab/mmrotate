@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import glob
 import os.path as osp
-from typing import List, Tuple
+from typing import List
 
 from mmengine.dataset import BaseDataset
 
@@ -17,12 +17,10 @@ class DOTADataset(BaseDataset):
     it is the path of a folder containing XML files.
 
     Args:
-        img_shape (tuple[int]): The shape of images. Due to the huge size
-            of the remote sensing image, we will cut it into slices with
-            the same shape. Defaults to (1024, 1024).
         diff_thr (int): The difficulty threshold of ground truth. Bboxes
             with difficulty higher than it will be ignored. The range of this
             value should be non-negative integer. Defaults to 100.
+        img_suffix (str): The suffix of images. Defaults to 'png'.
     """
 
     METAINFO = {
@@ -40,11 +38,11 @@ class DOTADataset(BaseDataset):
     }
 
     def __init__(self,
-                 img_shape: Tuple[int, int] = (1024, 1024),
                  diff_thr: int = 100,
+                 img_suffix: str = 'png',
                  **kwargs) -> None:
-        self.img_shape = img_shape
         self.diff_thr = diff_thr
+        self.img_suffix = img_suffix
         super().__init__(**kwargs)
 
     def load_data_list(self) -> List[dict]:
@@ -58,7 +56,7 @@ class DOTADataset(BaseDataset):
         data_list = []
         if self.ann_file == '':
             img_files = glob.glob(
-                osp.join(self.data_prefix['img_path'], '*.png'))
+                osp.join(self.data_prefix['img_path'], f'*.{self.img_suffix}'))
             for img_path in img_files:
                 data_info = {}
                 data_info['img_path'] = img_path
@@ -66,8 +64,6 @@ class DOTADataset(BaseDataset):
                 data_info['file_name'] = img_name
                 img_id = img_name[:-4]
                 data_info['img_id'] = img_id
-                data_info['height'] = self.img_shape[0]
-                data_info['width'] = self.img_shape[1]
 
                 instance = dict(bbox=[], bbox_label=[], ignore_flag=0)
                 data_info['instances'] = [instance]
@@ -83,12 +79,10 @@ class DOTADataset(BaseDataset):
                 data_info = {}
                 img_id = osp.split(txt_file)[1][:-4]
                 data_info['img_id'] = img_id
-                img_name = img_id + '.png'
+                img_name = img_id + f'.{self.img_suffix}'
                 data_info['file_name'] = img_name
                 data_info['img_path'] = osp.join(self.data_prefix['img_path'],
                                                  img_name)
-                data_info['height'] = self.img_shape[0]
-                data_info['width'] = self.img_shape[1]
 
                 instances = []
                 with open(txt_file) as f:
