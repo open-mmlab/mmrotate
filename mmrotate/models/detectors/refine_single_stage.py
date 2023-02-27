@@ -1,6 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from collections import Sequence
-from typing import List, Tuple, Union
+from typing import List, Sequence, Tuple, Union
 
 from mmdet.models.detectors.base import BaseDetector
 from mmdet.models.utils import unpack_gt_instances
