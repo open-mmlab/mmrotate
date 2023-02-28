@@ -164,7 +164,7 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 - [x] [Oriented RepPoints](configs/oriented_reppoints/README.md) (CVPR'2022)
 - [x] [KFIoU](configs/kfiou/README.md) (ICLR'2023)
 - [x] [H2RBox](configs/h2rbox/README.md) (ICLR'2023)
-- [x] [PSC](configs/psc/README.md) (arXiv)
+- [x] [PSC](configs/psc/README.md) (CVPR'2023)
 - [x] [RTMDet](configs/rotated_rtmdet/README.md) (arXiv)
 
 </details>

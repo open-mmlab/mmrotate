@@ -146,7 +146,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 - [x] [Oriented RepPoints](configs/oriented_reppoints/README.md) (CVPR'2022)
 - [x] [KFIoU](configs/kfiou/README.md) (ICLR'2023)
 - [x] [H2RBox](configs/h2rbox/README.md) (ICLR'2023)
-- [x] [PSC](configs/psc/README.md) (arXiv)
+- [x] [PSC](configs/psc/README.md) (CVPR'2023)
 - [x] [RTMDet](configs/rotated_rtmdet/README.md) (arXiv)
 
 </details>
