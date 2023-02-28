@@ -29,11 +29,11 @@ HRSC
 ## Citation
 
 ```
-@misc{yu2023psc,
-author = {Yu, Yi and Da, Feipeng},
-title = {Phase-Shifting Coder: Predicting Accurate Orientation in Oriented Object Detection},
-booktitle = {Proceedings of IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-year = {2023},
-url = {https://arxiv.org/abs/2211.06368}
+@inproceedings{yu2023psc,
+    author = {Yu, Yi and Da, Feipeng},
+    title = {Phase-Shifting Coder: Predicting Accurate Orientation in Oriented Object Detection},
+    booktitle = {Proceedings of IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    year = {2023},
+    url = {https://arxiv.org/abs/2211.06368}
 }
 ```
