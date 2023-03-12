@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'DOTADataset'
-data_root = 'data/ICDAR2019_MTD_HOQ/'
+data_root = 'data/TRR360D/'
 file_client_args = dict(backend='disk')
 METAINFO = dict(classes=('table', ))
 
