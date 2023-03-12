@@ -20,8 +20,11 @@ pip install -v -e .
 
 ```shell
 cd $MMROTATE_HOME
-mkdir data
-git clone https://github.com/vansin/TRR360D.git data/TRR360D
+mkdir -p data/TRR360D
+# git clone https://github.com/vansin/TRR360D.git data/TRR360D
+wget https://openmmlab.vansin.top/datasets/ICDAR2019_MTD_HOQ.zip -O data/TRR360D/TRR360D.zip
+cd $MMROTATE_HOME/data/TRR360D
+unzip TRR360D.zip
 ```
 
 600 个训练图片，240个测试图片
