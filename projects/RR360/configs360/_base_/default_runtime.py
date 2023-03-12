@@ -41,6 +41,6 @@ custom_imports = dict(
         'projects.RR360.structures',
         'projects.RR360.datasets.transforms',
         'projects.RR360.evaluation',
-        'projects.RR360.models'
+        # 'projects.RR360.models'
     ],
     allow_failed_imports=False)
