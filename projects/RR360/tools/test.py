@@ -13,6 +13,7 @@ from projects.RR360.structures.bbox import RotatedBoxes
 import mmrotate.structures
 from mmrotate.utils import register_all_modules
 
+# TODO : Refactoring with registry build
 mmrotate.structures.bbox.RotatedBoxes = RotatedBoxes
 
 

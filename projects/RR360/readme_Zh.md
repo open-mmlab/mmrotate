@@ -74,3 +74,14 @@ python projects/RR360/tools/test.py \
     work_dirs/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt/rotated_rtmdet_s_l1-3x-ic19_pt.py \
     work_dirs/RR360/configs360/rotated_rtmdet_x3_r/rotated_rtmdet_s_l1-3x-ic19_pt/epoch_36.pth
 ```
+
+# TODO
+
+RotatedBoxes的r360的使用现在是通过以下不是很优雅的方式的实现的，未来将会使用注册器build的方式重构
+
+```
+from projects.RR360.structures.bbox import RotatedBoxes
+import mmrotate.structures
+# TODO : Refactoring with registry build
+mmrotate.structures.bbox.RotatedBoxes = RotatedBoxes
+```
