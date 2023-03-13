@@ -1,6 +1,6 @@
 # RR360(360 Rotated Rectangle Detection)
 
-本项目在TRR360D数据集上支持360度旋转矩形框目标检测
+本项目在[TRR360D](https://paperswithcode.com/dataset/trr360d)数据集上支持360度旋转矩形框目标检测
 
 ![image](https://user-images.githubusercontent.com/25839884/221288868-1bb8c3e5-818c-4228-b2dc-8dcfd33e7025.png)
 

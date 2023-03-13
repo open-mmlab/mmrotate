@@ -1,10 +1,10 @@
 # RR360(360 Rotated Rectangle Detection)
 
-This project supports 360-degree rotated rectangle detection on the TRR360D dataset.
+This project supports 360-degree rotated rectangle detection on the [TRR360D](https://paperswithcode.com/dataset/trr360d) dataset.
 
 ![image](https://user-images.githubusercontent.com/25839884/221288868-1bb8c3e5-818c-4228-b2dc-8dcfd33e7025.png)
 
-# 环境配置
+# Environment Setup
 
 ```shell
 # Assuming mmengine, mmcv 2.x, and mmdetection are already installed
@@ -14,9 +14,9 @@ export MMROTATE_HOME=$(pwd)
 pip install -v -e .
 ```
 
-# 数据集准备
+# Dataset Preparation
 
-## 数据集下载
+## Dataset Download
 
 ```shell
 cd $MMROTATE_HOME
