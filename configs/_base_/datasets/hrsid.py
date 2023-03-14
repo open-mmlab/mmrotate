@@ -12,7 +12,7 @@ train_pipeline = [
         poly2mask=False),
     dict(type='ConvertMask2BoxType', box_type='rbox'),
     dict(type='mmdet.Resize', scale=(800, 800), keep_ratio=True),
-    dict(type='FilterAnnotations', min_gt_bbox_wh=(1e-2, 1e-2)),
+    dict(type='mmdet.FilterAnnotations', min_gt_bbox_wh=(1e-2, 1e-2)),
     dict(
         type='mmdet.RandomFlip',
         prob=0.75,
