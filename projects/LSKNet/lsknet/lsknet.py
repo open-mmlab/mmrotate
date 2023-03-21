@@ -5,7 +5,7 @@ from mmcv.cnn.utils.weight_init import (constant_init, normal_init,
                                         trunc_normal_init)
 from mmrotate.models.builder import ROTATED_BACKBONES
 from mmcv.runner import BaseModule
-from timm.models.layers import DropPath, to_2tuple, trunc_normal_
+from mmcv.cnn.bricks import DropPath
 import math
 from functools import partial
 import warnings
@@ -30,7 +30,7 @@ class Mlp(BaseModule):
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
         self.fc1 = nn.Conv2d(in_features, hidden_features, 1)
-        self.dwconv = nn.Conv2d(hidden_features, hidden_features, 3, 1, 1, bias=True, groups=hidden_features)
+        self.dwconv = DWConv(hidden_features)
         self.act = act_layer()
         self.fc2 = nn.Conv2d(hidden_features, out_features, 1)
         self.drop = nn.Dropout(drop)
@@ -55,18 +55,18 @@ class LSKmodule(BaseModule):
     def __init__(self, dim, init_cfg=None):
         super(LSKmodule, self).__init__(init_cfg=init_cfg)
         self.conv0 = nn.Conv2d(dim, dim, 5, padding=2, groups=dim)
-        self.conv1 = nn.Conv2d(dim, dim, 7, stride=1, padding=9, groups=dim, dilation=3)
-        self.conv0_s = nn.Conv2d(dim, dim//2, 1)
-        self.conv1_s = nn.Conv2d(dim, dim//2, 1)
+        self.conv_spatial = nn.Conv2d(dim, dim, 7, stride=1, padding=9, groups=dim, dilation=3)
+        self.conv1 = nn.Conv2d(dim, dim//2, 1)
+        self.conv2 = nn.Conv2d(dim, dim//2, 1)
         self.conv_squeeze = nn.Conv2d(2, 2, 7, padding=3)
-        self.conv_m = nn.Conv2d(dim//2, dim, 1)
+        self.conv = nn.Conv2d(dim//2, dim, 1)
 
     def forward(self, x):   
         attn1 = self.conv0(x)
-        attn2 = self.conv1(attn1)
+        attn2 = self.conv_spatial(attn1)
 
-        attn1 = self.conv0_s(attn1)
-        attn2 = self.conv1_s(attn2)
+        attn1 = self.conv1(attn1)
+        attn2 = self.conv2(attn2)
         
         attn = torch.cat([attn1, attn2], dim=1)
         avg_attn = torch.mean(attn, dim=1, keepdim=True)
@@ -74,7 +74,7 @@ class LSKmodule(BaseModule):
         agg = torch.cat([avg_attn, max_attn], dim=1)
         sig = self.conv_squeeze(agg).sigmoid()
         attn = attn1 * sig[:,0,:,:].unsqueeze(1) + attn2 * sig[:,1,:,:].unsqueeze(1)
-        attn = self.conv_m(attn)
+        attn = self.conv(attn)
         return x * attn
 
 
@@ -157,7 +157,7 @@ class OverlapPatchEmbed(BaseModule):
     """
     def __init__(self, patch_size=7, stride=4, in_chans=3, embed_dim=768, norm_cfg=None, init_cfg=None):
         super(OverlapPatchEmbed, self).__init__(init_cfg=init_cfg)
-        patch_size = to_2tuple(patch_size)
+        patch_size = (patch_size, patch_size)
         self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=stride,
                               padding=(patch_size[0] // 2, patch_size[1] // 2))
         if norm_cfg:
@@ -263,7 +263,7 @@ class LSKNet(BaseModule):
 
     @torch.jit.ignore
     def no_weight_decay(self):
-        return {'pos_embed1', 'pos_embed2', 'pos_embed3', 'pos_embed4', 'cls_token'}  # has pos_embed may be better
+        return {'pos_embed1', 'pos_embed2', 'pos_embed3', 'pos_embed4', 'cls_token'} 
 
     def get_classifier(self):
         return self.head
@@ -293,3 +293,15 @@ class LSKNet(BaseModule):
         return x
 
 
+class DWConv(nn.Module):
+    """Depth-wise convolution
+    Args: 
+        dim (int): In/out channel of the Depth-wise convolution.
+    """
+    def __init__(self, dim=768):
+        super(DWConv, self).__init__()
+        self.dwconv = nn.Conv2d(dim, dim, 3, 1, 1, bias=True, groups=dim)
+
+    def forward(self, x):
+        x = self.dwconv(x)
+        return x
