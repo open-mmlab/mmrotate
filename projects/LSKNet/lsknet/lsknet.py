@@ -53,7 +53,7 @@ class LSKmodule(BaseModule):
             Default: None.
     """
     def __init__(self, dim, init_cfg=None):
-        super(LSKmodule, self).__init__(nit_cfg=init_cfg)
+        super(LSKmodule, self).__init__(init_cfg=init_cfg)
         self.conv0 = nn.Conv2d(dim, dim, 5, padding=2, groups=dim)
         self.conv1 = nn.Conv2d(dim, dim, 7, stride=1, padding=9, groups=dim, dilation=3)
         self.conv0_s = nn.Conv2d(dim, dim//2, 1)
