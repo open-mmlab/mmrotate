@@ -1,12 +1,12 @@
 # dataset settings
 dataset_type = 'DOTADataset'
 data_root = 'data/TRR360D/'
-file_client_args = dict(backend='disk')
+backend_args = None
 
 METAINFO = dict(classes=('table', ))
 
 train_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
@@ -17,7 +17,7 @@ train_pipeline = [
     dict(type='mmdet.PackDetInputs')
 ]
 val_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     # avoid bboxes being resized
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
@@ -28,7 +28,7 @@ val_pipeline = [
                    'scale_factor'))
 ]
 test_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     dict(
         type='mmdet.PackDetInputs',
@@ -49,7 +49,8 @@ train_dataloader = dict(
         data_prefix=dict(img_path='img_train_obbox/'),
         img_shape=(1024, 1024),
         filter_cfg=dict(filter_empty_gt=True),
-        pipeline=train_pipeline))
+        pipeline=train_pipeline,
+        backend_args=backend_args))
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -66,7 +67,8 @@ val_dataloader = dict(
         # data_prefix=dict(img_path='img_test_obbox/'),
         img_shape=(1024, 1024),
         test_mode=True,
-        pipeline=val_pipeline))
+        pipeline=val_pipeline,
+        backend_args=backend_args))
 test_dataloader = val_dataloader
 
 val_evaluator = [
@@ -100,7 +102,8 @@ test_evaluator = [
 #         data_prefix=dict(img_path='test/images/'),
 #         img_shape=(1024, 1024),
 #         test_mode=True,
-#         pipeline=test_pipeline))
+#         pipeline=test_pipeline,
+#         backend_args=backend_args))
 # test_evaluator = dict(
 #     type='DOTAMetric',
 #     format_only=True,

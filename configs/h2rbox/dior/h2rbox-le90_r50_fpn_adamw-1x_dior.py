@@ -79,9 +79,7 @@ model = dict(
 
 # load hbox annotations
 train_pipeline = [
-    dict(
-        type='mmdet.LoadImageFromFile',
-        file_client_args={{_base_.file_client_args}}),
+    dict(type='mmdet.LoadImageFromFile', backend_args={{_base_.backend_args}}),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     # Horizontal GTBox, (x,y,w,h,theta)
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),

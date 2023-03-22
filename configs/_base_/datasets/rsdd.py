@@ -1,10 +1,10 @@
 # dataset settings
 dataset_type = 'mmdet.CocoDataset'
 data_root = 'data/rsdd/'
-file_client_args = dict(backend='disk')
+backend_args = None
 
 train_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(
         type='mmdet.LoadAnnotations',
         with_bbox=True,
@@ -19,7 +19,7 @@ train_pipeline = [
     dict(type='mmdet.PackDetInputs')
 ]
 val_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(512, 512), keep_ratio=True),
     # avoid bboxes being resized
     dict(
@@ -34,7 +34,7 @@ val_pipeline = [
                    'scale_factor', 'instances'))
 ]
 test_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(512, 512), keep_ratio=True),
     dict(
         type='mmdet.PackDetInputs',
@@ -57,7 +57,8 @@ train_dataloader = dict(
         ann_file='ImageSets/train.json',
         data_prefix=dict(img='JPEGImages/'),
         filter_cfg=dict(filter_empty_gt=True),
-        pipeline=train_pipeline))
+        pipeline=train_pipeline,
+        backend_args=backend_args))
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -71,7 +72,8 @@ val_dataloader = dict(
         ann_file='ImageSets/test.json',
         data_prefix=dict(img='JPEGImages/'),
         test_mode=True,
-        pipeline=val_pipeline))
+        pipeline=val_pipeline,
+        backend_args=backend_args))
 test_dataloader = val_dataloader
 
 val_evaluator = dict(type='RotatedCocoMetric', metric='bbox')
