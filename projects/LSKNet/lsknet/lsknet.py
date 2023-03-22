@@ -11,7 +11,7 @@ from mmcv.cnn.utils.weight_init import (constant_init, normal_init,
 from mmcv.runner import BaseModule
 from torch.nn.modules.utils import _pair as to_2tuple
 
-from mmrotate.models.builder import ROTATED_BACKBONES
+from mmrotate.registry import MODELS
 
 
 class Mlp(BaseModule):
@@ -200,7 +200,7 @@ class OverlapPatchEmbed(BaseModule):
                  norm_cfg=None,
                  init_cfg=None):
         super(OverlapPatchEmbed, self).__init__(init_cfg=init_cfg)
-        patch_size = (patch_size, patch_size)
+        patch_size = to_2tuple(patch_size)
         self.proj = nn.Conv2d(
             in_chans,
             embed_dim,
@@ -228,20 +228,24 @@ class OverlapPatchEmbed(BaseModule):
         return x, H, W
 
 
-@ROTATED_BACKBONES.register_module()
+@MODELS.register_module()
 class LSKNet(BaseModule):
     """Large Selective Kernel Network.
-    A PyTorch implement of : `Large Selective Kernel Network for Remote Sensing Object Detection.
-    <https://arxiv.org/pdf/2303.09030.pdf>`_
+
+    A PyTorch implement of : `Large Selective Kernel Network for
+        Remote Sensing Object Detection.`
+        PDF: https://arxiv.org/pdf/2303.09030.pdf
     Inspiration from
     https://github.com/zcablii/Large-Selective-Kernel-Network
     Args:
         in_chans (int): The num of input channels. Defaults to 3.
-        embed_dims (List[int]): Embedding channels of each LSK block. Defaults to [64, 128, 256, 512]
+        embed_dims (List[int]): Embedding channels of each LSK block.
+            Defaults to [64, 128, 256, 512]
         mlp_ratios (List[int]): Mlp ratios. Defaults to [8, 8, 4, 4]
         drop_rate (float): Dropout rate after embedding. Defaults to 0.
         drop_path_rate (float): Stochastic depth rate. Defaults to 0.1.
-        depths (List[int]): Number of LSK block in each stage Defaults to [3, 4, 6, 3]
+        depths (List[int]): Number of LSK block in each stage.
+            Defaults to [3, 4, 6, 3]
         num_stages (int): Number of stages. Defaults to 4
         pretrained (bool): If the model weight is pretrained. Defaults to None,
         init_cfg (dict, optional): The Config for initialization.
