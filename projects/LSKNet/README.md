@@ -12,7 +12,6 @@ Recent research on remote sensing object detection has largely focused on improv
 Author: @Yuxuan Li.
 This project is an implementation of "Large Selective Kernel Network for Remote Sensing Object Detection" at: [https://arxiv.org/pdf/2303.09030.pdf](https://arxiv.org/pdf/2303.09030.pdf)
 
-LSKNet backbone code is placed under mmrotate/models/backbones/, and the train/test configure files are placed under configs/lsknet/
 
 ## Usage
 
