@@ -29,7 +29,7 @@ python tools/train.py projects/example_project/configs/lsk_t_fpn_1x_dota_le90.py
 In MMRotate's root directory, run the following command to test the model:
 
 ```bash
-python tools/test.py projects/example_project/configs/lsk_t_fpn_1x_dota_le90.py ${CHECKPOINT_PATH}
+python tools/test.py projects/LSKNet/configs/lsk_t_fpn_1x_dota_le90.py ${CHECKPOINT_PATH}
 ```
 
 ## Results
