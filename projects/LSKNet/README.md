@@ -27,7 +27,7 @@ python tools/train.py projects/example_project/configs/lsk_t_fpn_1x_dota_le90.py
 In MMRotate's root directory, run the following command to test the model:
 
 ```bash
-python tools/test.py projects/example_project/confsigs/lsk_t_fpn_1x_dota_le90.py ${CHECKPOINT_PATH}
+python tools/test.py projects/example_project/configs/lsk_t_fpn_1x_dota_le90.py ${CHECKPOINT_PATH}
 ```
 
 ## Results
@@ -45,12 +45,6 @@ DOTA1.0
 | LSKNet_S (1024,1024,200) | 81.64 | le90  |   1x    |    1*8     |            [lsk_s_fpn_1x_dota_le90](./configs/lsknet/lsk_s_fpn_1x_dota_le90.py.py)             |         [model](https://pan.baidu.com/s/1dYfSldDDWWlqRfljLlYhvA?pwd=v55f) \| [log](https://pan.baidu.com/s/1r6n5SZjEQvo5F1W2-ngkYQ?pwd=chxz)         |   |
 | LSKNet_S* (1024,1024,200) | 81.85 | le90  |   1x   |    1*8     |            [lsk_s_ema_fpn_1x_dota_le90](./configs/lsknet/lsk_s_ema_fpn_1x_dota_le90.py)             |         [model](https://pan.baidu.com/s/1lNjApvSjchrkRVURAm6PoA?pwd=ubd5) \| [log](https://pan.baidu.com/s/14qjg9EJo6Sq1eyJRhoJ1CQ?pwd=dhp7)         | EMA Finetune  |
 <!-- https://github.com/open-mmlab/mmdetection/tree/3.x/configs/rtmdet -->
-FAIR1M-1.0
-
-|         Model         |  mAP  | Angle | lr schd | Batch Size |                                                    Configs                                                     |                                                                                                                                                                              Download     | note                                                                                                                                                                         |
-| :----------------------: | :---: | :---: | :-----: | :------: | :------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------: |
-| [O-RCNN](https://arxiv.org/abs/2108.05699) (1024,1024,200) | 45.60 | le90  |   1x    |    1*8     |  [oriented_rcnn_r50_fpn_1x_fair_le90](./configs/oriented_rcnn/oriented_rcnn_r50_fpn_1x_fair_le90.py)  |      -   | Prev. Best |
-| LSKNet_S (1024,1024,200) | 47.87 | le90  |   1x    |    1*8     |            [lsk_s_fpn_1x_dota_le90](./configs/lsknet/lsk_s_fpn_1x_dota_le90.py)             |         [model](https://pan.baidu.com/s/1sXyi23PhVwpuMRRdwsIJlQ?pwd=izs8) \| [log](https://pan.baidu.com/s/1idHq3--oyaWK3GWYqd8brQ?pwd=zznm)         | |
 
 HRSC2016 
 
@@ -93,7 +87,7 @@ A project does not necessarily have to be finished in a single PR, but it's esse
 
     <!-- Each major object should contain a docstring, describing its functionality and arguments. If you have adapted the code from other open-source projects, don't forget to cite the source project in docstring and make sure your behavior is not against its license. Typically, we do not accept any code snippet under GPL license. [A Short Guide to Open Source Licenses](https://medium.com/nationwide-technology/a-short-guide-to-open-source-licenses-cf5b1c329edd) -->
 
-  - [ ] Test-time correctness
+  - [x] Test-time correctness
 
     <!-- If you are reproducing the result from a paper, make sure your model's inference-time performance matches that in the original paper. The weights usually could be obtained by simply renaming the keys in the official pre-trained weights. This test could be skipped though, if you are able to prove the training-time correctness and check the second milestone. -->
 

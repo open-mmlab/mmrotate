@@ -3,6 +3,8 @@ _base_ = [
     '../../../configs/_base_/default_runtime.py'
 ]
 
+custom_imports = dict(imports=['projects.LSKNet.lsknet'])
+
 angle_version = 'le90'
 gpu_number = 8
 # fp16 = dict(loss_scale='dynamic')
