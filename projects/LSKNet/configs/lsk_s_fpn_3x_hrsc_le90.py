@@ -1,5 +1,6 @@
 _base_ = [
-    '../../../configs/_base_/datasets/hrsc.py', '../../../configs/_base_/schedules/schedule_3x.py',
+    '../../../configs/_base_/datasets/hrsc.py',
+    '../../../configs/_base_/schedules/schedule_3x.py',
     '../../../configs/_base_/default_runtime.py'
 ]
 
@@ -15,8 +16,10 @@ model = dict(
         embed_dims=[64, 128, 320, 512],
         drop_rate=0.1,
         drop_path_rate=0.1,
-        depths=[2,2,4,2],
-        init_cfg=dict(type='Pretrained', checkpoint="/data/pretrained/lsk_s_backbone.pth.tar"),
+        depths=[2, 2, 4, 2],
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='/data/pretrained/lsk_s_backbone.pth.tar'),
         norm_cfg=dict(type='SyncBN', requires_grad=True)),
     neck=dict(
         type='FPN',
@@ -149,7 +152,6 @@ train_pipeline = [
     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
 ]
 
-
 data = dict(
     samples_per_gpu=2,
     workers_per_gpu=2,
@@ -160,7 +162,7 @@ data = dict(
 optimizer = dict(
     _delete_=True,
     type='AdamW',
-    lr=0.0004, 
+    lr=0.0004,
     betas=(0.9, 0.999),
     weight_decay=0.05)
 

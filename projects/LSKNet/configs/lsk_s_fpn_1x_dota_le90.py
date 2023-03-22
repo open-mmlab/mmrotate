@@ -1,5 +1,6 @@
 _base_ = [
-    '../../../configs/_base_/datasets/dotav1.py', '../../../configs/_base_/schedules/schedule_1x.py',
+    '../../../configs/_base_/datasets/dotav1.py',
+    '../../../configs/_base_/schedules/schedule_1x.py',
     '../../../configs/_base_/default_runtime.py'
 ]
 
@@ -15,8 +16,10 @@ model = dict(
         embed_dims=[64, 128, 320, 512],
         drop_rate=0.1,
         drop_path_rate=0.1,
-        depths=[2,2,4,2],
-        init_cfg=dict(type='Pretrained', checkpoint="/data/pretrained/lsk_s_backbone.pth.tar"),
+        depths=[2, 2, 4, 2],
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='/data/pretrained/lsk_s_backbone.pth.tar'),
         norm_cfg=dict(type='SyncBN', requires_grad=True)),
     neck=dict(
         type='FPN',
@@ -160,6 +163,6 @@ data = dict(
 optimizer = dict(
     _delete_=True,
     type='AdamW',
-    lr=0.0002, #/8*gpu_number,
+    lr=0.0002,  #/8*gpu_number,
     betas=(0.9, 0.999),
     weight_decay=0.05)
