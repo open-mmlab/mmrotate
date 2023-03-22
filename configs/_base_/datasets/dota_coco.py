@@ -80,7 +80,11 @@ val_dataloader = dict(
         backend_args=backend_args))
 test_dataloader = val_dataloader
 
-val_evaluator = dict(type='RotatedCocoMetric', metric='bbox', classwise=True, backend_args=backend_args)
+val_evaluator = dict(
+    type='RotatedCocoMetric',
+    metric='bbox',
+    classwise=True,
+    backend_args=backend_args)
 
 test_evaluator = val_evaluator
 
