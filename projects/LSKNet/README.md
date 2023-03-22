@@ -21,7 +21,7 @@ LSKNet backbone code is placed under mmrotate/models/backbones/, and the train/t
 In MMRotate's root directory, run the following command to train the model:
 
 ```bash
-python tools/train.py projects/example_project/configs/lsk_t_fpn_1x_dota_le90.py
+python tools/train.py projects/LSKNet/configs/lsk_t_fpn_1x_dota_le90.py
 ```
 
 ### Testing commands
