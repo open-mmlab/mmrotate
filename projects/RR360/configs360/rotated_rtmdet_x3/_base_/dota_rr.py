@@ -67,8 +67,7 @@ train_dataloader = dict(
             data_prefix=dict(img_path='img_train_obbox/'),
             img_shape=(1024, 1024),
             filter_cfg=dict(filter_empty_gt=True),
-            pipeline=train_pipeline,
-            backend_args=backend_args)))
+            pipeline=train_pipeline)))
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -85,8 +84,7 @@ val_dataloader = dict(
         # data_prefix=dict(img_path='img_test_obbox/'),
         img_shape=(1024, 1024),
         test_mode=True,
-        pipeline=val_pipeline,
-        backend_args=backend_args))
+        pipeline=val_pipeline))
 test_dataloader = val_dataloader
 
 val_evaluator = [
@@ -120,8 +118,7 @@ test_evaluator = [
 #         data_prefix=dict(img_path='test/images/'),
 #         img_shape=(1024, 1024),
 #         test_mode=True,
-#         pipeline=test_pipeline,
-#         backend_args=backend_args))
+#         pipeline=test_pipeline))
 # test_evaluator = dict(
 #     type='DOTAMetric',
 #     format_only=True,

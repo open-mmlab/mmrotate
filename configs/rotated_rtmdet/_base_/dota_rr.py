@@ -61,8 +61,7 @@ train_dataloader = dict(
         ann_file='trainval/annfiles/',
         data_prefix=dict(img_path='trainval/images/'),
         filter_cfg=dict(filter_empty_gt=True),
-        pipeline=train_pipeline,
-        backend_args=backend_args))
+        pipeline=train_pipeline))
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -75,8 +74,7 @@ val_dataloader = dict(
         ann_file='trainval/annfiles/',
         data_prefix=dict(img_path='trainval/images/'),
         test_mode=True,
-        pipeline=val_pipeline,
-        backend_args=backend_args))
+        pipeline=val_pipeline))
 test_dataloader = val_dataloader
 
 val_evaluator = dict(type='DOTAMetric', metric='mAP')
@@ -95,8 +93,7 @@ test_evaluator = val_evaluator
 #         data_root=data_root,
 #         data_prefix=dict(img_path='test/images/'),
 #         test_mode=True,
-#         pipeline=test_pipeline,
-#         backend_args=backend_args))
+#         pipeline=test_pipeline))
 # test_evaluator = dict(
 #     type='DOTAMetric',
 #     format_only=True,
