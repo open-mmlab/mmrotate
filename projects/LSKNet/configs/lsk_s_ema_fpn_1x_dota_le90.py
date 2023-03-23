@@ -1,7 +1,7 @@
 _base_ = [
-    '../../../configs/_base_/datasets/dota_ms.py',
-    '../../../configs/_base_/schedules/schedule_1x.py',
-    '../../../configs/_base_/default_runtime.py'
+    'mmrotate::_base_/datasets/dota_ms.py',
+    'mmrotate::_base_/schedules/schedule_1x.py',
+    'mmrotate::_base_/default_runtime.py'
 ]
 
 custom_imports = dict(imports=['projects.LSKNet.lsknet'])
@@ -149,6 +149,4 @@ optim_wrapper = dict(
         betas=(0.9, 0.999),
         weight_decay=0.05))
 
-custom_hooks = [
-    dict(type='ExpMomentumEMAHook', total_iter=8541 * 12, priority=49)
-]
+custom_hooks = [dict(type='EMAHook')]

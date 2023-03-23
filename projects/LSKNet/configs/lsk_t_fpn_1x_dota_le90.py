@@ -1,7 +1,7 @@
 _base_ = [
-    '../../../configs/_base_/datasets/dota_ms.py',
-    '../../../configs/_base_/schedules/schedule_1x.py',
-    '../../../configs/_base_/default_runtime.py'
+    'mmrotate::_base_/datasets/dota_ms.py',
+    'mmrotate::_base_/schedules/schedule_1x.py',
+    'mmrotate::_base_/default_runtime.py'
 ]
 
 custom_imports = dict(imports=['projects.LSKNet.lsknet'])
