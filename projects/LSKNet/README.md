@@ -32,18 +32,18 @@ python tools/test.py projects/LSKNet/configs/lsk_t_fpn_1x_dota_le90.py ${CHECKPO
 
 ## Results
 
-Imagenet 300-epoch pre-trained LSKNet-T backbone: [Download](https://pan.baidu.com/s/1CQHQBLR9UVW-7cxg7LB2Dg?pwd=84jd)
+Imagenet 300-epoch pre-trained LSKNet-T backbone: [Download](https://download.openmmlab.com/mmrotate/v1.0/lsknet/backbones/lsk_t_backbone-2ef8a593.pth)
 
-Imagenet 300-epoch pre-trained LSKNet-S backbone: [Download](https://pan.baidu.com/s/1o-Pq8k_7qcTgfTWiBve6uA?pwd=dm3w)
+Imagenet 300-epoch pre-trained LSKNet-S backbone: [Download](https://download.openmmlab.com/mmrotate/v1.0/lsknet/backbones/lsk_s_backbone-e9d2e551.pth)
 
 DOTA1.0
 
 |                           Model                            |  mAP  | Angle | lr schd | Batch Size |                                   Configs                                    |                                                               Download                                                               |     note     |
 | :--------------------------------------------------------: | :---: | :---: | :-----: | :--------: | :--------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------: | :----------: |
 | [RTMDet-l](https://arxiv.org/abs/2212.07784) (1024,1024,-) | 81.33 |   -   | 3x-ema  |     8      |                                      -                                       |                                                                  -                                                                   |  Prev. Best  |
-|                  LSKNet_T (1024,1024,200)                  | 81.37 | le90  |   1x    |    2\*8    |     [lsk_t_fpn_1x_dota_le90](./configs/lsknet/lsk_t_fpn_1x_dota_le90.py)     | [model](https://pan.baidu.com/s/1LtHb7ahPAcGJGPGfNo9EuQ?pwd=auu6) \| [log](https://pan.baidu.com/s/1PpC-Qu0dcDQ-iYM0kz5i5g?pwd=0sre) |              |
-|                  LSKNet_S (1024,1024,200)                  | 81.64 | le90  |   1x    |    1\*8    |   [lsk_s_fpn_1x_dota_le90](./configs/lsknet/lsk_s_fpn_1x_dota_le90.py.py)    | [model](https://pan.baidu.com/s/1dYfSldDDWWlqRfljLlYhvA?pwd=v55f) \| [log](https://pan.baidu.com/s/1r6n5SZjEQvo5F1W2-ngkYQ?pwd=chxz) |              |
-|                 LSKNet_S\* (1024,1024,200)                 | 81.85 | le90  |   1x    |    1\*8    | [lsk_s_ema_fpn_1x_dota_le90](./configs/lsknet/lsk_s_ema_fpn_1x_dota_le90.py) | [model](https://pan.baidu.com/s/1lNjApvSjchrkRVURAm6PoA?pwd=ubd5) \| [log](https://pan.baidu.com/s/14qjg9EJo6Sq1eyJRhoJ1CQ?pwd=dhp7) | EMA Finetune |
+|                  LSKNet_T (1024,1024,200)                  | 81.37 | le90  |   1x    |    2\*8    |     [lsk_t_fpn_1x_dota_le90](./configs/lsknet/lsk_t_fpn_1x_dota_le90.py)     | [model](https://download.openmmlab.com/mmrotate/v1.0/lsknet/lsk_t_fpn_1x_dota_le90/lsk_t_fpn_1x_dota_le90_20230206-3ccee254.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/lsknet/lsk_t_fpn_1x_dota_le90/lsk_t_fpn_1x_dota_le90_20230206.log) |              |
+|                  LSKNet_S (1024,1024,200)                  | 81.64 | le90  |   1x    |    1\*8    |   [lsk_s_fpn_1x_dota_le90](./configs/lsknet/lsk_s_fpn_1x_dota_le90.py)    | [model](https://download.openmmlab.com/mmrotate/v1.0/lsknet/lsk_s_fpn_1x_dota_le90/lsk_t_fpn_1x_dota_le90_20230116-99749191.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/lsknet/lsk_s_fpn_1x_dota_le90/lsk_t_fpn_1x_dota_le90_20230116.log) |              |
+|                 LSKNet_S\* (1024,1024,200)                 | 81.85 | le90  |   1x    |    1\*8    | [lsk_s_ema_fpn_1x_dota_le90](./configs/lsknet/lsk_s_ema_fpn_1x_dota_le90.py) | [model](https://download.openmmlab.com/mmrotate/v1.0/lsknet/lsk_s_ema_fpn_1x_dota_le90/lsk_s_ema_fpn_1x_dota_le90_20230212-30ed4041.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/lsknet/lsk_s_ema_fpn_1x_dota_le90/lsk_s_ema_fpn_1x_dota_le90_20230212.log) | EMA Finetune |
 
 <!-- https://github.com/open-mmlab/mmdetection/tree/3.x/configs/rtmdet -->
 
@@ -53,7 +53,7 @@ HRSC2016
 | :------------------------------------------: | :-----: | :-----: | :---: | :-----: | :--------: | :-------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------: | :--------: |
 | [RTMDet-l](https://arxiv.org/abs/2212.07784) |  90.60  |  97.10  | le90  |   3x    |     -      |                                         -                                         |                                                                  -                                                                   | Prev. Best |
 |  [ReDet](https://arxiv.org/abs/2103.07733)   |  90.46  |  97.63  | le90  |   3x    |    2\*4    | [redet_re50_refpn_3x_hrsc_le90](./configs/redet/redet_re50_refpn_3x_hrsc_le90.py) |                                                                  -                                                                   | Prev. Best |
-|                   LSKNet_S                   |  90.65  |  98.46  | le90  |   3x    |    1\*8    |       [lsk_s_fpn_3x_hrsc_le90](./configs/lsknet/lsk_s_fpn_3x_hrsc_le90.py)        | [model](https://pan.baidu.com/s/1jRLb5m6tGab6BF1ky1JP6A?pwd=bosr) \| [log](https://pan.baidu.com/s/1f0i5oGn3QseKQLAGMcy4_w?pwd=kn0x) |            |
+|                   LSKNet_S                   |  90.65  |  98.46  | le90  |   3x    |    1\*8    |       [lsk_s_fpn_3x_hrsc_le90](./configs/lsknet/lsk_s_fpn_3x_hrsc_le90.py)        | [model](https://download.openmmlab.com/mmrotate/v1.0/lsknet/lsk_s_fpn_3x_hrsc_le90/lsk_s_fpn_3x_hrsc_le90_20230205-4a4a39ce.pth) \| [log](https://download.openmmlab.com/mmrotate/v1.0/lsknet/lsk_s_fpn_3x_hrsc_le90/lsk_s_fpn_3x_hrsc_le90_20230205-4a4a39ce.pth) |            |
 
 ## Citation
 
