@@ -82,7 +82,8 @@ def fake_rbbox_overlaps(bboxes1: RotatedBoxes,
         assert rows == cols
 
     if rows * cols == 0:
-        return bboxes1.new(rows, 1) if is_aligned else bboxes1.new(rows, cols)
+        return bboxes1.tensor.new(
+            rows, 1) if is_aligned else bboxes1.tensor.new(rows, cols)
 
     # convert rbb to minimum circumscribed hbb in <cx, cy, w, h, t> format.
     fake_rbboxes1 = bboxes1.convert_to('hbox').convert_to('rbox')
