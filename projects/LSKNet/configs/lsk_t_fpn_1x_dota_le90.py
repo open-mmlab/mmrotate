@@ -24,7 +24,7 @@ model = dict(
         depths=[3, 3, 5, 2],
         init_cfg=dict(
             type='Pretrained',
-            checkpoint='data/pretrained/lsk_t_backbone.pth.tar'),
+            checkpoint='https://download.openmmlab.com/mmrotate/v1.0/lsknet/backbones/lsk_t_backbone-2ef8a593.pth'),
         norm_cfg=dict(type='SyncBN', requires_grad=True)),
     neck=dict(
         type='FPN',
