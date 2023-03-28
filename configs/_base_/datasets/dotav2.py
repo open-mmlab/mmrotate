@@ -1,10 +1,10 @@
 # dataset settings
 dataset_type = 'DOTAv2Dataset'
 data_root = 'data/split_ss_dota2_0/'
-file_client_args = dict(backend='disk')
+backend_args = None
 
 train_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
@@ -15,7 +15,7 @@ train_pipeline = [
     dict(type='mmdet.PackDetInputs')
 ]
 val_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     # avoid bboxes being resized
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
@@ -26,7 +26,7 @@ val_pipeline = [
                    'scale_factor'))
 ]
 test_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(1024, 1024), keep_ratio=True),
     dict(
         type='mmdet.PackDetInputs',

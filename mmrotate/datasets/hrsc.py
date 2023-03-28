@@ -7,7 +7,7 @@ import mmcv
 import numpy as np
 import torch
 from mmengine.dataset import BaseDataset
-from mmengine.fileio import FileClient, list_from_file
+from mmengine.fileio import get, get_local_path, list_from_file
 
 from mmrotate.registry import DATASETS
 from mmrotate.structures.bbox import rbox2qbox
@@ -29,9 +29,10 @@ class HRSCDataset(BaseDataset):
             Defaults to 'Annotations'.
         classwise (bool): Whether to use all 31 classes or only one class.
             Defaults to False.
-        file_client_args (dict): Arguments to instantiate a FileClient.
-            See :class:`mmengine.fileio.FileClient` for details.
-            Defaults to ``dict(backend='disk')``.
+        file_client_args (dict): Arguments to instantiate the
+            corresponding backend in mmdet <= 3.0.0rc6. Defaults to None.
+        backend_args (dict, optional): Arguments to instantiate the
+            corresponding backend. Defaults to None.
     """
 
     METAINFO = {
@@ -64,13 +65,19 @@ class HRSCDataset(BaseDataset):
                  img_subdir: str = 'AllImages',
                  ann_subdir: str = 'Annotations',
                  classwise: bool = False,
-                 file_client_args: dict = dict(backend='disk'),
+                 file_client_args: dict = None,
+                 backend_args: dict = None,
                  **kwargs) -> None:
         self.img_subdir = img_subdir
         self.ann_subdir = ann_subdir
         self.classwise = classwise
-        self.file_client_args = file_client_args
-        self.file_client = FileClient(**self.file_client_args)
+        self.backend_args = backend_args
+        if file_client_args is not None:
+            raise RuntimeError(
+                'The `file_client_args` is deprecated, '
+                'please use `backend_args` instead, please refer to'
+                'https://github.com/open-mmlab/mmdetection/blob/dev-1.x/configs/_base_/datasets/coco_detection.py'  # noqa: E501
+            )
         super().__init__(**kwargs)
 
     @property
@@ -98,8 +105,7 @@ class HRSCDataset(BaseDataset):
             ]
 
         data_list = []
-        img_ids = list_from_file(
-            self.ann_file, file_client_args=self.file_client_args)
+        img_ids = list_from_file(self.ann_file, backend_args=self.backend_args)
         for img_id in img_ids:
             file_name = osp.join(self.img_subdir, f'{img_id}.bmp')
             xml_path = osp.join(self.sub_data_root, self.ann_subdir,
@@ -139,15 +145,16 @@ class HRSCDataset(BaseDataset):
         data_info['xml_path'] = img_info['xml_path']
 
         # deal with xml file
-        with self.file_client.get_local_path(
-                img_info['xml_path']) as local_path:
+        with get_local_path(
+                img_info['xml_path'],
+                backend_args=self.backend_args) as local_path:
             raw_ann_info = ET.parse(local_path)
         root = raw_ann_info.getroot()
 
         width = int(root.find('Img_SizeWidth').text)
         height = int(root.find('Img_SizeWidth').text)
         if width is None or height is None:
-            img_bytes = self.file_client.get(img_path)
+            img_bytes = get(img_path, backend_args=self.backend_args)
             img = mmcv.imfrombytes(img_bytes, backend='cv2')
             width, height = img.shape[:2]
             del img, img_bytes
