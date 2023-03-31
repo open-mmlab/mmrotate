@@ -18,7 +18,8 @@ from mmdet.apis import init_random_seed, set_random_seed
 from mmrotate.apis import train_detector
 from mmrotate.datasets import build_dataset
 from mmrotate.models import build_detector
-from mmrotate.utils import collect_env, get_root_logger, setup_multi_processes
+from mmrotate.utils import (collect_env, get_device, get_root_logger,
+                            setup_multi_processes)
 
 
 def parse_args():
@@ -178,6 +179,7 @@ def main():
             CLASSES=datasets[0].CLASSES)
     # add an attribute for visualization convenience
     model.CLASSES = datasets[0].CLASSES
+    cfg.device = get_device()
     train_detector(
         model,
         datasets,
