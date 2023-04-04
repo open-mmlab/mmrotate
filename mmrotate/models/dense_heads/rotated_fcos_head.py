@@ -13,12 +13,12 @@ from torch import Tensor
 
 from mmrotate.models.dense_heads.base_angle_dense_head import \
     BaseAngleDenseHead
-from mmrotate.registry import TASK_UTILS
+from mmrotate.registry import MODELS, TASK_UTILS
 
 INF = 1e8
 
 
-# @MODELS.register_module()
+@MODELS.register_module()
 class RotatedFCOSHead(BaseAngleDenseHead, FCOSHead):
     """Anchor-free head used in `FCOS <https://arxiv.org/abs/1904.01355>`_.
 
