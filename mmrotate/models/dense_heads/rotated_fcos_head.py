@@ -1,23 +1,19 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import copy
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import torch
 import torch.nn as nn
 from mmcv.cnn import Scale
 from mmdet.models.dense_heads import FCOSHead
-from mmdet.models.utils import (filter_scores_and_topk, multi_apply,
-                                select_single_mlvl)
-from mmdet.structures.bbox import cat_boxes
+from mmdet.models.utils import multi_apply
 from mmdet.utils import (ConfigType, InstanceList, OptConfigType,
                          OptInstanceList, reduce_mean)
-from mmengine import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
 
-from mmrotate.registry import MODELS, TASK_UTILS
-from mmrotate.structures import RotatedBoxes
-from mmrotate.models.dense_heads.base_angle_dense_head import BaseAngleDenseHead
+from mmrotate.models.dense_heads.base_angle_dense_head import \
+    BaseAngleDenseHead
+from mmrotate.registry import TASK_UTILS
 
 INF = 1e8
 
@@ -436,10 +432,3 @@ class RotatedFCOSHead(BaseAngleDenseHead, FCOSHead):
         angle_targets = gt_angle[range(num_points), min_area_inds]
 
         return labels, bbox_targets, angle_targets
-
-
-if __name__=='__main__':
-    from mmrotate.utils import register_all_modules
-    register_all_modules()
-    fcos_head = RotatedFCOSHead(num_classes=2, in_channels=256, feat_channels=256, strides=[8, 16, 32, 64, 128], angle_version='le90')
-    print(RotatedFCOSHead.mro())

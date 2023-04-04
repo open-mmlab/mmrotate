@@ -6,9 +6,7 @@ from mmcv.cnn import ConvModule, Scale, is_norm
 from mmdet.models import inverse_sigmoid
 from mmdet.models.dense_heads import RTMDetHead
 from mmdet.models.task_modules import anchor_inside_flags
-from mmdet.models.utils import (multi_apply,
-                                sigmoid_geometric_mean,
-                                unmap)
+from mmdet.models.utils import multi_apply, sigmoid_geometric_mean, unmap
 from mmdet.structures.bbox import bbox_cxcywh_to_xyxy, distance2bbox
 from mmdet.utils import (ConfigType, InstanceList, OptConfigType,
                          OptInstanceList, reduce_mean)
@@ -16,9 +14,10 @@ from mmengine.model import bias_init_with_prob, constant_init, normal_init
 from mmengine.structures import InstanceData
 from torch import Tensor, nn
 
+from mmrotate.models.dense_heads.base_angle_dense_head import \
+    BaseAngleDenseHead
 from mmrotate.registry import MODELS
 from mmrotate.structures import distance2obb
-from mmrotate.models.dense_heads.base_angle_dense_head import BaseAngleDenseHead
 
 
 @MODELS.register_module()

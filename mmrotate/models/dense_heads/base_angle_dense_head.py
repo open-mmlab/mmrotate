@@ -1,3 +1,4 @@
+# Copyright (c) OpenMMLab. All rights reserved.
 import copy
 from typing import List, Optional
 
@@ -5,22 +6,19 @@ import torch
 from mmdet.models.dense_heads.base_dense_head import BaseDenseHead
 from mmdet.models.utils import filter_scores_and_topk, select_single_mlvl
 from mmdet.structures.bbox import cat_boxes
-from mmdet.utils import InstanceList
+from mmdet.utils import ConfigType, InstanceList, OptConfigType
 from mmengine import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
-from mmdet.utils import (ConfigType, InstanceList, OptConfigType,
-                         OptInstanceList, reduce_mean)
 
-from mmrotate.structures import RotatedBoxes
 from mmrotate.registry import MODELS, TASK_UTILS
+from mmrotate.structures import RotatedBoxes
 
 
 @MODELS.register_module()
 class BaseAngleDenseHead(BaseDenseHead):
-    """
-    Base class for dense heads with angle.
-    Commonly, BaseAngleDenseHead will be used with other head.
+    """Base class for dense heads with angle. Commonly, BaseAngleDenseHead will
+    be used with other head.
 
     Args:
         angle_version (str, optional): The version of angle. Defaults to
@@ -38,7 +36,8 @@ class BaseAngleDenseHead(BaseDenseHead):
                  use_hbbox_loss: bool = False,
                  angle_coder: ConfigType = dict(type='PseudoAngleCoder'),
                  loss_angle: OptConfigType = None,
-                 *args, **kwargs):
+                 *args,
+                 **kwargs):
         self.angle_version = angle_version
         self.use_hbbox_loss = use_hbbox_loss
         self.angle_coder = TASK_UTILS.build(angle_coder)
@@ -277,9 +276,11 @@ class BaseAngleDenseHead(BaseDenseHead):
         decode_with_angle = cfg.get('decode_with_angle', True)
         if decode_with_angle:
             bbox_pred = torch.cat([bbox_pred, decoded_angle], dim=-1)
-            bboxes = self.bbox_coder.decode(priors, bbox_pred, max_shape=img_shape)
+            bboxes = self.bbox_coder.decode(
+                priors, bbox_pred, max_shape=img_shape)
         else:
-            bboxes = self.bbox_coder.decode(priors, bbox_pred, max_shape=img_shape)
+            bboxes = self.bbox_coder.decode(
+                priors, bbox_pred, max_shape=img_shape)
             bboxes = torch.cat([bboxes[..., :4], decoded_angle], dim=-1)
 
         results = InstanceData()
