@@ -41,17 +41,18 @@ class BaseAngleDenseHead(BaseDenseHead):
         self.angle_version = angle_version
         self.use_hbbox_loss = use_hbbox_loss
         self.angle_coder = TASK_UTILS.build(angle_coder)
+        # Commonly, BaseAngleDenseHead will be used with other head.
+        # So we call super here to init the other head.
+        # For example, RotatedFCOSHead will used with FCOSHead,
+        # so super here will call the init function of FCOSHead.
+        super().__init__(*args, **kwargs)
+
         if loss_angle is not None:
             self.loss_angle = MODELS.build(loss_angle)
         else:
             self.loss_angle = None
         if self.use_hbbox_loss:
             assert self.loss_angle is not None
-        # Commonly, BaseAngleDenseHead will be used with other head.
-        # So we call super here to init the other head.
-        # For example, RotatedFCOSHead will used with FCOSHead,
-        # so super here will call the init function of FCOSHead.
-        super().__init__(*args, **kwargs)
 
     def predict_by_feat(self,
                         cls_scores: List[Tensor],
