@@ -49,9 +49,9 @@ class RotatedRTMDetHead(BaseAngleDenseHead, RTMDetHead):
         self.is_scale_angle = scale_angle
         super().__init__(
             # Arguments of RTMDetHead
-            num_classes,
-            in_channels,
-            # useless, but error
+            num_classes=num_classes,
+            in_channels=in_channels,
+            # add scope to prevent error
             loss_centerness=dict(
                 type='mmdet.CrossEntropyLoss',
                 use_sigmoid=True,
@@ -481,8 +481,8 @@ class RotatedRTMDetSepBNHead(RotatedRTMDetHead):
         assert scale_angle is False, \
             'scale_angle does not support in RotatedRTMDetSepBNHead'
         super().__init__(
-            num_classes,
-            in_channels,
+            num_classes=num_classes,
+            in_channels=in_channels,
             norm_cfg=norm_cfg,
             act_cfg=act_cfg,
             pred_kernel_size=pred_kernel_size,
