@@ -1,10 +1,10 @@
 # dataset settings
 dataset_type = 'HRSCDataset'
 data_root = 'data/hrsc/'
-file_client_args = dict(backend='disk')
+backend_args = None
 
 train_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
     dict(type='ConvertBoxType', box_type_mapping=dict(gt_bboxes='rbox')),
     dict(type='mmdet.Resize', scale=(800, 512), keep_ratio=True),
@@ -15,7 +15,7 @@ train_pipeline = [
     dict(type='mmdet.PackDetInputs')
 ]
 val_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(800, 512), keep_ratio=True),
     # avoid bboxes being resized
     dict(type='mmdet.LoadAnnotations', with_bbox=True, box_type='qbox'),
@@ -26,7 +26,7 @@ val_pipeline = [
                    'scale_factor'))
 ]
 test_pipeline = [
-    dict(type='mmdet.LoadImageFromFile', file_client_args=file_client_args),
+    dict(type='mmdet.LoadImageFromFile', backend_args=backend_args),
     dict(type='mmdet.Resize', scale=(800, 512), keep_ratio=True),
     dict(
         type='mmdet.PackDetInputs',
@@ -45,7 +45,8 @@ train_dataloader = dict(
         ann_file='ImageSets/trainval.txt',
         data_prefix=dict(sub_data_root='FullDataSet/'),
         filter_cfg=dict(filter_empty_gt=True),
-        pipeline=train_pipeline))
+        pipeline=train_pipeline,
+        backend_args=backend_args))
 val_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -58,7 +59,8 @@ val_dataloader = dict(
         ann_file='ImageSets/test.txt',
         data_prefix=dict(sub_data_root='FullDataSet/'),
         test_mode=True,
-        pipeline=val_pipeline))
+        pipeline=val_pipeline,
+        backend_args=backend_args))
 test_dataloader = val_dataloader
 
 val_evaluator = dict(type='DOTAMetric', metric='mAP')
