@@ -21,6 +21,7 @@ train_dataloader = dict(dataset=dict())
 
 data_root = 'data/split_ms_dota/'
 
-train_dataloader = dict(dataset=dict(data_root=data_root, pipeline=train_pipeline))
+train_dataloader = dict(
+    dataset=dict(data_root=data_root, pipeline=train_pipeline))
 val_dataloader = dict(dataset=dict(data_root=data_root))
 test_dataloader = dict(dataset=dict(data_root=data_root))

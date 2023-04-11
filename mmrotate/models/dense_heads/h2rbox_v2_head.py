@@ -1,24 +1,20 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
 import math
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import torch
-from mmcv.cnn import Scale
-from mmdet.models.utils import (filter_scores_and_topk, multi_apply,
-                                select_single_mlvl)
+from mmdet.models.utils import filter_scores_and_topk, multi_apply
 from mmdet.structures.bbox import cat_boxes, get_box_tensor
 from mmdet.utils import (ConfigType, InstanceList, OptConfigType,
                          OptInstanceList, reduce_mean)
 from mmengine import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
-import torch.nn as nn
-import torch.nn.functional as F
 
 from mmrotate.models.dense_heads.rotated_fcos_head import RotatedFCOSHead
 from mmrotate.registry import MODELS
-from mmrotate.structures import RotatedBoxes, hbox2rbox, rbox2hbox
+from mmrotate.structures import RotatedBoxes
 
 INF = 1e8
 
@@ -86,7 +82,7 @@ class H2RBoxV2Head(RotatedFCOSHead):
                  loss_symmetry_ss: ConfigType = dict(
                      type='H2RBoxV2ConsistencyLoss'),
                  rotation_agnostic_classes: list = None,
-                 rotation_agnostic_resize_classes: list = None,
+                 agnostic_resize_classes: list = None,
                  use_circumiou_loss=True,
                  use_standalone_angle=True,
                  use_reweighted_loss_bbox=False,
@@ -108,7 +104,7 @@ class H2RBoxV2Head(RotatedFCOSHead):
 
         self.loss_symmetry_ss = MODELS.build(loss_symmetry_ss)
         self.rotation_agnostic_classes = rotation_agnostic_classes
-        self.rotation_agnostic_resize_classes = rotation_agnostic_resize_classes
+        self.agnostic_resize_classes = agnostic_resize_classes
         self.use_circumiou_loss = use_circumiou_loss
         self.use_standalone_angle = use_standalone_angle
         self.use_reweighted_loss_bbox = use_reweighted_loss_bbox
@@ -410,11 +406,11 @@ class H2RBoxV2Head(RotatedFCOSHead):
         # get labels and bbox_targets of each image
         labels_list, bbox_targets_list, \
             angle_targets_list, id_targets_list = multi_apply(
-            self._get_targets_single,
-            batch_gt_instances,
-            points=concat_points,
-            regress_ranges=concat_regress_ranges,
-            num_points_per_lvl=num_points)
+                self._get_targets_single,
+                batch_gt_instances,
+                points=concat_points,
+                regress_ranges=concat_regress_ranges,
+                num_points_per_lvl=num_points)
 
         # split to per img, per level
         labels_list = [labels.split(num_points, 0) for labels in labels_list]
@@ -672,8 +668,8 @@ class H2RBoxV2Head(RotatedFCOSHead):
             bboxes = get_box_tensor(results.bboxes)
             for id in self.rotation_agnostic_classes:
                 bboxes[results.labels == id, -1] = 0
-            if self.rotation_agnostic_resize_classes:
-                for id in self.rotation_agnostic_resize_classes:
+            if self.agnostic_resize_classes:
+                for id in self.agnostic_resize_classes:
                     bboxes[results.labels == id, 2:4] *= 0.85
             results.bboxes = RotatedBoxes(bboxes)
 

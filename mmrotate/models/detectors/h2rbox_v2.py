@@ -1,12 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import math
 import copy
+import math
 from typing import Tuple, Union
 
 import torch
 from mmdet.models.detectors.single_stage import SingleStageDetector
 from mmdet.models.utils import unpack_gt_instances
-from mmdet.structures import SampleList, DetDataSample
+from mmdet.structures import DetDataSample, SampleList
 from mmdet.structures.bbox import get_box_tensor
 from mmdet.utils import ConfigType, InstanceList, OptConfigType, OptMultiConfig
 from torch import Tensor
@@ -134,7 +134,10 @@ class H2RBoxV2Detector(SingleStageDetector):
             batch_inputs, 0, self.crop_size, batch_gt_instances, self.padding)
         offset = 1
         for gt_instances in batch_gt_instances:
-            gt_instances.bid = torch.arange(0, len(gt_instances.bboxes), 1, \
+            gt_instances.bid = torch.arange(
+                0,
+                len(gt_instances.bboxes),
+                1,
                 device=gt_instances.bboxes.device) + offset + 0.2
             offset += len(gt_instances.bboxes)
 
@@ -147,7 +150,10 @@ class H2RBoxV2Detector(SingleStageDetector):
             batch_inputs, rot, self.crop_size, batch_gt_rot, self.padding)
         offset = 1
         for gt_instances in batch_gt_rot:
-            gt_instances.bid = torch.arange(0, len(gt_instances.bboxes), 1, \
+            gt_instances.bid = torch.arange(
+                0,
+                len(gt_instances.bboxes),
+                1,
                 device=gt_instances.bboxes.device) + offset + 0.4
             offset += len(gt_instances.bboxes)
 
@@ -157,7 +163,10 @@ class H2RBoxV2Detector(SingleStageDetector):
         offset = 1
         for gt_instances in batch_gt_flp:
             gt_instances.bboxes.flip_(batch_inputs.shape[2:4], 'vertical')
-            gt_instances.bid = torch.arange(0, len(gt_instances.bboxes), 1, \
+            gt_instances.bid = torch.arange(
+                0,
+                len(gt_instances.bboxes),
+                1,
                 device=gt_instances.bboxes.device) + offset + 0.6
             offset += len(gt_instances.bboxes)
 
