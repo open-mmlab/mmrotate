@@ -1,13 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import random
-from math import sqrt
-from unittest import TestCase
-
 import cv2
 import numpy as np
+import random
 import torch
+from math import sqrt
 from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from mmengine.testing import assert_allclose
+from unittest import TestCase
 
 from mmrotate.structures.bbox import RotatedBoxes
 

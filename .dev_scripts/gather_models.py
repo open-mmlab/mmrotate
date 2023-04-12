@@ -2,14 +2,13 @@
 import argparse
 import glob
 import json
+import mmcv
 import os.path as osp
 import shutil
 import subprocess
-from collections import OrderedDict
-
-import mmcv
 import torch
 import yaml
+from collections import OrderedDict
 
 
 def ordered_yaml_dump(data, stream=None, Dumper=yaml.SafeDumper, **kwds):

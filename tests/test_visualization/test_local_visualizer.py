@@ -1,13 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import os
-from unittest import TestCase
-
 import cv2
 import numpy as np
+import os
 import torch
 from mmdet.structures import DetDataSample
 from mmdet.structures.mask import BitmapMasks
 from mmengine.structures import InstanceData
+from unittest import TestCase
 
 from mmrotate.structures.bbox import RotatedBoxes
 from mmrotate.visualization import RotLocalVisualizer

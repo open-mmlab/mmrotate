@@ -1,12 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Optional, Union
-
 import torch
 from mmcv.ops import convex_iou
 from mmdet.models.task_modules.assigners.assign_result import AssignResult
 from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import Optional, Union
 
 from mmrotate.registry import TASK_UTILS
 

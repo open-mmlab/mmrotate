@@ -1,11 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from math import sqrt
-from unittest import TestCase
-
 import numpy as np
 import torch
+from math import sqrt
 from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.testing import assert_allclose
+from unittest import TestCase
 
 from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes
 

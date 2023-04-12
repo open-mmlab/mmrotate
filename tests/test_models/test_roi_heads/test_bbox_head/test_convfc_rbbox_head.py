@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import unittest
-from unittest import TestCase
-
 import torch
+import unittest
 from parameterized import parameterized
+from unittest import TestCase
 
 from mmrotate.models.roi_heads.bbox_heads import RotatedShared2FCBBoxHead
 from mmrotate.utils import register_all_modules

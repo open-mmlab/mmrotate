@@ -2,16 +2,15 @@
 import argparse
 import os
 import os.path as osp
-
 from mmdet.utils import register_all_modules as register_all_modules_mmdet
 from mmengine.config import Config, DictAction
 from mmengine.evaluator import DumpResults
 from mmengine.registry import RUNNERS
 from mmengine.runner import Runner
-from projects.RR360.structures.bbox import RotatedBoxes
 
 import mmrotate.structures
 from mmrotate.utils import register_all_modules
+from projects.RR360.structures.bbox import RotatedBoxes
 
 # TODO : Refactoring with registry build
 mmrotate.structures.bbox.RotatedBoxes = RotatedBoxes

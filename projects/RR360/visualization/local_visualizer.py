@@ -1,19 +1,18 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional
-
 import numpy as np
 import torch
 from mmdet.structures.mask import BitmapMasks, PolygonMasks, bitmap_to_polygon
 from mmdet.visualization import DetLocalVisualizer, jitter_color
 from mmdet.visualization.palette import _get_adaptive_scales
 from mmengine.structures import InstanceData
-from projects.RR360.structures.bbox import RotatedBoxes
 from torch import Tensor
+from typing import List, Optional
 
 from mmrotate.registry import VISUALIZERS
 # from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes
 from mmrotate.structures.bbox import QuadriBoxes
 from mmrotate.visualization.palette import get_palette
+from projects.RR360.structures.bbox import RotatedBoxes
 
 
 @VISUALIZERS.register_module()

@@ -1,6 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import argparse
-
 import numpy as np
 import torch
 from mmengine.config import Config, DictAction

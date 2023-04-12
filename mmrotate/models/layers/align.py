@@ -1,10 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List
-
 import torch
 from mmcv.ops import DeformConv2d, DeformConv2dPack, rotated_feature_align
 from mmengine.model import BaseModule, normal_init
 from torch import Tensor, nn
+from typing import List
 
 from mmrotate.registry import MODELS
 

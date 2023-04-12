@@ -1,7 +1,6 @@
 # Copyright (c) SJTU. All rights reserved.
-from copy import deepcopy
-
 import torch
+from copy import deepcopy
 from torch import nn
 
 from mmrotate.registry import MODELS

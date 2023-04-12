@@ -1,12 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Sequence, Tuple, Union
-
 from mmdet.models.detectors.base import BaseDetector
 from mmdet.models.utils import unpack_gt_instances
 from mmdet.structures import OptSampleList, SampleList
 from mmdet.utils import ConfigType, OptConfigType, OptMultiConfig
 from mmengine.model import ModuleList
 from torch import Tensor
+from typing import List, Sequence, Tuple, Union
 
 from mmrotate.registry import MODELS
 

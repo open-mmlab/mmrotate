@@ -1,6 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional
-
 import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule, Scale
@@ -11,6 +9,7 @@ from mmdet.structures.bbox import cat_boxes, get_box_tensor
 from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import List, Optional
 
 from mmrotate.registry import MODELS
 from mmrotate.structures.bbox import RotatedBoxes

@@ -1,10 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import unittest
-from unittest import TestCase
-
 import torch
+import unittest
 from mmengine.config import Config
 from parameterized import parameterized
+from unittest import TestCase
 
 from mmrotate.registry import MODELS
 from mmrotate.testing import demo_mm_inputs, demo_mm_proposals

@@ -1,10 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from argparse import ArgumentParser, Namespace
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
 from mmengine.config import Config
 from mmengine.utils import mkdir_or_exist
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 try:
     from model_archiver.model_packaging import package_model

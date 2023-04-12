@@ -1,13 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
-from os.path import dirname, exists, join
-
 import numpy as np
 import torch
 from mmdet.structures import DetDataSample
 from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.dataset import pseudo_collate
 from mmengine.structures import InstanceData, PixelData
+from os.path import dirname, exists, join
 
 from mmrotate.structures.bbox import RotatedBoxes, rbox2qbox
 

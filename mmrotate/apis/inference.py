@@ -1,6 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional, Sequence, Union
-
 import mmcv
 import numpy as np
 import torch
@@ -8,6 +6,7 @@ from mmcv.ops import RoIPool
 from mmcv.transforms import Compose
 from mmdet.structures import DetDataSample, SampleList
 from torch import nn
+from typing import List, Optional, Sequence, Union
 
 from mmrotate.utils import (get_multiscale_patch, get_test_pipeline_cfg,
                             merge_results_by_nms, slide_window)

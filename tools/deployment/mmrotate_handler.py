@@ -1,8 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import base64
-import os
-
 import mmcv
+import os
 import torch
 from mmdet.apis import inference_detector, init_detector
 from ts.torch_handler.base_handler import BaseHandler

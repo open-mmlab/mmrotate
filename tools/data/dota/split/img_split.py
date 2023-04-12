@@ -4,19 +4,18 @@
 
 import argparse
 import codecs
+import cv2
 import datetime
 import itertools
 import json
 import logging
+import numpy as np
 import os
 import os.path as osp
 import time
 from functools import partial, reduce
 from math import ceil
 from multiprocessing import Manager, Pool
-
-import cv2
-import numpy as np
 from PIL import Image
 
 Image.MAX_IMAGE_PIXELS = None

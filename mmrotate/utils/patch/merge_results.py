@@ -1,11 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Sequence, Tuple
-
 import numpy as np
 from mmcv.ops import batched_nms
 from mmdet.structures import DetDataSample, SampleList
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import Sequence, Tuple
 
 
 def translate_bboxes(bboxes: Tensor, offset: Sequence[int]):

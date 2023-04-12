@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
-import unittest
-
 import numpy as np
 import torch
+import unittest
 from mmdet.structures.bbox import BaseBoxes
 from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from mmengine.testing import assert_allclose

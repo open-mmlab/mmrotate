@@ -1,19 +1,18 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
+import numpy as np
 import os
 import os.path as osp
 import re
 import tempfile
+import torch
 import zipfile
 from collections import OrderedDict, defaultdict
-from typing import List, Optional, Sequence, Union
-
-import numpy as np
-import torch
 from mmcv.ops import nms_quadri, nms_rotated
 from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
+from typing import List, Optional, Sequence, Union
 
 from mmrotate.evaluation import eval_rbbox_map
 from mmrotate.registry import METRICS

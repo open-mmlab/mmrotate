@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from unittest import TestCase
-
 import torch
 from mmdet.structures.bbox import HorizontalBoxes
 from mmengine.testing import assert_allclose
+from unittest import TestCase
 
 from mmrotate.models.task_modules.coders import DeltaXYWHHBBoxCoder
 from mmrotate.structures.bbox import RotatedBoxes

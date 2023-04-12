@@ -1,7 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
-from typing import List, Optional, Tuple
-
 import torch
 from mmcv.cnn import ConvModule, Scale, is_norm
 from mmdet.models import inverse_sigmoid
@@ -17,6 +15,7 @@ from mmengine import ConfigDict
 from mmengine.model import bias_init_with_prob, constant_init, normal_init
 from mmengine.structures import InstanceData
 from torch import Tensor, nn
+from typing import List, Optional, Tuple
 
 from mmrotate.registry import MODELS, TASK_UTILS
 from mmrotate.structures import RotatedBoxes, distance2obb

@@ -1,10 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Union
-
 import torch
 from mmdet.models.task_modules.coders.base_bbox_coder import BaseBBoxCoder
 from mmdet.structures.bbox import HorizontalBoxes, get_box_tensor
 from torch import Tensor
+from typing import Union
 
 from mmrotate.registry import TASK_UTILS
 from mmrotate.structures.bbox import QuadriBoxes

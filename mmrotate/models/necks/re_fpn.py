@@ -1,18 +1,18 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 # Modified from csuhan: https://github.com/csuhan/ReDet
-import warnings
-from typing import List, Optional, Sequence, Tuple, Union
-
 import torch.nn as nn
+import warnings
 from mmdet.utils import MultiConfig, OptConfigType
 from mmengine.model import BaseModule
 from torch import Tensor
+from typing import List, Optional, Sequence, Tuple, Union
 
 from mmrotate.registry import MODELS
 
 try:
     import e2cnn.nn as enn  # noqa: F401
     from e2cnn.nn import EquivariantModule
+
     from ..utils.enn import (build_enn_feature, build_enn_norm_layer, ennConv,
                              ennInterpolate, ennMaxPool, ennReLU)
 except ImportError:

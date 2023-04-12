@@ -1,12 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import time
-import unittest
-from unittest import TestCase
-
 import torch
+import unittest
 from mmdet.structures import DetDataSample
 from mmengine.logging import MessageHub
 from parameterized import parameterized
+from unittest import TestCase
 
 from mmrotate.testing import demo_mm_inputs, get_detector_cfg
 from mmrotate.utils import register_all_modules

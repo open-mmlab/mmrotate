@@ -2,7 +2,6 @@
 import argparse
 import os
 import os.path as osp
-
 from mmdet.utils import register_all_modules as register_all_modules_mmdet
 from mmengine.config import Config, DictAction
 from mmengine.evaluator import DumpResults

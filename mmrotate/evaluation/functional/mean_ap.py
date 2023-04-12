@@ -1,11 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from multiprocessing import get_context
-
 import numpy as np
 import torch
 from mmcv.ops import box_iou_quadri, box_iou_rotated
 from mmdet.evaluation.functional import average_precision
 from mmengine.logging import print_log
+from multiprocessing import get_context
 from terminaltables import AsciiTable
 
 

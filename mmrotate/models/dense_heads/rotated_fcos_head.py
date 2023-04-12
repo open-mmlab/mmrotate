@@ -1,7 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import copy
-from typing import Dict, List, Optional, Tuple
-
 import torch
 import torch.nn as nn
 from mmcv.cnn import Scale
@@ -14,6 +12,7 @@ from mmdet.utils import (ConfigType, InstanceList, OptConfigType,
 from mmengine import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import Dict, List, Optional, Tuple
 
 from mmrotate.registry import MODELS, TASK_UTILS
 from mmrotate.structures import RotatedBoxes

@@ -1,6 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import unittest
-
 from parameterized import parameterized
 
 from mmrotate.datasets import DOTADataset, DOTAv2Dataset, DOTAv15Dataset

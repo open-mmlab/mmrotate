@@ -1,13 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import warnings
-from typing import List, Optional
-
 import torch
+import warnings
 from mmdet.models.task_modules.assigners.assign_result import AssignResult
 from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
 from mmdet.utils import ConfigType
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import List, Optional
 
 from mmrotate.registry import TASK_UTILS
 

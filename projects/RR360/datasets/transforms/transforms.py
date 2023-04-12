@@ -1,8 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Union
-
 # import cv2
 import mmcv
+from typing import Union
 
 from mmrotate.datasets.transforms import Rotate
 from mmrotate.registry import TRANSFORMS

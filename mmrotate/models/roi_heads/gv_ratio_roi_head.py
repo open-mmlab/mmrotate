@@ -1,6 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Tuple
-
 import torch
 from mmdet.models.roi_heads.standard_roi_head import StandardRoIHead
 from mmdet.models.task_modules.samplers import SamplingResult
@@ -8,6 +6,7 @@ from mmdet.models.utils import empty_instances
 from mmdet.structures.bbox import bbox2roi
 from mmdet.utils import ConfigType, InstanceList
 from torch import Tensor
+from typing import List, Tuple
 
 from mmrotate.registry import MODELS
 

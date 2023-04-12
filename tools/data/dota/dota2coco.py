@@ -1,11 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 # Written by dingjiansw101
 # Reference: https://github.com/CAPTAIN-WHU/DOTA_devkit
+import cv2
 import json
 import os
 from argparse import ArgumentParser
-
-import cv2
 from mmengine.utils import ProgressBar
 
 try:

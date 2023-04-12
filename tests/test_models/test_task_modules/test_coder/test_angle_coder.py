@@ -1,8 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from unittest import TestCase
-
 import torch
 from mmengine.testing import assert_allclose
+from unittest import TestCase
 
 from mmrotate.models.task_modules.coders import CSLCoder
 

@@ -1,13 +1,12 @@
 """copy from /mmrotate/structures/bbox/rotated_boxes.py and redefine 'r360'."""
-import math
-from typing import Optional, Tuple, TypeVar, Union
-
 import cv2
+import math
 import numpy as np
 import torch
 from mmdet.structures.bbox import register_box, register_box_converter
 from mmdet.structures.mask import BitmapMasks, PolygonMasks
 from torch import Tensor
+from typing import Optional, Tuple, TypeVar, Union
 
 from mmrotate.structures.bbox import QuadriBoxes
 from mmrotate.structures.bbox import RotatedBoxes as mmrotate_RotatedBoxes

@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import math
-import unittest
-
 import pytest
 import torch
+import unittest
 from mmengine.structures import InstanceData
 
 from mmrotate.models.dense_heads import H2RBoxHead

@@ -1,14 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import cv2
 import datetime
 import itertools
+import numpy as np
 import os.path as osp
+import pycocotools.mask as maskUtils
 import tempfile
 from collections import OrderedDict
-from typing import Dict, Optional, Sequence
-
-import cv2
-import numpy as np
-import pycocotools.mask as maskUtils
 from mmcv.ops import box_iou_rotated
 from mmdet.datasets.api_wrappers import COCO
 from mmdet.evaluation import CocoMetric
@@ -16,6 +14,7 @@ from mmengine import MMLogger
 from mmengine.fileio import dump, load
 from pycocotools.cocoeval import COCOeval
 from terminaltables import AsciiTable
+from typing import Dict, Optional, Sequence
 
 from mmrotate.registry import METRICS
 from mmrotate.structures.bbox import RotatedBoxes
