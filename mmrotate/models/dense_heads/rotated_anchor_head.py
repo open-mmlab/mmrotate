@@ -166,7 +166,7 @@ class RotatedAnchorHead(BaseDenseHead):
         # since feature map sizes of all images are the same, we only compute
         # anchors for one time
         multi_level_anchors = self.anchor_generator.grid_priors(
-            featmap_sizes, device)
+            featmap_sizes, device=device)
         anchor_list = [multi_level_anchors for _ in range(num_imgs)]
 
         # for each image, we compute valid flags of multi level anchors
