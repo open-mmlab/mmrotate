@@ -4,11 +4,11 @@
 
 <!-- [ALGORITHM] -->
 
+## Abstract
+
 <div align=center>
 <img src="https://raw.githubusercontent.com/zytx121/image-host/main/imgs/h2rbox_v2.png" width="800"/>
 </div>
-
-## Abstract
 
 With the increasing demand for oriented object detection e.g. in autonomous driving and remote sensing, the oriented annotation has become a labor-intensive work. To make full use of existing horizontally annotated datasets and reduce the annotation cost, a weakly-supervised detector H2RBox for learning the rotated box (RBox) from the horizontal box (HBox) has been proposed and received great attention. This paper presents a new version, H2RBox-v2, to further bridge the gap between HBox-supervised and RBox-supervised oriented object detection. While exploiting axisymmetry via flipping and rotating consistencies is available through our theoretical analysis, H2RBox-v2, using a weakly-supervised branch similar to H2RBox, is embedded with a novel self-supervised branch that learns orientations from the symmetry inherent in the image of objects. Complemented by modules to cope with peripheral issues, e.g. angular periodicity, a stable and effective solution is achieved. To our knowledge, H2RBox-v2 is the first symmetry-supervised paradigm for oriented object detection. Compared to H2RBox, our method is less susceptible to low annotation quality and insufficient training data, which in such cases is expected to give a competitive performance much closer to fully-supervised oriented object detectors. Specifically, the performance comparison between H2RBox-v2 and Rotated FCOS on DOTA-v1.0/1.5/2.0 is 72.31%/64.76%/50.33% vs. 72.44%/64.53%/51.77%, 89.66% vs. 88.99% on HRSC, and 42.27% vs. 41.25% on FAIR1M.
 
