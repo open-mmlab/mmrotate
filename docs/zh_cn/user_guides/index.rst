@@ -24,3 +24,4 @@ MMRotate 提供了几十个预训练模型 `Model Zoo <https://mmrotate.readthed
    useful_tools.md
    visualization.md
    deploy.md
+   label_studio.md

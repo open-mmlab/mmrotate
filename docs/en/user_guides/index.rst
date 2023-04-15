@@ -24,3 +24,4 @@ Useful Tools
    useful_tools.md
    visualization.md
    deploy.md
+   label_studio.md
