@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     from label_studio_ml.api import init_app
 
-    from projects.LabelStudio.backend_template.mmdetection import MMDetection
+    from projects.LabelStudio.backend_template._mmrotate import MMRotate
 
     parser = argparse.ArgumentParser(description='Label studio')
     parser.add_argument(
@@ -122,11 +122,11 @@ if __name__ == '__main__':
         kwargs.update(parse_kwargs())
 
     if args.check:
-        print('Check "' + MMDetection.__name__ + '" instance creation..')
-        model = MMDetection(**kwargs)
+        print('Check "' + MMRotate.__name__ + '" instance creation..')
+        model = MMRotate(**kwargs)
 
     app = init_app(
-        model_class=MMDetection,
+        model_class=MMRotate,
         model_dir=os.environ.get('MODEL_DIR', args.model_dir),
         redis_queue=os.environ.get('RQ_QUEUE_NAME', 'default'),
         redis_host=os.environ.get('REDIS_HOST', 'localhost'),
@@ -138,7 +138,7 @@ if __name__ == '__main__':
 else:
     # for uWSGI use
     app = init_app(
-        model_class=MMDetection,
+        model_class=MMRotate,
         model_dir=os.environ.get('MODEL_DIR', os.path.dirname(__file__)),
         redis_queue=os.environ.get('RQ_QUEUE_NAME', 'default'),
         redis_host=os.environ.get('REDIS_HOST', 'localhost'),

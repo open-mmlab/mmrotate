@@ -19,8 +19,8 @@ from mmrotate.structures.bbox import RotatedBoxes
 logger = logging.getLogger(__name__)
 
 
-class MMDetection(LabelStudioMLBase):
-    """Object detector based on https://github.com/open-mmlab/mmdetection."""
+class MMRotate(LabelStudioMLBase):
+    """Object detector based on https://github.com/open-mmlab/mmrotate."""
 
     def __init__(self,
                  config_file=None,
@@ -32,7 +32,7 @@ class MMDetection(LabelStudioMLBase):
                  palette='dota',
                  **kwargs):
 
-        super(MMDetection, self).__init__(**kwargs)
+        super(MMRotate, self).__init__(**kwargs)
         config_file = config_file or os.environ['config_file']
         checkpoint_file = checkpoint_file or os.environ['checkpoint_file']
         self.config_file = config_file
