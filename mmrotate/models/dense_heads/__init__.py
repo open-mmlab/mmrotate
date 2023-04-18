@@ -2,6 +2,7 @@
 from .angle_branch_retina_head import AngleBranchRetinaHead
 from .cfa_head import CFAHead
 from .h2rbox_head import H2RBoxHead
+from .h2rbox_v2_head import H2RBoxV2Head
 from .oriented_reppoints_head import OrientedRepPointsHead
 from .oriented_rpn_head import OrientedRPNHead
 from .r3_head import R3Head, R3RefineHead
@@ -17,6 +18,6 @@ __all__ = [
     'RotatedRetinaHead', 'OrientedRPNHead', 'RotatedRepPointsHead',
     'SAMRepPointsHead', 'AngleBranchRetinaHead', 'RotatedATSSHead',
     'RotatedFCOSHead', 'OrientedRepPointsHead', 'R3Head', 'R3RefineHead',
-    'S2AHead', 'S2ARefineHead', 'CFAHead', 'H2RBoxHead', 'RotatedRTMDetHead',
-    'RotatedRTMDetSepBNHead'
+    'S2AHead', 'S2ARefineHead', 'CFAHead', 'H2RBoxHead', 'H2RBoxV2Head',
+    'RotatedRTMDetHead', 'RotatedRTMDetSepBNHead'
 ]
