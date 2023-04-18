@@ -172,6 +172,7 @@ A summary can be found in the [Model Zoo](docs/en/model_zoo.md) page.
 - [x] [H2RBox](configs/h2rbox/README.md) (ICLR'2023)
 - [x] [PSC](configs/psc/README.md) (CVPR'2023)
 - [x] [RTMDet](configs/rotated_rtmdet/README.md) (arXiv)
+- [x] [H2RBox-v2](configs/h2rbox_v2/README.md) (arXiv)
 
 </details>
 

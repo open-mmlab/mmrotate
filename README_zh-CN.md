@@ -168,6 +168,7 @@ https://user-images.githubusercontent.com/10410257/154433305-416d129b-60c8-44c7-
 - [x] [H2RBox](configs/h2rbox/README.md) (ICLR'2023)
 - [x] [PSC](configs/psc/README.md) (CVPR'2023)
 - [x] [RTMDet](configs/rotated_rtmdet/README.md) (arXiv)
+- [x] [H2RBox-v2](configs/h2rbox_v2/README.md) (arXiv)
 
 </details>
 
