@@ -6,9 +6,8 @@ import torch
 import torch.nn as nn
 from mmcv.cnn import build_norm_layer
 from mmcv.cnn.bricks import DropPath
-from mmcv.cnn.utils.weight_init import (constant_init, normal_init,
-                                        trunc_normal_init)
-from mmcv.runner import BaseModule
+from mmengine.model import (BaseModule, constant_init, normal_init,
+                            trunc_normal_init)
 from torch.nn.modules.utils import _pair as to_2tuple
 
 from mmrotate.registry import MODELS
