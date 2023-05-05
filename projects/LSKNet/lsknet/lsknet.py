@@ -26,7 +26,7 @@ class Mlp(BaseModule):
             Default: dict(type='GELU').
         drop (float, optional): Probability of an element to be
             zeroed in FFN. Default 0.0.
-        init_cfg (obj:`mmcv.ConfigDict`): The Config for initialization.
+        init_cfg (obj:`mmengine.ConfigDict`): The Config for initialization.
             Default: None.
     """
 
@@ -61,7 +61,7 @@ class LSKmodule(BaseModule):
 
     Args:
         dim (int): Number of input channels.
-        init_cfg (obj:`mmcv.ConfigDict`): The Config for initialization.
+        init_cfg (obj:`mmengine.ConfigDict`): The Config for initialization.
             Default: None.
     """
 
@@ -98,7 +98,7 @@ class Attention(BaseModule):
 
     Args:
         d_model (int): Number of input channels.
-        init_cfg (obj:`mmcv.ConfigDict`): The Config for initialization.
+        init_cfg (obj:`mmengine.ConfigDict`): The Config for initialization.
             Default: None.
     """
 
@@ -131,9 +131,9 @@ class Block(BaseModule):
         drop_path (float): Stochastic depth rate. Defaults to 0.1.
         act_layer (dict, optional): The activation config for FFNs.
             Default: dict(type='GELU').
-        norm_cfg (obj:`mmcv.ConfigDict`): The Config for normalization.
+        norm_cfg (obj:`mmengine.ConfigDict`): The Config for normalization.
             Default: None.
-        init_cfg (obj:`mmcv.ConfigDict`): The Config for initialization.
+        init_cfg (obj:`mmengine.ConfigDict`): The Config for initialization.
             Default: None.
     """
 
@@ -185,9 +185,9 @@ class OverlapPatchEmbed(BaseModule):
         stride (int): OverlapPatchEmbed stride. Defaults to 4
         in_chans (int): Number of input channels. Defaults to 3.
         embed_dim (int): The hidden dimension of OverlapPatchEmbed.
-        norm_cfg (obj:`mmcv.ConfigDict`): The Config for normalization.
+        norm_cfg (obj:`mmengine.ConfigDict`): The Config for normalization.
             Default: None.
-        init_cfg (obj:`mmcv.ConfigDict`): The Config for initialization.
+        init_cfg (obj:`mmengine.ConfigDict`): The Config for initialization.
             Default: None.
     """
 
