@@ -36,9 +36,7 @@ DOTA 格式的注解 txt 文件：
 
 1. `data` 部分。具体来说，您需要在 `data.train`, `data.val` 和 `data.test` 中显式添加 classes 字段。
 
-2. `data` 属性变量。具体来说，特别是您需要在 `data.train`, `data.val` 和  `data.test` 中添加 classes 字段。
-
-3. `model` 部分中的 ` num_classes`  属性变量。特别是将所有 num_classes 的默认值（例如 COCO 中的 80）覆盖到您的类别编号中。
+2. `model` 部分中的 ` num_classes`  属性变量。特别是将所有 num_classes 的默认值（例如 COCO 中的 80）覆盖到您的类别编号中。
 
 在 `configs/my_custom_config.py` :
 
