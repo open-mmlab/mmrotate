@@ -1,4 +1,6 @@
--r requirements/build.txt
--r requirements/optional.txt
--r requirements/runtime.txt
--r requirements/tests.txt
+gradio
+numpy
+openmim
+prettytable
+torch>=1.8
+torchvision
