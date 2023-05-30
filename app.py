@@ -82,10 +82,13 @@ with gr.Blocks() as demo:
             with gr.Column():
                 visualization = gr.Image(label='Result', type='numpy')
 
-        # with gr.Row():
-        #     paths, _ = get_file_list('demo')
-        #     example_images = gr.Dataset(
-        #         components=[input_image], samples=[[path] for path in paths])
+        with gr.Row():
+            # paths, _ = get_file_list('demo')
+            example_images = gr.Dataset(
+                components=[input_image], samples=[
+                os.path.join("examples", e)
+                for e in os.listdir("examples")
+            ],)
 
         run_button.click(
             fn=inference,
