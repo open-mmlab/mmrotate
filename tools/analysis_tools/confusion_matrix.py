@@ -124,7 +124,8 @@ def analyze_per_img_dets(confusion_matrix,
     gt_bboxes = np.array(gt_bboxes)
     # By default gt_bboxes is qbox not rbox
     # rbbox_overlaps does not support ndarray input
-    gt_bboxes = torch.from_numpy(gt_bboxes)
+    # add .float to avoid opencv error
+    gt_bboxes = torch.from_numpy(gt_bboxes).float()
     gt_bboxes = qbox2rbox(gt_bboxes)
 
     gt_labels = np.array(gt_labels)
