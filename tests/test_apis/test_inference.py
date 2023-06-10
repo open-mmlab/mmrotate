@@ -1,13 +1,12 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import os.path as osp
-from unittest import TestCase
-
 import numpy as np
+import os.path as osp
 import pytest
 import torch
 from mmdet.apis import init_detector
 from mmdet.structures import DetDataSample
 from parameterized import parameterized
+from unittest import TestCase
 
 from mmrotate.apis import inference_detector_by_patches
 from mmrotate.utils import register_all_modules

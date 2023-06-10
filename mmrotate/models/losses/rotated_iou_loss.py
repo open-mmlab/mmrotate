@@ -1,8 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import warnings
-
 import torch
 import torch.nn as nn
+import warnings
 from mmdet.models.losses.utils import weighted_loss
 
 from mmrotate.registry import MODELS

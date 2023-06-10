@@ -1,8 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Sequence, Union
-
 import mmcv
 from mmcv.transforms import BaseTransform
+from typing import Sequence, Union
 
 from mmrotate.registry import TRANSFORMS
 

@@ -1,11 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Optional
-
 import torch
 from mmdet.models.losses import accuracy
 from mmdet.models.roi_heads.bbox_heads import Shared2FCBBoxHead
 from mmdet.structures.bbox import get_box_tensor
 from torch import Tensor
+from typing import Optional
 
 from mmrotate.registry import MODELS
 

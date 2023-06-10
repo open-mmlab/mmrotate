@@ -1,10 +1,9 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import numpy as np
 import os.path as osp
 import tempfile
-import unittest
-
-import numpy as np
 import torch
+import unittest
 
 from mmrotate.evaluation import DOTAMetric
 

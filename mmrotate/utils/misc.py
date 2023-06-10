@@ -1,7 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Union
-
 from mmengine.config import Config, ConfigDict
+from typing import Union
 
 
 def get_test_pipeline_cfg(cfg: Union[str, ConfigDict]) -> ConfigDict:

@@ -1,12 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Optional, Tuple
-
 import numpy as np
 import torch
 from mmdet.models.utils import multi_apply
 from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import Dict, List, Optional, Tuple
 
 from mmrotate.models.dense_heads.rotated_reppoints_head import \
     RotatedRepPointsHead

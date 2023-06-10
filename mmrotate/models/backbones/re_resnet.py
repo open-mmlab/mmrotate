@@ -1,19 +1,19 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 # Modified from csuhan: https://github.com/csuhan/ReDet
-from typing import Optional, Sequence, Tuple
-
 import torch.nn as nn
 import torch.utils.checkpoint as cp
 from mmdet.utils import ConfigType, OptConfigType, OptMultiConfig
 from mmengine.model import BaseModule
 from torch import Tensor
 from torch.nn.modules.batchnorm import _BatchNorm
+from typing import Optional, Sequence, Tuple
 
 from mmrotate.registry import MODELS
 
 try:
     import e2cnn.nn as enn
     from e2cnn.nn import EquivariantModule
+
     from ..utils.enn import (build_enn_divide_feature, build_enn_norm_layer,
                              build_enn_trivial_feature, ennAvgPool, ennConv,
                              ennMaxPool, ennReLU, ennTrivialConv)

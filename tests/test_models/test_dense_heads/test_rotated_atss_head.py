@@ -1,7 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import unittest
-
 import torch
+import unittest
 from mmengine import Config
 from mmengine.structures import InstanceData
 

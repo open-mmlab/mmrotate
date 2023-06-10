@@ -1,6 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional, Tuple, Union
-
 import torch
 import torch.nn as nn
 from mmcv.cnn import ConvModule
@@ -8,6 +6,7 @@ from mmdet.models.utils import select_single_mlvl
 from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
 from torch import Tensor
+from typing import List, Optional, Tuple, Union
 
 from mmrotate.registry import MODELS
 from mmrotate.structures.bbox import RotatedBoxes

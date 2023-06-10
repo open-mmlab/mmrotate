@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from unittest import TestCase
-
 import torch
 from mmengine import Config
 from mmengine.structures import InstanceData
+from unittest import TestCase
 
 from mmrotate.models.dense_heads import R3Head, R3RefineHead
 from mmrotate.structures.bbox import RotatedBoxes

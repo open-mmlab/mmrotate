@@ -3,7 +3,6 @@ import argparse
 import logging
 import os
 import os.path as osp
-
 from mmdet.utils import register_all_modules as register_all_modules_mmdet
 from mmengine.config import Config, DictAction
 from mmengine.logging import print_log

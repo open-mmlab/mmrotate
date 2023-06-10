@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import glob
 import os.path as osp
-from typing import List
-
 from mmengine.dataset import BaseDataset
+from typing import List
 
 from mmrotate.registry import DATASETS
 

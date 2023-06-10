@@ -1,7 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import unittest
-
 import torch
+import unittest
 from mmdet.models import L1Loss
 from mmengine.structures import InstanceData
 from parameterized import parameterized

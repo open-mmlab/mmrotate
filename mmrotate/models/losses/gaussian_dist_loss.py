@@ -1,7 +1,6 @@
 # Copyright (c) SJTU. All rights reserved.
-from copy import deepcopy
-
 import torch
+from copy import deepcopy
 from mmdet.models.losses.utils import weighted_loss
 from torch import nn
 

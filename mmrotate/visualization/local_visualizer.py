@@ -1,6 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional
-
 import numpy as np
 import torch
 from mmdet.structures.mask import BitmapMasks, PolygonMasks, bitmap_to_polygon
@@ -8,6 +6,7 @@ from mmdet.visualization import DetLocalVisualizer, jitter_color
 from mmdet.visualization.palette import _get_adaptive_scales
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import List, Optional
 
 from mmrotate.registry import VISUALIZERS
 from mmrotate.structures.bbox import QuadriBoxes, RotatedBoxes

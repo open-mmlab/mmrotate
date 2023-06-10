@@ -1,6 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Dict, List, Tuple
-
 import torch
 from mmcv.ops import min_area_polygons
 from mmdet.models.dense_heads.reppoints_head import RepPointsHead
@@ -9,6 +7,7 @@ from mmdet.utils import InstanceList, OptInstanceList
 from mmengine.config import ConfigDict
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import Dict, List, Tuple
 
 from mmrotate.registry import MODELS
 from mmrotate.structures.bbox import RotatedBoxes, qbox2rbox

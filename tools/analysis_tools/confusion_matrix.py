@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import argparse
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 from matplotlib.ticker import MultipleLocator
 from mmcv.ops import nms_rotated
 from mmdet.registry import DATASETS

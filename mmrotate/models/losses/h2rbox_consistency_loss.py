@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import Optional
-
 import torch
 from mmdet.utils import ConfigType
 from torch import Tensor
+from typing import Optional
 
 from mmrotate.registry import MODELS
 

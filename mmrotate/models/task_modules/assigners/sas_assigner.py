@@ -1,11 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Optional
-
 import torch
 from mmcv.ops import convex_iou, points_in_polygons
 from mmdet.models.task_modules.assigners.assign_result import AssignResult
 from mmdet.models.task_modules.assigners.base_assigner import BaseAssigner
 from mmengine.structures import InstanceData
+from typing import List, Optional
 
 from mmrotate.registry import TASK_UTILS
 from mmrotate.structures.bbox import qbox2hbox

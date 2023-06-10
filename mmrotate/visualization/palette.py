@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from typing import List, Tuple, Union
-
 import mmcv
 import numpy as np
 from mmengine.utils import is_str
+from typing import List, Tuple, Union
 
 
 def get_palette(palette: Union[List[tuple], str, tuple],

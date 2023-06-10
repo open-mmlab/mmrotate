@@ -1,7 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from numbers import Number
-from typing import List, Optional, Union
-
 import cv2
 import mmcv
 import numpy as np
@@ -10,6 +7,8 @@ from mmcv.transforms.utils import cache_randomness
 from mmdet.structures.bbox import BaseBoxes, get_box_type
 from mmdet.structures.mask import PolygonMasks
 from mmengine.utils import is_list_of
+from numbers import Number
+from typing import List, Optional, Union
 
 from mmrotate.registry import TRANSFORMS
 

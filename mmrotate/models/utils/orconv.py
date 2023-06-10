@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from __future__ import absolute_import
-import math
 
+import math
 import torch
 import torch.nn.functional as F
 from mmcv.ops import active_rotated_filter

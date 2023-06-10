@@ -1,7 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import math
-from typing import Dict, List, Optional, Tuple
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -11,6 +9,7 @@ from mmdet.models.utils import images_to_levels, multi_apply, unmap
 from mmdet.utils import ConfigType, InstanceList, OptInstanceList
 from mmengine.structures import InstanceData
 from torch import Tensor
+from typing import Dict, List, Optional, Tuple
 
 from mmrotate.models.dense_heads.rotated_reppoints_head import \
     RotatedRepPointsHead

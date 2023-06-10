@@ -1,7 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from argparse import ArgumentParser
-
 import mmcv
+from argparse import ArgumentParser
 from mmdet.apis import init_detector
 
 from mmrotate.apis import inference_detector_by_patches

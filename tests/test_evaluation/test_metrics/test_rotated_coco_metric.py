@@ -1,12 +1,11 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import os.path as osp
-import tempfile
-from unittest import TestCase
-
 import numpy as np
+import os.path as osp
 import pycocotools.mask as mask_util
+import tempfile
 import torch
 from mmengine.fileio import dump
+from unittest import TestCase
 
 from mmrotate.evaluation import RotatedCocoMetric
 

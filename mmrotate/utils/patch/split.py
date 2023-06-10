@@ -1,8 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import numpy as np
 from itertools import product
 from math import ceil
-
-import numpy as np
 
 
 def get_multiscale_patch(sizes, steps, ratios):

@@ -1,9 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from unittest import TestCase
-
 import e2cnn.nn as enn
 import torch
 from torch.nn.modules.batchnorm import _BatchNorm
+from unittest import TestCase
 
 from mmrotate.models.necks import ReFPN
 from mmrotate.models.utils.enn import build_enn_divide_feature

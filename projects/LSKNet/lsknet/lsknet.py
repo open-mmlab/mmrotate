@@ -1,9 +1,8 @@
 import math
-import warnings
-from functools import partial
-
 import torch
 import torch.nn as nn
+import warnings
+from functools import partial
 from mmcv.cnn import build_norm_layer
 from mmcv.cnn.bricks import DropPath
 from mmengine.model import (BaseModule, constant_init, normal_init,
