@@ -4,6 +4,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 from matplotlib.ticker import MultipleLocator
 from mmcv.ops import nms_rotated
 from mmdet.registry import DATASETS
@@ -11,7 +12,7 @@ from mmengine import Config, DictAction
 from mmengine.fileio import load
 from mmengine.utils import ProgressBar
 
-from mmrotate.structures.bbox import rbbox_overlaps
+from mmrotate.structures.bbox import qbox2rbox, rbbox_overlaps
 from mmrotate.utils import register_all_modules
 
 
@@ -121,6 +122,12 @@ def analyze_per_img_dets(confusion_matrix,
         gt_labels.append(gt['bbox_label'])
 
     gt_bboxes = np.array(gt_bboxes)
+    # By default gt_bboxes is qbox not rbox
+    # rbbox_overlaps does not support ndarray input
+    # add .float to avoid opencv error
+    gt_bboxes = torch.from_numpy(gt_bboxes).float()
+    gt_bboxes = qbox2rbox(gt_bboxes)
+
     gt_labels = np.array(gt_labels)
 
     unique_label = np.unique(result['labels'].numpy())
@@ -130,11 +137,14 @@ def analyze_per_img_dets(confusion_matrix,
         det_bboxes = result['bboxes'][mask].numpy()
         det_scores = result['scores'][mask].numpy()
 
+        # rbbox_overlaps and nms_rotated does not support ndarray input
+        det_bboxes = torch.from_numpy(det_bboxes)
+        det_scores = torch.from_numpy(det_scores)
+
         if nms_iou_thr:
             det_bboxes, _ = nms_rotated(det_bboxes, det_scores, nms_iou_thr)
         ious = rbbox_overlaps(det_bboxes[:, :5], gt_bboxes)
-        for i, det_bbox in enumerate(det_bboxes):
-            score = det_bbox[5]
+        for i, score in enumerate(det_scores):
             det_match = 0
             if score >= score_thr:
                 for j, gt_label in enumerate(gt_labels):
