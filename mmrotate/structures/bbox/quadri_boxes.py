@@ -304,14 +304,13 @@ class QuadriBoxes(BaseBoxes):
             :obj:`BitmapMasks`: Converted masks
         """
         img_h, img_w = img_shape
-        polygons = self.tensor
+        polygons = self.vertices.numpy().astype(np.int0)
 
-        gt_masks = np.zeros((len(boxes), img_h, img_w), dtype=np.uint8)
+        gt_masks = np.zeros((len(polygons), img_h, img_w), dtype=np.uint8)
 
         for i, polygon in enumerate(polygons):
             cv2.drawContours(gt_masks[i], [polygon], 0, 1, -1)
         return BitmapMasks(gt_masks, img_h, img_w)
-
 
     @staticmethod
     def overlaps(boxes1: BaseBoxes,

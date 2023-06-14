@@ -399,7 +399,8 @@ class RotatedBoxes(BaseBoxes):
         img_h, img_w = img_shape
         boxes = self.tensor
 
-        polygons = cls.rbox2corner(boxes)
+        polygons = self.rbox2corner(boxes).numpy()
+        polygons = polygons.reshape(-1, 4, 2).astype(np.int0)
         gt_masks = np.zeros((len(boxes), img_h, img_w), dtype=np.uint8)
 
         for i, polygon in enumerate(polygons):
