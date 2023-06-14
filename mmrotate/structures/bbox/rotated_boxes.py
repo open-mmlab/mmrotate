@@ -389,6 +389,23 @@ class RotatedBoxes(BaseBoxes):
         return (offset_x <= w / 2 - eps) & (offset_x >= - w / 2 + eps) & \
             (offset_y <= h / 2 - eps) & (offset_y >= - h / 2 + eps)
 
+    def create_masks(self, img_shape: Tuple[int, int]) -> BitmapMasks:
+        """
+        Args:
+            img_shape (Tuple[int, int]): A tuple of image height and width.
+        Returns:
+            :obj:`BitmapMasks`: Converted masks
+        """
+        img_h, img_w = img_shape
+        boxes = self.tensor
+
+        polygons = cls.rbox2corner(boxes)
+        gt_masks = np.zeros((len(boxes), img_h, img_w), dtype=np.uint8)
+
+        for i, polygon in enumerate(polygons):
+            cv2.drawContours(gt_masks[i], [polygon], 0, 1, -1)
+        return BitmapMasks(gt_masks, img_h, img_w)
+
     @staticmethod
     def overlaps(boxes1: BaseBoxes,
                  boxes2: BaseBoxes,
