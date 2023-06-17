@@ -703,5 +703,5 @@ class H2RBoxHead(RotatedFCOSHead):
                 inds = results.labels == id
                 bboxes[inds, :] = hbox2rbox(rbox2hbox(bboxes[inds, :]))
 
-        results.bboxes = RotatedBoxes(bboxes)
+            results.bboxes = RotatedBoxes(bboxes)
         return results
