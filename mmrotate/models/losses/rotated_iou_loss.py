@@ -127,7 +127,7 @@ class RotatedIoULoss(nn.Module):
             # iou_loss of shape (n,)
             assert weight.shape == pred.shape
             weight = weight.mean(-1)
-        with torch.cuda.amp.autocast(enabled=False):            
+        with torch.cuda.amp.autocast(enabled=False):
             loss = self.loss_weight * rotated_iou_loss(
                 pred,
                 target,
