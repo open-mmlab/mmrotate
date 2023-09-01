@@ -238,10 +238,10 @@ MMRotate 是一款由不同学校和公司共同贡献的开源项目。我们�
 
 ## 欢迎加入 OpenMMLab 社区
 
-扫描下方的二维码可关注 OpenMMLab 团队的 [知乎官方账号](https://www.zhihu.com/people/openmmlab)，加入 OpenMMLab 团队的 [官方交流 QQ 群](https://jq.qq.com/?_wv=1027&k=aCvMxdr3)或联络 OpenMMLab 官方微信小助手
+扫描下方的二维码可关注 OpenMMLab 团队的 知乎官方账号，扫描下方微信二维码添加喵喵好友，进入 MMRotate 微信交流社群。【加好友申请格式：研究方向+地区+学校/公司+姓名】
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/open-mmlab/mmcv/master/docs/en/_static/zhihu_qrcode.jpg" height="400"><img src="https://raw.githubusercontent.com/open-mmlab/mmcv/master/docs/en/_static/wechat_qrcode.jpg" height="400"><img src="https://raw.githubusercontent.com/open-mmlab/mmcv/master/docs/en/_static/qq_group_qrcode.jpg" height="400">
+<img src="https://raw.githubusercontent.com/open-mmlab/mmcv/master/docs/en/_static/zhihu_qrcode.jpg" height="400"><img src="https://github.com/open-mmlab/mmrotate/assets/62195058/b54a3927-62f3-419e-9648-00b8edb50dab" height="400">
 </div>
 
 我们会在 OpenMMLab 社区为大家
