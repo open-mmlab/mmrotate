@@ -389,6 +389,16 @@ class RotatedBoxes(BaseBoxes):
         return (offset_x <= w / 2 - eps) & (offset_x >= - w / 2 + eps) & \
             (offset_y <= h / 2 - eps) & (offset_y >= - h / 2 + eps)
 
+    def create_masks(self, img_shape: Tuple[int, int]) -> BitmapMasks:
+        """
+        Args:
+            img_shape (Tuple[int, int]): A tuple of image height and width.
+        Returns:
+            :obj:`BitmapMasks`: Converted masks
+        """
+        qbox = self.convert_to('qbox')
+        return qbox.create_masks(img_shape)
+
     @staticmethod
     def overlaps(boxes1: BaseBoxes,
                  boxes2: BaseBoxes,
@@ -442,7 +452,8 @@ class RotatedBoxes(BaseBoxes):
         if isinstance(masks, BitmapMasks):
             for idx in range(num_masks):
                 mask = masks.masks[idx]
-                points = np.stack(np.nonzero(mask), axis=-1).astype(np.float32)
+                coor_y, coor_x = np.nonzero(mask)
+                points = np.stack([coor_x, coor_y], axis=-1).astype(np.float32)
                 (x, y), (w, h), angle = cv2.minAreaRect(points)
                 boxes.append([x, y, w, h, angle / 180 * np.pi])
         elif isinstance(masks, PolygonMasks):
