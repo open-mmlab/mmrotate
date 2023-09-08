@@ -18,14 +18,17 @@ def tpfp_default(det_bboxes,
     """Check if detected bboxes are true positive or false positive.
 
     Args:
-        det_bboxes (ndarray): Detected bboxes of this image, of shape (m, 6).
-        gt_bboxes (ndarray): GT bboxes of this image, of shape (n, 5).
+        det_bboxes (ndarray): Detected bboxes of this image, of shape (m, 6)
+            or (m, 7).
+        gt_bboxes (ndarray): GT bboxes of this image, of shape (n, 5)
+            or (n, 6).
         gt_bboxes_ignore (ndarray): Ignored gt bboxes of this image,
-            of shape (k, 5). Defaults to None
+            of shape (k, 5) or (k, 6). Defaults to None
         iou_thr (float): IoU threshold to be considered as matched.
             Defaults to 0.5.
-        box_type (str): Box type. If the QuadriBoxes is used, you need to
-            specify 'qbox'. Defaults to 'rbox'.
+        box_type (str): Box type. If the QuadriBoxes or RotatedHeadBoxes is
+            used, you need to specify 'qbox' or 'rheadbox'. Defaults to
+            'rbox'.
         area_ranges (list[tuple], optional): Range of bbox areas to be
             evaluated, in the format [(min1, max1), (min2, max2), ...].
             Defaults to None.
@@ -51,6 +54,7 @@ def tpfp_default(det_bboxes,
     # a certain scale
     tp = np.zeros((num_scales, num_dets), dtype=np.float32)
     fp = np.zeros((num_scales, num_dets), dtype=np.float32)
+    tp_head = np.zeros((num_scales, num_dets), dtype=np.float32)
 
     # if there is no gt bboxes in this image, then all det bboxes
     # within area range are false positives
@@ -59,12 +63,19 @@ def tpfp_default(det_bboxes,
             fp[...] = 1
         else:
             raise NotImplementedError
-        return tp, fp
+        if box_type == 'rheadbox':
+            return tp, fp, tp_head
+        else:
+            return tp, fp
 
     if box_type == 'rbox':
         ious = box_iou_rotated(
             torch.from_numpy(det_bboxes).float(),
             torch.from_numpy(gt_bboxes).float()).numpy()
+    elif box_type == 'rheadbox':
+        ious = box_iou_rotated(
+            torch.from_numpy(det_bboxes[..., :5]).float(),
+            torch.from_numpy(gt_bboxes[..., :5]).float()).numpy()
     elif box_type == 'qbox':
         ious = box_iou_quadri(
             torch.from_numpy(det_bboxes).float(),
@@ -91,7 +102,12 @@ def tpfp_default(det_bboxes,
                         or gt_area_ignore[matched_gt]):
                     if not gt_covered[matched_gt]:
                         gt_covered[matched_gt] = True
-                        tp[k, i] = 1
+                        if box_type == 'rheadbox':
+                            if gt_bboxes[matched_gt, -1] == det_bboxes[i, -2]:
+                                tp[k, i] = 1
+                                tp_head[k, i] = 1
+                        else:
+                            tp[k, i] = 1
                     else:
                         fp[k, i] = 1
                 # otherwise ignore this detected bbox, tp = 0, fp = 0
@@ -99,6 +115,9 @@ def tpfp_default(det_bboxes,
                 fp[k, i] = 1
             else:
                 if box_type == 'rbox':
+                    bbox = det_bboxes[i, :5]
+                    area = bbox[2] * bbox[3]
+                elif box_type == 'rheadbox':
                     bbox = det_bboxes[i, :5]
                     area = bbox[2] * bbox[3]
                 elif box_type == 'qbox':
@@ -114,7 +133,10 @@ def tpfp_default(det_bboxes,
                     raise NotImplementedError
                 if area >= min_area and area < max_area:
                     fp[k, i] = 1
-    return tp, fp
+    if box_type == 'rheadbox':
+        return tp, fp, tp_head
+    else:
+        return tp, fp
 
 
 def get_cls_results(det_results, annotations, class_id, box_type):
@@ -147,6 +169,9 @@ def get_cls_results(det_results, annotations, class_id, box_type):
             elif box_type == 'qbox':
                 cls_gts.append(torch.zeros((0, 8), dtype=torch.float64))
                 cls_gts_ignore.append(torch.zeros((0, 8), dtype=torch.float64))
+            elif box_type == 'rheadbox':
+                cls_gts.append(torch.zeros((0, 6), dtype=torch.float64))
+                cls_gts_ignore.append(torch.zeros((0, 6)))
             else:
                 raise NotImplementedError
 
@@ -171,9 +196,10 @@ def eval_rbbox_map(det_results,
         annotations (list[dict]): Ground truth annotations where each item of
             the list indicates an image. Keys of annotations are:
 
-            - `bboxes`: numpy array of shape (n, 5)
+            - `bboxes`: numpy array of shape (n, 5) or (n, 6)
             - `labels`: numpy array of shape (n, )
             - `bboxes_ignore` (optional): numpy array of shape (k, 5)
+                or (k, 6)
             - `labels_ignore` (optional): numpy array of shape (k, )
         scale_ranges (list[tuple], optional): Range of scales to be evaluated,
             in the format [(min1, max1), (min2, max2), ...]. A range of
@@ -212,13 +238,22 @@ def eval_rbbox_map(det_results,
             det_results, annotations, i, box_type)
 
         # compute tp and fp for each image with multiple processes
-        tpfp = pool.starmap(
-            tpfp_default,
-            zip(cls_dets, cls_gts, cls_gts_ignore,
-                [iou_thr for _ in range(num_imgs)],
-                [box_type for _ in range(num_imgs)],
-                [area_ranges for _ in range(num_imgs)]))
-        tp, fp = tuple(zip(*tpfp))
+        if box_type == 'rheadbox':
+            tpfphead = pool.starmap(
+                tpfp_default,
+                zip(cls_dets, cls_gts, cls_gts_ignore,
+                    [iou_thr for _ in range(num_imgs)],
+                    [box_type for _ in range(num_imgs)],
+                    [area_ranges for _ in range(num_imgs)]))
+            tp, fp, tp_head = tuple(zip(*tpfphead))
+        else:
+            tpfp = pool.starmap(
+                tpfp_default,
+                zip(cls_dets, cls_gts, cls_gts_ignore,
+                    [iou_thr for _ in range(num_imgs)],
+                    [box_type for _ in range(num_imgs)],
+                    [area_ranges for _ in range(num_imgs)]))
+            tp, fp = tuple(zip(*tpfp))
         # calculate gt number of each scale
         # ignored gts or gts beyond the specific scale are not counted
         num_gts = np.zeros(num_scales, dtype=int)
@@ -226,7 +261,7 @@ def eval_rbbox_map(det_results,
             if area_ranges is None:
                 num_gts[0] += bbox.shape[0]
             else:
-                if box_type == 'rbox':
+                if box_type == 'rbox' or box_type == 'rheadbox':
                     gt_areas = bbox[:, 2] * bbox[:, 3]
                 elif box_type == 'qbox':
                     pts = bbox.reshape(*bbox.shape[:-1], 4, 2)
@@ -267,6 +302,13 @@ def eval_rbbox_map(det_results,
             'precision': precisions,
             'ap': ap
         })
+        if box_type == 'rheadbox':
+            tp_head = np.hstack(tp_head)
+            head_acc = []
+            for tp_s_head in tp_head:
+                head_acc.append(sum(tp_s_head) / len(tp_s_head))
+            head_acc = np.array(head_acc)
+            eval_results[-1]['head_acc'] = head_acc
     pool.close()
     if scale_ranges is not None:
         # shape (num_classes, num_scales)
@@ -286,16 +328,43 @@ def eval_rbbox_map(det_results,
                 aps.append(cls_result['ap'])
         mean_ap = np.array(aps).mean().item() if aps else 0.0
 
-    print_map_summary(
-        mean_ap, eval_results, dataset, area_ranges, logger=logger)
-
-    return mean_ap, eval_results
+    if box_type == 'rheadbox':
+        if scale_ranges is not None:
+            all_head_acc = np.vstack(
+                [cls_result['head_acc'] for cls_result in eval_results])
+            mean_head_acc = []
+            for i in range(num_scales):
+                if np.any(all_num_gts[:, i] > 0):
+                    mean_head_acc.append(all_head_acc[all_num_gts[:, i] > 0,
+                                                      i].mean())
+                else:
+                    mean_head_acc.append(0.0)
+        else:
+            head_accs = []
+            for cls_result in eval_results:
+                if cls_result['num_gts'] > 0:
+                    head_accs.append(cls_result['head_acc'])
+            mean_head_acc = np.array(
+                head_accs).mean().item() if head_accs else 0.0
+        print_map_summary(
+            mean_ap,
+            eval_results,
+            dataset,
+            area_ranges,
+            mean_head_acc=mean_head_acc,
+            logger=logger)
+        return mean_ap, mean_head_acc, eval_results
+    else:
+        print_map_summary(
+            mean_ap, eval_results, dataset, area_ranges, logger=logger)
+        return mean_ap, eval_results
 
 
 def print_map_summary(mean_ap,
                       results,
                       dataset=None,
                       scale_ranges=None,
+                      mean_head_acc=None,
                       logger=None):
     """Print mAP and results of each class.
 
@@ -307,6 +376,8 @@ def print_map_summary(mean_ap,
         results (list[dict]): Calculated from `eval_map()`.
         dataset (list[str] | str, optional): Dataset name or dataset classes.
         scale_ranges (list[tuple], optional): Range of scales to be evaluated.
+        mean_head_acc (float): Calculated from 'eval_map()', mean head
+            detection accuracy, if None, no head detection.
         logger (logging.Logger | str, optional): The way to print the mAP
             summary. See `mmcv.utils.print_log()` for details.
             Defaults to None.
@@ -328,11 +399,13 @@ def print_map_summary(mean_ap,
     recalls = np.zeros((num_scales, num_classes), dtype=np.float32)
     aps = np.zeros((num_scales, num_classes), dtype=np.float32)
     num_gts = np.zeros((num_scales, num_classes), dtype=int)
+    head_accs = np.zeros((num_scales, num_classes), dtype=np.float32)
     for i, cls_result in enumerate(results):
         if cls_result['recall'].size > 0:
             recalls[:, i] = np.array(cls_result['recall'], ndmin=2)[:, -1]
         aps[:, i] = cls_result['ap']
         num_gts[:, i] = cls_result['num_gts']
+        head_accs[:, i] = cls_result['head_acc'] if mean_head_acc else None
 
     if dataset is None:
         label_names = [str(i) for i in range(num_classes)]
@@ -341,19 +414,35 @@ def print_map_summary(mean_ap,
 
     if not isinstance(mean_ap, list):
         mean_ap = [mean_ap]
+    if mean_head_acc and not isinstance(mean_head_acc, list):
+        mean_head_acc = [mean_head_acc]
 
-    header = ['class', 'gts', 'dets', 'recall', 'ap']
+    header = ['class', 'gts', 'dets', 'recall', 'ap', 'head_acc'] if \
+        mean_head_acc else ['class', 'gts', 'dets', 'recall', 'ap']
     for i in range(num_scales):
         if scale_ranges is not None:
             print_log(f'Scale range {scale_ranges[i]}', logger=logger)
         table_data = [header]
         for j in range(num_classes):
-            row_data = [
-                label_names[j], num_gts[i, j], results[j]['num_dets'],
-                f'{recalls[i, j]:.3f}', f'{aps[i, j]:.3f}'
-            ]
+            if mean_head_acc:
+                row_data = [
+                    label_names[j], num_gts[i, j], results[j]['num_dets'],
+                    f'{recalls[i, j]:.3f}', f'{aps[i, j]:.3f}',
+                    f'{head_accs[i, j]:.3f}'
+                ]
+            else:
+                row_data = [
+                    label_names[j], num_gts[i, j], results[j]['num_dets'],
+                    f'{recalls[i, j]:.3f}', f'{aps[i, j]:.3f}'
+                ]
             table_data.append(row_data)
-        table_data.append(['mAP', '', '', '', f'{mean_ap[i]:.3f}'])
+        if mean_head_acc:
+            table_data.append([
+                'mAP', '', '', '', f'{mean_ap[i]:.3f}',
+                f'{mean_head_acc[i]:.3f}'
+            ])
+        else:
+            table_data.append(['mAP', '', '', '', f'{mean_ap[i]:.3f}'])
         table = AsciiTable(table_data)
         table.inner_footing_row_border = True
         print_log('\n' + table.table, logger=logger)
