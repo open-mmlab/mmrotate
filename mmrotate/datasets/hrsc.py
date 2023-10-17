@@ -95,7 +95,7 @@ class HRSCDataset(CustomDataset):
 
             filename = osp.join(self.img_subdir, f'{img_id}.bmp')
             data_info['filename'] = f'{img_id}.bmp'
-            xml_path = osp.join(self.img_prefix, self.ann_subdir,
+            xml_path = osp.join(self.ann_subdir,
                                 f'{img_id}.xml')
             tree = ET.parse(xml_path)
             root = tree.getroot()
