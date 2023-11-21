@@ -92,3 +92,82 @@ def get_num_level_anchors_inside(num_level_anchors, inside_flags):
         int(flags.sum()) for flags in split_inside_flags
     ]
     return num_level_anchors_inside
+
+
+def covariance_output_to_cholesky(pred_bbox_cov, num_factor=5):
+    """
+    Transforms output to covariance cholesky decomposition.
+    Args:
+        num_factor:
+        pred_bbox_cov (kx4 or kx10): Output covariance matrix elements.
+
+    Returns:
+        predicted_cov_cholesky (kx4x4): cholesky factor matrix
+    """
+    # Embed diagonal variance
+    diag_vars = torch.sqrt(torch.exp(pred_bbox_cov[:, 0:num_factor]))
+    predicted_cov_cholesky = torch.diag_embed(diag_vars)
+
+    if pred_bbox_cov.shape[1] > num_factor:
+        tril_indices = torch.tril_indices(row=num_factor, col=num_factor, offset=-1)
+        predicted_cov_cholesky[:, tril_indices[0],
+        tril_indices[1]] = pred_bbox_cov[:, num_factor:]
+
+    return predicted_cov_cholesky
+
+
+def clamp_log_variance(pred_bbox_cov, clamp_min=-7.0, clamp_max=7.0):
+    """
+    Tiny function that clamps variance for consistency across all methods.
+    """
+    pred_bbox_var_component = torch.clamp(
+        pred_bbox_cov[:, 0:4], clamp_min, clamp_max)
+    return torch.cat((pred_bbox_var_component, pred_bbox_cov[:, 4:]), dim=1)
+
+
+def get_probabilistic_loss_weight(current_step, annealing_step):
+    """
+    Tiny function to get adaptive probabilistic loss weight for consistency across all methods.
+    """
+    probabilistic_loss_weight = min(1.0, current_step / annealing_step)
+    probabilistic_loss_weight = (
+                                        100 ** probabilistic_loss_weight - 1.0) / (100.0 - 1.0)
+
+    return probabilistic_loss_weight
+
+
+def compute_mean_covariance_torch(input_samples):
+    """
+    Function for efficient computation of mean and covariance matrix in pytorch.
+
+    Args:
+        input_samples(list): list of tensors from M stochastic monte-carlo sampling runs, each containing N x k tensors.
+
+    Returns:
+        predicted_mean(Tensor): an Nxk tensor containing the predicted mean.
+        predicted_covariance(Tensor): an Nxkxk tensor containing the predicted covariance matrix.
+
+    """
+    if isinstance(input_samples, torch.Tensor):
+        num_samples = input_samples.shape[2]
+    else:
+        num_samples = len(input_samples)
+        input_samples = torch.stack(input_samples, 2)
+
+    # Compute Mean
+    predicted_mean = torch.mean(input_samples, 2, keepdim=True)
+
+    # Compute Covariance
+    residuals = torch.transpose(
+        torch.unsqueeze(
+            input_samples -
+            predicted_mean,
+            1),
+        1,
+        3)
+    predicted_covariance = torch.matmul(
+        residuals, torch.transpose(residuals, 3, 2))
+    predicted_covariance = torch.sum(
+        predicted_covariance, 1) / (num_samples - 1)
+
+    return predicted_mean.squeeze(2), predicted_covariance
