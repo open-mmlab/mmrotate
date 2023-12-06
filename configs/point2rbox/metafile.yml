@@ -1,0 +1,50 @@
+Collections:
+- Name: point2rbox
+  Metadata:
+    Training Data: DOTAv1.0
+    Training Techniques:
+      - AdamW
+    Training Resources: 1x GeForce RTX 4090
+    Architecture:
+      - ResNet
+  Paper:
+    URL: https://arxiv.org/pdf/2311.14758.pdf
+    Title: 'Point2RBox: Combine Knowledge from Synthetic Visual Patterns for End-to-end Oriented Object Detection with Single Point Supervision'
+  README: configs/point2rbox/README.md
+
+Models:
+  - Name: point2rbox-yolof-dota
+    In Collection: point2rbox
+    Config: configs/point2rbox/point2rbox-yolof-dota.py
+    Metadata:
+      Training Data: DOTAv1.0
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DOTAv1.0
+        Metrics:
+          mAP: 41.87
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/point2rbox/point2rbox-yolof-dota/point2rbox-yolof-dota-c94da82d.pth
+
+  - Name: point2rbox-yolof-dior
+    In Collection: point2rbox
+    Config: configs/point2rbox/point2rbox-yolof-dior.py
+    Metadata:
+      Training Data: DIOR
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: DIOR
+        Metrics:
+          mAP: 27.34
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/point2rbox/point2rbox-yolof-dior/point2rbox-yolof-dior-f4f724df.pth
+
+  - Name: point2rbox-yolof-hrsc
+    In Collection: point2rbox
+    Config: configs/point2rbox/point2rbox-yolof-hrsc.py
+    Metadata:
+      Training Data: HRSC
+    Results:
+      - Task: Oriented Object Detection
+        Dataset: HRSC
+        Metrics:
+          mAP: 79.40
+    Weights: https://download.openmmlab.com/mmrotate/v1.0/point2rbox/point2rbox-yolof-hrsc/point2rbox-yolof-hrsc-9d096323.pth

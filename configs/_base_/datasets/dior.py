@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'DIORDataset'
-data_root = 'data/DIOR/'
+data_root = 'data/dior/'
 backend_args = None
 
 train_pipeline = [
@@ -60,7 +60,7 @@ train_dataloader = dict(
                 backend_args=backend_args)
         ]))
 val_dataloader = dict(
-    batch_size=1,
+    batch_size=8,
     num_workers=2,
     persistent_workers=True,
     drop_last=False,
