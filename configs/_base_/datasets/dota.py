@@ -59,27 +59,27 @@ val_dataloader = dict(
         data_prefix=dict(img_path='trainval/images/'),
         test_mode=True,
         pipeline=val_pipeline))
-# test_dataloader = val_dataloader
+test_dataloader = val_dataloader
 
 val_evaluator = dict(type='DOTAMetric', metric='mAP')
-# test_evaluator = val_evaluator
+test_evaluator = val_evaluator
 
 # inference on test dataset and format the output results
 # for submission. Note: the test set has no annotation.
-test_dataloader = dict(
-    batch_size=8,
-    num_workers=2,
-    persistent_workers=True,
-    drop_last=False,
-    sampler=dict(type='DefaultSampler', shuffle=False),
-    dataset=dict(
-        type=dataset_type,
-        data_root=data_root,
-        data_prefix=dict(img_path='test/images/'),
-        test_mode=True,
-        pipeline=test_pipeline))
-test_evaluator = dict(
-    type='DOTAMetric',
-    format_only=True,
-    merge_patches=True,
-    outfile_prefix='./work_dirs/dota/Task1')
+# test_dataloader = dict(
+#     batch_size=1,
+#     num_workers=2,
+#     persistent_workers=True,
+#     drop_last=False,
+#     sampler=dict(type='DefaultSampler', shuffle=False),
+#     dataset=dict(
+#         type=dataset_type,
+#         data_root=data_root,
+#         data_prefix=dict(img_path='test/images/'),
+#         test_mode=True,
+#         pipeline=test_pipeline))
+# test_evaluator = dict(
+#     type='DOTAMetric',
+#     format_only=True,
+#     merge_patches=True,
+#     outfile_prefix='./work_dirs/dota/Task1')
