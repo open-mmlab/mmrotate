@@ -14,7 +14,7 @@ With the rapidly increasing demand for oriented object detection (OOD), recent r
 
 ## Basic patterns
 
-Extract [basic_patterns.zip](https://github.com/yuyi1005/point2rbox/files/13816301/basic_patterns.zip) to data folder. The path can also be modified in config files.
+Extract [basic_patterns.zip](https://github.com/open-mmlab/mmrotate/files/13816461/basic_patterns.zip) to data folder. The path can also be modified in config files.
 
 ## Results and models
 
