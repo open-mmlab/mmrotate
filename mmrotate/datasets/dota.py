@@ -17,6 +17,7 @@ from mmcv.ops import nms_rotated
 from mmdet.datasets.custom import CustomDataset
 
 from mmrotate.core import eval_rbbox_map, obb2poly_np, poly2obb_np
+from mmengine.device import is_cuda_available, is_musa_available
 from .builder import ROTATED_DATASETS
 
 
@@ -373,7 +374,10 @@ def _merge_func(info, CLASSES, iou_thr):
             big_img_results.append(dets[labels == i])
         else:
             try:
-                cls_dets = torch.from_numpy(dets[labels == i]).cuda()
+                if is_cuda_available():
+                    cls_dets = torch.from_numpy(dets[labels == i]).cuda()
+                elif is_musa_available():
+                    cls_dets = torch.from_numpy(dets[labels == i]).musa()
             except:  # noqa: E722
                 cls_dets = torch.from_numpy(dets[labels == i])
             nms_dets, keep_inds = nms_rotated(cls_dets[:, :5], cls_dets[:, -1],

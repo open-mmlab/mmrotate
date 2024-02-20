@@ -2,6 +2,7 @@
 import torch
 import torch.nn as nn
 from mmcv.ops import convex_giou
+from mmengine.device import is_musa_available, is_cuda_available
 from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 
@@ -229,11 +230,16 @@ class BCConvexGIoULossFuction(Function):
 
         target_aspect = AspectRatio(target)
         smooth_loss_weight = torch.exp((-1 / 4) * target_aspect)
-        loss = \
-            smooth_loss_weight * (diff_mean_loss.reshape(-1, 1).cuda() +
-                                  diff_corners_loss.reshape(-1, 1).cuda()) + \
-            1 - (1 - 2 * smooth_loss_weight) * convex_gious
-
+        if is_cuda_available():
+            loss = \
+                smooth_loss_weight * (diff_mean_loss.reshape(-1, 1).cuda() +
+                                    diff_corners_loss.reshape(-1, 1).cuda()) + \
+                1 - (1 - 2 * smooth_loss_weight) * convex_gious
+        elif is_musa_available():
+            loss = \
+                smooth_loss_weight * (diff_mean_loss.reshape(-1, 1).musa() +
+                                    diff_corners_loss.reshape(-1, 1).musa()) + \
+                1 - (1 - 2 * smooth_loss_weight) * convex_gious
         if weight is not None:
             loss = loss * weight
             grad = grad * weight.reshape(-1, 1)

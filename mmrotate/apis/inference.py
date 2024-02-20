@@ -6,7 +6,7 @@ from mmcv.ops import RoIPool
 from mmcv.parallel import collate, scatter
 from mmdet.datasets import replace_ImageToTensor
 from mmdet.datasets.pipelines import Compose
-
+from mmengine.device import is_musa_available
 from mmrotate.core import get_multiscale_patch, merge_results, slide_window
 
 
@@ -70,6 +70,8 @@ def inference_detector_by_patches(model,
         data['img'] = [img.data[0] for img in data['img']]
         if next(model.parameters()).is_cuda:
             # scatter to specified GPU
+            data = scatter(data, [device])[0]
+        if is_musa_available() and next(model.parameters()).is_musa:
             data = scatter(data, [device])[0]
         else:
             for m in model.modules():
