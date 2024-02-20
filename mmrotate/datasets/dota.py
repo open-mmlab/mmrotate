@@ -15,9 +15,9 @@ import numpy as np
 import torch
 from mmcv.ops import nms_rotated
 from mmdet.datasets.custom import CustomDataset
+from mmengine.device import is_cuda_available, is_musa_available
 
 from mmrotate.core import eval_rbbox_map, obb2poly_np, poly2obb_np
-from mmengine.device import is_cuda_available, is_musa_available
 from .builder import ROTATED_DATASETS
 
 

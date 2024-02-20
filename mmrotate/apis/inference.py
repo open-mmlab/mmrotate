@@ -7,6 +7,7 @@ from mmcv.parallel import collate, scatter
 from mmdet.datasets import replace_ImageToTensor
 from mmdet.datasets.pipelines import Compose
 from mmengine.device import is_musa_available
+
 from mmrotate.core import get_multiscale_patch, merge_results, slide_window
 
 

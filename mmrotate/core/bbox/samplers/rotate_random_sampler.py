@@ -2,7 +2,8 @@
 import torch
 from mmdet.core.bbox.samplers.base_sampler import BaseSampler
 from mmdet.core.bbox.samplers.sampling_result import SamplingResult
-from mmengine.device import is_musa_available, is_cuda_available
+from mmengine.device import is_cuda_available, is_musa_available
+
 from ..builder import ROTATED_BBOX_SAMPLERS
 
 
@@ -50,10 +51,14 @@ class RRandomSampler(BaseSampler):
         if not is_tensor:
             if is_cuda_available():
                 gallery = torch.tensor(
-                    gallery, dtype=torch.long, device=torch.cuda.current_device())
+                    gallery,
+                    dtype=torch.long,
+                    device=torch.cuda.current_device())
             elif is_musa_available():
                 gallery = torch.tensor(
-                    gallery, dtype=torch.long, device=torch.musa.current_device())      
+                    gallery,
+                    dtype=torch.long,
+                    device=torch.musa.current_device())
         perm = torch.randperm(gallery.numel(), device=gallery.device)[:num]
         rand_inds = gallery[perm]
         if not is_tensor:

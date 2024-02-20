@@ -3,7 +3,7 @@ from math import pi
 
 import numpy as np
 import torch
-from mmengine.device import is_musa_available, is_cuda_available
+from mmengine.device import is_cuda_available, is_musa_available
 
 
 class GaussianMixture():
@@ -51,9 +51,9 @@ class GaussianMixture():
             self.var_init = var_init
 
         if is_musa_available():
-            device='musa'
+            device = 'musa'
         elif is_cuda_available():
-            device='cuda'
+            device = 'cuda'
         if self.requires_grad:
             if self.mu_init is not None:
                 assert torch.is_tensor(self.mu_init)

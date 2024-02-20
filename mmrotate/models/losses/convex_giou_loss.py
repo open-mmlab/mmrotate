@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from mmcv.ops import convex_giou
-from mmengine.device import is_musa_available, is_cuda_available
+from mmengine.device import is_cuda_available, is_musa_available
 from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 
