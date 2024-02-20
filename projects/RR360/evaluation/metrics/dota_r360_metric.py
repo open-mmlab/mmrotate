@@ -14,6 +14,7 @@ from mmcv.ops import nms_quadri, nms_rotated
 from mmengine.evaluator import BaseMetric
 from mmengine.fileio import dump
 from mmengine.logging import MMLogger
+from mmengine.device import is_musa_available, is_cuda_available
 from projects.RR360.evaluation import eval_rbbox_head_map
 
 from mmrotate.registry import METRICS
@@ -159,7 +160,10 @@ class DOTAR360Metric(BaseMetric):
                     big_img_results.append(dets[labels == i])
                 else:
                     try:
-                        cls_dets = torch.from_numpy(dets[labels == i]).cuda()
+                        if is_cuda_available():
+                            cls_dets = torch.from_numpy(dets[labels == i]).cuda()
+                        elif is_musa_available():
+                            cls_dets = torch.from_numpy(dets[labels == i]).musa()
                     except:  # noqa: E722
                         cls_dets = torch.from_numpy(dets[labels == i])
                     if self.predict_box_type == 'rbox':

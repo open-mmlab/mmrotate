@@ -6,6 +6,7 @@ import torch.nn as nn
 from mmdet.models.losses.utils import weighted_loss
 
 from mmrotate.registry import MODELS
+from mmengine.device import is_musa_available, is_cuda_available
 
 try:
     from mmcv.ops import diff_iou_rotated_2d
@@ -127,14 +128,26 @@ class RotatedIoULoss(nn.Module):
             # iou_loss of shape (n,)
             assert weight.shape == pred.shape
             weight = weight.mean(-1)
-        with torch.cuda.amp.autocast(enabled=False):
-            loss = self.loss_weight * rotated_iou_loss(
-                pred,
-                target,
-                weight,
-                mode=self.mode,
-                eps=self.eps,
-                reduction=reduction,
-                avg_factor=avg_factor,
-                **kwargs)
+        if is_cuda_available():
+            with torch.cuda.amp.autocast(enabled=False):
+                loss = self.loss_weight * rotated_iou_loss(
+                    pred,
+                    target,
+                    weight,
+                    mode=self.mode,
+                    eps=self.eps,
+                    reduction=reduction,
+                    avg_factor=avg_factor,
+                    **kwargs)
+        elif is_musa_available():
+            with torch.musa.amp.autocast(enabled=False):
+                loss = self.loss_weight * rotated_iou_loss(
+                    pred,
+                    target,
+                    weight,
+                    mode=self.mode,
+                    eps=self.eps,
+                    reduction=reduction,
+                    avg_factor=avg_factor,
+                    **kwargs)      
         return loss

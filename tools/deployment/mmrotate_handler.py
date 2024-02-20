@@ -8,7 +8,7 @@ from mmdet.apis import inference_detector, init_detector
 from ts.torch_handler.base_handler import BaseHandler
 
 import mmrotate  # noqa: F401
-
+from mmengine.device import is_musa_available, is_cuda_available
 
 class MMRotateHandler(BaseHandler):
     """MMRotate handler to load torchscript or eager mode [state_dict]
@@ -23,10 +23,15 @@ class MMRotateHandler(BaseHandler):
             pertaining to the model artifacts parameters.
         """
         properties = context.system_properties
-        self.map_location = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.device = torch.device(self.map_location + ':' +
-                                   str(properties.get('gpu_id')) if torch.cuda.
-                                   is_available() else self.map_location)
+        if is_cuda_available():
+            self.map_location = 'cuda'
+            self.device = torch.device(self.map_location + ':' + str(properties.get('gpu_id')))
+        elif is_musa_available():
+            self.map_location = 'musa'
+            self.device = torch.device(self.map_location + ':' + str(properties.get('gpu_id')))
+        else:
+            self.map_location = 'cpu'
+            self.device = torch.device(self.map_location)
         self.manifest = context.manifest
 
         model_dir = properties.get('model_dir')
