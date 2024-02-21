@@ -1,6 +1,6 @@
 # KFIoU
 
-> [The KFIoU Loss for Rotated Object Detection](https://arxiv.org/pdf/2101.11952.pdf)
+> [The KFIoU Loss for Rotated Object Detection](https://arxiv.org/pdf/2201.12558.pdf)
 
 <!-- [ALGORITHM] -->
 

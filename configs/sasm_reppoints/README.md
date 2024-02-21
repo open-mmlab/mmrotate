@@ -1,6 +1,6 @@
 # SASM
 
-> [Shape-Adaptive Selection and Measurement for Oriented Object Detection](https://www.aaai.org/AAAI22Papers/AAAI-2171.HouL.pdf)
+> [Shape-Adaptive Selection and Measurement for Oriented Object Detection](https://cdn.aaai.org/ojs/19975/19975-13-23988-1-2-20220628.pdf)
 
 <!-- [ALGORITHM] -->
 
