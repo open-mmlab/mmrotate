@@ -1,6 +1,6 @@
 # H2RBox-v2
 
-> [H2RBox-v2: Boosting HBox-supervised Oriented Object Detection via Symmetric Learning](https://arxiv.org/pdf/2304.04403)
+> [H2RBox-v2: Incorporating Symmetry for Boosting Horizontal Box Supervised Oriented Object Detection](https://arxiv.org/pdf/2304.04403)
 
 <!-- [ALGORITHM] -->
 
@@ -44,7 +44,7 @@ HRSC
 
 ```
 @misc{yu2023h2rboxv2,
-title={H2RBox-v2: Boosting HBox-supervised Oriented Object Detection via Symmetric Learning},
+title={H2RBox-v2: Incorporating Symmetry for Boosting Horizontal Box Supervised Oriented Object Detection},
 author={Yi Yu and Xue Yang and Qingyun Li and Yue Zhou and Gefan Zhang and Feipeng Da and Junchi Yan},
 year={2023},
 eprint={2304.04403},
