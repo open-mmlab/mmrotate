@@ -39,12 +39,10 @@ HRSC
 ## Citation
 
 ```
-@misc{yu2023point2rbox,
+@inproceedings{yu2024point2rbox,
 title={Point2RBox: Combine Knowledge from Synthetic Visual Patterns for End-to-end Oriented Object Detection with Single Point Supervision},
-author={Yi Yu and Xue Yang and Qingyun Li and Feipeng Da and Junchi Yan and Jifeng Dai and Yu Qiao},
-year={2023},
-eprint={2311.14758},
-archivePrefix={arXiv},
-primaryClass={cs.CV}
+author={Yi Yu and Xue Yang and Qingyun Li and Feipeng Da and Jifeng Dai and Yu Qiao and Junchi Yan},
+year={2024},
+booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition}
 }
 ```
