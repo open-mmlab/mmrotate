@@ -197,7 +197,7 @@ class DOTAMetric(BaseMetric):
                 else:
                     raise NotImplementedError
                 for qbox, score in zip(qboxes, scores):
-                    txt_element = [img_id, str(round(float(score), 2))
+                    txt_element = [img_id, str(float(score))
                                    ] + [f'{p:.2f}' for p in qbox]
                     f.writelines(' '.join(txt_element) + '\n')
 
