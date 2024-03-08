@@ -1,6 +1,10 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Optional, Tuple, Union
+
 import numpy as np
 import torch
+
+from mmrotate.structures.bbox.box_converters import qbox2rbox, rbox2qbox
 
 
 def norm_angle(angle, angle_range):
@@ -112,3 +116,42 @@ def distance2obb(points: torch.Tensor,
 
     angle_regular = norm_angle(angle, angle_version)
     return torch.cat([ctr, wh, angle_regular], dim=-1)
+
+
+def rbox_project(
+    bboxes: Union[torch.Tensor, np.ndarray],
+    homography_matrix: Union[torch.Tensor, np.ndarray],
+    img_shape: Optional[Tuple[int, int]] = None
+) -> Union[torch.Tensor, np.ndarray]:
+    """Geometric transformation for rbox. modified from
+    mmdet/structures/bbox/transforms.py/bbox_project to support rbox.
+
+    Args:
+        bboxes (Union[torch.Tensor, np.ndarray]): Shape (n, 5) for rboxes.
+        homography_matrix (Union[torch.Tensor, np.ndarray]):
+            Shape (3, 3) for geometric transformation.
+        img_shape (Tuple[int, int], optional): Image shape. Defaults to None.
+    Returns:
+        Union[torch.Tensor, np.ndarray]: Converted bboxes.
+    """
+    bboxes_type = type(bboxes)
+    if bboxes_type is np.ndarray:
+        bboxes = torch.from_numpy(bboxes)
+    if isinstance(homography_matrix, np.ndarray):
+        homography_matrix = torch.from_numpy(homography_matrix)
+
+    corners = rbox2qbox(bboxes).reshape(-1, 2)
+    corners = torch.cat(
+        [corners, corners.new_ones(corners.shape[0], 1)], dim=1)
+    corners = torch.matmul(homography_matrix, corners.t()).t()
+    # Convert to homogeneous coordinates by normalization
+    corners = corners[:, :2] / corners[:, 2:3]
+
+    corners = corners.reshape(-1, 8)
+    corners[:, 0::2] = corners[:, 0::2].clamp(0, img_shape[1])
+    corners[:, 1::2] = corners[:, 1::2].clamp(0, img_shape[0])
+    bboxes = qbox2rbox(corners)
+
+    if bboxes_type is np.ndarray:
+        bboxes = bboxes.numpy()
+    return bboxes
