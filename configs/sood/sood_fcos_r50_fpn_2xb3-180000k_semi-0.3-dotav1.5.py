@@ -95,8 +95,6 @@ custom_hooks = [
     dict(type='MeanTeacherHook', start_iter=3200, momentum=0.0004),
 ]
 
-randomness = dict(seed=42, diff_rank_seed=False, deterministic=True)
-
 vis_backends = [dict(type='TensorboardVisBackend')]
 
 visualizer = dict(
