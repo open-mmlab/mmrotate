@@ -27,7 +27,7 @@ assert (mmengine_version >= digit_version(mmengine_minimum_version)
     f'<{mmengine_maximum_version}.'
 
 mmdet_minimum_version = '3.0.0rc6'
-mmdet_maximum_version = '3.2.0'
+mmdet_maximum_version = '3.3.0'
 mmdet_version = digit_version(mmdet.__version__)
 
 assert (mmdet_version >= digit_version(mmdet_minimum_version)
