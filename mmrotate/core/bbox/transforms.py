@@ -332,7 +332,7 @@ def poly2obb_full360(polys):
         torch.pow(pt2[..., 0] - pt3[..., 0], 2) +
         torch.pow(pt2[..., 1] - pt3[..., 1], 2))
     angles = torch.atan2((pt1[..., 1] - pt2[..., 1]),
-                          (pt1[..., 0] - pt2[..., 0]))
+                         (pt1[..., 0] - pt2[..., 0]))
     angles = norm_angle(angles, 'full360')
     x_ctr = (pt1[..., 0] + pt3[..., 0]) / 2.0
     y_ctr = (pt1[..., 1] + pt3[..., 1]) / 2.0
@@ -460,8 +460,8 @@ def poly2obb_np_le90(poly):
 
 
 def poly2obb_np_full360(poly):
-    """Convert polygons to oriented bounding boxes.
-    Assumes head points then tail points.
+    """Convert polygons to oriented bounding boxes. Assumes head points then
+    tail points.
 
     Args:
         polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3]

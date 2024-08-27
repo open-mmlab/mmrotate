@@ -31,7 +31,7 @@ def test_transforms():
 
     # test full360
     # Check obb2poly and poly2obb is inverse function in full360 rotation
-    for angle in np.linspace(- .9 * np.pi, .9 * np.pi, 4):
+    for angle in np.linspace(-.9 * np.pi, .9 * np.pi, 4):
         # numpy version
         box_np = np.array((100, 100, 80, 50, angle), dtype=np.float32)
         pts_np = rtf.obb2poly_np(box_np[None], version='full360')[0]
@@ -39,11 +39,14 @@ def test_transforms():
         np.testing.assert_almost_equal(box_np, box2_np, decimal=4)
 
         # torch version
-        box_torch = torch.tensor((100, 100, 80, 50, angle), dtype=torch.float32)
+        box_torch = torch.tensor((100, 100, 80, 50, angle),
+                                 dtype=torch.float32)
         pts_torch = rtf.obb2poly(box_torch[None], version='full360')[0]
         box2_torch = rtf.poly2obb(pts_torch, version='full360')[0]
         torch.testing.assert_close(box_torch, box2_torch, rtol=1e-4, atol=1e-4)
 
         # compatibility
-        torch.testing.assert_close(box_torch, torch.from_numpy(box_np), rtol=1e-4, atol=1e-4)
-        torch.testing.assert_close(pts_torch, torch.from_numpy(pts_np), rtol=1e-4, atol=1e-4)
+        torch.testing.assert_close(
+            box_torch, torch.from_numpy(box_np), rtol=1e-4, atol=1e-4)
+        torch.testing.assert_close(
+            pts_torch, torch.from_numpy(pts_np), rtol=1e-4, atol=1e-4)
