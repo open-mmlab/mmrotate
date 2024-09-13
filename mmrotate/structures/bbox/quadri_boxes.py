@@ -296,6 +296,22 @@ class QuadriBoxes(BaseBoxes):
         values = (x1 - pt_x) * (y2 - pt_y) - (y1 - pt_y) * (x2 - pt_x)
         return (values >= eps).all(dim=-1) | (values <= -eps).all(dim=-1)
 
+    def create_masks(self, img_shape: Tuple[int, int]) -> BitmapMasks:
+        """
+        Args:
+            img_shape (Tuple[int, int]): A tuple of image height and width.
+        Returns:
+            :obj:`BitmapMasks`: Converted masks
+        """
+        img_h, img_w = img_shape
+        polygons = self.vertices.numpy().astype(np.int0)
+
+        gt_masks = np.zeros((len(polygons), img_h, img_w), dtype=np.uint8)
+
+        for i, polygon in enumerate(polygons):
+            cv2.drawContours(gt_masks[i], [polygon], 0, 1, -1)
+        return BitmapMasks(gt_masks, img_h, img_w)
+
     @staticmethod
     def overlaps(boxes1: BaseBoxes,
                  boxes2: BaseBoxes,
