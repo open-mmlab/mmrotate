@@ -44,9 +44,9 @@ HRSC
 
 ```
 @inproceedings{yu2023h2rboxv2,
-      title={H2RBox-v2: Incorporating Symmetry for Boosting Horizontal Box Supervised Oriented Object Detection}, 
-      author={Yi Yu and Xue Yang and Qingyun Li and Yue Zhou and and Feipeng Da and Junchi Yan},
-      year={2023},
-      booktitle={Advances in Neural Information Processing Systems}
+title={H2RBox-v2: Incorporating Symmetry for Boosting Horizontal Box Supervised Oriented Object Detection},
+author={Yi Yu and Xue Yang and Qingyun Li and Yue Zhou and and Feipeng Da and Junchi Yan},
+year={2023},
+booktitle={Advances in Neural Information Processing Systems}
 }
 ```
