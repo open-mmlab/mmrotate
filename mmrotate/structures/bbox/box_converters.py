@@ -7,6 +7,7 @@ from torch import Tensor
 
 from .quadri_boxes import QuadriBoxes
 from .rotated_boxes import RotatedBoxes
+from .rotated_head_boxes import RotatedHeadBoxes
 
 
 @register_box_converter(HorizontalBoxes, RotatedBoxes)
@@ -113,3 +114,17 @@ def qbox2rbox(boxes: Tensor) -> Tensor:
         rboxes.append([x, y, w, h, angle / 180 * np.pi])
     rboxes = boxes.new_tensor(rboxes)
     return rboxes.view(*original_shape, 5)
+
+
+@register_box_converter(RotatedHeadBoxes, RotatedBoxes)
+def rheadbox2rbox(boxes: Tensor) -> Tensor:
+    """Convert quadrilateral boxes to rotated boxes.
+
+    Args:
+        boxes (Tensor): RotatedHeadBoxes box tensor with shape of (..., 7).
+
+    Returns:
+        Tensor: Rotated box tensor with shape of (..., 5).
+    """
+    rboxes = boxes[..., :5]
+    return rboxes
