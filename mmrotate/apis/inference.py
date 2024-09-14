@@ -60,7 +60,7 @@ def inference_detector_by_patches(
                     'type'] != 'LoadPanopticAnnotations':
                 new_test_pipeline.append(pipeline)
         # set loading pipeline type
-        test_pipeline[0].type = 'LoadPatchFromNDArray'
+        test_pipeline[0].type = 'mmrotate.LoadPatchFromNDArray'
         test_pipeline = Compose(new_test_pipeline)
 
     if model.data_preprocessor.device.type == 'cpu':
