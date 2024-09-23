@@ -81,7 +81,7 @@ jobs:
         type: string
       cuda:
         type: enum
-        enum: ["10.1", "10.2", "11.1"]
+        enum: ["10.1", "10.2", "11.1", "11.7"]
       cudnn:
         type: integer
         default: 7
@@ -155,8 +155,8 @@ workflows:
             - lint
       - build_cpu:
           name: maximum_version_cpu
-          torch: 1.13.0
-          torchvision: 0.14.0
+          torch: 2.0.0
+          torchvision: 0.15.1
           python: 3.9.0
           requires:
             - minimum_version_cpu
