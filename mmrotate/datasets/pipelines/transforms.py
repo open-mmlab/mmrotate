@@ -80,10 +80,8 @@ class RRandomFlip(RandomFlip):
         flipped = bboxes.copy()
         if direction == 'horizontal':
             flipped[:, 0] = img_shape[1] - bboxes[:, 0] - 1
-            flipped[:4] = flipped[[1, 0, 3, 2]].copy()
         elif direction == 'vertical':
             flipped[:, 1] = img_shape[0] - bboxes[:, 1] - 1
-            flipped[:4] = flipped[[1, 0, 3, 2]].copy()
         elif direction == 'diagonal':
             flipped[:, 0] = img_shape[1] - bboxes[:, 0] - 1
             flipped[:, 1] = img_shape[0] - bboxes[:, 1] - 1
@@ -273,6 +271,7 @@ class PolyRandomRotate(object):
     def __repr__(self):
         repr_str = self.__class__.__name__
         repr_str += f'(rotate_ratio={self.rotate_ratio}, ' \
+                    f'base_angles={self.base_angles}, ' \
                     f'angles_range={self.angles_range}, ' \
                     f'auto_bound={self.auto_bound})'
         return repr_str

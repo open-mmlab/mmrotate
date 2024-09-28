@@ -67,7 +67,7 @@ class DeltaXYWHAOBBoxCoder(BaseBBoxCoder):
         assert bboxes.size(0) == gt_bboxes.size(0)
         assert bboxes.size(-1) == 5
         assert gt_bboxes.size(-1) == 5
-        if self.angle_range in ['oc', 'le135', 'le90', 'full360']:
+        if self.angle_range in ['oc', 'le135', 'le90']:
             return bbox2delta(bboxes, gt_bboxes, self.means, self.stds,
                               self.angle_range, self.norm_factor,
                               self.edge_swap, self.proj_xy)
@@ -99,7 +99,7 @@ class DeltaXYWHAOBBoxCoder(BaseBBoxCoder):
             torch.Tensor: Decoded boxes.
         """
         assert pred_bboxes.size(0) == bboxes.size(0)
-        if self.angle_range in ['oc', 'le135', 'le90', 'full360']:
+        if self.angle_range in ['oc', 'le135', 'le90']:
             return delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
                               max_shape, wh_ratio_clip, self.add_ctr_clamp,
                               self.ctr_clamp, self.angle_range,

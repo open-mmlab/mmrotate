@@ -108,8 +108,6 @@ def poly2obb(polys, version='oc'):
         results = poly2obb_le135(polys)
     elif version == 'le90':
         results = poly2obb_le90(polys)
-    elif version == 'full360':
-        results = poly2obb_full360(polys)
     else:
         raise NotImplementedError
     return results
@@ -131,8 +129,6 @@ def poly2obb_np(polys, version='oc'):
         results = poly2obb_np_le135(polys)
     elif version == 'le90':
         results = poly2obb_np_le90(polys)
-    elif version == 'full360':
-        results = poly2obb_np_full360(polys)
     else:
         raise NotImplementedError
     return results
@@ -153,9 +149,6 @@ def obb2hbb(rbboxes, version='oc'):
     elif version == 'le135':
         results = obb2hbb_le135(rbboxes)
     elif version == 'le90':
-        results = obb2hbb_le90(rbboxes)
-    elif version == 'full360':
-        # NOTE: same as 90
         results = obb2hbb_le90(rbboxes)
     else:
         raise NotImplementedError
@@ -178,9 +171,6 @@ def obb2poly(rbboxes, version='oc'):
         results = obb2poly_le135(rbboxes)
     elif version == 'le90':
         results = obb2poly_le90(rbboxes)
-    elif version == 'full360':
-        # NOTE: same as 90
-        results = obb2poly_le90(rbboxes)
     else:
         raise NotImplementedError
     return results
@@ -202,8 +192,6 @@ def obb2poly_np(rbboxes, version='oc'):
         results = obb2poly_np_le135(rbboxes)
     elif version == 'le90':
         results = obb2poly_np_le90(rbboxes)
-    elif version == 'full360':
-        results = obb2poly_np_full360(rbboxes)
     else:
         raise NotImplementedError
     return results
@@ -224,9 +212,6 @@ def obb2xyxy(rbboxes, version='oc'):
     elif version == 'le135':
         results = obb2xyxy_le135(rbboxes)
     elif version == 'le90':
-        results = obb2xyxy_le90(rbboxes)
-    elif version == 'full360':
-        # NOTE: same as 90
         results = obb2xyxy_le90(rbboxes)
     else:
         raise NotImplementedError
@@ -250,7 +235,6 @@ def hbb2obb(hbboxes, version='oc'):
     elif version == 'le90':
         results = hbb2obb_le90(hbboxes)
     else:
-        # NOTE: not well defined for full360. Leave it unimplemented
         raise NotImplementedError
     return results
 
@@ -311,31 +295,6 @@ def poly2obb_le135(polys):
     edges = torch.stack([edge1, edge2], dim=1)
     width, _ = torch.max(edges, 1)
     height, _ = torch.min(edges, 1)
-    return torch.stack([x_ctr, y_ctr, width, height, angles], 1)
-
-
-def poly2obb_full360(polys):
-    """Convert polygons to oriented bounding boxes.
-
-    Args:
-        polys (torch.Tensor): [x0,y0,x1,y1,x2,y2,x3,y3]
-
-    Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
-    """
-    polys = torch.reshape(polys, [-1, 8])
-    pt1, pt2, pt3, _ = polys[..., :8].chunk(4, 1)
-    width = torch.sqrt(
-        torch.pow(pt1[..., 0] - pt2[..., 0], 2) +
-        torch.pow(pt1[..., 1] - pt2[..., 1], 2))
-    height = torch.sqrt(
-        torch.pow(pt2[..., 0] - pt3[..., 0], 2) +
-        torch.pow(pt2[..., 1] - pt3[..., 1], 2))
-    angles = torch.atan2((pt1[..., 1] - pt2[..., 1]),
-                         (pt1[..., 0] - pt2[..., 0]))
-    angles = norm_angle(angles, 'full360')
-    x_ctr = (pt1[..., 0] + pt3[..., 0]) / 2.0
-    y_ctr = (pt1[..., 1] + pt3[..., 1]) / 2.0
     return torch.stack([x_ctr, y_ctr, width, height, angles], 1)
 
 
@@ -456,33 +415,6 @@ def poly2obb_np_le90(poly):
         else:
             a += np.pi
     assert np.pi / 2 > a >= -np.pi / 2
-    return x, y, w, h, a
-
-
-def poly2obb_np_full360(poly):
-    """Convert polygons to oriented bounding boxes. Assumes head points then
-    tail points.
-
-    Args:
-        polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3]
-
-    Returns:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle]
-    """
-    pt1, pt2, pt3, pt4 = np.array(poly).reshape((4, 2))
-    x, y = (pt1 + pt2 + pt3 + pt4) / 4.0
-    dx, dy = pt2 - pt1
-    a = np.arctan2(dy, dx)
-    w = np.linalg.norm(pt2 - pt1)
-    h = np.linalg.norm(pt3 - pt2)
-    if w < 2 or h < 2:
-        return
-    while not np.pi > a >= -np.pi:
-        if a >= np.pi:
-            a -= np.pi
-        else:
-            a += np.pi
-    assert np.pi > a >= -np.pi
     return x, y, w, h, a
 
 
@@ -702,26 +634,6 @@ def hbb2obb_le90(hbboxes):
     return obboxes
 
 
-def hbb2obb_full360(hbboxes):
-    """Convert horizontal bounding boxes to oriented bounding boxes.
-
-    Args:
-        hbbs (torch.Tensor): [x_lt,y_lt,x_rb,y_rb]
-
-    Returns:
-        obbs (torch.Tensor): [x_ctr,y_ctr,w,h,angle]
-    """
-    x = (hbboxes[..., 0] + hbboxes[..., 2]) * 0.5
-    y = (hbboxes[..., 1] + hbboxes[..., 3]) * 0.5
-    w = hbboxes[..., 2] - hbboxes[..., 0]
-    h = hbboxes[..., 3] - hbboxes[..., 1]
-    theta = x.new_zeros(*x.shape)
-    obboxes1 = torch.stack([x, y, w, h, theta], dim=-1)
-    obboxes2 = torch.stack([x, y, h, w, theta - np.pi / 2], dim=-1)
-    obboxes = torch.where((w >= h)[..., None], obboxes1, obboxes2)
-    return obboxes
-
-
 def obb2xyxy_oc(rbboxes):
     """Convert oriented bounding boxes to horizontal bounding boxes.
 
@@ -871,31 +783,6 @@ def obb2poly_np_le90(obboxes):
     return polys
 
 
-def obb2poly_np_full360(obboxes):
-    """Convert oriented bounding boxes to polygons.
-
-    Args:
-        obbs (ndarray): [x_ctr,y_ctr,w,h,angle,score]
-
-    Returns:
-        polys (ndarray): [x0,y0,x1,y1,x2,y2,x3,y3,score]
-    """
-    try:
-        center, w, h, theta, score = np.split(obboxes, (2, 3, 4, 5), axis=-1)
-    except:  # noqa: E722
-        results = np.stack([0., 0., 0., 0., 0., 0., 0., 0., 0.], axis=-1)
-        return results.reshape(1, -1)
-    Cos, Sin = np.cos(theta), np.sin(theta)
-    vector1 = np.concatenate([w / 2 * Cos, w / 2 * Sin], axis=-1)
-    vector2 = np.concatenate([-h / 2 * Sin, h / 2 * Cos], axis=-1)
-    point1 = center - vector1 - vector2
-    point2 = center + vector1 - vector2
-    point3 = center + vector1 + vector2
-    point4 = center - vector1 + vector2
-    polys = np.concatenate([point1, point2, point3, point4, score], axis=-1)
-    return polys
-
-
 def cal_line_length(point1, point2):
     """Calculate the length of line.
 
@@ -976,8 +863,6 @@ def norm_angle(angle, angle_range):
         return (angle + np.pi / 4) % np.pi - np.pi / 4
     elif angle_range == 'le90':
         return (angle + np.pi / 2) % np.pi - np.pi / 2
-    elif angle_range == 'full360':
-        return angle % (2 * np.pi) - np.pi
     else:
         print('Not yet implemented.')
 
