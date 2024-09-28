@@ -27,16 +27,10 @@ class CSLCoder(BaseBBoxCoder):
     def __init__(self, angle_version, omega=1, window='gaussian', radius=6):
         super().__init__()
         self.angle_version = angle_version
-        assert angle_version in ['oc', 'le90', 'le135', 'full360']
+        assert angle_version in ['oc', 'le90', 'le135']
         assert window in ['gaussian', 'triangle', 'rect', 'pulse']
-        self.angle_range = 90 if angle_version == 'oc' else \
-            (360 if angle_version == 'full360' else 180)
-        self.angle_offset_dict = {
-            'oc': 0,
-            'le90': 90,
-            'le135': 45,
-            'full360': 180
-        }
+        self.angle_range = 90 if angle_version == 'oc' else 180
+        self.angle_offset_dict = {'oc': 0, 'le90': 90, 'le135': 45}
         self.angle_offset = self.angle_offset_dict[angle_version]
         self.omega = omega
         self.window = window

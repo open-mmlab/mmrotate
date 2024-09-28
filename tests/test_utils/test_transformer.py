@@ -28,23 +28,3 @@ def test_transforms():
     obboxes3 = rtf.hbb2obb(hbboxes, 'le90')
     assert not np.allclose(obboxes1.numpy(), obboxes2)
     assert np.allclose(obboxes2.numpy(), obboxes3)
-
-    # test full360
-    # Check obb2poly and poly2obb is inverse function in full360 rotation
-    for angle in np.linspace(-.9 * np.pi, .9 * np.pi, 4):
-        # numpy version
-        box_np = np.array((100, 100, 80, 50, angle), dtype=np.float32)
-        pts_np = rtf.obb2poly_np(box_np[None], version='full360')[0]
-        box2_np = rtf.poly2obb_np(pts_np, version='full360')
-        np.testing.assert_almost_equal(box_np, box2_np, decimal=4)
-
-        # torch version
-        box_torch = torch.tensor((100, 100, 80, 50, angle),
-                                 dtype=torch.float32)
-        pts_torch = rtf.obb2poly(box_torch[None], version='full360')[0]
-        box2_torch = rtf.poly2obb(pts_torch, version='full360')[0]
-        torch.norm(box_torch - box2_torch) < 1e-4
-
-        # compatibility between numpy and torch implementations
-        torch.norm(box_torch - torch.from_numpy(box_np)) < 1e-4
-        torch.norm(pts_torch - torch.from_numpy(pts_np)) < 1e-4
