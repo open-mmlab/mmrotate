@@ -116,7 +116,7 @@ class ConvexAssigner(BaseAssigner):
         assigned_gt_inds = points.new_zeros((num_points, ), dtype=torch.long)
         # stores the assigned gt dist (to this point) of each point
         assigned_gt_dist = points.new_full((num_points, ), float('inf'))
-        points_range = torch.arange(points.shape[0])
+        points_range = torch.arange(points.shape[0],device=points.device)
 
         for idx in range(num_gts):
             gt_lvl = gt_bboxes_lvl[idx]
