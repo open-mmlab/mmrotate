@@ -420,8 +420,7 @@ class RotatedBoxes(BaseBoxes):
             boxes1.tensor,
             boxes2.tensor,
             mode=mode,
-            is_aligned=is_aligned,
-            eps=eps)
+            is_aligned=is_aligned)
 
     @staticmethod
     def from_instance_masks(masks: MaskType) -> 'RotatedBoxes':
