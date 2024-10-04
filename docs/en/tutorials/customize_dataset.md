@@ -34,7 +34,7 @@ Here we give an example to show the above two steps, which uses a customized dat
 
 There are two aspects involved in the modification of config file:
 
-1. The `data` field. Specifically, you need to explicitly add the `classes` fields in `data.train`, `data.val` and `data.test`.
+1. The `data` field. Specifically, you need to explicitly add the `classes` fields in `train_dataloader.dataset.metainfo`, `val_dataloader.dataset.metainfo` and `test_dataloader.dataset.metainfo`.
 2. The `num_classes` field in the `model` part. Explicitly over-write all the `num_classes` from default value (e.g. 80 in COCO) to your classes number.
 
 In `configs/my_custom_config.py`:
@@ -47,27 +47,38 @@ _base_ = './rotated_retinanet_hbb_r50_fpn_1x_dota_oc'
 # 1. dataset settings
 dataset_type = 'DOTADataset'
 classes = ('a', 'b', 'c', 'd', 'e')
-data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
-    train=dict(
+
+train_dataloader = dict(
+    batch_size=8,
+    num_workers=8,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=True),
+    batch_sampler=None,
+    pin_memory=False,
+    dataset=dict(
         type=dataset_type,
-        # explicitly add your class names to the field `classes`
-        classes=classes,
-        ann_file='path/to/your/train/annotation_data',
-        img_prefix='path/to/your/train/image_data'),
-    val=dict(
+        metainfo=dict(classes=classes),
+        data_root=data_root,
+        ann_file='trainval/annfiles/',
+        data_prefix=dict(img_path='trainval/images/'),
+        filter_cfg=dict(filter_empty_gt=True),
+        pipeline=train_pipeline))
+val_dataloader = dict(
+    batch_size=1,
+    num_workers=2,
+    persistent_workers=True,
+    drop_last=False,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
         type=dataset_type,
-        # explicitly add your class names to the field `classes`
-        classes=classes,
-        ann_file='path/to/your/val/annotation_data',
-        img_prefix='path/to/your/val/image_data'),
-    test=dict(
-        type=dataset_type,
-        # explicitly add your class names to the field `classes`
-        classes=classes,
-        ann_file='path/to/your/test/annotation_data',
-        img_prefix='path/to/your/test/image_data'))
+        metainfo=dict(classes=classes),
+        data_root=data_root,
+        ann_file='trainval/annfiles/',
+        data_prefix=dict(img_path='trainval/images/'),
+        test_mode=True,
+        pipeline=val_pipeline))
+test_dataloader = val_dataloader
+
 
 # 2. model settings
 model = dict(
