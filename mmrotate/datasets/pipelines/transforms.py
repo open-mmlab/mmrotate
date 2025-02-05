@@ -352,7 +352,7 @@ class RRandomCrop(RandomCrop):
             img = img[crop_y1:crop_y2, crop_x1:crop_x2, ...]
             img_shape = img.shape
             results[key] = img
-        results['img_shape'] = img_shape
+        results['img_shape'] = img_shape[:2]
 
         height, width, _ = img_shape
 
@@ -375,6 +375,8 @@ class RRandomCrop(RandomCrop):
             if (key == 'gt_bboxes' and not valid_inds.any()
                     and not allow_negative_crop):
                 return None
+                
+            valid_inds = np.atleast_1d(valid_inds)
             results[key] = bboxes[valid_inds, :]
             # label fields. e.g. gt_labels and gt_labels_ignore
             label_key = self.bbox2label.get(key)

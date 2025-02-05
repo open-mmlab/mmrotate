@@ -226,6 +226,8 @@ def plot_confusion_matrix(confusion_matrix,
     if save_dir is not None:
         plt.savefig(
             os.path.join(save_dir, 'confusion_matrix.png'), format='png')
+        plt.savefig(
+            os.path.join(save_dir, 'confusion_matrix.svg'), format='svg')
     if show:
         plt.show()
 
@@ -261,8 +263,10 @@ def main():
         confusion_matrix,
         dataset.CLASSES + ('background', ),
         save_dir=args.save_dir,
-        show=args.show)
+        show=args.show,
+        color_theme=args.color_theme)
 
 
 if __name__ == '__main__':
     main()
+

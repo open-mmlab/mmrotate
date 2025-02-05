@@ -276,12 +276,20 @@ def print_map_summary(mean_ap,
     if scale_ranges is not None:
         assert len(scale_ranges) == num_scales
 
-    num_classes = len(results)
+    # num_classes = len(results)
+    # recalls = np.zeros((num_scales, num_classes), dtype=np.float32)
 
-    recalls = np.zeros((num_scales, num_classes), dtype=np.float32)
+    ####################################################################################################################
+    num_classes = len(dataset) if dataset else len(results)
+    num_results_classes = len(results)
+    min_classes = min(num_classes, num_results_classes)
+    recalls = np.zeros((num_scales, min_classes), dtype=np.float32)
+    ####################################################################################################################
+
     aps = np.zeros((num_scales, num_classes), dtype=np.float32)
     num_gts = np.zeros((num_scales, num_classes), dtype=int)
-    for i, cls_result in enumerate(results):
+    # for i, cls_result in enumerate(results):
+    for i, cls_result in enumerate(results[:min_classes]):
         if cls_result['recall'].size > 0:
             recalls[:, i] = np.array(cls_result['recall'], ndmin=2)[:, -1]
         aps[:, i] = cls_result['ap']
@@ -290,7 +298,8 @@ def print_map_summary(mean_ap,
     if dataset is None:
         label_names = [str(i) for i in range(num_classes)]
     else:
-        label_names = dataset
+        # label_names = dataset
+        label_names = dataset[:min_classes]
 
     if not isinstance(mean_ap, list):
         mean_ap = [mean_ap]
@@ -302,7 +311,8 @@ def print_map_summary(mean_ap,
         table_data = [header]
         for j in range(num_classes):
             row_data = [
-                label_names[j], num_gts[i, j], results[j]['num_dets'],
+                # label_names[j], num_gts[i, j], results[j]['num_dets'],
+                label_names[j], num_gts[i, j], results[j].get('num_dets', 0),
                 f'{recalls[i, j]:.3f}', f'{aps[i, j]:.3f}'
             ]
             table_data.append(row_data)
@@ -310,3 +320,4 @@ def print_map_summary(mean_ap,
         table = AsciiTable(table_data)
         table.inner_footing_row_border = True
         print_log('\n' + table.table, logger=logger)
+
