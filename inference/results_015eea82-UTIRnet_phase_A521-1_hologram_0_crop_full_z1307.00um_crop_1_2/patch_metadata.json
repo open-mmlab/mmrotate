@@ -1,0 +1,56 @@
+[
+  {
+    "patch": 0,
+    "x": -160,
+    "y": -160,
+    "detections": 18
+  },
+  {
+    "patch": 1,
+    "x": 0,
+    "y": -160,
+    "detections": 26
+  },
+  {
+    "patch": 2,
+    "x": 160,
+    "y": -160,
+    "detections": 31
+  },
+  {
+    "patch": 3,
+    "x": -160,
+    "y": 0,
+    "detections": 26
+  },
+  {
+    "patch": 4,
+    "x": 0,
+    "y": 0,
+    "detections": 29
+  },
+  {
+    "patch": 5,
+    "x": 160,
+    "y": 0,
+    "detections": 32
+  },
+  {
+    "patch": 6,
+    "x": -160,
+    "y": 160,
+    "detections": 32
+  },
+  {
+    "patch": 7,
+    "x": 0,
+    "y": 160,
+    "detections": 34
+  },
+  {
+    "patch": 8,
+    "x": 160,
+    "y": 160,
+    "detections": 39
+  }
+]
