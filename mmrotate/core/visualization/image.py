@@ -139,6 +139,8 @@ def imshow_det_rbboxes(img,
         assert bboxes is not None and bboxes.shape[1] == 6
         scores = bboxes[:, -1]
         inds = scores > score_thr
+        if hasattr(inds, "to"):
+            inds = inds.to(bboxes.device)
         bboxes = bboxes[inds, :]
         labels = labels[inds]
         if segms is not None:
